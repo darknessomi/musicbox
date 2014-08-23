@@ -17,8 +17,8 @@ from player import Player
 from ui import Ui
 
 home = os.path.expanduser("~")
-if os.path.isdir(home + '/netease-musicbox') is False:
-    os.mkdir(home+'/netease-musicbox')
+if os.path.isdir(home + '/.netease-musicbox') is False:
+    os.mkdir(home+'/.netease-musicbox')
 
 locale.setlocale(locale.LC_ALL, "")
 code = locale.getpreferredencoding()   
