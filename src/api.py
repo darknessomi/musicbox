@@ -258,7 +258,7 @@ class NetEase:
                 }
                 temp.append(albums_info)
 
-        elif dig_type == 'playlists':
+        elif dig_type == 'top_playlists':
             for i in range(0, len(data) ):
                 playlists_info = {
                     'playlist_id': data[i]['id'],

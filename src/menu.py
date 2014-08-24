@@ -16,6 +16,7 @@ from api import NetEase
 from player import Player
 from ui import Ui
 from const import Constant
+import logger
 
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
@@ -47,6 +48,8 @@ shortcut = [
     ['r', 'Remove    ', '删除当前条目'],
     ['q', 'Quit      ', '退出']
 ]
+
+log = logger.getLogger(__name__)
 
 
 class Menu:
@@ -285,8 +288,16 @@ class Menu:
             self.datalist = netease.dig_info(songs, 'songs')
             self.title += ' > ' + datalist[idx]['albums_name']
 
-        # 该歌单包含的歌曲
+        # 精选歌单选项
         elif datatype == 'playlists':
+            data = self.datalist[idx]
+            self.datatype = data['datatype']
+            self.datalist = netease.dig_info(data['callback'](), self.datatype)
+            self.title += ' > ' + data['title']
+            log.debug(self.datalist)
+
+        # 全站置顶歌单包含的歌曲
+        elif datatype == 'top_playlists':
             playlist_id = datalist[idx]['playlist_id']
             songs = netease.playlist_detail(playlist_id)
             self.datatype = 'songs'
@@ -318,8 +329,18 @@ class Menu:
 
         # 精选歌单
         elif idx == 3:
-            playlists = netease.top_playlists()
-            self.datalist = netease.dig_info(playlists, 'playlists')
+            self.datalist = [
+                {
+                    'title': '全站置顶',
+                    'datatype': 'top_playlists',
+                    'callback': netease.top_playlists
+                },
+                {
+                    'title': '分类精选',
+                    'datatype': 'playlist_classes',
+                    'callback': netease.playlist_classes
+                }
+            ]
             self.title += ' > 精选歌单'
             self.datatype = 'playlists'            
 
