@@ -43,6 +43,7 @@ setup(
 
     install_requires = [
         'requests',
+        'BeautifulSoup4',
      ],
 
     entry_points = {
