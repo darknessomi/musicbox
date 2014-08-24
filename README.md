@@ -1,9 +1,12 @@
 NetEase-MusicBox
 =================
+Thanks vellow
+
+原作者vellow已不再开发，后续版本欢迎大家共同开发。
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
-![NetEase-MusicBox](http://i.imgur.com/J5353vK.gif)
+![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
 
 ### 功能特性
 
@@ -17,6 +20,7 @@ NetEase-MusicBox
 8. 随心打碟
 9. 本地收藏（不提供下载）
 10. Vimer式快捷键让操作丝般顺滑
+11. 可使用数字快捷键
 
 ### 键盘快捷键
 
@@ -40,6 +44,14 @@ NetEase-MusicBox
 	<tr> <td>R</td> <td>Remove</td> <td>删除当前条目</td> </tr>
 	<tr> <td>Q</td> <td>Quit</td> <td>退出</td> </tr>
 </table>
+### 编译安装
+	$ sudo pip install netease-musicbox  
+	
+	$ git clone https://github.com/darknessomi/musicbox.git  
+	
+	$ cd musicbox
+	
+	$ sudo python setup.py install
 
 
 ### Mac安装
@@ -77,7 +89,7 @@ Enjoy it !
 
 ### The MIT License (MIT)
 
-CopyRight (c) 2014 vellow  &lt;<a href="mailto:i@vellow.net">i@vellow.net</a>&gt;
+CopyRight (c) 2014 omi  &lt;<a href="4399.omi@gmail.com">4399.omi@gmail.com</a>&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

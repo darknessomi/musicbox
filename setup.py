@@ -24,7 +24,7 @@ ________     __________________________  _____ _     _
 |   A sexy cli musicbox based on Python      |
 |   Music resource from music.163.com        |
 |                                            |
-|   Built with love to music by @vellow      |
+|   Built with love to music by omi          |
 |                                            |
 + ------------------------------------------ +
 
@@ -36,7 +36,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'NetEase-MusicBox',
-    version = '0.1.0.1.10',
+    version = '0.1.0.1.2',
     packages = find_packages(),
 
     include_package_data = True,
@@ -52,9 +52,9 @@ setup(
         ],
     },
 
-    author = 'vellow',
-    author_email = 'i@vellow.net',
-    url = 'https://github.com/vellow/NetEase-MusicBox',
+    author = 'omi',
+    author_email = '4399.omi@gmail.com',
+    url = 'https://github.com/darknessomi/musicbox',
     description = 'A sexy command line interface musicbox',
     keywords = ['music', 'netease', 'cli', 'player'],
     zip_safe = False,

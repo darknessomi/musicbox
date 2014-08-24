@@ -244,7 +244,7 @@ class Menu:
 
             elif key == ord('g'):
                 if datatype == 'help':
-                    webbrowser.open_new_tab('https://github.com/vellow/NetEase-MusicBox')
+                    webbrowser.open_new_tab('https://github.com/darknessomi/musicbox')
 
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step)
 
