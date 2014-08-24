@@ -9,6 +9,7 @@ import re
 import json
 import requests
 import hashlib
+from bs4 import BeautifulSoup
 
 
 # list去重
@@ -35,6 +36,7 @@ class NetEase:
         self.cookies = {
             'appver': '1.5.2'
         }
+        self.playlist_class_dict = {}
 
     def httpRequest(self, method, action, query=None, urlencoded=None, callback=None, timeout=None):    
         if(method == 'GET'):
@@ -102,6 +104,14 @@ class NetEase:
         try:
             data = self.httpRequest('GET', action)
             return data['playlists']
+        except:
+            return []
+
+    def playlist_classes(self):
+        action = 'http://music.163.com/discover/playlist/'
+        try:
+            data = self.httpRequest('GET', action)
+            return self.dig_info(data, 'playlist_classes')
         except:
             return []
 
@@ -267,5 +277,14 @@ class NetEase:
                 'mp3_url': data['mp3Url']
                 }
             temp = channel_info    
+
+        elif dig_type == 'playlist_classes':
+            soup = BeautifulSoup(data)
+            dls = soup.select('dl.f-cb')
+            for dl in dls:
+                title = dl.dt.text
+                sub = [item.text for item in dl.select('a')]
+                temp.append(title)
+                self.playlist_class_dict[title] = sub
 
         return temp
