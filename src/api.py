@@ -10,6 +10,7 @@ import json
 import requests
 import hashlib
 from bs4 import BeautifulSoup
+import logger
 
 
 # list去重
@@ -19,6 +20,8 @@ def uniq(arr):
     return arr2
 
 default_timeout = 10
+
+log = logger.getLogger(__name__)
 
 
 class NetEase:
@@ -39,6 +42,10 @@ class NetEase:
         self.playlist_class_dict = {}
 
     def httpRequest(self, method, action, query=None, urlencoded=None, callback=None, timeout=None):    
+        connection = json.loads(self.rawHttpRequest(method, action, query, urlencoded, callback, timeout))
+        return connection
+
+    def rawHttpRequest(self, method, action, query=None, urlencoded=None, callback=None, timeout=None):
         if(method == 'GET'):
             url = action if (query == None) else (action + '?' + query)
             connection = requests.get(url, headers=self.header, timeout=default_timeout)
@@ -52,8 +59,7 @@ class NetEase:
             )
 
         connection.encoding = "UTF-8"
-        connection = json.loads(connection.text)
-        return connection
+        return connection.text
 
     # 登录
     def login(self, username, password):
@@ -110,8 +116,8 @@ class NetEase:
     def playlist_classes(self):
         action = 'http://music.163.com/discover/playlist/'
         try:
-            data = self.httpRequest('GET', action)
-            return self.dig_info(data, 'playlist_classes')
+            data = self.rawHttpRequest('GET', action)
+            return data
         except:
             return []
 
@@ -279,6 +285,7 @@ class NetEase:
             temp = channel_info    
 
         elif dig_type == 'playlist_classes':
+            log.debug(data)
             soup = BeautifulSoup(data)
             dls = soup.select('dl.f-cb')
             for dl in dls:

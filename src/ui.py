@@ -95,6 +95,13 @@ class Ui:
                     else:
                         self.screen.addstr(i - offset +8, 19, str(i) + '. ' + datalist[i]['playlists_name'] + '   -   ' + datalist[i]['creator_name'])
 
+            elif datatype == 'playlist_classes':
+                for i in range(offset, min( len(datalist), offset+step) ):
+                    if i == index:
+                        self.screen.addstr(i - offset +8, 16, '-> ' + str(i) + '. ' + datalist[i], curses.color_pair(2))
+                    else:
+                        self.screen.addstr(i - offset +8, 19, str(i) + '. ' + datalist[i])
+
             elif datatype == 'djchannels':
                 for i in range(offset, min( len(datalist), offset+step) ):
                     if i == index:
