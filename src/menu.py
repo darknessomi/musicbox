@@ -111,6 +111,7 @@ class Menu:
                 if self.datatype == 'songs' or self.datatype == 'djchannels' or self.datatype == 'help':
                     continue
                 idx = key - ord('0')
+                self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, idx, self.step)
                 self.ui.build_loading()
                 self.dispatch_enter(idx)
                 self.index = 0
