@@ -106,6 +106,16 @@ class Menu:
             elif key == ord('j'):
                 self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx+1 )
 
+            # 数字快捷键
+            elif ord('0') <= key <= ord('9'):
+                if self.datatype == 'songs' or self.datatype == 'djchannels' or self.datatype == 'help':
+                    continue
+                idx = key - ord('0')
+                self.ui.build_loading()
+                self.dispatch_enter(idx)
+                self.index = 0
+                self.offset = 0    
+
             # 向上翻页
             elif key == ord('u'):
                 if offset == 0:
