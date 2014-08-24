@@ -294,7 +294,6 @@ class Menu:
             self.datatype = data['datatype']
             self.datalist = netease.dig_info(data['callback'](), self.datatype)
             self.title += ' > ' + data['title']
-            log.debug(self.datalist)
 
         # 全站置顶歌单包含的歌曲
         elif datatype == 'top_playlists':
@@ -303,6 +302,23 @@ class Menu:
             self.datatype = 'songs'
             self.datalist = netease.dig_info(songs, 'songs')
             self.title += ' > ' + datalist[idx]['playlists_name']
+
+        # 分类精选
+        elif datatype == 'playlist_classes':
+            # 分类名称
+            data = self.datalist[idx]
+            self.datatype = 'playlist_class_detail'
+            self.datalist = netease.dig_info(data, self.datatype)
+            self.title += ' > ' + data
+            log.debug(self.datalist)
+
+        # 某一分类的详情
+        elif datatype == 'playlist_class_detail':
+            # 子类别
+            data = self.datalist[idx]
+            self.datatype = 'top_playlists'
+            self.datalist = netease.dig_info(netease.top_playlists(data), self.datatype)
+            self.title += ' > ' + data
 
     def choice_channel(self, idx):
         # 排行榜

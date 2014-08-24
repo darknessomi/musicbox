@@ -113,6 +113,7 @@ class NetEase:
         except:
             return []
 
+    # 分类歌单
     def playlist_classes(self):
         action = 'http://music.163.com/discover/playlist/'
         try:
@@ -120,6 +121,10 @@ class NetEase:
             return data
         except:
             return []
+
+    # 分类歌单中某一个分类的详情
+    def playlist_class_detail(self):
+        pass
 
     # 歌单详情
     def playlist_detail(self, playlist_id):
@@ -285,7 +290,6 @@ class NetEase:
             temp = channel_info    
 
         elif dig_type == 'playlist_classes':
-            log.debug(data)
             soup = BeautifulSoup(data)
             dls = soup.select('dl.f-cb')
             for dl in dls:
@@ -293,5 +297,9 @@ class NetEase:
                 sub = [item.text for item in dl.select('a')]
                 temp.append(title)
                 self.playlist_class_dict[title] = sub
+
+        elif dig_type == 'playlist_class_detail':
+            log.debug(data)
+            temp = self.playlist_class_dict[data]
 
         return temp
