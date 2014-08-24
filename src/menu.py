@@ -15,10 +15,12 @@ import webbrowser
 from api import NetEase
 from player import Player
 from ui import Ui
+from const import Constant
+import logger
 
 home = os.path.expanduser("~")
-if os.path.isdir(home + '/netease-musicbox') is False:
-    os.mkdir(home+'/netease-musicbox')
+if os.path.isdir(Constant.conf_dir) is False:
+    os.mkdir(Constant.conf_dir)
 
 locale.setlocale(locale.LC_ALL, "")
 code = locale.getpreferredencoding()   
@@ -47,6 +49,8 @@ shortcut = [
     ['q', 'Quit      ', '退出']
 ]
 
+log = logger.getLogger(__name__)
+
 
 class Menu:
     def __init__(self):
@@ -69,7 +73,7 @@ class Menu:
         self.userid = None
         self.username = None
         try:
-            sfile = file(home + "/netease-musicbox/flavor.json",'r')
+            sfile = file(Constant.conf_dir + "/flavor.json",'r')
             data = json.loads(sfile.read())
             self.collection = data['collection']
             self.account = data['account']
@@ -104,6 +108,17 @@ class Menu:
             # 下移
             elif key == ord('j'):
                 self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx+1 )
+
+            # 数字快捷键
+            elif ord('0') <= key <= ord('9'):
+                if self.datatype == 'songs' or self.datatype == 'djchannels' or self.datatype == 'help':
+                    continue
+                idx = key - ord('0')
+                self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, idx, self.step)
+                self.ui.build_loading()
+                self.dispatch_enter(idx)
+                self.index = 0
+                self.offset = 0    
 
             # 向上翻页
             elif key == ord('u'):
@@ -235,7 +250,7 @@ class Menu:
 
 
         self.player.stop()
-        sfile = file(home + "/netease-musicbox/flavor.json", 'w')
+        sfile = file(Constant.conf_dir + "/flavor.json", 'w')
         data = {
             'account': self.account,
             'collection': self.collection
@@ -273,13 +288,37 @@ class Menu:
             self.datalist = netease.dig_info(songs, 'songs')
             self.title += ' > ' + datalist[idx]['albums_name']
 
-        # 该歌单包含的歌曲
+        # 精选歌单选项
         elif datatype == 'playlists':
+            data = self.datalist[idx]
+            self.datatype = data['datatype']
+            self.datalist = netease.dig_info(data['callback'](), self.datatype)
+            self.title += ' > ' + data['title']
+
+        # 全站置顶歌单包含的歌曲
+        elif datatype == 'top_playlists':
             playlist_id = datalist[idx]['playlist_id']
             songs = netease.playlist_detail(playlist_id)
             self.datatype = 'songs'
             self.datalist = netease.dig_info(songs, 'songs')
             self.title += ' > ' + datalist[idx]['playlists_name']
+
+        # 分类精选
+        elif datatype == 'playlist_classes':
+            # 分类名称
+            data = self.datalist[idx]
+            self.datatype = 'playlist_class_detail'
+            self.datalist = netease.dig_info(data, self.datatype)
+            self.title += ' > ' + data
+            log.debug(self.datalist)
+
+        # 某一分类的详情
+        elif datatype == 'playlist_class_detail':
+            # 子类别
+            data = self.datalist[idx]
+            self.datatype = 'top_playlists'
+            self.datalist = netease.dig_info(netease.top_playlists(data), self.datatype)
+            self.title += ' > ' + data
 
     def choice_channel(self, idx):
         # 排行榜
@@ -306,8 +345,18 @@ class Menu:
 
         # 精选歌单
         elif idx == 3:
-            playlists = netease.top_playlists()
-            self.datalist = netease.dig_info(playlists, 'playlists')
+            self.datalist = [
+                {
+                    'title': '全站置顶',
+                    'datatype': 'top_playlists',
+                    'callback': netease.top_playlists
+                },
+                {
+                    'title': '分类精选',
+                    'datatype': 'playlist_classes',
+                    'callback': netease.playlist_classes
+                }
+            ]
             self.title += ' > 精选歌单'
             self.datatype = 'playlists'            
 
@@ -332,8 +381,8 @@ class Menu:
                 self.userid = user_info['account']['id']
             # 读取登录之后的用户歌单
             myplaylist = netease.user_playlist( self.userid )
-            self.datalist = netease.dig_info(myplaylist, 'playlists')
-            self.datatype = 'playlists'
+            self.datatype = 'top_playlists'
+            self.datalist = netease.dig_info(myplaylist, self.datatype)
             self.title += ' > ' + self.username + ' 的歌单'
 
         # DJ节目
