@@ -117,7 +117,7 @@ class Ui:
                         self.screen.addstr(i - offset +8, 19, str(i) + '. \'' + datalist[i][0].upper() + '\'   ' + datalist[i][1] + '   ' + datalist[i][2])                
                 self.screen.addstr(20, 6, 'NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存')
                 self.screen.addstr(21, 10, '按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~')
-                self.screen.addstr(22, 19, 'Build with love to music by @vellow')
+                self.screen.addstr(22, 19, 'Build with love to music by omi')
 
         self.screen.refresh()    
 
