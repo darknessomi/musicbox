@@ -381,8 +381,8 @@ class Menu:
                 self.userid = user_info['account']['id']
             # 读取登录之后的用户歌单
             myplaylist = netease.user_playlist( self.userid )
-            self.datalist = netease.dig_info(myplaylist, 'playlists')
-            self.datatype = 'playlists'
+            self.datatype = 'top_playlists'
+            self.datalist = netease.dig_info(myplaylist, self.datatype)
             self.title += ' > ' + self.username + ' 的歌单'
 
         # DJ节目
