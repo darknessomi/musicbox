@@ -44,26 +44,27 @@ Thanks vellow
 	<tr> <td>R</td> <td>Remove</td> <td>删除当前条目</td> </tr>
 	<tr> <td>Q</td> <td>Quit</td> <td>退出</td> </tr>
 </table>
-### 编译安装
- 
- 需要先安装mpg123  
+
 	
+
+
+### Mac安装
+
 	$ git clone https://github.com/darknessomi/musicbox.git  
 	
 	$ cd musicbox
 	
 	$ sudo python setup.py install
 
-
-### Mac安装
-
-	$ sudo pip install netease-musicbox
-
 	$ brew install mpg123
 
 ### Linux安装
 
-	$ sudo pip install netease-musicbox
+	$ git clone https://github.com/darknessomi/musicbox.git  
+	
+	$ cd musicbox
+	
+	$ sudo python setup.py install
 
 	$ sudo apt-get install mpg123
 
