@@ -45,7 +45,8 @@ Thanks vellow
 	<tr> <td>Q</td> <td>Quit</td> <td>退出</td> </tr>
 </table>
 ### 编译安装
-	$ sudo pip install netease-musicbox  
+ 
+ 需要先安装mpg123  
 	
 	$ git clone https://github.com/darknessomi/musicbox.git  
 	
