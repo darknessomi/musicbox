@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-#encoding: UTF-8
+# -*- coding: utf-8 -*-
+# @Author: omi
+# @Date:   2014-08-24 21:51:57
+# @Last Modified by:   omi
+# @Last Modified time: 2014-08-25 18:02:04
+
 
 '''
 网易云音乐 Menu
