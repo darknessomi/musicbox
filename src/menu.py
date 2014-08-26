@@ -297,6 +297,7 @@ class Menu:
 
         # 全站置顶歌单包含的歌曲
         elif datatype == 'top_playlists':
+            log.debug(datalist)
             playlist_id = datalist[idx]['playlist_id']
             songs = netease.playlist_detail(playlist_id)
             self.datatype = 'songs'
@@ -318,6 +319,7 @@ class Menu:
             data = self.datalist[idx]
             self.datatype = 'top_playlists'
             self.datalist = netease.dig_info(netease.top_playlists(data), self.datatype)
+            log.debug(self.datalist)
             self.title += ' > ' + data
 
     def choice_channel(self, idx):
@@ -441,7 +443,8 @@ class Menu:
             self.title = '专辑搜索列表'
 
         elif x == ord('4'):
-            self.datatype = 'playlists'
-            self.datalist = ui.build_search('playlists')
+            # 搜索结果可以用top_playlists处理
+            self.datatype = 'top_playlists'
+            self.datalist = ui.build_search('search_playlist')
             self.title = '精选歌单搜索列表'
 

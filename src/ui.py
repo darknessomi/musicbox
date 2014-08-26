@@ -162,13 +162,13 @@ class Ui:
             except:
                 return []
 
-        elif stype == 'playlists':
+        elif stype == 'search_playlist':
             artist_name = self.get_param('搜索网易精选集：')
             try:
                 data = netease.search(artist_name, stype=1000)
                 if 'playlists' in data['result']:
                     playlists = data['result']['playlists']
-                    return netease.dig_info(playlists, 'playlists')
+                    return netease.dig_info(playlists, 'top_playlists')
             except:
                 return []
 
