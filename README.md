@@ -74,7 +74,7 @@ Thanks vellow
 	
 	$ sudo pip install requests
 
-如果是运行 $ musicbox 出错
+    如果是运行 $ musicbox 出错
 
 	$ sudo pip install --upgrade setuptools
 
