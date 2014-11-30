@@ -81,6 +81,12 @@ Thanks vellow
 2. pip: Command not found
 
 	$ sudo apt-get install python-pip
+
+3. ImportError: No module named setuptools
+    
+    $ sudo easy_install pip
+    
+    $ sudo apt-get install python-setuptools
 	
 ### 使用
 
