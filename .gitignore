@@ -54,3 +54,5 @@ docs/_build/
 
 # ctags
 tags
+
+.idea/*
