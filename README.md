@@ -96,6 +96,10 @@ Thanks vellow
 
 Enjoy it !
 
+### 更新日志
+
+2015-1-2 版本 0.1.1  新增退出并清除用户信息功能
+
 ### The MIT License (MIT)
 
 CopyRight (c) 2014 omi  &lt;<a href="4399.omi@gmail.com">4399.omi@gmail.com</a>&gt;
