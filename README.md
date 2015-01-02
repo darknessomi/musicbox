@@ -43,6 +43,7 @@ Thanks vellow
 	<tr> <td>C</td> <td>Collection</td> <td>收藏列表</td> </tr>
 	<tr> <td>R</td> <td>Remove</td> <td>删除当前条目</td> </tr>
 	<tr> <td>Q</td> <td>Quit</td> <td>退出</td> </tr>
+	<tr> <td>W</td> <td>Quit&Clear</td> <td>退出并清除用户信息</td> </tr>
 </table>
 
 	
