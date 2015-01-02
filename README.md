@@ -2,8 +2,6 @@ NetEase-MusicBox
 =================
 Thanks vellow
 
-原作者vellow已不再开发，后续版本欢迎大家共同开发。
-
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
