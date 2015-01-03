@@ -68,9 +68,24 @@ class NetEase:
 
     # 登录
     def login(self, username, password):
-        action = 'http://music.163.com/api/login/'
+        if(username[0] == '@'):
+            return self.phone_login(username, password);
+        action = 'https://music.163.com/api/login/'
         data = {
             'username': username,
+            'password': hashlib.md5( password ).hexdigest(),
+            'rememberLogin': 'true'
+        }
+        try:
+            return self.httpRequest('POST', action, data)
+        except:
+            return {'code': 501}
+    
+    # 手机登录
+    def phone_login(self, username, password):
+        action = 'https://music.163.com/api/login/cellphone'
+        data = {
+            'phone': username[1:],
             'password': hashlib.md5( password ).hexdigest(),
             'rememberLogin': 'true'
         }
