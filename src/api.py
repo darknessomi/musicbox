@@ -68,8 +68,9 @@ class NetEase:
 
     # 登录
     def login(self, username, password):
-        if(username[0] == '@'):
-            return self.phone_login(username, password);
+        pattern = re.compile(r'^0\d{2,3}\d{7,8}$|^1[358]\d{9}$|^147\d{8}$')
+        if(pattern.match(username)):
+            return self.phone_login(username, password)
         action = 'https://music.163.com/api/login/'
         data = {
             'username': username,
@@ -85,7 +86,7 @@ class NetEase:
     def phone_login(self, username, password):
         action = 'https://music.163.com/api/login/cellphone'
         data = {
-            'phone': username[1:],
+            'phone': username,
             'password': hashlib.md5( password ).hexdigest(),
             'rememberLogin': 'true'
         }
