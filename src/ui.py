@@ -194,7 +194,7 @@ class Ui:
 
     def build_login(self):
         curses.noecho()
-        info = self.get_param('请输入登录信息,手机号登陆请以@打头 e.g: john@163.com 123456 或者 @18600000000 123456')
+        info = self.get_param('请输入登录信息(支持手机登陆) e.g: john@163.com 123456')
         account = info.split(' ')
         if len(account) != 2:
             return self.build_login()
