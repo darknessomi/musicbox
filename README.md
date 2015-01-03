@@ -2,8 +2,6 @@ NetEase-MusicBox
 =================
 Thanks vellow
 
-原作者vellow已不再开发，后续版本欢迎大家共同开发。
-
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
@@ -43,6 +41,7 @@ Thanks vellow
 	<tr> <td>C</td> <td>Collection</td> <td>收藏列表</td> </tr>
 	<tr> <td>R</td> <td>Remove</td> <td>删除当前条目</td> </tr>
 	<tr> <td>Q</td> <td>Quit</td> <td>退出</td> </tr>
+	<tr> <td>W</td> <td>Quit&Clear</td> <td>退出并清除用户信息</td> </tr>
 </table>
 
 	
@@ -94,6 +93,10 @@ Thanks vellow
 
 
 Enjoy it !
+
+### 更新日志
+
+2015-1-2 版本 0.1.1  新增退出并清除用户信息功能
 
 ### The MIT License (MIT)
 

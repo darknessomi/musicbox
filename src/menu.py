@@ -51,7 +51,8 @@ shortcut = [
     ['s', 'Star      ', '添加到收藏'],
     ['c', 'Collection', '收藏列表'],
     ['r', 'Remove    ', '删除当前条目'],
-    ['q', 'Quit      ', '退出']
+    ['q', 'Quit      ', '退出'],
+    ["w", 'Quit&Clear', '退出并清除用户信息']
 ]
 
 log = logger.getLogger(__name__)
@@ -104,6 +105,11 @@ class Menu:
 
             # 退出
             if key == ord('q'):
+                break
+
+            # 退出并清除用户信息
+            if key == ord('w'):
+                self.account = {}
                 break
 
             # 上移
