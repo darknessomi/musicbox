@@ -1,6 +1,6 @@
 NetEase-MusicBox
 =================
-Thanks vellow
+###Thanks vellow,hbprotoss,Catofes
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
@@ -96,7 +96,9 @@ Enjoy it !
 
 ### 更新日志
 
-2015-1-2 版本 0.1.1  新增退出并清除用户信息功能
+2015-1-3 版本 0.1.1.1    修复部分仅手机注册用户登录无法登陆 (感谢Catofes反馈)
+
+2015-1-2 版本 0.1.1      新增退出并清除用户信息功能
 
 ### The MIT License (MIT)
 
