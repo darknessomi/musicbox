@@ -34,6 +34,7 @@ class Player:
         self.pause_flag = False
         self.songs = []
         self.idx = 0
+        self.volume = 100
 
     def popen_recall(self, onExit, popenArgs):
         """
@@ -43,8 +44,23 @@ class Player:
         would give to subprocess.Popen.
         """
         def runInThread(onExit, popenArgs):
-            self.popen_handler = subprocess.Popen(['mpg123', popenArgs], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            self.popen_handler.wait()
+            self.popen_handler = subprocess.Popen(['mpg123', '-R',], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self.popen_handler.stdin.write("SILENCE\n")
+            self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
+            self.popen_handler.stdin.write("L " + popenArgs + "\n")
+            #self.popen_handler.wait()
+            while(True):
+                if(self.playing_flag == False):
+                    break
+                try:
+                    strout = self.popen_handler.stdout.readline()
+                except IOError:
+                    break
+                if(strout == "@P 0\n"):
+                    self.popen_handler.stdin.write("Q\n")
+                    self.popen_handler.kill()
+                    break
+
             if self.playing_flag:
                 self.idx = carousel(0, len(self.songs)-1, self.idx+1 )
                 onExit()
@@ -103,6 +119,7 @@ class Player:
     def stop(self):
         if self.playing_flag and self.popen_handler:
             self.playing_flag = False
+            self.popen_handler.stdin.write("Q\n")
             self.popen_handler.kill()
 
     def pause(self):
@@ -128,3 +145,15 @@ class Player:
         time.sleep(0.01)
         self.idx = carousel(0, len(self.songs)-1, self.idx-1 )
         self.recall()
+
+    def volume_up(self):
+        self.volume = self.volume + 10
+        if(self.volume > 100):
+            self.volume = 100
+        self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
+
+    def volume_down(self):
+        self.volume = self.volume - 10
+        if(self.volume < 0):
+            self.volume = 0
+        self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
