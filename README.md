@@ -35,6 +35,7 @@ NetEase-MusicBox
 	<tr> <td>=</td> <td>Volume +</td> <td>音量增加</td> </tr>
 	<tr> <td>-</td> <td>Volume -</td> <td>音量减少</td> </tr>
 	<tr> <td>Space</td> <td>Play/Pause</td> <td>播放/暂停</td> </tr>
+    <tr> <td>?</td> <td>Shuffle</td> <td>手气不错</td> </tr>
 	<tr> <td>M</td> <td>Menu</td> <td>主菜单</td> </tr>
 	<tr> <td>P</td> <td>Present</td> <td>当前播放列表</td> </tr>
 	<tr> <td>A</td> <td>Add</td> <td>添加曲目到打碟</td> </tr>
@@ -97,6 +98,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-1-8 版本 0.1.2.3    增加手气不错,微调音量控制
 
 2015-1-8 版本 0.1.2.0    增加音量控制
 
