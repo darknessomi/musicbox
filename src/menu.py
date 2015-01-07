@@ -44,6 +44,8 @@ shortcut = [
     ['[', 'Prev song ', '上一曲'],
     [']', 'Next song ', '下一曲'],
     [' ', 'Play/Pause', '播放/暂停'],
+    ['+', 'Volume+   ', '音量增加'],
+    ['-', 'Volume-   ', '音量减少'],
     ['m', 'Menu      ', '主菜单'],
     ['p', 'Present   ', '当前播放列表'],
     ['a', 'Add       ', '添加曲目到打碟'],
@@ -187,6 +189,18 @@ class Menu:
                     continue 
                 self.player.prev()
                 time.sleep(0.1)
+
+            #增加音量
+            elif key == ord('+'):
+               if len(self.presentsongs) == 0:
+                    continue
+               self.player.volume_up()
+
+            #减少音量
+            elif key == ord('-'):
+               if len(self.presentsongs) == 0:
+                    continue
+               self.player.volume_down()
 
             # 播放、暂停
             elif key == ord(' '):
