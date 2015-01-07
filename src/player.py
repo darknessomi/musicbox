@@ -53,11 +53,12 @@ class Player:
                 if(self.playing_flag == False):
                     break
                 try:
-                    strout = self.popen_handler.stdout.readline();
+                    strout = self.popen_handler.stdout.readline()
                 except IOError:
                     break
                 if(strout == "@P 0\n"):
-                    self.popen_handler.stdin.write("Q\n");
+                    self.popen_handler.stdin.write("Q\n")
+                    self.popen_handler.kill()
                     break
 
             if self.playing_flag:
@@ -118,7 +119,7 @@ class Player:
     def stop(self):
         if self.playing_flag and self.popen_handler:
             self.playing_flag = False
-            self.popen_handler.stdin.write("Q\n");
+            self.popen_handler.stdin.write("Q\n")
             self.popen_handler.kill()
 
     def pause(self):
@@ -149,10 +150,10 @@ class Player:
         self.volume = self.volume + 10
         if(self.volume > 100):
             self.volume = 100
-        self.popen_handler.stdin.write("V " + str(self.volume) + "\n");
+        self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
 
     def volume_down(self):
         self.volume = self.volume - 10
         if(self.volume < 0):
             self.volume = 0
-        self.popen_handler.stdin.write("V " + str(self.volume) + "\n");
+        self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
