@@ -32,7 +32,7 @@ NetEase-MusicBox
 	<tr> <td>F</td> <td>Search</td> <td>快速搜索</td> </tr>
 	<tr> <td>[</td> <td>Prev song</td> <td>上一曲</td> </tr>
 	<tr> <td>]</td> <td>Next song</td> <td>下一曲</td> </tr>
-	<tr> <td>+</td> <td>Volume +</td> <td>音量增加</td> </tr>
+	<tr> <td>=</td> <td>Volume +</td> <td>音量增加</td> </tr>
 	<tr> <td>-</td> <td>Volume -</td> <td>音量减少</td> </tr>
 	<tr> <td>Space</td> <td>Play/Pause</td> <td>播放/暂停</td> </tr>
 	<tr> <td>M</td> <td>Menu</td> <td>主菜单</td> </tr>
