@@ -50,8 +50,14 @@ class Player:
             self.popen_handler.stdin.write("L " + popenArgs + "\n")
             #self.popen_handler.wait()
             while(True):
-                strout = self.popen_handler.stdout.readline();
+                if(self.playing_flag == False):
+                    break
+                try:
+                    strout = self.popen_handler.stdout.readline();
+                except IOError:
+                    break
                 if(strout == "@P 0\n"):
+                    self.popen_handler.stdin.write("Q\n");
                     break
 
             if self.playing_flag:
@@ -112,6 +118,7 @@ class Player:
     def stop(self):
         if self.playing_flag and self.popen_handler:
             self.playing_flag = False
+            self.popen_handler.stdin.write("Q\n");
             self.popen_handler.kill()
 
     def pause(self):
