@@ -40,7 +40,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'NetEase-MusicBox',
-    version = '0.1.2.0',
+    version = '0.1.2.3',
     packages = find_packages(),
 
     include_package_data = True,

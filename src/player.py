@@ -16,6 +16,7 @@ import threading
 import time
 import os
 import signal
+import random
 from ui import Ui
 
 
@@ -34,7 +35,7 @@ class Player:
         self.pause_flag = False
         self.songs = []
         self.idx = 0
-        self.volume = 100
+        self.volume = 60
 
     def popen_recall(self, onExit, popenArgs):
         """
@@ -50,13 +51,13 @@ class Player:
             self.popen_handler.stdin.write("L " + popenArgs + "\n")
             #self.popen_handler.wait()
             while(True):
-                if(self.playing_flag == False):
+                if self.playing_flag == False:
                     break
                 try:
                     strout = self.popen_handler.stdout.readline()
                 except IOError:
                     break
-                if(strout == "@P 0\n"):
+                if strout == "@P 0\n":
                     self.popen_handler.stdin.write("Q\n")
                     self.popen_handler.kill()
                     break
@@ -146,14 +147,21 @@ class Player:
         self.idx = carousel(0, len(self.songs)-1, self.idx-1 )
         self.recall()
 
+    def shuffle(self):
+        self.stop()
+        time.sleep(0.01)
+        num = random.randint(0, 12)
+        self.idx = carousel(0, len(self.songs)-1, self.idx+num )
+        self.recall()
+
     def volume_up(self):
-        self.volume = self.volume + 10
+        self.volume = self.volume + 7
         if(self.volume > 100):
             self.volume = 100
         self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
 
     def volume_down(self):
-        self.volume = self.volume - 10
+        self.volume = self.volume - 7
         if(self.volume < 0):
             self.volume = 0
         self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
