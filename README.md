@@ -1,8 +1,8 @@
 NetEase-MusicBox   
 =================
 
-###Author by omi Mofity by China
-###Thanks vellow,hbprotoss,Catofes
+Author by omi Mofity by chenai
+Thanks vellow,hbprotoss,Catofes
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
