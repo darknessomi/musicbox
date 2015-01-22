@@ -28,7 +28,7 @@ if os.path.isdir(Constant.conf_dir) is False:
     os.mkdir(Constant.conf_dir)
 
 locale.setlocale(locale.LC_ALL, "")
-code = locale.getpreferredencoding()   
+code = locale.getpreferredencoding()
 
 # carousel x in [left, right]
 carousel = lambda left, right, x: left if (x>right) else (right if x<left else x)
@@ -88,7 +88,7 @@ class Menu:
             self.account = data['account']
             sfile.close()
         except:
-            self.collection = []        
+            self.collection = []
             self.account = {}
 
     def start(self):
@@ -132,7 +132,7 @@ class Menu:
                 self.ui.build_loading()
                 self.dispatch_enter(idx)
                 self.index = 0
-                self.offset = 0    
+                self.offset = 0
 
             # 向上翻页
             elif key == ord('u'):
@@ -159,7 +159,7 @@ class Menu:
                 self.ui.build_loading()
                 self.dispatch_enter(idx)
                 self.index = 0
-                self.offset = 0    
+                self.offset = 0
 
             # 回退
             elif key == ord('h'):
@@ -187,7 +187,7 @@ class Menu:
             # 播放上一曲
             elif key == ord('['):
                 if len(self.presentsongs) == 0:
-                    continue 
+                    continue
                 self.player.prev()
                 time.sleep(0.1)
 
@@ -273,7 +273,7 @@ class Menu:
                     self.title = self.stack[0][1]
                     self.datalist = self.stack[0][2]
                     self.offset = 0
-                    self.index = 0                    
+                    self.index = 0
 
             elif key == ord('g'):
                 if datatype == 'help':
@@ -303,12 +303,12 @@ class Menu:
         self.stack.append( [datatype, title, datalist, offset, index])
 
         if datatype == 'main':
-            self.choice_channel(idx) 
+            self.choice_channel(idx)
 
         # 该艺术家的热门歌曲
         elif datatype == 'artists':
             artist_id = datalist[idx]['artist_id']
-            songs = netease.artists(artist_id)         
+            songs = netease.artists(artist_id)
             self.datatype = 'songs'
             self.datalist = netease.dig_info(songs, 'songs')
             self.title += ' > ' + datalist[idx]['artists_name']
@@ -355,6 +355,36 @@ class Menu:
             log.debug(self.datalist)
             self.title += ' > ' + data
 
+        # 搜索菜单
+        elif datatype == 'search':
+            ui = self.ui
+            #if do search, push current info into stack
+            if idx in range(ord('1'), ord('5')):
+                self.screen.addstr(0,0, str(idx))
+            #self.stack.append( [self.datatype, self.title, self.datalist, self.offset, self.index ])
+            self.index = 0
+            self.offset = 0
+            if idx == 1:# '1':
+                self.datatype = 'songs'
+                self.datalist = ui.build_search('songs')
+                self.title = '歌曲搜索列表'
+
+            elif idx == 2:
+                self.datatype = 'artists'
+                self.datalist = ui.build_search('artists')
+                self.title = '艺术家搜索列表'
+
+            elif idx == 3:
+                self.datatype = 'albums'
+                self.datalist = ui.build_search('albums')
+                self.title = '专辑搜索列表'
+
+            elif idx == 0:
+                # 搜索结果可以用top_playlists处理
+                self.datatype = 'top_playlists'
+                self.datalist = ui.build_search('search_playlist')
+                self.title = '精选歌单搜索列表'
+
     def choice_channel(self, idx):
         # 排行榜
         netease = self.netease
@@ -393,7 +423,7 @@ class Menu:
                 }
             ]
             self.title += ' > 精选歌单'
-            self.datatype = 'playlists'            
+            self.datatype = 'playlists'
 
         # 我的歌单
         elif idx == 4:
@@ -402,7 +432,7 @@ class Menu:
                 # 使用本地存储了账户登录
                 if self.account:
                     user_info = netease.login(self.account[0], self.account[1])
-                    
+
                 # 本地没有存储账户，或本地账户失效，则引导录入
                 if self.account == {} or user_info['code'] != 200:
                     data = self.ui.build_login()
@@ -440,7 +470,10 @@ class Menu:
 
         # 搜索
         elif idx == 8:
-            self.search()
+            #self.search()
+            self.datatype = 'search'
+            self.title += ' > 搜索'
+            self.datalist = ['歌曲', '艺术家', '专辑', '网易精选集']
 
         # 帮助
         elif idx == 9:
@@ -449,7 +482,7 @@ class Menu:
             self.datalist = shortcut
 
         self.offset = 0
-        self.index = 0 
+        self.index = 0
 
     def search(self):
         ui = self.ui

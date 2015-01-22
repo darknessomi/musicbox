@@ -1,5 +1,7 @@
-NetEase-MusicBox
+NetEase-MusicBox   
 =================
+
+###Author by omi Mofity by China
 ###Thanks vellow,hbprotoss,Catofes
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
@@ -109,7 +111,7 @@ Enjoy it !
 
 ### The MIT License (MIT)
 
-CopyRight (c) 2014 omi  &lt;<a href="4399.omi@gmail.com">4399.omi@gmail.com</a>&gt;
+CopyRight (c) 2014 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
