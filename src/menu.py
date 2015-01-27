@@ -31,7 +31,7 @@ locale.setlocale(locale.LC_ALL, "")
 code = locale.getpreferredencoding()
 
 # carousel x in [left, right]
-carousel = lambda left, right, x: left if (x>right) else (right if x<left else x)
+carousel = lambda left, right, x: left if (x > right) else (right if x < left else x)
 
 shortcut = [
     ['j', 'Down      ', '下移'],
@@ -82,7 +82,7 @@ class Menu:
         self.userid = None
         self.username = None
         try:
-            sfile = file(Constant.conf_dir + "/flavor.json",'r')
+            sfile = file(Constant.conf_dir + "/flavor.json", 'r')
             data = json.loads(sfile.read())
             self.collection = data['collection']
             self.account = data['account']
@@ -117,11 +117,11 @@ class Menu:
 
             # 上移
             elif key == ord('k'):
-                self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx-1 )
+                self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx - 1)
 
             # 下移
             elif key == ord('j'):
-                self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx+1 )
+                self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx + 1)
 
             # 数字快捷键
             elif ord('0') <= key <= ord('9'):
@@ -141,16 +141,16 @@ class Menu:
                 self.offset -= step
 
                 # e.g. 23 - 10 = 13 --> 10
-                self.index = (index-step)//step*step
+                self.index = (index - step) // step * step
 
             # 向下翻页
             elif key == ord('d'):
-                if offset + step >= len( datalist ):
+                if offset + step >= len(datalist):
                     continue
                 self.offset += step
 
                 # e.g. 23 + 10 = 33 --> 30
-                self.index = (index+step)//step*step
+                self.index = (index + step) // step * step
 
             # 前进
             elif key == ord('l') or key == 10:
@@ -175,7 +175,7 @@ class Menu:
 
             # 搜索
             elif key == ord('f'):
-				# 8 is the 'search' menu
+                # 8 is the 'search' menu
                 self.choice_channel(8)
 
             # 播放下一曲
@@ -224,7 +224,7 @@ class Menu:
             elif key == ord('p'):
                 if len(self.presentsongs) == 0:
                     continue
-                self.stack.append( [datatype, title, datalist, offset, index] )
+                self.stack.append([datatype, title, datalist, offset, index])
                 self.datatype = self.presentsongs[0]
                 self.title = self.presentsongs[1]
                 self.datalist = self.presentsongs[2]
@@ -234,13 +234,13 @@ class Menu:
             # 添加到打碟歌单
             elif key == ord('a'):
                 if datatype == 'songs' and len(datalist) != 0:
-                    self.djstack.append( datalist[idx] )
+                    self.djstack.append(datalist[idx])
                 elif datatype == 'artists':
                     pass
 
             # 加载打碟歌单
             elif key == ord('z'):
-                self.stack.append( [datatype, title, datalist, offset, index] )
+                self.stack.append([datatype, title, datalist, offset, index])
                 self.datatype = 'songs'
                 self.title = '网易云音乐 > 打碟'
                 self.datalist = self.djstack
@@ -250,11 +250,11 @@ class Menu:
             # 添加到收藏歌曲
             elif key == ord('s'):
                 if (datatype == 'songs' or datatype == 'djchannels') and len(datalist) != 0:
-                    self.collection.append( datalist[idx] )
+                    self.collection.append(datalist[idx])
 
             # 加载收藏歌曲
             elif key == ord('c'):
-                self.stack.append( [datatype, title, datalist, offset, index] )
+                self.stack.append([datatype, title, datalist, offset, index])
                 self.datatype = 'songs'
                 self.title = '网易云音乐 > 收藏'
                 self.datalist = self.collection
@@ -265,11 +265,11 @@ class Menu:
             elif key == ord('r'):
                 if datatype != 'main' and len(datalist) != 0:
                     self.datalist.pop(idx)
-                    self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx )
+                    self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx)
 
             elif key == ord('m'):
                 if datatype != 'main':
-                    self.stack.append( [datatype, title, datalist, offset, index] )
+                    self.stack.append([datatype, title, datalist, offset, index])
                     self.datatype = self.stack[0][0]
                     self.title = self.stack[0][1]
                     self.datalist = self.stack[0][2]
@@ -281,7 +281,6 @@ class Menu:
                     webbrowser.open_new_tab('https://github.com/darknessomi/musicbox')
 
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step)
-
 
         self.player.stop()
         sfile = file(Constant.conf_dir + "/flavor.json", 'w')
@@ -301,7 +300,7 @@ class Menu:
         datalist = self.datalist
         offset = self.offset
         index = self.index
-        self.stack.append( [datatype, title, datalist, offset, index])
+        self.stack.append([datatype, title, datalist, offset, index])
 
         if datatype == 'main':
             self.choice_channel(idx)
@@ -359,9 +358,9 @@ class Menu:
         # 搜索菜单
         elif datatype == 'search':
             ui = self.ui
-            #if do search, push current info into stack
+            # if do search, push current info into stack
             if idx in range(1, 5):
-                self.stack.append( [self.datatype, self.title, self.datalist, self.offset, self.index ])
+                self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
             self.index = 0
             self.offset = 0
             if idx == 0:
@@ -446,7 +445,7 @@ class Menu:
                 self.username = user_info['profile']['nickname']
                 self.userid = user_info['account']['id']
             # 读取登录之后的用户歌单
-            myplaylist = netease.user_playlist( self.userid )
+            myplaylist = netease.user_playlist(self.userid)
             self.datatype = 'top_playlists'
             self.datalist = netease.dig_info(myplaylist, self.datatype)
             self.title += ' > ' + self.username + ' 的歌单'
