@@ -175,7 +175,8 @@ class Menu:
 
             # 搜索
             elif key == ord('f'):
-                self.search()
+				# 8 is the 'search' menu
+                self.choice_channel(8)
 
             # 播放下一曲
             elif key == ord(']'):
@@ -359,12 +360,17 @@ class Menu:
         elif datatype == 'search':
             ui = self.ui
             #if do search, push current info into stack
-            if idx in range(ord('1'), ord('5')):
-                self.screen.addstr(0,0, str(idx))
-            #self.stack.append( [self.datatype, self.title, self.datalist, self.offset, self.index ])
+            if idx in range(1, 5):
+                self.stack.append( [self.datatype, self.title, self.datalist, self.offset, self.index ])
             self.index = 0
             self.offset = 0
-            if idx == 1:# '1':
+            if idx == 0:
+                # 搜索结果可以用top_playlists处理
+                self.datatype = 'top_playlists'
+                self.datalist = ui.build_search('search_playlist')
+                self.title = '精选歌单搜索列表'
+
+            elif idx == 1:
                 self.datatype = 'songs'
                 self.datalist = ui.build_search('songs')
                 self.title = '歌曲搜索列表'
@@ -379,11 +385,6 @@ class Menu:
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
 
-            elif idx == 0:
-                # 搜索结果可以用top_playlists处理
-                self.datatype = 'top_playlists'
-                self.datalist = ui.build_search('search_playlist')
-                self.title = '精选歌单搜索列表'
 
     def choice_channel(self, idx):
         # 排行榜
@@ -470,7 +471,6 @@ class Menu:
 
         # 搜索
         elif idx == 8:
-            #self.search()
             self.datatype = 'search'
             self.title += ' > 搜索'
             self.datalist = ['歌曲', '艺术家', '专辑', '网易精选集']
@@ -483,34 +483,4 @@ class Menu:
 
         self.offset = 0
         self.index = 0
-
-    def search(self):
-        ui = self.ui
-        x = ui.build_search_menu()
-        # if do search, push current info into stack
-        if x in range(ord('1'), ord('5')):
-            self.stack.append( [self.datatype, self.title, self.datalist, self.offset, self.index ])
-            self.index = 0
-            self.offset = 0
-
-        if x == ord('1'):
-            self.datatype = 'songs'
-            self.datalist = ui.build_search('songs')
-            self.title = '歌曲搜索列表'
-
-        elif x == ord('2'):
-            self.datatype = 'artists'
-            self.datalist = ui.build_search('artists')
-            self.title = '艺术家搜索列表'
-
-        elif x == ord('3'):
-            self.datatype = 'albums'
-            self.datalist = ui.build_search('albums')
-            self.title = '专辑搜索列表'
-
-        elif x == ord('4'):
-            # 搜索结果可以用top_playlists处理
-            self.datatype = 'top_playlists'
-            self.datalist = ui.build_search('search_playlist')
-            self.title = '精选歌单搜索列表'
 
