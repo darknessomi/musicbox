@@ -358,9 +358,9 @@ class Menu:
         # 搜索菜单
         elif datatype == 'search':
             ui = self.ui
-            # if do search, push current info into stack
-            if idx in range(1, 5):
-                self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+            # no need to do stack.append, Otherwise there will be a bug when you input key 'h' to return
+            #if idx in range(1, 5):
+            #    self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
             self.index = 0
             self.offset = 0
             if idx == 0:
