@@ -176,7 +176,7 @@ class Menu:
             # 搜索
             elif key == ord('f'):
                 # 8 is the 'search' menu
-                self.choice_channel(8)
+                self.dispatch_enter(8)
 
             # 播放下一曲
             elif key == ord(']'):
