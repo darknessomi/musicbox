@@ -34,32 +34,31 @@ ________     __________________________  _____ _     _
 
 '''
 
-
 from setuptools import setup, find_packages
 
 
 setup(
-    name = 'NetEase-MusicBox',
-    version = '0.1.2.4',
-    packages = find_packages(),
+    name='NetEase-MusicBox',
+    version='0.1.2.4',
+    packages=find_packages(),
 
-    include_package_data = True,
+    include_package_data=True,
 
-    install_requires = [
+    install_requires=[
         'requests',
         'BeautifulSoup4',
-     ],
+    ],
 
-    entry_points = {
-        'console_scripts' : [
+    entry_points={
+        'console_scripts': [
             'musicbox = src:start'
         ],
     },
 
-    author = 'omi',
-    author_email = '4399.omi@gmail.com',
-    url = 'https://github.com/darknessomi/musicbox',
-    description = 'A sexy command line interface musicbox',
-    keywords = ['music', 'netease', 'cli', 'player'],
-    zip_safe = False,
+    author='omi',
+    author_email='4399.omi@gmail.com',
+    url='https://github.com/darknessomi/musicbox',
+    description='A sexy command line interface musicbox',
+    keywords=['music', 'netease', 'cli', 'player'],
+    zip_safe=False,
 )
