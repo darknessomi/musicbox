@@ -188,21 +188,21 @@ class Ui:
 
         return []
 
-	def build_login(self):
-		curses.noecho()
-		info = self.get_param('请输入登录信息(支持手机登陆) e.g: john@163.com 123456')
-		account = info.split(' ')
-		if len(account) != 2:
+     def build_login(self):
+	curses.noecho()
+	info = self.get_param('请输入登录信息(支持手机登陆) e.g: john@163.com 123456')
+	account = info.split(' ')
+	if len(account) != 2:
+		return self.build_login()
+	login_info = self.netease.login(account[0], account[1])
+	if login_info['code'] != 200:
+		x = self.build_login_error()
+		if x == ord('1'):
 			return self.build_login()
-		login_info = self.netease.login(account[0], account[1])
-		if login_info['code'] != 200:
-			x = self.build_login_error()
-			if x == ord('1'):
-				return self.build_login()
-			else:
-				return -1
 		else:
-			return [login_info, account]
+			return -1
+	else:
+		return [login_info, account]
 
     def build_login_error(self):
         self.screen.move(4,1)
