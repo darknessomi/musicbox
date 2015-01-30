@@ -90,7 +90,7 @@ class Menu:
             sfile.close()
         except:
             self.collection = []
-            self.account = {
+            self.account = {}
                 
     def change_term(self,signum, frame):
         self.ui.screen.clear()
