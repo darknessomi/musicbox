@@ -217,13 +217,7 @@ class Ui:
         return []
 
     def build_login(self):
-        curses.noecho()
-        self.screen.move(4, 1)
-        self.screen.clrtobot()
-        self.screen.addstr(5, 19, '请输入登录信息(支持手机登陆) e.g: john@163.com 12345',curses.color_pair(1))
-        self.screen.addstr(8, 19, "账号:", curses.color_pair(1))
-        self.screen.addstr(9, 19, "密码:", curses.color_pair(1))
-        self.screen.refresh()
+        self.build_login_bar()
         local_account = self.get_account()
         local_password = self.get_password()
         login_info = self.netease.login(local_account, local_password)
@@ -235,6 +229,15 @@ class Ui:
                 return -1
         else:
             return [login_info, local_account+local_password]
+
+    def build_login_bar(self):
+        curses.noecho()
+        self.screen.move(4, 1)
+        self.screen.clear()
+        self.screen.addstr(5, 19, '请输入登录信息(支持手机登陆)',curses.color_pair(1))
+        self.screen.addstr(8, 19, "账号:", curses.color_pair(1))
+        self.screen.addstr(9, 19, "密码:", curses.color_pair(1))
+        self.screen.refresh()
 
     def build_login_error(self):
         self.screen.move(4, 1)
