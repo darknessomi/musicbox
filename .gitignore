@@ -56,3 +56,6 @@ docs/_build/
 tags
 
 .idea/*
+
+#ignore mac file
+.DS_Store
