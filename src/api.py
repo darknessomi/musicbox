@@ -128,8 +128,7 @@ class NetEase:
 
     # 歌单（网友精选碟） hot||new http://music.163.com/#/discover/playlist/
     def top_playlists(self, category='全部', order='hot', offset=0, limit=50):
-        action = 'http://music.163.com/api/playlist/list?cat=' + category + '&order=' + order + '&offset=' + str(offset) + '&total=' + (
-        'true' if offset else 'false') + '&limit=' + str(limit)
+        action = 'http://music.163.com/api/playlist/list?cat=' + category + '&order=' + order + '&offset=' + str(offset) + '&total=' + ('true' if offset else 'false') + '&limit=' + str(limit)
         try:
             data = self.httpRequest('GET', action)
             return data['playlists']

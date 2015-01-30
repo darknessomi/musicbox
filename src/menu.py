@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2014-08-25 18:02:04
+# @Last Modified time: 2015-01-30 18:06:12
 
 
 '''
@@ -22,6 +22,8 @@ from player import Player
 from ui import Ui
 from const import Constant
 import logger
+import signal
+
 
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
@@ -82,6 +84,7 @@ class Menu:
         self.userid = None
         self.username = None
         signal.signal(signal.SIGWINCH, self.change_term)
+
         try:
             sfile = file(Constant.conf_dir + "/flavor.json", 'r')
             data = json.loads(sfile.read())
@@ -91,8 +94,8 @@ class Menu:
         except:
             self.collection = []
             self.account = {}
-                
-    def change_term(self,signum, frame):
+
+    def change_term(self, signum, frame):
         self.ui.screen.clear()
         self.ui.screen.refresh()
 
@@ -437,7 +440,6 @@ class Menu:
                 # 使用本地存储了账户登录
                 if self.account:
                     user_info = netease.login(self.account[0], self.account[1])
-
                 # 本地没有存储账户，或本地账户失效，则引导录入
                 if self.account == {} or user_info['code'] != 200:
                     data = self.ui.build_login()
@@ -487,4 +489,3 @@ class Menu:
 
         self.offset = 0
         self.index = 0
-
