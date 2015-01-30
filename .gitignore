@@ -59,3 +59,4 @@ tags
 
 # ignore mac file
 .DS_Store
+src/.DS_Store
