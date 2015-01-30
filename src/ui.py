@@ -233,7 +233,7 @@ class Ui:
     def build_login_bar(self):
         curses.noecho()
         self.screen.move(4, 1)
-        self.screen.clear()
+        self.screen.clrtobot()
         self.screen.addstr(5, 19, '请输入登录信息(支持手机登陆)',curses.color_pair(1))
         self.screen.addstr(8, 19, "账号:", curses.color_pair(1))
         self.screen.addstr(9, 19, "密码:", curses.color_pair(1))
