@@ -81,6 +81,7 @@ class Menu:
         self.djstack = []
         self.userid = None
         self.username = None
+        signal.signal(signal.SIGWINCH, self.change_term)
         try:
             sfile = file(Constant.conf_dir + "/flavor.json", 'r')
             data = json.loads(sfile.read())
@@ -89,7 +90,11 @@ class Menu:
             sfile.close()
         except:
             self.collection = []
-            self.account = {}
+            self.account = {
+                
+    def change_term(self,signum, frame):
+        self.ui.screen.clear()
+        self.ui.screen.refresh()
 
     def start(self):
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step)
