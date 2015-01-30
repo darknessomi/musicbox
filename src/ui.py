@@ -218,11 +218,15 @@ class Ui:
 
     def build_login(self):
         curses.noecho()
-        info = self.get_param('请输入登录信息(支持手机登陆) e.g: john@163.com 123456')
-        account = info.split(' ')
-        if len(account) != 2:
-            return self.build_login()
-        login_info = self.netease.login(account[0], account[1])
+        self.screen.move(4, 1)
+        self.screen.clrtobot()
+        self.screen.addstr(5, 19, '请输入登录信息(支持手机登陆) e.g: john@163.com 12345',curses.color_pair(1))
+        self.screen.addstr(8, 19, "账号:", curses.color_pair(1))
+        self.screen.addstr(9, 19, "密码:", curses.color_pair(1))
+        self.screen.refresh()
+        local_account = self.get_account()
+        local_password = self.get_password()
+        login_info = self.netease.login(local_account, local_password)
         if login_info['code'] != 200:
             x = self.build_login_error()
             if x == ord('1'):
@@ -230,7 +234,7 @@ class Ui:
             else:
                 return -1
         else:
-            return [login_info, account]
+            return [login_info, local_account+local_password]
 
     def build_login_error(self):
         self.screen.move(4, 1)
@@ -242,6 +246,16 @@ class Ui:
         self.screen.refresh()
         x = self.screen.getch()
         return x
+
+    def get_account(self):
+        curses.echo()
+        account = self.screen.getstr(8,24,60)
+        return account
+
+    def get_password(self):
+        curses.noecho()
+        password = self.screen.getstr(9,24,60)
+        return password
 
     def get_param(self, prompt_string):
         # keep playing info in line 1

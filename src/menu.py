@@ -442,7 +442,6 @@ class Menu:
                 # 使用本地存储了账户登录
                 if self.account:
                     user_info = netease.login(self.account[0], self.account[1])
-
                 # 本地没有存储账户，或本地账户失效，则引导录入
                 if self.account == {} or user_info['code'] != 200:
                     data = self.ui.build_login()
