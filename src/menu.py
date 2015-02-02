@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2014-08-25 18:02:04
+# @Last Modified time: 2015-01-30 18:06:12
 
 
 '''
@@ -85,7 +85,6 @@ class Menu:
         self.username = None
         signal.signal(signal.SIGWINCH, self.change_term)
 
-
         try:
             sfile = file(Constant.conf_dir + "/flavor.json", 'r')
             data = json.loads(sfile.read())
@@ -96,7 +95,7 @@ class Menu:
             self.collection = []
             self.account = {}
 
-    def change_term(self,signum, frame):
+    def change_term(self, signum, frame):
         self.ui.screen.clear()
         self.ui.screen.refresh()
 
@@ -368,7 +367,7 @@ class Menu:
         elif datatype == 'search':
             ui = self.ui
             # no need to do stack.append, Otherwise there will be a bug when you input key 'h' to return
-            #if idx in range(1, 5):
+            # if idx in range(1, 5):
             #    self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
             self.index = 0
             self.offset = 0
@@ -392,7 +391,6 @@ class Menu:
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
-
 
 
     def choice_channel(self, idx):
@@ -491,4 +489,3 @@ class Menu:
 
         self.offset = 0
         self.index = 0
-
