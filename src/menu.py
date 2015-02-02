@@ -122,7 +122,6 @@ class Menu:
             offset = self.offset
             idx = index = self.index
             step = self.step
-            sigkill = self.sigkill
             stack = self.stack
             djstack = self.djstack
             key = self.screen.getch()
