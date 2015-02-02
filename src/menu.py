@@ -83,7 +83,6 @@ class Menu:
         self.djstack = []
         self.userid = None
         self.username = None
-        self.sigkill = False
         signal.signal(signal.SIGWINCH, self.change_term)
         signal.signal(signal.SIGINT, self.send_kill)
 
@@ -102,7 +101,16 @@ class Menu:
         self.ui.screen.refresh()
 
     def send_kill(self,signum,fram):
-        self.sigkill = True
+        self.player.stop()
+        sfile = file(Constant.conf_dir + "/flavor.json", 'w')
+        data = {
+            'account': self.account,
+            'collection': self.collection
+        }
+        sfile.write(json.dumps(data))
+        sfile.close()
+        curses.endwin()
+        sys.exit()
 
     def start(self):
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step)
@@ -121,7 +129,7 @@ class Menu:
             self.ui.screen.refresh()
 
             # 退出
-            if key == ord('q') or sigkill == True:
+            if key == ord('q'):
                 break
 
             # 退出并清除用户信息
