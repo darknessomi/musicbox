@@ -84,6 +84,7 @@ class Menu:
         self.userid = None
         self.username = None
         signal.signal(signal.SIGWINCH, self.change_term)
+        signal.signal(signal.SIGINT, self.send_kill)
 
         try:
             sfile = file(Constant.conf_dir + "/flavor.json", 'r')
@@ -98,6 +99,18 @@ class Menu:
     def change_term(self, signum, frame):
         self.ui.screen.clear()
         self.ui.screen.refresh()
+
+    def send_kill(self,signum,fram):
+        self.player.stop()
+        sfile = file(Constant.conf_dir + "/flavor.json", 'w')
+        data = {
+            'account': self.account,
+            'collection': self.collection
+        }
+        sfile.write(json.dumps(data))
+        sfile.close()
+        curses.endwin()
+        sys.exit()
 
     def start(self):
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step)
