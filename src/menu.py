@@ -83,7 +83,9 @@ class Menu:
         self.djstack = []
         self.userid = None
         self.username = None
+        self.sigkill = False
         signal.signal(signal.SIGWINCH, self.change_term)
+        signal.signal(signal.SIGINT, self.send_kill)
 
         try:
             sfile = file(Constant.conf_dir + "/flavor.json", 'r')
@@ -99,6 +101,9 @@ class Menu:
         self.ui.screen.clear()
         self.ui.screen.refresh()
 
+    def send_kill(self,signum,fram):
+        self.sigkill = True
+
     def start(self):
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step)
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
@@ -109,13 +114,14 @@ class Menu:
             offset = self.offset
             idx = index = self.index
             step = self.step
+            sigkill = self.sigkill
             stack = self.stack
             djstack = self.djstack
             key = self.screen.getch()
             self.ui.screen.refresh()
 
             # 退出
-            if key == ord('q'):
+            if key == ord('q') or sigkill == True:
                 break
 
             # 退出并清除用户信息
