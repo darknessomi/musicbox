@@ -220,7 +220,8 @@ class Ui:
         self.build_login_bar()
         local_account = self.get_account()
         local_password = self.get_password()
-        login_info = self.netease.login(local_account, local_password)
+        login_info = self.netease.login(local_account, local_password
+        account = [local_account,local_password]
         if login_info['code'] != 200:
             x = self.build_login_error()
             if x == ord('1'):
@@ -228,7 +229,7 @@ class Ui:
             else:
                 return -1
         else:
-            return [login_info, local_account+local_password]
+            return [login_info, account]
 
     def build_login_bar(self):
         curses.noecho()
