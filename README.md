@@ -4,6 +4,9 @@ NetEase-MusicBox
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.3.1-blue.svg)]() [![platform](http://sdut-zrt.qiniudn.com/ platform - osx | linux -lightgrey.svg)]()
+
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
 
 ### 功能特性
@@ -113,9 +116,9 @@ Enjoy it !
 
 2015-01-02 版本 0.1.1.0    新增退出并清除用户信息功能
 
-### The MIT License (MIT)
+### The MIT License (MIT) 
 
-CopyRight (c) 2014 omi  &lt;<a href="4399.omi@gmail.com">4399.omi@gmail.com</a>&gt;
+CopyRight (c) 2015 omi  &lt;<a href="4399.omi@gmail.com">4399.omi@gmail.com</a>&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
