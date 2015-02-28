@@ -216,11 +216,27 @@ class Ui:
 
         return []
 
+    def build_choose_login_mehod(self):
+        self.screen.move(4, 1)
+        self.screen.clrtobot()
+        self.screen.addstr(8, 19, '请选择登录方式', curses.color_pair(1))
+        self.screen.addstr(10, 19, '[1] 手机号码登录')
+        self.screen.addstr(11, 19, '[2] 其他登录方式')
+        self.screen.addstr(14, 19, '请键入对应数字:', curses.color_pair(2))
+        self.screen.refresh()
+        x = self.screen.getch()
+        return x
+
     def build_login(self):
+        x = self.build_choose_login_mehod()
+
         self.build_login_bar()
         local_account = self.get_account()
         local_password = self.get_password()
-        login_info = self.netease.login(local_account, local_password)
+        if x == ord("1") :
+            login_info = self.netease.phone_login(local_account, local_password)
+        else :
+            login_info = self.netease.login(local_account, local_password)
         account = [local_account,local_password]
         if login_info['code'] != 200:
             x = self.build_login_error()
@@ -235,7 +251,7 @@ class Ui:
         curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
-        self.screen.addstr(5, 19, '请输入登录信息(支持手机登陆)',curses.color_pair(1))
+        self.screen.addstr(5, 19, '请输入登录信息',curses.color_pair(1))
         self.screen.addstr(8, 19, "账号:", curses.color_pair(1))
         self.screen.addstr(9, 19, "密码:", curses.color_pair(1))
         self.screen.move(8,24)
