@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2014-08-25 18:02:08
+# @Last Modified time: 2015-02-28 13:03:11
 
 
 '''
@@ -69,7 +69,7 @@ class NetEase:
 
     # 登录
     def login(self, username, password):
-        pattern = re.compile(r'^0\d{2,3}\d{7,8}$|^1[358]\d{9}$|^147\d{8}$')
+        pattern = re.compile(r'^0\d{2,3}\d{7,8}$|^1[34578]\d{9}$')
         if (pattern.match(username)):
             return self.phone_login(username, password)
         action = 'https://music.163.com/api/login/'
