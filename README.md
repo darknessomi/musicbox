@@ -5,7 +5,7 @@ NetEase-MusicBox
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
-[![versions](https://img.shields.io/badge/versions%20-%20%200.1.3.1-blue.svg)]() [![platform](http://sdut-zrt.qiniudn.com/ platform - osx | linux -lightgrey.svg)]()
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.3.2-blue.svg)]() [![platform](http://sdut-zrt.qiniudn.com/ platform - osx | linux -lightgrey.svg)]()
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
 
@@ -139,4 +139,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
 

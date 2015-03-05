@@ -51,7 +51,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'musicbox = src:start'
+            'musicbox = NEMbox:start'
         ],
     },
 
