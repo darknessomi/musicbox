@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2015-02-28 13:03:11
+# @Last Modified time: 2015-03-18 02:11:54
 
 
 '''
@@ -72,7 +72,7 @@ class NetEase:
         pattern = re.compile(r'^0\d{2,3}\d{7,8}$|^1[34578]\d{9}$')
         if (pattern.match(username)):
             return self.phone_login(username, password)
-        action = 'https://music.163.com/api/login/'
+        action = 'http://music.163.com/api/login/'
         data = {
             'username': username,
             'password': hashlib.md5(password).hexdigest(),
@@ -85,7 +85,7 @@ class NetEase:
 
     # 手机登录
     def phone_login(self, username, password):
-        action = 'https://music.163.com/api/login/cellphone'
+        action = 'http://music.163.com/api/login/cellphone'
         data = {
             'phone': username,
             'password': hashlib.md5(password).hexdigest(),
