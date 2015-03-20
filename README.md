@@ -5,7 +5,7 @@ NetEase-MusicBox
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
-[![versions](https://img.shields.io/badge/versions%20-%20%200.1.3.2-blue.svg)]() [![platform](http://sdut-zrt.qiniudn.com/ platform - osx | linux -lightgrey.svg)]()
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.3.3-blue.svg)]() [![platform](http://sdut-zrt.qiniudn.com/ platform - osx | linux -lightgrey.svg)]()
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
 
@@ -72,6 +72,17 @@ NetEase-MusicBox
 	$ sudo python setup.py install
 
 	$ sudo apt-get install mpg123
+
+#### 已测试的系统兼容列表
+
+<table>
+	<tr> <td>OS X</td> <td>10.10 / 10.9</td> </tr>
+	<tr> <td>Ubuntu</td> <td>14.04</td> </tr>
+	<tr> <td>Kali</td> <td>1.1.0</td> </tr>
+	<tr> <td>CentOS</td> <td>7</td> </tr>
+	<tr> <td>openSUSE</td> <td>13.2</td> </tr>
+</table>
+
 
 #### 错误处理
 
