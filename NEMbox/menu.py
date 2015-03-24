@@ -142,11 +142,11 @@ class Menu:
                 break
 
             # 上移
-            elif key == ord('k'):
+            elif key == ord('k') or key == curses.KEY_UP:
                 self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx - 1)
 
             # 下移
-            elif key == ord('j'):
+            elif key == ord('j') or key == curses.KEY_DOWN:
                 self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx + 1)
 
             # 数字快捷键
@@ -161,7 +161,7 @@ class Menu:
                 self.offset = 0
 
             # 向上翻页
-            elif key == ord('u'):
+            elif key == ord('u') or key == curses.KEY_PPAGE:
                 if offset == 0:
                     continue
                 self.offset -= step
@@ -170,7 +170,7 @@ class Menu:
                 self.index = (index - step) // step * step
 
             # 向下翻页
-            elif key == ord('d'):
+            elif key == ord('d') or key == curses.KEY_NPAGE:
                 if offset + step >= len(datalist):
                     continue
                 self.offset += step
@@ -179,7 +179,7 @@ class Menu:
                 self.index = (index + step) // step * step
 
             # 前进
-            elif key == ord('l') or key == 10:
+            elif key == ord('l') or key == curses.KEY_RIGHT or key == 10:
                 if self.datatype == 'songs' or self.datatype == 'djchannels' or self.datatype == 'help':
                     continue
                 self.ui.build_loading()
@@ -188,7 +188,7 @@ class Menu:
                 self.offset = 0
 
             # 回退
-            elif key == ord('h'):
+            elif key == ord('h') or key == curses.KEY_LEFT:
                 # if not main menu
                 if len(self.stack) == 1:
                     continue
