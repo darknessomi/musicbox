@@ -13,7 +13,6 @@
 import re
 import json
 import requests
-import hashlib
 from bs4 import BeautifulSoup
 import logger
 
@@ -75,7 +74,7 @@ class NetEase:
         action = 'http://music.163.com/api/login/'
         data = {
             'username': username,
-            'password': hashlib.md5(password).hexdigest(),
+            'password': password,
             'rememberLogin': 'true'
         }
         try:
@@ -88,7 +87,7 @@ class NetEase:
         action = 'http://music.163.com/api/login/cellphone'
         data = {
             'phone': username,
-            'password': hashlib.md5(password).hexdigest(),
+            'password': password,
             'rememberLogin': 'true'
         }
         try:
