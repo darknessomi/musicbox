@@ -288,6 +288,26 @@ class Menu:
                     self.datalist.pop(idx)
                     self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx)
 
+            # 当前项目下移
+            elif key == ord("J"):
+                if datatype != 'main' and len(datalist) != 0 and idx + 1 != len(self.datalist):
+                    song = self.datalist.pop(idx)
+                    self.datalist.insert(idx + 1, song)
+                    self.index = idx + 1
+                    # 翻页
+                    if self.index >= offset + step:
+                        self.offset = offset + step
+
+            # 当前项目上移
+            elif key == ord("K"):
+                if datatype != 'main' and len(datalist) != 0 and idx != 0:
+                    song = self.datalist.pop(idx)
+                    self.datalist.insert(idx - 1, song)
+                    self.index = idx - 1
+                    # 翻页
+                    if self.index < offset:
+                        self.offset = offset - step
+
             elif key == ord('m'):
                 if datatype != 'main':
                     self.stack.append([datatype, title, datalist, offset, index])
