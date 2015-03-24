@@ -56,8 +56,8 @@ shortcut = [
     ['s', 'Star      ', '添加到收藏'],
     ['c', 'Collection', '收藏列表'],
     ['r', 'Remove    ', '删除当前条目'],
-    ['J', 'Move Down ', '向下移动当前条目'],
-    ['K', 'Move Up   ', '向上移动当前条目'],
+    ['Shift+j', 'Move Down ', '向下移动当前条目'],
+    ['Shift+k', 'Move Up   ', '向上移动当前条目'],
     ['q', 'Quit      ', '退出'],
     ["w", 'Quit&Clear', '退出并清除用户信息']
 ]
