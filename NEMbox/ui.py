@@ -151,11 +151,11 @@ class Ui:
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.screen.addstr(i - offset + 8, 16,
-                                           '-> ' + str(i) + '. \'' + datalist[i][0].upper() + '\'   ' + datalist[i][
+                                           '-> ' + str(i) + '. \'' + (datalist[i][0].upper() + '\'').ljust(11) + datalist[i][
                                                1] + '   ' + datalist[i][2], curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 8, 19,
-                                           str(i) + '. \'' + datalist[i][0].upper() + '\'   ' + datalist[i][1] + '   ' +
+                                           str(i) + '. \'' + (datalist[i][0].upper() + '\'').ljust(11) + datalist[i][1] + '   ' +
                                            datalist[i][2])
                 self.screen.addstr(20, 6, 'NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存')
                 self.screen.addstr(21, 10, '按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~')
