@@ -129,6 +129,9 @@ class Menu:
             key = self.screen.getch()
             self.ui.screen.refresh()
 
+            # 大写字母转换为小写
+            key = _lower(key)
+
             # 退出
             if key == ord('q'):
                 break
@@ -524,3 +527,8 @@ class Menu:
 
         self.offset = 0
         self.index = 0
+
+def _lower(ch):
+    if ch >= ord('A') and ch<=ord('Z'):
+        ch += 32
+    return ch
