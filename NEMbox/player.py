@@ -166,3 +166,13 @@ class Player:
         if (self.volume < 0):
             self.volume = 0
         self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
+
+    def update_size(self):
+        try:
+            item = self.songs[self.idx]
+            if self.playing_flag:
+                self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'])
+            if self.pause_flag:
+                self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], pause=True)
+        except IndexError:
+            pass

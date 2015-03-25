@@ -129,6 +129,11 @@ class Menu:
             key = self.screen.getch()
             self.ui.screen.refresh()
 
+            # term resize
+            if key == -1:
+                self.ui.update_size()
+                self.player.update_size()
+
             # 退出
             if key == ord('q'):
                 break
