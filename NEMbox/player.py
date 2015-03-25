@@ -40,7 +40,7 @@ class Player:
         """
         Runs the given args in a subprocess.Popen, and then calls the function
         onExit when the subprocess completes.
-        onExit is a callable object, and popenArgs is a lists/tuple of args that 
+        onExit is a callable object, and popenArgs is a lists/tuple of args that
         would give to subprocess.Popen.
         """
 
@@ -75,7 +75,7 @@ class Player:
     def recall(self):
         self.playing_flag = True
         item = self.songs[self.idx]
-        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'])
+        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'])
         self.popen_recall(self.recall, item['mp3_url'])
 
     def play(self, datatype, songs, idx):
@@ -111,7 +111,7 @@ class Player:
             else:
                 pass
 
-    # play another   
+    # play another
     def switch(self):
         self.stop()
         # wait process be killed
@@ -128,13 +128,13 @@ class Player:
         self.pause_flag = True
         os.kill(self.popen_handler.pid, signal.SIGSTOP)
         item = self.songs[self.idx]
-        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], pause=True)
+        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], pause=True)
 
     def resume(self):
         self.pause_flag = False
         os.kill(self.popen_handler.pid, signal.SIGCONT)
         item = self.songs[self.idx]
-        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'])
+        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'])
 
     def next(self):
         self.stop()
