@@ -39,13 +39,13 @@ def uniq(arr):
 
 # 获取高音质mp3 url
 def geturl(song):
-    if 'hMusic' in song:
+    if song['hMusic']:
         music = song['hMusic']
         quality = 'HD'
-    elif 'mMusic' in song:
+    elif song['mMusic']:
         music = song['mMusic']
         quality = 'MD'
-    elif 'lMusic' in song:
+    elif song['lMusic']:
         music = song['lMusic']
         quality = 'LD'
     else:
