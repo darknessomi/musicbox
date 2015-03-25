@@ -64,3 +64,6 @@ src/.DS_Store
 
 # ignore demo
 out.gif
+
+# ignore swp files
+NEMbox/*.swp

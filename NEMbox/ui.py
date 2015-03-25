@@ -265,12 +265,12 @@ class Ui:
 
     def get_account(self):
         curses.echo()
-        account = self.screen.getstr(8,24,60)
+        account = self.screen.getstr(8, self.startcol+6,60)
         return account
 
     def get_password(self):
         curses.noecho()
-        password = self.screen.getstr(9,24,60)
+        password = self.screen.getstr(9, self.startcol+6,60)
         return password
 
     def get_param(self, prompt_string):
