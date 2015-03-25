@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2015-03-25 16:20:11
+# @Last Modified time: 2015-03-25 17:32:54
 
 
 '''
@@ -17,6 +17,10 @@ from bs4 import BeautifulSoup
 import logger
 import hashlib
 import random
+
+default_timeout = 10
+
+log = logger.getLogger(__name__)
 
 # 加密算法, 基于https://github.com/yanunon/NeteaseCloudMusic脚本实现
 def encrypted_id(id):
@@ -56,11 +60,6 @@ def geturl(song):
     enc_id = encrypted_id(song_id)
     url = "http://m%s.music.126.net/%s/%s.mp3"%(random.randrange(1,3), enc_id, song_id)
     return url, quality
-
-
-default_timeout = 10
-
-log = logger.getLogger(__name__)
 
 
 class NetEase:
