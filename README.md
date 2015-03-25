@@ -1,8 +1,6 @@
 NetEase-MusicBox
 =================
 
-...that dynamically changes the ui as the size of terminal changes.
-
 
 ###Thanks vellow,hbprotoss,Catofes,尘埃
 
@@ -12,7 +10,6 @@ NetEase-MusicBox
 [![versions](https://img.shields.io/badge/versions%20-%20%200.1.3.4-blue.svg)]() [![platform](http://sdut-zrt.qiniudn.com/ platform - osx | linux -lightgrey.svg)]()
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
-![NetEase-MusicBox](https://cloud.githubusercontent.com/assets/1016134/6818504/409d3980-d26e-11e4-8035-c31c19775d78.gif)
 
 ### 功能特性
 
