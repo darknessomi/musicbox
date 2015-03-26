@@ -82,7 +82,7 @@ class Ui:
                         self.screen.addstr(i - offset + 8, 0, ' ' * self.startcol)
                         self.screen.addstr(i - offset + 8, self.indented_startcol,
                                            str('-> ' + str(i) + '. ' + datalist[i]['song_name'] + self.space + datalist[i][
-                                               'artist'] + '  < ' + datalist[i]['album_name'] + ' >')[:int(self.x*1.5)],
+                                               'artist'] + '  < ' + datalist[i]['album_name'] + ' >')[:int(self.x*2)],
                                            curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 8, 0, ' ' * self.startcol)
