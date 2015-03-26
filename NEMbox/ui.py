@@ -36,7 +36,7 @@ class Ui:
         self.update_space()
         
 
-    def build_playinfo(self, song_name, artist, album_name, pause=False):
+    def build_playinfo(self, song_name, artist, album_name, quality, pause=False):
         curses.noecho()
         # refresh top 2 line
         self.screen.move(1, 1)
@@ -44,9 +44,9 @@ class Ui:
         self.screen.move(2, 1)
         self.screen.clrtoeol()
         if pause:
-            self.screen.addstr(1, self.startcol, '_ _ z Z Z', curses.color_pair(3))
+            self.screen.addstr(1, self.startcol, '_ _ z Z Z' + quality, curses.color_pair(3))
         else:
-            self.screen.addstr(1, 6, '♫  ♪ ♫  ♪', curses.color_pair(3))
+            self.screen.addstr(1, self.indented_startcol, '♫  ♪ ♫  ♪' + quality, curses.color_pair(3))
         self.screen.addstr(1, self.startcol, song_name + self.space + artist + '  < ' + album_name + ' >', curses.color_pair(4))
         self.screen.refresh()
 

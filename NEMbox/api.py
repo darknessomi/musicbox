@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2015-03-18 02:11:54
+# @Last Modified time: 2015-03-25 17:32:54
 
 
 '''
@@ -15,7 +15,25 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import logger
+import hashlib
+import random
 
+default_timeout = 10
+
+log = logger.getLogger(__name__)
+
+# 加密算法, 基于https://github.com/yanunon/NeteaseCloudMusic脚本实现
+def encrypted_id(id):
+    magic = bytearray('3go8&$8*3*3h0k(2)2')
+    song_id = bytearray(id)
+    magic_len = len(magic)
+    for i in xrange(len(song_id)):
+        song_id[i] = song_id[i]^magic[i%magic_len]
+    m = hashlib.md5(song_id)
+    result = m.digest().encode('base64')[:-1]
+    result = result.replace('/', '_')
+    result = result.replace('+', '-')
+    return result
 
 # list去重
 def uniq(arr):
@@ -23,10 +41,25 @@ def uniq(arr):
     arr2.sort(key=arr.index)
     return arr2
 
+# 获取高音质mp3 url
+def geturl(song):
+    if song['hMusic']:
+        music = song['hMusic']
+        quality = 'HD'
+    elif song['mMusic']:
+        music = song['mMusic']
+        quality = 'MD'
+    elif song['lMusic']:
+        music = song['lMusic']
+        quality = 'LD'
+    else:
+        return song['mp3Url'], ''
 
-default_timeout = 10
-
-log = logger.getLogger(__name__)
+    quality = quality + ' {0}k'.format(music['bitrate']/1000)
+    song_id = str(music['dfsId'])
+    enc_id = encrypted_id(song_id)
+    url = "http://m%s.music.126.net/%s/%s.mp3"%(random.randrange(1,3), enc_id, song_id)
+    return url, quality
 
 
 class NetEase:
@@ -251,12 +284,14 @@ class NetEase:
         temp = []
         if dig_type == 'songs':
             for i in range(0, len(data)):
+                url, quality = geturl(data[i])
                 song_info = {
                     'song_id': data[i]['id'],
                     'artist': [],
                     'song_name': data[i]['name'],
                     'album_name': data[i]['album']['name'],
-                    'mp3_url': data[i]['mp3Url']
+                    'mp3_url': url,
+                    'quality': quality
                 }
                 if 'artist' in data[i]:
                     song_info['artist'] = data[i]['artist']
@@ -301,12 +336,14 @@ class NetEase:
 
 
         elif dig_type == 'channels':
+            url, quality = geturl(data)
             channel_info = {
                 'song_id': data['id'],
                 'song_name': data['name'],
                 'artist': data['artists'][0]['name'],
                 'album_name': 'DJ节目',
-                'mp3_url': data['mp3Url']
+                'mp3_url': url,
+                'quality': quality
             }
             temp = channel_info
 

@@ -2,18 +2,18 @@ NetEase-MusicBox
 =================
 
 
-###Thanks vellow,hbprotoss,Catofes,尘埃
+###Thanks vellow,hbprotoss,Catofes,尘埃,chaserhkj,Ma233
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
-[![versions](https://img.shields.io/badge/versions%20-%20%200.1.3.4-blue.svg)]() [![platform](http://sdut-zrt.qiniudn.com/ platform - osx | linux -lightgrey.svg)]()
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.4.0-blue.svg)]() [![platform](http://sdut-zrt.qiniudn.com/ platform - osx | linux -lightgrey.svg)]()
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
 
 ### 功能特性
 
-1. 320kps的高品质音乐
+1. 320kbps的高品质音乐(播放时显示HD标记)
 2. 歌曲，艺术家，专辑检索
 3. 网易热门歌曲排行榜
 4. 网易新碟推荐
@@ -116,6 +116,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-03-25 版本 0.1.4.0    优先使用320kbps音源,优化线路,显示当前音乐音质 (感谢chaserhkj反馈)
 
 2015-03-24 版本 0.1.3.4    增加向上/向下移动项目功能 (感谢chaserhkj提交)
 
