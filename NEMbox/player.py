@@ -169,10 +169,11 @@ class Player:
 
     def update_size(self):
         try:
+            self.ui.update_size()
             item = self.songs[self.idx]
             if self.playing_flag:
-                self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'])
+                self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'])
             if self.pause_flag:
-                self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], pause=True)
+                self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], pause=True)
         except IndexError:
             pass

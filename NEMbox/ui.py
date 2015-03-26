@@ -29,8 +29,8 @@ class Ui:
         curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         # term resize handling
         size = terminalsize.get_terminal_size()
-        self.x = max(size[0], 5)
-        self.y = size[1]
+        self.x = max(size[0], 10)
+        self.y = max(size[1], 10)
         self.startcol = int(float(self.x)/8)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
@@ -44,10 +44,10 @@ class Ui:
         self.screen.move(2, 1)
         self.screen.clrtoeol()
         if pause:
-            self.screen.addstr(1, self.startcol, '_ _ z Z Z' + quality, curses.color_pair(3))
+            self.screen.addstr(1, self.indented_startcol, '_ _ z Z Z ' + quality, curses.color_pair(3))
         else:
-            self.screen.addstr(1, self.indented_startcol, '♫  ♪ ♫  ♪' + quality, curses.color_pair(3))
-        self.screen.addstr(1, self.startcol, song_name + self.space + artist + '  < ' + album_name + ' >', curses.color_pair(4))
+            self.screen.addstr(1, self.indented_startcol, '♫  ♪ ♫  ♪ ' + quality, curses.color_pair(3))
+        self.screen.addstr(1, self.indented_startcol + 18, song_name + self.space + artist + '  < ' + album_name + ' >', curses.color_pair(4))
         self.screen.refresh()
 
     def build_loading(self):
@@ -290,8 +290,8 @@ class Ui:
     def update_size(self):
         # get terminal size
         size = terminalsize.get_terminal_size()
-        self.x = max(size[0], 5)
-        self.y = size[1]
+        self.x = max(size[0], 10)
+        self.y = max(size[1], 10)
         
         # update intendations
         curses.resizeterm(self.y, max(self.x, 20))
