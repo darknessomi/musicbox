@@ -47,7 +47,7 @@ class Ui:
             self.screen.addstr(1, self.indented_startcol, '_ _ z Z Z ' + quality, curses.color_pair(3))
         else:
             self.screen.addstr(1, self.indented_startcol, '♫  ♪ ♫  ♪ ' + quality, curses.color_pair(3))
-        self.screen.addstr(1, self.indented_startcol + 18, song_name + self.space + artist + '  < ' + album_name + ' >', curses.color_pair(4))
+        self.screen.addstr(1, min(self.indented_startcol + 18, self.x-1), song_name + self.space + artist + '  < ' + album_name + ' >', curses.color_pair(4))
         self.screen.refresh()
 
     def build_loading(self):
