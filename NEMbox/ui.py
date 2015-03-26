@@ -30,8 +30,8 @@ class Ui:
         # term resize handling
         size = terminalsize.get_terminal_size()
         self.x = max(size[0], 10)
-        self.y = max(size[1], 10)
-        self.startcol = int(float(self.x)/8)
+        self.y = max(size[1], 25)
+        self.startcol = int(float(self.x)/5)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
         
@@ -291,11 +291,11 @@ class Ui:
         # get terminal size
         size = terminalsize.get_terminal_size()
         self.x = max(size[0], 10)
-        self.y = max(size[1], 10)
+        self.y = max(size[1], 25)
         
         # update intendations
-        curses.resizeterm(self.y, max(self.x, 20))
-        self.startcol = int(float(self.x)/8)
+        curses.resizeterm(self.y, self.x)
+        self.startcol = int(float(self.x)/5)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
         self.screen.clear()
