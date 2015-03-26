@@ -61,3 +61,9 @@ src/.idea/*
 # ignore mac file
 .DS_Store
 src/.DS_Store
+
+# ignore demo
+out.gif
+
+# ignore swp files
+NEMbox/*.swp

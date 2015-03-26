@@ -11,6 +11,7 @@
 '''
 
 import curses
+import terminalsize
 from api import NetEase
 import hashlib
 
@@ -26,7 +27,14 @@ class Ui:
         curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)
         curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
         curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-
+        # term resize handling
+        size = terminalsize.get_terminal_size()
+        self.x = max(size[0], 10)
+        self.y = max(size[1], 25)
+        self.startcol = int(float(self.x)/5)
+        self.indented_startcol = max(self.startcol - 3, 0)
+        self.update_space()
+        
 
     def build_playinfo(self, song_name, artist, album_name, quality, pause=False):
         curses.noecho()
@@ -36,14 +44,14 @@ class Ui:
         self.screen.move(2, 1)
         self.screen.clrtoeol()
         if pause:
-            self.screen.addstr(1, 6, '_ _ z Z Z ' + quality, curses.color_pair(3))
+            self.screen.addstr(1, self.indented_startcol, '_ _ z Z Z ' + quality, curses.color_pair(3))
         else:
-            self.screen.addstr(1, 6, '♫  ♪ ♫  ♪ ' + quality, curses.color_pair(3))
-        self.screen.addstr(1, 24, song_name + '   -   ' + artist + '  < ' + album_name + ' >', curses.color_pair(4))
+            self.screen.addstr(1, self.indented_startcol, '♫  ♪ ♫  ♪ ' + quality, curses.color_pair(3))
+        self.screen.addstr(1, min(self.indented_startcol + 18, self.x-1), song_name + self.space + artist + '  < ' + album_name + ' >', curses.color_pair(4))
         self.screen.refresh()
 
     def build_loading(self):
-        self.screen.addstr(6, 19, '享受高品质音乐，loading...', curses.color_pair(1))
+        self.screen.addstr(6, self.startcol, '享受高品质音乐，loading...', curses.color_pair(1))
         self.screen.refresh()
 
 
@@ -52,114 +60,118 @@ class Ui:
         curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
-        self.screen.addstr(4, 19, title, curses.color_pair(1))
+        self.screen.addstr(4, self.startcol, title, curses.color_pair(1))
 
         if len(datalist) == 0:
-            self.screen.addstr(8, 19, '这里什么都没有 -，-')
+            self.screen.addstr(8, self.startcol, '这里什么都没有 -，-')
 
         else:
             if datatype == 'main':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 8, 16, '-> ' + str(i) + '. ' + datalist[i],
+                        self.screen.addstr(i - offset + 8, self.indented_startcol, '-> ' + str(i) + '. ' + datalist[i],
                                            curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 8, 19, str(i) + '. ' + datalist[i])
+                        self.screen.addstr(i - offset + 8, self.startcol, str(i) + '. ' + datalist[i])
 
             elif datatype == 'songs':
-                for i in range(offset, min(len(datalist), offset + step)):
+                iter_range = min(len(datalist), offset + step)
+                for i in range(offset, iter_range):
                     # this item is focus
                     if i == index:
-                        self.screen.addstr(i - offset + 8, 16,
-                                           '-> ' + str(i) + '. ' + datalist[i]['song_name'] + '   -   ' + datalist[i][
-                                               'artist'] + '  < ' + datalist[i]['album_name'] + ' >',
+                        self.screen.addstr(i - offset + 8, 0, ' ' * self.startcol)
+                        self.screen.addstr(i - offset + 8, self.indented_startcol,
+                                           str('-> ' + str(i) + '. ' + datalist[i]['song_name'] + self.space + datalist[i][
+                                               'artist'] + '  < ' + datalist[i]['album_name'] + ' >')[:int(self.x*2)],
                                            curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 8, 19,
-                                           str(i) + '. ' + datalist[i]['song_name'] + '   -   ' + datalist[i][
-                                               'artist'] + '  < ' + datalist[i]['album_name'] + ' >')
+                        self.screen.addstr(i - offset + 8, 0, ' ' * self.startcol)
+                        self.screen.addstr(i - offset + 8, self.startcol,
+                                           str(str(i) + '. ' + datalist[i]['song_name'] + self.space + datalist[i][
+                                               'artist'] + '  < ' + datalist[i]['album_name'] + ' >')[:int(self.x*2)])
+                    self.screen.addstr(iter_range - offset + 8, 0, ' ' * self.x)
 
             elif datatype == 'artists':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 8, 16,
-                                           '-> ' + str(i) + '. ' + datalist[i]['artists_name'] + '   -   ' + str(
+                        self.screen.addstr(i - offset + 8, self.indented_startcol,
+                                           '-> ' + str(i) + '. ' + datalist[i]['artists_name'] + self.space + str(
                                                datalist[i]['alias']), curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 8, 19,
-                                           str(i) + '. ' + datalist[i]['artists_name'] + '   -   ' + datalist[i][
+                        self.screen.addstr(i - offset + 8, self.startcol,
+                                           str(i) + '. ' + datalist[i]['artists_name'] + self.space + datalist[i][
                                                'alias'])
 
             elif datatype == 'albums':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 8, 16,
-                                           '-> ' + str(i) + '. ' + datalist[i]['albums_name'] + '   -   ' + datalist[i][
+                        self.screen.addstr(i - offset + 8, self.indented_startcol,
+                                           '-> ' + str(i) + '. ' + datalist[i]['albums_name'] + self.space + datalist[i][
                                                'artists_name'], curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 8, 19,
-                                           str(i) + '. ' + datalist[i]['albums_name'] + '   -   ' + datalist[i][
+                        self.screen.addstr(i - offset + 8, self.startcol,
+                                           str(i) + '. ' + datalist[i]['albums_name'] + self.space + datalist[i][
                                                'artists_name'])
 
             elif datatype == 'playlists':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 8, 16, '-> ' + str(i) + '. ' + datalist[i]['title'],
+                        self.screen.addstr(i - offset + 8, self.indented_startcol, '-> ' + str(i) + '. ' + datalist[i]['title'],
                                            curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 8, 19, str(i) + '. ' + datalist[i]['title'])
+                        self.screen.addstr(i - offset + 8, self.startcol, str(i) + '. ' + datalist[i]['title'])
 
 
             elif datatype == 'top_playlists':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 8, 16,
-                                           '-> ' + str(i) + '. ' + datalist[i]['playlists_name'] + '   -   ' +
+                        self.screen.addstr(i - offset + 8, self.indented_startcol,
+                                           '-> ' + str(i) + '. ' + datalist[i]['playlists_name'] + self.space +
                                            datalist[i]['creator_name'], curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 8, 19,
-                                           str(i) + '. ' + datalist[i]['playlists_name'] + '   -   ' + datalist[i][
+                        self.screen.addstr(i - offset + 8, self.startcol,
+                                           str(i) + '. ' + datalist[i]['playlists_name'] + self.space + datalist[i][
                                                'creator_name'])
 
             elif datatype == 'playlist_classes' or datatype == 'playlist_class_detail':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 8, 16, '-> ' + str(i) + '. ' + datalist[i],
+                        self.screen.addstr(i - offset + 8, self.indented_startcol, '-> ' + str(i) + '. ' + datalist[i],
                                            curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 8, 19, str(i) + '. ' + datalist[i])
+                        self.screen.addstr(i - offset + 8, self.startcol, str(i) + '. ' + datalist[i])
 
             elif datatype == 'djchannels':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 8, 16, '-> ' + str(i) + '. ' + datalist[i]['song_name'],
+                        self.screen.addstr(i - offset + 8, self.indented_startcol, '-> ' + str(i) + '. ' + datalist[i]['song_name'],
                                            curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 8, 19, str(i) + '. ' + datalist[i]['song_name'])
+                        self.screen.addstr(i - offset + 8, self.startcol, str(i) + '. ' + datalist[i]['song_name'])
 
             elif datatype == 'search':
                 self.screen.move(4, 1)
                 self.screen.clrtobot()
-                self.screen.addstr(8, 19, '选择搜索类型:', curses.color_pair(1))
+                self.screen.addstr(8, self.startcol, '选择搜索类型:', curses.color_pair(1))
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 10, 16, '-> ' + str(i) + '.' + datalist[i - 1],
+                        self.screen.addstr(i - offset + 10, self.indented_startcol, '-> ' + str(i) + '.' + datalist[i - 1],
                                            curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 10, 19, str(i) + '.' + datalist[i - 1])
+                        self.screen.addstr(i - offset + 10, self.startcol, str(i) + '.' + datalist[i - 1])
             elif datatype == 'help':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 8, 16,
+                        self.screen.addstr(i - offset + 8, self.indented_startcol,
                                            '-> ' + str(i) + '. \'' + (datalist[i][0].upper() + '\'').ljust(11) + datalist[i][
                                                1] + '   ' + datalist[i][2], curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 8, 19,
+                        self.screen.addstr(i - offset + 8, self.startcol,
                                            str(i) + '. \'' + (datalist[i][0].upper() + '\'').ljust(11) + datalist[i][1] + '   ' +
                                            datalist[i][2])
                 self.screen.addstr(20, 6, 'NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存')
                 self.screen.addstr(21, 10, '按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~')
-                self.screen.addstr(22, 19, 'Build with love to music by omi')
+                self.screen.addstr(22, self.startcol, 'Build with love to music by omi')
 
         self.screen.refresh()
 
@@ -235,31 +247,31 @@ class Ui:
         curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
-        self.screen.addstr(5, 19, '请输入登录信息(支持手机登陆)',curses.color_pair(1))
-        self.screen.addstr(8, 19, "账号:", curses.color_pair(1))
-        self.screen.addstr(9, 19, "密码:", curses.color_pair(1))
+        self.screen.addstr(5, self.startcol, '请输入登录信息(支持手机登陆)',curses.color_pair(1))
+        self.screen.addstr(8, self.startcol, "账号:", curses.color_pair(1))
+        self.screen.addstr(9, self.startcol, "密码:", curses.color_pair(1))
         self.screen.move(8,24)
         self.screen.refresh()
 
     def build_login_error(self):
         self.screen.move(4, 1)
         self.screen.clrtobot()
-        self.screen.addstr(8, 19, '艾玛，登录信息好像不对呢 (O_O)#', curses.color_pair(1))
-        self.screen.addstr(10, 19, '[1] 再试一次')
-        self.screen.addstr(11, 19, '[2] 稍后再试')
-        self.screen.addstr(14, 19, '请键入对应数字:', curses.color_pair(2))
+        self.screen.addstr(8, self.startcol, '艾玛，登录信息好像不对呢 (O_O)#', curses.color_pair(1))
+        self.screen.addstr(10, self.startcol, '[1] 再试一次')
+        self.screen.addstr(11, self.startcol, '[2] 稍后再试')
+        self.screen.addstr(14, self.startcol, '请键入对应数字:', curses.color_pair(2))
         self.screen.refresh()
         x = self.screen.getch()
         return x
 
     def get_account(self):
         curses.echo()
-        account = self.screen.getstr(8,24,60)
+        account = self.screen.getstr(8, self.startcol+6,60)
         return account
 
     def get_password(self):
         curses.noecho()
-        password = self.screen.getstr(9,24,60)
+        password = self.screen.getstr(9, self.startcol+6,60)
         return password
 
     def get_param(self, prompt_string):
@@ -267,10 +279,33 @@ class Ui:
         curses.echo()
         self.screen.move(4, 1)
         self.screen.clrtobot()
-        self.screen.addstr(5, 19, prompt_string, curses.color_pair(1))
+        self.screen.addstr(5, self.startcol, prompt_string, curses.color_pair(1))
         self.screen.refresh()
-        info = self.screen.getstr(10, 19, 60)
+        info = self.screen.getstr(10, self.startcol, 60)
         if info.strip() is '':
             return self.get_param(prompt_string)
         else:
             return info
+
+    def update_size(self):
+        # get terminal size
+        size = terminalsize.get_terminal_size()
+        self.x = max(size[0], 10)
+        self.y = max(size[1], 25)
+        
+        # update intendations
+        curses.resizeterm(self.y, self.x)
+        self.startcol = int(float(self.x)/5)
+        self.indented_startcol = max(self.startcol - 3, 0)
+        self.update_space()
+        self.screen.clear()
+        self.screen.refresh()
+
+    def update_space(self):
+        if self.x > 140:
+            self.space = "   -   "
+        elif self.x > 80:
+            self.space = "  -  "
+        else:
+            self.space = " - "
+        self.screen.refresh()
