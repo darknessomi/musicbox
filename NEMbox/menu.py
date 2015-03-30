@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2015-01-30 18:06:12
+# @Last Modified time: 2015-03-30 23:36:21
 
 
 '''
@@ -412,6 +412,13 @@ class Menu:
             log.debug(self.datalist)
             self.title += ' > ' + data
 
+        # 歌曲榜单
+        elif datatype == 'toplists':
+            songs = netease.top_songlist(idx)
+            self.title += ' > ' + self.datalist[idx]
+            self.datalist = netease.dig_info(songs, 'songs')
+            self.datatype = 'songs'
+
         # 搜索菜单
         elif datatype == 'search':
             ui = self.ui
@@ -446,10 +453,9 @@ class Menu:
         # 排行榜
         netease = self.netease
         if idx == 0:
-            songs = netease.top_songlist()
-            self.datalist = netease.dig_info(songs, 'songs')
+            self.datalist=netease.return_toplists()
             self.title += ' > 排行榜'
-            self.datatype = 'songs'
+            self.datatype = 'toplists'
 
         # 艺术家
         elif idx == 1:

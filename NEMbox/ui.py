@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2015-01-30 18:02:34
+# @Last Modified time: 2015-03-30 23:36:21
 
 
 '''
@@ -132,6 +132,15 @@ class Ui:
                         self.screen.addstr(i - offset + 8, self.startcol,
                                            str(i) + '. ' + datalist[i]['playlists_name'] + self.space + datalist[i][
                                                'creator_name'])
+
+
+            elif datatype == 'toplists':
+                for i in range(offset, min(len(datalist), offset + step)):
+                    if i == index:
+                        self.screen.addstr(i - offset + 8, self.indented_startcol, '-> ' + str(i) + '. ' + datalist[i], curses.color_pair(2))
+                    else:
+                        self.screen.addstr(i - offset + 8, self.startcol, str(i) + '. ' + datalist[i])
+
 
             elif datatype == 'playlist_classes' or datatype == 'playlist_class_detail':
                 for i in range(offset, min(len(datalist), offset + step)):

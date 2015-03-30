@@ -8,7 +8,7 @@ NetEase-MusicBox
 
 [![](https://img.shields.io/travis/joyent/node/v0.6.svg)]()
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
-[![versions](https://img.shields.io/badge/versions%20-%20%200.1.5.1-blue.svg)]()
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.5.2-blue.svg)]()
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
@@ -17,7 +17,7 @@ NetEase-MusicBox
 
 1. 320kbps的高品质音乐(播放时显示HD标记)
 2. 歌曲，艺术家，专辑检索
-3. 网易热门歌曲排行榜
+3. 网易22个歌曲排行榜
 4. 网易新碟推荐
 5. 网易精选歌单
 6. 网易DJ节目
@@ -117,6 +117,8 @@ I### Linux安装
 Enjoy it !
 
 ### 更新日志
+
+2015-03-31 版本 0.1.5.2    新增22个歌曲排行榜
 
 2015-03-30 版本 0.1.5.1    新增一键 P 回到历史播放列表功能 (感谢Catofes提交)
 
