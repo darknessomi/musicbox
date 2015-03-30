@@ -85,6 +85,7 @@ class Menu:
         self.djstack = []
         self.userid = None
         self.username = None
+        self.resume_play = True
         signal.signal(signal.SIGWINCH, self.change_term)
         signal.signal(signal.SIGINT, self.send_kill)
 
@@ -93,10 +94,13 @@ class Menu:
             data = json.loads(sfile.read())
             self.collection = data['collection']
             self.account = data['account']
+            self.presentsongs = data['presentsongs']
             sfile.close()
         except:
             self.collection = []
             self.account = {}
+            self.presentsongs = []
+            self.resume_play = False
 
     def change_term(self, signum, frame):
         self.ui.screen.clear()
@@ -107,7 +111,8 @@ class Menu:
         sfile = file(Constant.conf_dir + "/flavor.json", 'w')
         data = {
             'account': self.account,
-            'collection': self.collection
+            'collection': self.collection,
+            'presentsongs': self.presentsongs
         }
         sfile.write(json.dumps(data))
         sfile.close()
@@ -258,6 +263,9 @@ class Menu:
                 self.datalist = self.presentsongs[2]
                 self.offset = self.presentsongs[3]
                 self.index = self.presentsongs[4]
+                if self.resume_play:
+                    self.player.play(self.datatype, self.datalist, self.index)
+                    self.resume_play = False
 
             # 添加到打碟歌单
             elif key == ord('a'):
@@ -334,7 +342,8 @@ class Menu:
         sfile = file(Constant.conf_dir + "/flavor.json", 'w')
         data = {
             'account': self.account,
-            'collection': self.collection
+            'collection': self.collection,
+            'presentsongs': self.presentsongs
         }
         sfile.write(json.dumps(data))
         sfile.close()
