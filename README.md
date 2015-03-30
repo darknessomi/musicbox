@@ -8,7 +8,7 @@ NetEase-MusicBox
 
 [![](https://img.shields.io/travis/joyent/node/v0.6.svg)]()
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
-[![versions](https://img.shields.io/badge/versions%20-%20%200.1.5.0-blue.svg)]()
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.5.1-blue.svg)]()
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
@@ -44,7 +44,7 @@ NetEase-MusicBox
 	<tr> <td>Space</td> <td>Play/Pause</td> <td>播放/暂停</td> </tr>
     <tr> <td>?</td> <td>Shuffle</td> <td>手气不错</td> </tr>
 	<tr> <td>M</td> <td>Menu</td> <td>主菜单</td> </tr>
-	<tr> <td>P</td> <td>Present</td> <td>当前播放列表</td> </tr>
+	<tr> <td>P</td> <td>Present/History</td> <td>当前/历史播放列表</td> </tr>
 	<tr> <td>A</td> <td>Add</td> <td>添加曲目到打碟</td> </tr>
 	<tr> <td>Z</td> <td>DJ list</td> <td>打碟列表</td> </tr>
 	<tr> <td>S</td> <td>Star</td> <td>添加到收藏</td> </tr>
@@ -68,8 +68,7 @@ NetEase-MusicBox
 	$ sudo python setup.py install
 
 	$ brew install mpg123
-
-### Linux安装
+I### Linux安装
 
 	$ git clone https://github.com/darknessomi/musicbox.git  
 	
@@ -118,6 +117,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-03-30 版本 0.1.5.1    新增一键 P 回到历史播放列表功能 (感谢Catofes提交)
 
 2015-03-27 版本 0.1.5.0    使用全新动态UI绘制方法,提高稳定性 (感谢Will Jiang提交)
 
