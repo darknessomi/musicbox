@@ -46,16 +46,16 @@ shortcut = [
     ['[', 'Prev song ', '上一曲'],
     [']', 'Next song ', '下一曲'],
     [' ', 'Play/Pause', '播放/暂停'],
-    ['?', 'Shuffle   ', '手气不错'],
-    ['=', 'Volume+   ', '音量增加'],
-    ['-', 'Volume-   ', '音量减少'],
-    ['m', 'Menu      ', '主菜单'],
-    ['p', 'Present   ', '当前播放列表'],
-    ['a', 'Add       ', '添加曲目到打碟'],
-    ['z', 'DJ list   ', '打碟列表'],
-    ['s', 'Star      ', '添加到收藏'],
-    ['c', 'Collection', '收藏列表'],
-    ['r', 'Remove    ', '删除当前条目'],
+    ['?', 'Shuffle          ', '手气不错'],
+    ['=', 'Volume+          ', '音量增加'],
+    ['-', 'Volume-          ', '音量减少'],
+    ['m', 'Menu             ', '主菜单'],
+    ['p', 'Present/History  ', '当前/历史播放列表'],
+    ['a', 'Add              ', '添加曲目到打碟'],
+    ['z', 'DJ list          ', '打碟列表'],
+    ['s', 'Star             ', '添加到收藏'],
+    ['c', 'Collection       ', '收藏列表'],
+    ['r', 'Remove           ', '删除当前条目'],
     ['Shift+j', 'Move Down ', '向下移动当前条目'],
     ['Shift+k', 'Move Up   ', '向上移动当前条目'],
     ['q', 'Quit      ', '退出'],
@@ -85,6 +85,7 @@ class Menu:
         self.djstack = []
         self.userid = None
         self.username = None
+        self.resume_play = True
         signal.signal(signal.SIGWINCH, self.change_term)
         signal.signal(signal.SIGINT, self.send_kill)
 
@@ -93,10 +94,13 @@ class Menu:
             data = json.loads(sfile.read())
             self.collection = data['collection']
             self.account = data['account']
+            self.presentsongs = data['presentsongs']
             sfile.close()
         except:
             self.collection = []
             self.account = {}
+            self.presentsongs = []
+            self.resume_play = False
 
     def change_term(self, signum, frame):
         self.ui.screen.clear()
@@ -107,7 +111,8 @@ class Menu:
         sfile = file(Constant.conf_dir + "/flavor.json", 'w')
         data = {
             'account': self.account,
-            'collection': self.collection
+            'collection': self.collection,
+            'presentsongs': self.presentsongs
         }
         sfile.write(json.dumps(data))
         sfile.close()
@@ -258,6 +263,9 @@ class Menu:
                 self.datalist = self.presentsongs[2]
                 self.offset = self.presentsongs[3]
                 self.index = self.presentsongs[4]
+                if self.resume_play:
+                    self.player.play(self.datatype, self.datalist, self.index)
+                    self.resume_play = False
 
             # 添加到打碟歌单
             elif key == ord('a'):
@@ -334,7 +342,8 @@ class Menu:
         sfile = file(Constant.conf_dir + "/flavor.json", 'w')
         data = {
             'account': self.account,
-            'collection': self.collection
+            'collection': self.collection,
+            'presentsongs': self.presentsongs
         }
         sfile.write(json.dumps(data))
         sfile.close()
