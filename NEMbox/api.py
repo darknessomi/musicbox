@@ -317,11 +317,17 @@ class NetEase:
         if dig_type == 'songs':
             for i in range(0, len(data)):
                 url, quality = geturl(data[i])
+                
+                if data[i]['album'] != None:
+                    album_name = data[i]['album']['name']
+                else:
+                    album_name = '未知专辑'
+                    
                 song_info = {
                     'song_id': data[i]['id'],
                     'artist': [],
                     'song_name': data[i]['name'],
-                    'album_name': data[i]['album']['name'],
+                    'album_name': album_name,
                     'mp3_url': url,
                     'quality': quality
                 }
