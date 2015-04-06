@@ -51,8 +51,8 @@ class Ui:
         self.screen.refresh()
 
     def build_loading(self):
-        # self.screen.addstr(6, self.startcol, '享受高品质音乐，loading...', curses.color_pair(1))
-        self.screen.addstr(6, 0, '享受高品质音乐，loading...'.center(self.x) , curses.color_pair(1))
+        self.screen.addstr(6, self.startcol, '享受高品质音乐，loading...', curses.color_pair(1))
+        # self.screen.addstr(6, 0, '享受高品质音乐，loading...'.center(self.x) , curses.color_pair(1))
         self.screen.refresh()
 
 
@@ -90,6 +90,7 @@ class Ui:
                         self.screen.addstr(i - offset + 8, self.startcol,
                                            str(str(i) + '. ' + datalist[i]['song_name'] + self.space + datalist[i][
                                                'artist'] + '  < ' + datalist[i]['album_name'] + ' >')[:int(self.x*2)])
+                        self.screen.addstr(i - offset + 8, self.x - self.startcol, ' '*self.startcol)
                     self.screen.addstr(iter_range - offset + 8, 0, ' ' * self.x)
 
             elif datatype == 'artists':
