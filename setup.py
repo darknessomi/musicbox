@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 22:08:33
 # @Last Modified by:   omi
-# @Last Modified time: 2014-08-25 18:02:34
+# @Last Modified time: 2015-03-30 23:36:21
 
 '''
 __   ___________________________________________
@@ -39,7 +39,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='NetEase-MusicBox',
-    version='0.1.4.0',
+    version='0.1.5.3',
     packages=find_packages(),
 
     include_package_data=True,
