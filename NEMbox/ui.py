@@ -51,7 +51,8 @@ class Ui:
         self.screen.refresh()
 
     def build_loading(self):
-        self.screen.addstr(6, self.startcol, '享受高品质音乐，loading...', curses.color_pair(1))
+        # self.screen.addstr(6, self.startcol, '享受高品质音乐，loading...', curses.color_pair(1))
+        self.screen.addstr(6, 0, '享受高品质音乐，loading...'.center(self.x) , curses.color_pair(1))
         self.screen.refresh()
 
 
@@ -304,8 +305,9 @@ class Ui:
     def update_space(self):
         if self.x > 140:
             self.space = "   -   "
-        elif self.x > 80:
+        elif self.x > 100:
             self.space = "  -  "
         else:
             self.space = " - "
         self.screen.refresh()
+
