@@ -4,4 +4,4 @@ import os
 
 
 class Constant:
-    conf_dir = os.path.expanduser('~') + '/.netease-musicbox'
+    conf_dir = os.path.join(os.path.expanduser('~'), '.netease-musicbox')
