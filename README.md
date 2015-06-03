@@ -86,6 +86,7 @@ NetEase-MusicBox
 	<tr> <td>Kali</td> <td>1.1.0</td> </tr>
 	<tr> <td>CentOS</td> <td>7</td> </tr>
 	<tr> <td>openSUSE</td> <td>13.2</td> </tr>
+	<tr> <td>Fedora</td> <td>22</td> </tr>
 </table>
 
 
@@ -118,7 +119,7 @@ Enjoy it !
 
 ### 更新日志
 
-2015-05-26 版本 0.1.5.4    修复海外用户无法搜索的问题
+2015-05-26 版本 0.1.5.5    修复海外用户无法搜索的问题
 
 2015-05-05 版本 0.1.5.4    优化log文件路径
 
