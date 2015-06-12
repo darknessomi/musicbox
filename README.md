@@ -8,7 +8,7 @@ NetEase-MusicBox
 
 [![](https://img.shields.io/travis/joyent/node/v0.6.svg)]()
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
-[![versions](https://img.shields.io/badge/versions%20-%20%200.1.5.3-blue.svg)]()
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.5.5-blue.svg)]()
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
@@ -86,6 +86,7 @@ NetEase-MusicBox
 	<tr> <td>Kali</td> <td>1.1.0</td> </tr>
 	<tr> <td>CentOS</td> <td>7</td> </tr>
 	<tr> <td>openSUSE</td> <td>13.2</td> </tr>
+	<tr> <td>Fedora</td> <td>22</td> </tr>
 </table>
 
 
@@ -117,6 +118,10 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-05-26 版本 0.1.5.5    修复海外用户无法搜索的问题
+
+2015-05-05 版本 0.1.5.4    优化log文件路径
 
 2015-04-02 版本 0.1.5.3    修复个别歌单崩溃错误
 

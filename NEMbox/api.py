@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2015-03-30 23:36:21
+# @Last Modified time: 2015-05-26 01:06:55
 
 
 '''
@@ -171,7 +171,7 @@ class NetEase:
 
     # 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002) *(type)*
     def search(self, s, stype=1, offset=0, total='true', limit=60):
-        action = 'http://music.163.com/api/search/get/web'
+        action = 'http://music.163.com/api/search/get'
         data = {
             's': s,
             'type': stype,
