@@ -75,7 +75,7 @@ class Player:
     def recall(self):
         self.playing_flag = True
         item = self.songs[self.idx]
-        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'])
+        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
         self.popen_recall(self.recall, item['mp3_url'])
 
     def play(self, datatype, songs, idx):
@@ -128,13 +128,13 @@ class Player:
         self.pause_flag = True
         os.kill(self.popen_handler.pid, signal.SIGSTOP)
         item = self.songs[self.idx]
-        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], pause=True)
+        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time(), pause=True)
 
     def resume(self):
         self.pause_flag = False
         os.kill(self.popen_handler.pid, signal.SIGCONT)
         item = self.songs[self.idx]
-        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'])
+        self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
 
     def next(self):
         self.stop()
@@ -172,8 +172,8 @@ class Player:
             self.ui.update_size()
             item = self.songs[self.idx]
             if self.playing_flag:
-                self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'])
+                self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
             if self.pause_flag:
-                self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], pause=True)
+                self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time(), pause=True)
         except IndexError:
             pass
