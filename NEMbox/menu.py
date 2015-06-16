@@ -23,7 +23,7 @@ from ui import Ui
 from const import Constant
 import logger
 import signal
-
+import thread
 
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
@@ -88,6 +88,7 @@ class Menu:
         self.resume_play = True
         signal.signal(signal.SIGWINCH, self.change_term)
         signal.signal(signal.SIGINT, self.send_kill)
+        self.START = time.time()
 
         try:
             sfile = file(Constant.conf_dir + "/flavor.json", 'r')
@@ -120,7 +121,8 @@ class Menu:
         sys.exit()
 
     def start(self):
-        self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step)
+        self.START = time.time()//1
+        self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
         while True:
             datatype = self.datatype
@@ -131,6 +133,7 @@ class Menu:
             step = self.step
             stack = self.stack
             djstack = self.djstack
+            self.screen.timeout(500)
             key = self.screen.getch()
             self.ui.screen.refresh()
 
@@ -151,17 +154,19 @@ class Menu:
             # 上移
             elif key == ord('k'):
                 self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx - 1)
+                self.START = time.time()
 
             # 下移
             elif key == ord('j'):
                 self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx + 1)
+                self.START = time.time()
 
             # 数字快捷键
             elif ord('0') <= key <= ord('9'):
                 if self.datatype == 'songs' or self.datatype == 'djchannels' or self.datatype == 'help':
                     continue
                 idx = key - ord('0')
-                self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, idx, self.step)
+                self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, idx, self.step, self.START)
                 self.ui.build_loading()
                 self.dispatch_enter(idx)
                 self.index = 0
@@ -171,6 +176,7 @@ class Menu:
             elif key == ord('u'):
                 if offset == 0:
                     continue
+                self.START = time.time()
                 self.offset -= step
 
                 # e.g. 23 - 10 = 13 --> 10
@@ -180,6 +186,7 @@ class Menu:
             elif key == ord('d'):
                 if offset + step >= len(datalist):
                     continue
+                self.START = time.time()
                 self.offset += step
 
                 # e.g. 23 + 10 = 33 --> 30
@@ -189,6 +196,7 @@ class Menu:
             elif key == ord('l') or key == 10:
                 if self.datatype == 'songs' or self.datatype == 'djchannels' or self.datatype == 'help':
                     continue
+                self.START = time.time()
                 self.ui.build_loading()
                 self.dispatch_enter(idx)
                 self.index = 0
@@ -199,6 +207,7 @@ class Menu:
                 # if not main menu
                 if len(self.stack) == 1:
                     continue
+                self.START = time.time()
                 up = stack.pop()
                 self.datatype = up[0]
                 self.title = up[1]
@@ -306,6 +315,7 @@ class Menu:
             # 当前项目下移
             elif key == ord("J"):
                 if datatype != 'main' and len(datalist) != 0 and idx + 1 != len(self.datalist):
+                    self.START = time.time()
                     song = self.datalist.pop(idx)
                     self.datalist.insert(idx + 1, song)
                     self.index = idx + 1
@@ -316,6 +326,7 @@ class Menu:
             # 当前项目上移
             elif key == ord("K"):
                 if datatype != 'main' and len(datalist) != 0 and idx != 0:
+                    self.START = time.time()
                     song = self.datalist.pop(idx)
                     self.datalist.insert(idx - 1, song)
                     self.index = idx - 1
@@ -336,7 +347,7 @@ class Menu:
                 if datatype == 'help':
                     webbrowser.open_new_tab('https://github.com/darknessomi/musicbox')
 
-            self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step)
+            self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
 
         self.player.stop()
         sfile = file(Constant.conf_dir + "/flavor.json", 'w')
