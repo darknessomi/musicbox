@@ -11,13 +11,17 @@
 '''
 # Let's make some noise
 
+from __future__ import absolute_import, division, print_function, \
+    with_statement
+
 import subprocess
 import threading
 import time
 import os
 import signal
 import random
-from ui import Ui
+
+from NEMbox.ui import Ui
 
 
 # carousel x in [left, right]
@@ -45,10 +49,11 @@ class Player:
         """
 
         def runInThread(onExit, popenArgs):
-            self.popen_handler = subprocess.Popen(['mpg123', '-R', ], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self.popen_handler = subprocess.Popen(['mpg123', '-R', ], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
             self.popen_handler.stdin.write("SILENCE\n")
             self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
             self.popen_handler.stdin.write("L " + popenArgs + "\n")
+            self.popen_handler.stdin.flush()  #Python3 need
             # self.popen_handler.wait()
             while (True):
                 if self.playing_flag == False:
@@ -59,6 +64,7 @@ class Player:
                     break
                 if strout == "@P 0\n":
                     self.popen_handler.stdin.write("Q\n")
+                    self.popen_handler.stdin.flush()
                     self.popen_handler.kill()
                     break
 
@@ -90,9 +96,8 @@ class Player:
                     self.pause()
 
             else:
-                if datatype == 'songs' or datatype == 'djchannels':
-                    self.songs = songs
-                    self.idx = idx
+                self.songs = songs
+                self.idx = idx
 
                 # if it's playing
                 if self.playing_flag:
@@ -122,6 +127,7 @@ class Player:
         if self.playing_flag and self.popen_handler:
             self.playing_flag = False
             self.popen_handler.stdin.write("Q\n")
+            self.popen_handler.stdin.flush()
             self.popen_handler.kill()
 
     def pause(self):
@@ -136,7 +142,7 @@ class Player:
         item = self.songs[self.idx]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
 
-    def next(self):
+    def nextsong(self):  #Python3 Built-in Function next(), use nextsong() instead
         self.stop()
         time.sleep(0.01)
         self.idx = carousel(0, len(self.songs) - 1, self.idx + 1)
@@ -160,12 +166,14 @@ class Player:
         if (self.volume > 100):
             self.volume = 100
         self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
+        self.popen_handler.stdin.flush()
 
     def volume_down(self):
         self.volume = self.volume - 7
         if (self.volume < 0):
             self.volume = 0
         self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
+        self.popen_handler.stdin.flush()
 
     def update_size(self):
         try:

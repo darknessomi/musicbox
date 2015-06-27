@@ -10,12 +10,16 @@
 网易云音乐 Ui
 '''
 
+from __future__ import absolute_import, division, print_function, \
+    with_statement
+
 import curses
-import terminalsize
-from api import NetEase
 import hashlib
 from time import time
-from scrollstring import *
+
+from NEMbox import terminalsize
+from NEMbox.api import NetEase
+from NEMbox.scrollstring import *
 
 
 class Ui:
@@ -282,7 +286,7 @@ class Ui:
 
     def build_login(self):
         self.build_login_bar()
-        local_account = self.get_account()
+        local_account = self.get_account().decode('ascii')
         local_password = hashlib.md5(self.get_password()).hexdigest()
         login_info = self.netease.login(local_account, local_password)
         account = [local_account,local_password]
@@ -340,7 +344,7 @@ class Ui:
         self.screen.addstr(5, self.startcol, prompt_string, curses.color_pair(1))
         self.screen.refresh()
         info = self.screen.getstr(10, self.startcol, 60)
-        if info.strip() is '':
+        if info.strip() is b'':
             return self.get_param(prompt_string)
         else:
             return info
