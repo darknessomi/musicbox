@@ -5,8 +5,14 @@
 网易云音乐 Entry
 '''
 
+from __future__ import absolute_import
+
+import os.path
+import sys
 import curses, traceback
-from menu import Menu
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../'))
+from NEMbox.menu import Menu
 
 
 def start():

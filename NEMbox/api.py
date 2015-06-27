@@ -10,13 +10,18 @@
 网易云音乐 Api
 '''
 
+from __future__ import absolute_import, division, print_function, \
+    with_statement
+
 import re
 import json
-import requests
-from bs4 import BeautifulSoup
-import logger
 import hashlib
 import random
+import base64
+import requests
+from bs4 import BeautifulSoup
+
+from NEMbox import logger
 
 # 歌曲榜单地址
 top_list_all={
@@ -50,13 +55,13 @@ log = logger.getLogger(__name__)
 
 # 加密算法, 基于https://github.com/yanunon/NeteaseCloudMusic脚本实现
 def encrypted_id(id):
-    magic = bytearray('3go8&$8*3*3h0k(2)2')
-    song_id = bytearray(id)
+    magic = bytearray('3go8&$8*3*3h0k(2)2', 'ascii')
+    song_id = bytearray(id, 'ascii')
     magic_len = len(magic)
-    for i in xrange(len(song_id)):
+    for i in range(len(song_id)):
         song_id[i] = song_id[i]^magic[i%magic_len]
     m = hashlib.md5(song_id)
-    result = m.digest().encode('base64')[:-1]
+    result = base64.b64encode(m.digest()).decode('ascii')
     result = result.replace('/', '_')
     result = result.replace('+', '-')
     return result

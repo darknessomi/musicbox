@@ -10,20 +10,28 @@
 网易云音乐 Menu
 '''
 
+from __future__ import absolute_import, division, print_function, \
+    with_statement
+
 import curses
 import locale
 import sys
 import os
 import json
 import time
-import webbrowser
-from api import NetEase
-from player import Player
-from ui import Ui
-from const import Constant
-import logger
 import signal
-import thread
+import webbrowser
+
+from NEMbox.api import NetEase
+from NEMbox.player import Player
+from NEMbox.ui import Ui
+from NEMbox.const import Constant
+from NEMbox import logger
+
+if sys.version[0] == '3':  #python3
+    import _thread as thread
+elif sys.version[0] == '2':  #python2
+    import thread
 
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
@@ -67,8 +75,10 @@ log = logger.getLogger(__name__)
 
 class Menu:
     def __init__(self):
-        reload(sys)
-        sys.setdefaultencoding('UTF-8')
+        if sys.version[0] == '2':  #python2
+            reload(sys)
+            sys.setdefaultencoding('UTF-8')
+        
         self.datatype = 'main'
         self.title = '网易云音乐'
         self.datalist = ['排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单', 'DJ节目', '打碟', '收藏', '搜索', '帮助']
@@ -91,12 +101,11 @@ class Menu:
         self.START = time.time()
 
         try:
-            sfile = file(Constant.conf_dir + "/flavor.json", 'r')
-            data = json.loads(sfile.read())
-            self.collection = data['collection']
-            self.account = data['account']
-            self.presentsongs = data['presentsongs']
-            sfile.close()
+            with open(Constant.conf_dir + "/flavor.json", 'r') as sfile:
+                data = json.loads(sfile.read())
+                self.collection = data['collection']
+                self.account = data['account']
+                self.presentsongs = data['presentsongs']
         except:
             self.collection = []
             self.account = {}
@@ -109,14 +118,13 @@ class Menu:
 
     def send_kill(self,signum,fram):
         self.player.stop()
-        sfile = file(Constant.conf_dir + "/flavor.json", 'w')
-        data = {
-            'account': self.account,
-            'collection': self.collection,
-            'presentsongs': self.presentsongs
-        }
-        sfile.write(json.dumps(data))
-        sfile.close()
+        with open(Constant.conf_dir + "/flavor.json", 'w') as sfile:
+            data = {
+                'account': self.account,
+                'collection': self.collection,
+                'presentsongs': self.presentsongs
+            }
+            sfile.write(json.dumps(data))
         curses.endwin()
         sys.exit()
 
@@ -224,7 +232,7 @@ class Menu:
             elif key == ord(']'):
                 if len(self.presentsongs) == 0:
                     continue
-                self.player.next()
+                self.player.nextsong()  #Python3 Built-in Function, next()
                 time.sleep(0.1)
 
             # 播放上一曲
@@ -350,14 +358,13 @@ class Menu:
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
 
         self.player.stop()
-        sfile = file(Constant.conf_dir + "/flavor.json", 'w')
-        data = {
-            'account': self.account,
-            'collection': self.collection,
-            'presentsongs': self.presentsongs
-        }
-        sfile.write(json.dumps(data))
-        sfile.close()
+        with open(Constant.conf_dir + "/flavor.json", 'w') as sfile:
+            data = {
+                'account': self.account,
+                'collection': self.collection,
+                'presentsongs': self.presentsongs
+            }
+            sfile.write(json.dumps(data))
         curses.endwin()
 
     def dispatch_enter(self, idx):
