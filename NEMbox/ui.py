@@ -13,6 +13,7 @@
 import curses
 import terminalsize
 from api import NetEase
+import hashlib
 from time import time
 from scrollstring import *
 
@@ -282,8 +283,8 @@ class Ui:
     def build_login(self):
         self.build_login_bar()
         local_account = self.get_account()
-        local_password = self.get_password()
-        # local_password = hashlib.md5(self.get_password()).hexdigest()
+        # local_password = self.get_password()
+        local_password = hashlib.md5(self.get_password()).hexdigest()
         login_info = self.netease.login(local_account, local_password)
         account = [local_account,local_password]
         if login_info['code'] != 200:

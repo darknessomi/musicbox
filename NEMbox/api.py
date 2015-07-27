@@ -52,6 +52,17 @@ default_timeout = 10
 
 log = logger.getLogger(__name__)
 
+modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7'
+nonce = '0CoJUm6Qyw8W8jud'
+pubKey = '010001'
+pem = """-----BEGIN RSA PUBLIC KEY-----
+MIGJAoGBAOC1CfYlnfhkLbw1ZikBR33yJnfsFStf9orOYVu3tyUVKzqxeodq6opa
+p20uQXYp7E7jQfVhNfzPaVKAEE4DEuy9qSVXyThwEUr2ydBcT38MNoW3pGvuJVky
+V1zOELQk2BPP5IddPoIEe5fd71J0HVRrjiidxpNbPs4EYtsKIrjnAgMBAAE=
+OWRjNjkzNWIzZWNlMDQ2MmRiMGEyMmI4ZTcCBjAxMDAwMQ==
+-----END RSA PUBLIC KEY-----
+"""
+
 # 歌曲加密算法, 基于https://github.com/yanunon/NeteaseCloudMusic脚本实现
 def encrypted_id(id):
     magic = bytearray('3go8&$8*3*3h0k(2)2')
@@ -67,16 +78,6 @@ def encrypted_id(id):
 
 # 登录加密算法, 基于https://github.com/stkevintan/nw_musicbox脚本实现
 def encrypted_login(username, password):
-    modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7'
-    nonce = '0CoJUm6Qyw8W8jud'
-    pubKey = '010001'
-    pem = """-----BEGIN RSA PUBLIC KEY-----
-    MIGJAoGBAOC1CfYlnfhkLbw1ZikBR33yJnfsFStf9orOYVu3tyUVKzqxeodq6opa
-    p20uQXYp7E7jQfVhNfzPaVKAEE4DEuy9qSVXyThwEUr2ydBcT38MNoW3pGvuJVky
-    V1zOELQk2BPP5IddPoIEe5fd71J0HVRrjiidxpNbPs4EYtsKIrjnAgMBAAE=
-    OWRjNjkzNWIzZWNlMDQ2MmRiMGEyMmI4ZTcCBjAxMDAwMQ==
-    -----END RSA PUBLIC KEY-----
-    """
     text = {
         'username': username,
         'password': password,
@@ -95,16 +96,6 @@ def encrypted_login(username, password):
     return data
 
 def encrypted_phonelogin(username, password):
-    modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7'
-    nonce = '0CoJUm6Qyw8W8jud'
-    pubKey = '010001'
-    pem = """-----BEGIN RSA PUBLIC KEY-----
-    MIGJAoGBAOC1CfYlnfhkLbw1ZikBR33yJnfsFStf9orOYVu3tyUVKzqxeodq6opa
-    p20uQXYp7E7jQfVhNfzPaVKAEE4DEuy9qSVXyThwEUr2ydBcT38MNoW3pGvuJVky
-    V1zOELQk2BPP5IddPoIEe5fd71J0HVRrjiidxpNbPs4EYtsKIrjnAgMBAAE=
-    OWRjNjkzNWIzZWNlMDQ2MmRiMGEyMmI4ZTcCBjAxMDAwMQ==
-    -----END RSA PUBLIC KEY-----
-    """
     text = {
         'phone': username,
         'password': password,
@@ -120,12 +111,13 @@ def encrypted_phonelogin(username, password):
         'params': encText,
         'encSecKey': encSecKey
     }
-    print(data)
+    # sfile = open("login.json", 'w')
+    # sfile.write(json.dumps(data))
+    # sfile.close()
     return data
 
 def aesEncrypt(text, secKey):
-    mode = AES.MODE_CBC
-    encryptor = AES.new(secKey, mode, '0102030405060708')
+    encryptor = AES.new(secKey, 2, '0102030405060708')
     ciphertext = encryptor.encrypt(text)
     return ciphertext
 
