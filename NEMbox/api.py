@@ -15,7 +15,7 @@ import os
 import json
 import requests
 from Crypto.Cipher import AES
-from Crypto.PublicKey import RSA
+import rsa
 from bs4 import BeautifulSoup
 import logger
 import hashlib
@@ -120,6 +120,7 @@ def encrypted_phonelogin(username, password):
         'params': encText,
         'encSecKey': encSecKey
     }
+    print(data)
     return data
 
 def aesEncrypt(text, secKey):
@@ -128,9 +129,10 @@ def aesEncrypt(text, secKey):
     ciphertext = encryptor.encrypt(text)
     return ciphertext
 
-def rsaEncrypt(text, pem):
-    key = RSA.importKey(pem)
-    encText = key.exportKey('PEM',text,1)
+def rsaEncrypt(secKey, pem):
+    pubkey = rsa.PublicKey.load_pkcs1(pem)
+    encText = rsa.encrypt(secKey, pubkey)
+    encText = encText.decode('ISO-8859-1').encode('HEX')
     return encText
 
 def createSecretKey(size):
