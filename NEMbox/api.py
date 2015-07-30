@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2015-05-26 01:06:55
+# @Last Modified time: 2015-07-30 21:21:15
 
 
 '''
@@ -11,12 +11,15 @@
 '''
 
 import re
+import os
 import json
 import requests
+from Crypto.Cipher import AES
 from bs4 import BeautifulSoup
 import logger
 import hashlib
 import random
+import base64
 
 # 歌曲榜单地址
 top_list_all={
@@ -48,7 +51,12 @@ default_timeout = 10
 
 log = logger.getLogger(__name__)
 
-# 加密算法, 基于https://github.com/yanunon/NeteaseCloudMusic脚本实现
+modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7'
+nonce = '0CoJUm6Qyw8W8jud'
+pubKey = '010001'
+
+
+# 歌曲加密算法, 基于https://github.com/yanunon/NeteaseCloudMusic脚本实现
 def encrypted_id(id):
     magic = bytearray('3go8&$8*3*3h0k(2)2')
     song_id = bytearray(id)
@@ -60,6 +68,55 @@ def encrypted_id(id):
     result = result.replace('/', '_')
     result = result.replace('+', '-')
     return result
+
+# 登录加密算法, 基于https://github.com/stkevintan/nw_musicbox脚本实现
+def encrypted_login(username, password):
+    text = {
+        'username': username,
+        'password': password,
+        'rememberLogin': 'true'
+    }
+    text = json.dumps(text)
+    secKey = createSecretKey(16)
+    encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
+    encSecKey = rsaEncrypt(secKey, pubKey, modulus)
+    data = {
+        'params': encText,
+        'encSecKey': encSecKey
+    }
+    return data
+
+def encrypted_phonelogin(username, password):
+    text = {
+        'phone': username,
+        'password': password,
+        'rememberLogin': 'true'
+    }
+    text = json.dumps(text)
+    secKey = createSecretKey(16)
+    encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
+    encSecKey = rsaEncrypt(secKey, pubKey, modulus)
+    data = {
+        'params': encText,
+        'encSecKey': encSecKey
+    }
+    return data
+
+def aesEncrypt(text, secKey):
+    pad = 16 - len(text) % 16
+    text = text + pad * chr(pad)
+    encryptor = AES.new(secKey, 2, '0102030405060708')
+    ciphertext = encryptor.encrypt(text)
+    ciphertext = base64.b64encode(ciphertext)
+    return ciphertext
+
+def rsaEncrypt(text, pubKey, modulus):
+    text = text[::-1]
+    rs = int(text.encode('hex'), 16)**int(pubKey, 16)%int(modulus, 16)
+    return format(rs, 'x').zfill(256)
+
+def createSecretKey(size):
+    return (''.join(map(lambda xx: (hex(ord(xx))[2:]), os.urandom(size))))[0:16]
 
 # list去重
 def uniq(arr):
@@ -136,12 +193,8 @@ class NetEase:
         pattern = re.compile(r'^0\d{2,3}\d{7,8}$|^1[34578]\d{9}$')
         if (pattern.match(username)):
             return self.phone_login(username, password)
-        action = 'http://music.163.com/api/login/'
-        data = {
-            'username': username,
-            'password': password,
-            'rememberLogin': 'true'
-        }
+        action = 'http://music.163.com/weapi/login/'
+        data = encrypted_login(username, password)
         try:
             return self.httpRequest('POST', action, data)
         except:
@@ -149,12 +202,8 @@ class NetEase:
 
     # 手机登录
     def phone_login(self, username, password):
-        action = 'http://music.163.com/api/login/cellphone'
-        data = {
-            'phone': username,
-            'password': password,
-            'rememberLogin': 'true'
-        }
+        action = 'http://music.163.com/weapi/login/cellphone'
+        data = encrypted_phonelogin(username, password)
         try:
             return self.httpRequest('POST', action, data)
         except:
