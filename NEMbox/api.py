@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
-# @Last Modified by:   omi
-# @Last Modified time: 2015-05-26 01:06:55
+# @Last Modified by:   mchome
+# @Last Modified time: 2015-07-30 20:07:33
 
 
 '''
@@ -15,7 +15,6 @@ import os
 import json
 import requests
 from Crypto.Cipher import AES
-import rsa
 from bs4 import BeautifulSoup
 import logger
 import hashlib
@@ -55,13 +54,7 @@ log = logger.getLogger(__name__)
 modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7'
 nonce = '0CoJUm6Qyw8W8jud'
 pubKey = '010001'
-pem = """-----BEGIN RSA PUBLIC KEY-----
-MIGJAoGBAOC1CfYlnfhkLbw1ZikBR33yJnfsFStf9orOYVu3tyUVKzqxeodq6opa
-p20uQXYp7E7jQfVhNfzPaVKAEE4DEuy9qSVXyThwEUr2ydBcT38MNoW3pGvuJVky
-V1zOELQk2BPP5IddPoIEe5fd71J0HVRrjiidxpNbPs4EYtsKIrjnAgMBAAE=
-OWRjNjkzNWIzZWNlMDQ2MmRiMGEyMmI4ZTcCBjAxMDAwMQ==
------END RSA PUBLIC KEY-----
-"""
+
 
 # 歌曲加密算法, 基于https://github.com/yanunon/NeteaseCloudMusic脚本实现
 def encrypted_id(id):
@@ -83,12 +76,10 @@ def encrypted_login(username, password):
         'password': password,
         'rememberLogin': 'true'
     }
-    text = hashlib.md5(json.dumps(text)).hexdigest()
+    text = json.dumps(text)
     secKey = createSecretKey(16)
-    encText = aesEncrypt(text, nonce)
-    encText = aesEncrypt(encText, secKey)
-    encText = base64.b64encode(encText)
-    encSecKey = rsaEncrypt(secKey, pem)
+    encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
+    encSecKey = rsaEncrypt(secKey, pubKey, modulus)
     data = {
         'params': encText,
         'encSecKey': encSecKey
@@ -101,12 +92,10 @@ def encrypted_phonelogin(username, password):
         'password': password,
         'rememberLogin': 'true'
     }
-    text = hashlib.md5(json.dumps(text)).hexdigest()
+    text = json.dumps(text)
     secKey = createSecretKey(16)
-    encText = aesEncrypt(text, nonce)
-    encText = aesEncrypt(encText, secKey)
-    encText = base64.b64encode(encText)
-    encSecKey = rsaEncrypt(secKey, pem)
+    encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
+    encSecKey = rsaEncrypt(secKey, pubKey, modulus)
     data = {
         'params': encText,
         'encSecKey': encSecKey
@@ -117,15 +106,17 @@ def encrypted_phonelogin(username, password):
     return data
 
 def aesEncrypt(text, secKey):
+    pad = 16 - len(text) % 16
+    text = text + pad * chr(pad)
     encryptor = AES.new(secKey, 2, '0102030405060708')
     ciphertext = encryptor.encrypt(text)
+    ciphertext = base64.b64encode(ciphertext)
     return ciphertext
 
-def rsaEncrypt(secKey, pem):
-    pubkey = rsa.PublicKey.load_pkcs1(pem)
-    encText = rsa.encrypt(secKey, pubkey)
-    encText = encText.decode('ISO-8859-1').encode('HEX')
-    return encText
+def rsaEncrypt(text, pubKey, modulus):
+    text = text[::-1]
+    rs = int(text.encode('hex'), 16)**int(pubKey, 16)%int(modulus, 16)
+    return format(rs, 'x').zfill(256)
 
 def createSecretKey(size):
     return (''.join(map(lambda xx: (hex(ord(xx))[2:]), os.urandom(size))))[0:16]
