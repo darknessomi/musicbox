@@ -68,6 +68,7 @@ NetEase-MusicBox
 	$ sudo python setup.py install
 
 	$ brew install mpg123
+
 ### Linux安装
 
 	$ git clone https://github.com/darknessomi/musicbox.git  

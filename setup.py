@@ -48,7 +48,6 @@ setup(
         'requests',
         'BeautifulSoup4',
         'pycrypto',
-        'rsa',
     ],
 
     entry_points={
