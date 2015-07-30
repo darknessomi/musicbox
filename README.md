@@ -2,13 +2,13 @@ NetEase-MusicBox
 =================
 
 
-####Thanks vellow,hbprotoss,Catofes,尘埃,chaserhkj,Ma233,20015jjw
+####Thanks vellow,hbprotoss,Catofes,尘埃,chaserhkj,Ma233,20015jjw,mchome
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
 [![](https://img.shields.io/travis/joyent/node/v0.6.svg)]()
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
-[![versions](https://img.shields.io/badge/versions%20-%20%200.1.5.6-blue.svg)]()
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.6.0-blue.svg)]()
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
@@ -81,7 +81,7 @@ NetEase-MusicBox
 #### 已测试的系统兼容列表
 
 <table>
-	<tr> <td>OS X</td> <td>10.10 / 10.9</td> </tr>
+	<tr> <td>OS X</td> <td>10.11 / 10.10 / 10.9</td> </tr>
 	<tr> <td>Ubuntu</td> <td>14.04</td> </tr>
 	<tr> <td>Kali</td> <td>1.1.0</td> </tr>
 	<tr> <td>CentOS</td> <td>7</td> </tr>
@@ -118,6 +118,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-07-30 版本 0.1.6.0    修复由于接口更换导致的用户登陆问题
 
 2015-06-17 版本 0.1.5.6    优化对过长歌曲信息的显示
 

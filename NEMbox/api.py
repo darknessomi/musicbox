@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
-# @Last Modified by:   mchome
-# @Last Modified time: 2015-07-30 20:07:33
+# @Last Modified by:   omi
+# @Last Modified time: 2015-07-30 21:21:15
 
 
 '''
@@ -100,9 +100,6 @@ def encrypted_phonelogin(username, password):
         'params': encText,
         'encSecKey': encSecKey
     }
-    # sfile = open("login.json", 'w')
-    # sfile.write(json.dumps(data))
-    # sfile.close()
     return data
 
 def aesEncrypt(text, secKey):
@@ -197,10 +194,6 @@ class NetEase:
         if (pattern.match(username)):
             return self.phone_login(username, password)
         action = 'http://music.163.com/weapi/login/'
-        # data = {
-        #     'params':'QN2FMbwsIPjwPhDrqNIPQ7kUz9jnw4I6XaLwWPLJFY6V3jJqzmAaXBHOreIWctHBGk+ICB5IXTC6zlF4juOjoTfdauP26olOi/b3dF+GZMKFWmHekWwPU039w2RlrVMLlOmqdFheZ5b4jikcONZaNajpSodIJaRSkT/V79oGM3/GtljK2ESAntfTvZ3WbBcnAJ5h6pqZrHPhe4Y/PpWbBQ==',
-        #     'encSecKey': '4a2313415c12a1f29bd3e2219bafcaf1f7e8d888f0209253e7239fa01eec544961931102850d4acf10f9c624319672e97f7fa7b1998bce0148e66184f8256f207bbedbcb58e13b6855b5479f79d5819ae4a0681c3289bd67f59e172c13af5fc63c48ce549bf125a05e8824e89070c84ef67f6583e8ce18d2b474b7782ff779ae'
-        # }
         data = encrypted_login(username, password)
         try:
             return self.httpRequest('POST', action, data)
