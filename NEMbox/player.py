@@ -17,6 +17,7 @@ import time
 import os
 import signal
 import random
+import re
 from ui import Ui
 
 
@@ -35,7 +36,9 @@ class Player:
         self.songs = []
         self.idx = 0
         self.volume = 60
-
+        self.process_length = 0
+        self.process_location = 0
+        self.process_first = False
     def popen_recall(self, onExit, popenArgs):
         """
         Runs the given args in a subprocess.Popen, and then calls the function
@@ -46,9 +49,10 @@ class Player:
 
         def runInThread(onExit, popenArgs):
             self.popen_handler = subprocess.Popen(['mpg123', '-R', ], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            self.popen_handler.stdin.write("SILENCE\n")
+            #self.popen_handler.stdin.write("SILENCE\n")
             self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
             self.popen_handler.stdin.write("L " + popenArgs + "\n")
+            self.process_first = True
             # self.popen_handler.wait()
             while (True):
                 if self.playing_flag == False:
@@ -57,6 +61,16 @@ class Player:
                     strout = self.popen_handler.stdout.readline()
                 except IOError:
                     break
+                if re.match("^\@F.*$", strout):
+                    process_data = strout.split(" ")
+                    process_location = float(process_data[4])
+                    if self.process_first:
+                        self.process_length = process_location
+                        self.process_first = False
+                        self.process_location = 0
+                    else:
+                        self.process_location = self.process_length - process_location
+                    continue
                 if strout == "@P 0\n":
                     self.popen_handler.stdin.write("Q\n")
                     self.popen_handler.kill()

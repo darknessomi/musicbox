@@ -76,6 +76,50 @@ class Ui:
         #                        curses.color_pair(4))
 
         self.screen.refresh()
+    def build_process_bar(self, now_playing, total_length, playing_flag, pause_flag):
+        curses.noecho()
+        self.screen.move(3, 1)
+        self.screen.clrtoeol()
+        if not playing_flag:
+            return
+        if total_length <= 0:
+            total_length = 1
+        if now_playing > total_length or now_playing <= 0:
+            now_playing = 0
+        process="["
+        for i in range(0, 64):
+            if i < now_playing / total_length * 64:
+                if (i+1) > now_playing / total_length * 64:
+                    if not pause_flag:
+                        process += ">"
+                        continue
+                process += "="
+            else:
+                process += " "
+        process += "] "
+        now_minute = int(now_playing / 60)
+        if now_minute > 10:
+            now_minute = str(now_minute)
+        else:
+            now_minute = "0" + str(now_minute)
+        now_second = int(now_playing - int(now_playing / 60) * 60)
+        if now_second > 10:
+            now_second = str(now_second)
+        else:
+            now_second = "0" + str(now_second)
+        total_minute = int(total_length / 60)
+        if total_minute > 10:
+            total_minute = str(total_minute)
+        else:
+            total_minute = "0" + str(total_minute)
+        total_second = int(total_length - int(total_length / 60) * 60)
+        if total_second > 10:
+            total_second = str(total_second)
+        else:
+            total_second = "0" + str(total_second)
+        process += "( " + now_minute + ":" + now_second + "/" + total_minute + ":" + total_second + " )"
+        self.screen.addstr(3, self.startcol, process, curses.color_pair(1))
+        self.screen.refresh()
 
     def build_loading(self):
         self.screen.addstr(6, self.startcol, '享受高品质音乐，loading...', curses.color_pair(1))
