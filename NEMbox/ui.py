@@ -238,10 +238,10 @@ class Ui:
             elif datatype == 'djchannels':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 9, self.indented_startcol, '-> ' + str(i) + '. ' + datalist[i]['song_name'],
+                        self.screen.addstr(i - offset + 8, self.indented_startcol, '-> ' + str(i) + '. ' + datalist[i]['song_name'],
                                            curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 9, self.startcol, str(i) + '. ' + datalist[i]['song_name'])
+                        self.screen.addstr(i - offset + 8, self.startcol, str(i) + '. ' + datalist[i]['song_name'])
 
             elif datatype == 'search':
                 self.screen.move(4, 1)
