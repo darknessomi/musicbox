@@ -153,25 +153,25 @@ class Ui:
                 for i in range(offset, iter_range):
                     # this item is focus
                     if i == index:
-                        self.screen.addstr(i - offset + 9, 0, ' ' * self.startcol)
+                        self.screen.addstr(i - offset + 8, 0, ' ' * self.startcol)
                         lead = '-> ' + str(i) + '. '
-                        self.screen.addstr(i - offset + 9, self.indented_startcol, lead, curses.color_pair(2))
+                        self.screen.addstr(i - offset + 8, self.indented_startcol, lead, curses.color_pair(2))
                         name = str(datalist[i]['song_name'] + self.space + datalist[i][
                                                    'artist'] + '  < ' + datalist[i]['album_name'] + ' >')
 
                         # the length decides whether to scoll
                         if truelen(name) < self.x - self.startcol - 1:
-                            self.screen.addstr(i - offset + 9, self.indented_startcol + len(lead),
+                            self.screen.addstr(i - offset + 8, self.indented_startcol + len(lead),
                                                name, 
                                                curses.color_pair(2))
                         else:
                             name = scrollstring(name + '  ', start)
-                            self.screen.addstr(i - offset + 9, self.indented_startcol + len(lead),
+                            self.screen.addstr(i - offset + 8, self.indented_startcol + len(lead),
                                                str(name), 
                                                curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 9, 0, ' ' * self.startcol)
-                        self.screen.addstr(i - offset + 9, self.startcol,
+                        self.screen.addstr(i - offset + 8, 0, ' ' * self.startcol)
+                        self.screen.addstr(i - offset + 8, self.startcol,
                                            str(str(i) + '. ' + datalist[i]['song_name'] + self.space + datalist[i][
                                                'artist'] + '  < ' + datalist[i]['album_name'] + ' >')[:int(self.x*2)])
                     self.screen.addstr(iter_range - offset + 9, 0, ' ' * self.x)
