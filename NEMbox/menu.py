@@ -123,6 +123,8 @@ class Menu:
     def start(self):
         self.START = time.time()//1
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
+        self.ui.build_process_bar(self.player.process_location, self.player.process_length,self.player.playing_flag,
+                                  self.player.pause_flag)
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
         while True:
             datatype = self.datatype
@@ -347,6 +349,8 @@ class Menu:
                 if datatype == 'help':
                     webbrowser.open_new_tab('https://github.com/darknessomi/musicbox')
 
+            self.ui.build_process_bar(self.player.process_location, self.player.process_length,self.player.playing_flag,
+                                      self.player.pause_flag)
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
 
         self.player.stop()
