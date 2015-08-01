@@ -8,7 +8,7 @@ NetEase-MusicBox
 
 [![](https://img.shields.io/travis/joyent/node/v0.6.svg)]()
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
-[![versions](https://img.shields.io/badge/versions%20-%20%200.1.6.0-blue.svg)]()
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.6.2-blue.svg)]()
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
 ![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
@@ -119,6 +119,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-08-02 版本 0.1.6.2    新增显示播放进度
 
 2015-07-30 版本 0.1.6.0    修复由于接口更换导致的用户登陆问题
 
