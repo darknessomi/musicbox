@@ -2,7 +2,7 @@ NetEase-MusicBox
 =================
 
 
-####Thanks vellow,hbprotoss,Catofes,尘埃,chaserhkj,Ma233,20015jjw,mchome
+####Thanks vellow, hbprotoss, Catofes, 尘埃, chaserhkj, Ma233, 20015jjw, mchome, stkevintan
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
@@ -11,7 +11,7 @@ NetEase-MusicBox
 [![versions](https://img.shields.io/badge/versions%20-%20%200.1.6.2-blue.svg)]()
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
-![NetEase-MusicBox](http://sdut-zrt.qiniudn.com/687474703a2f2f692e696d6775722e636f6d2f4a35333533764b2e676966.gif)
+![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)
 
 ### 功能特性
 
