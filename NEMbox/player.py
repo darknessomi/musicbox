@@ -87,6 +87,8 @@ class Player:
         return thread
 
     def recall(self):
+        if self.idx < 0 or self.idx >= len(self.songs):
+            return
         self.playing_flag = True
         item = self.songs[self.idx]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
