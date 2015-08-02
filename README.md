@@ -8,14 +8,14 @@ NetEase-MusicBox
 
 [![](https://img.shields.io/travis/joyent/node/v0.6.svg)]()
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
-[![versions](https://img.shields.io/badge/versions%20-%20%200.1.6.2-blue.svg)]()
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.6.5-blue.svg)]()
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
 ![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)
 
 ### 功能特性
 
-1. 320kbps的高品质音乐(播放时显示HD标记)
+1. 320kbps的高品质音乐
 2. 歌曲，艺术家，专辑检索
 3. 网易22个歌曲排行榜
 4. 网易新碟推荐
@@ -23,9 +23,10 @@ NetEase-MusicBox
 6. 网易DJ节目
 7. 私人歌单
 8. 随心打碟
-9. 本地收藏（不提供下载）
-10. Vimer式快捷键让操作丝般顺滑
-11. 可使用数字快捷键
+9. 本地收藏
+10. 播放进度及播放模式显示
+11. Vimer式快捷键让操作丝般顺滑
+12. 可使用数字快捷键
 
 ### 键盘快捷键
 
@@ -45,13 +46,14 @@ NetEase-MusicBox
     <tr> <td>?</td> <td>Shuffle</td> <td>手气不错</td> </tr>
 	<tr> <td>M</td> <td>Menu</td> <td>主菜单</td> </tr>
 	<tr> <td>P</td> <td>Present/History</td> <td>当前/历史播放列表</td> </tr>
+	<tr> <td>⇧+P</td> <td>Playing Mode</td> <td>播放模式切换</td> </tr>
 	<tr> <td>A</td> <td>Add</td> <td>添加曲目到打碟</td> </tr>
 	<tr> <td>Z</td> <td>DJ list</td> <td>打碟列表</td> </tr>
 	<tr> <td>S</td> <td>Star</td> <td>添加到收藏</td> </tr>
 	<tr> <td>C</td> <td>Collection</td> <td>收藏列表</td> </tr>
 	<tr> <td>R</td> <td>Remove</td> <td>删除当前条目</td> </tr>
-	<tr> <td>Shift+J</td> <td>Move Down</td> <td>向下移动当前项目</td> </tr>
-	<tr> <td>Shift+K</td> <td>Move Up</td> <td>向上移动当前项目</td> </tr>
+	<tr> <td>⇧+J</td> <td>Move Down</td> <td>向下移动当前项目</td> </tr>
+	<tr> <td>⇧+K</td> <td>Move Up</td> <td>向上移动当前项目</td> </tr>
 	<tr> <td>Q</td> <td>Quit</td> <td>退出</td> </tr>
 	<tr> <td>W</td> <td>Quit&Clear</td> <td>退出并清除用户信息</td> </tr>
 </table>
@@ -119,6 +121,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-08-02 版本 0.1.6.5    新增播放模式切换
 
 2015-08-02 版本 0.1.6.2    新增显示播放进度
 
