@@ -39,6 +39,7 @@ class Player:
         self.process_length = 0
         self.process_location = 0
         self.process_first = False
+        self.playing_mode = 0
     def popen_recall(self, onExit, popenArgs):
         """
         Runs the given args in a subprocess.Popen, and then calls the function
@@ -77,7 +78,19 @@ class Player:
                     break
 
             if self.playing_flag:
-                self.idx = carousel(0, len(self.songs) - 1, self.idx + 1)
+                if self.idx < 0 or self.idx >= len(self.songs):
+                    return
+                # Playing mode. 0 is ordered. 1 is orderde loop. 2 is single song loop. 3 is random.
+                if self.playing_mode == 0:
+                    self.idx = carousel(0, len(self.songs) - 1, self.idx + 1)
+                elif self.playing_mode == 1:
+                    self.idx = (self.idx + 1) % len(self.songs)
+                elif self.playing_mode == 2:
+                    self.idx = self.idx
+                elif self.playing_mode == 3:
+                    self.idx = random.randint(0, len(self.songs))
+                else:
+                    self.idx = carousel(0, len(self.songs) - 1, self.idx + 1)
                 onExit()
             return
 

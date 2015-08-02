@@ -51,6 +51,7 @@ shortcut = [
     ['-', 'Volume-          ', '音量减少'],
     ['m', 'Menu             ', '主菜单'],
     ['p', 'Present/History  ', '当前/历史播放列表'],
+    ['Shift+p', 'Playing Mode   ', '播放模式切换'],
     ['a', 'Add              ', '添加曲目到打碟'],
     ['z', 'DJ list          ', '打碟列表'],
     ['s', 'Star             ', '添加到收藏'],
@@ -124,7 +125,7 @@ class Menu:
         self.START = time.time()//1
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
         self.ui.build_process_bar(self.player.process_location, self.player.process_length,self.player.playing_flag,
-                                  self.player.pause_flag)
+                                  self.player.pause_flag, self.player.playing_mode)
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
         while True:
             datatype = self.datatype
@@ -278,6 +279,10 @@ class Menu:
                     self.player.play(self.datatype, self.datalist, self.index)
                     self.resume_play = False
 
+            # 播放模式切换
+            elif key == ord('P'):
+                self.player.playing_mode = (self.player.playing_mode + 1) % 4
+
             # 添加到打碟歌单
             elif key == ord('a'):
                 if datatype == 'songs' and len(datalist) != 0:
@@ -350,7 +355,7 @@ class Menu:
                     webbrowser.open_new_tab('https://github.com/darknessomi/musicbox')
 
             self.ui.build_process_bar(self.player.process_location, self.player.process_length,self.player.playing_flag,
-                                      self.player.pause_flag)
+                                      self.player.pause_flag, self.player.playing_mode)
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
 
         self.player.stop()

@@ -76,7 +76,7 @@ class Ui:
         #                        curses.color_pair(4))
 
         self.screen.refresh()
-    def build_process_bar(self, now_playing, total_length, playing_flag, pause_flag):
+    def build_process_bar(self, now_playing, total_length, playing_flag, pause_flag, playing_mode):
         curses.noecho()
         self.screen.move(3, 1)
         self.screen.clrtoeol()
@@ -120,6 +120,16 @@ class Ui:
         else:
             total_second = "0" + str(total_second)
         process += "( " + now_minute + ":" + now_second + "/" + total_minute + ":" + total_second + " )"
+        if playing_mode == 0:
+            process += "  顺序播放"
+        elif playing_mode == 1:
+            process += "  顺序循环"
+        elif playing_mode == 2:
+            process += "  单曲循环"
+        elif playing_mode == 3:
+            process += "  随机播放"
+        else:
+            pass
         self.screen.addstr(3, self.startcol-2, process, curses.color_pair(1))
         self.screen.refresh()
 
