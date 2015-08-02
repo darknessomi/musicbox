@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2015-08-02 00:05:11
+# @Last Modified time: 2015-08-02 20:57:35
 
 
 '''
@@ -89,9 +89,9 @@ class Ui:
         if now_playing > total_length or now_playing <= 0:
             now_playing = 0
         process="["
-        for i in range(0, 48):
-            if i < now_playing / total_length * 48:
-                if (i+1) > now_playing / total_length * 48:
+        for i in range(0, 33):
+            if i < now_playing / total_length * 33:
+                if (i+1) > now_playing / total_length * 33:
                     if not pause_flag:
                         process += ">"
                         continue
@@ -119,15 +119,15 @@ class Ui:
             total_second = str(total_second)
         else:
             total_second = "0" + str(total_second)
-        process += "( " + now_minute + ":" + now_second + "/" + total_minute + ":" + total_second + " )"
+        process += "(" + now_minute + ":" + now_second + "/" + total_minute + ":" + total_second + ")"
         if playing_mode == 0:
-            process += "  顺序播放"
+            process = "顺序播放 " + process
         elif playing_mode == 1:
-            process += "  顺序循环"
+            process = "顺序循环 " + process
         elif playing_mode == 2:
-            process += "  单曲循环"
+            process = "单曲循环 " + process
         elif playing_mode == 3:
-            process += "  随机播放"
+            process = "随机播放 " + process
         else:
             pass
         self.screen.addstr(3, self.startcol-2, process, curses.color_pair(1))

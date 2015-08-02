@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
-# @Last Modified time: 2015-03-30 23:36:21
+# @Last Modified time: 2015-08-02 20:55:11
 
 
 '''
@@ -51,12 +51,12 @@ shortcut = [
     ['-', 'Volume-          ', '音量减少'],
     ['m', 'Menu             ', '主菜单'],
     ['p', 'Present/History  ', '当前/历史播放列表'],
-    ['Shift+p', 'Playing Mode   ', '播放模式切换'],
+    ['Shift+p', 'Playing Mode     ', '播放模式切换'],
     ['a', 'Add              ', '添加曲目到打碟'],
     ['z', 'DJ list          ', '打碟列表'],
     ['s', 'Star             ', '添加到收藏'],
     ['c', 'Collection       ', '收藏列表'],
-    ['r', 'Remove           ', '删除当前条目'],
+    ['r', 'Remove    ', '删除当前条目'],
     ['Shift+j', 'Move Down ', '向下移动当前条目'],
     ['Shift+k', 'Move Up   ', '向上移动当前条目'],
     ['q', 'Quit      ', '退出'],
