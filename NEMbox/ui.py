@@ -128,6 +128,8 @@ class Ui:
             process = "单曲循环 " + process
         elif playing_mode == 3:
             process = "随机播放 " + process
+        elif playing_mode == 4:
+            process = "随机循环 " + process
         else:
             pass
         self.screen.addstr(3, self.startcol-2, process, curses.color_pair(1))
