@@ -23,7 +23,7 @@ from ui import Ui
 from const import Constant
 import logger
 import signal
-import thread
+from storage import Storage
 
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
@@ -75,7 +75,9 @@ class Menu:
         self.datalist = ['排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单', 'DJ节目', '打碟', '收藏', '搜索', '帮助']
         self.offset = 0
         self.index = 0
-        self.presentsongs = []
+        self.storage = Storage()
+        self.storage.load()
+        self.collection = self.storage.database['collections'][0]
         self.player = Player()
         self.ui = Ui()
         self.netease = NetEase()
@@ -91,41 +93,21 @@ class Menu:
         signal.signal(signal.SIGINT, self.send_kill)
         self.START = time.time()
 
-        try:
-            sfile = file(Constant.conf_dir + "/flavor.json", 'r')
-            data = json.loads(sfile.read())
-            self.collection = data['collection']
-            self.account = data['account']
-            self.presentsongs = data['presentsongs']
-            sfile.close()
-        except:
-            self.collection = []
-            self.account = {}
-            self.presentsongs = []
-            self.resume_play = False
-
     def change_term(self, signum, frame):
         self.ui.screen.clear()
         self.ui.screen.refresh()
 
-    def send_kill(self,signum,fram):
+    def send_kill(self, signum, fram):
         self.player.stop()
-        sfile = file(Constant.conf_dir + "/flavor.json", 'w')
-        data = {
-            'account': self.account,
-            'collection': self.collection,
-            'presentsongs': self.presentsongs
-        }
-        sfile.write(json.dumps(data))
-        sfile.close()
+        self.storage.save()
         curses.endwin()
         sys.exit()
 
     def start(self):
-        self.START = time.time()//1
+        self.START = time.time() // 1
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
-        self.ui.build_process_bar(self.player.playing_id, self.player.process_location, self.player.process_length,self.player.playing_flag,
-                                  self.player.pause_flag, self.player.playing_mode)
+        self.ui.build_process_bar(self.player.process_location, self.player.process_length, self.player.playing_flag,
+                                  self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
         while True:
             datatype = self.datatype
@@ -151,7 +133,10 @@ class Menu:
 
             # 退出并清除用户信息
             if key == ord('w'):
-                self.account = {}
+                self.storage.database['user'] = {
+                    "username": "",
+                    "password": "",
+                }
                 break
 
             # 上移
@@ -225,33 +210,29 @@ class Menu:
 
             # 播放下一曲
             elif key == ord(']'):
-                if len(self.presentsongs) == 0:
+                if len(self.storage.database["player_info"]["player_list"]) == 0:
                     continue
                 self.player.next()
                 time.sleep(0.1)
 
             # 播放上一曲
             elif key == ord('['):
-                if len(self.presentsongs) == 0:
+                if len(self.storage.database["player_info"]["player_list"]) == 0:
                     continue
                 self.player.prev()
                 time.sleep(0.1)
 
             # 增加音量
             elif key == ord('='):
-                if len(self.presentsongs) == 0:
-                    continue
                 self.player.volume_up()
 
             # 减少音量
             elif key == ord('-'):
-                if len(self.presentsongs) == 0:
-                    continue
                 self.player.volume_down()
 
             # 随机播放
             elif key == ord('?'):
-                if len(self.presentsongs) == 0:
+                if len(self.storage.database["player_info"]["player_list"]) == 0:
                     continue
                 self.player.shuffle()
                 time.sleep(0.1)
@@ -259,29 +240,38 @@ class Menu:
             # 播放、暂停
             elif key == ord(' '):
                 if datatype == 'songs':
-                    self.presentsongs = ['songs', title, datalist, offset, index]
+                    self.resume_play = False
+                    self.player.new_player_list('songs', self.title, self.datalist, -1)
+                    self.player.play_and_pause(idx)
                 elif datatype == 'djchannels':
-                    self.presentsongs = ['djchannels', title, datalist, offset, index]
-                self.player.play(datatype, datalist, idx)
+                    self.resume_play = False
+                    self.player.new_player_list('djchannels', self.title, self.datalist, -1)
+                    self.player.play_and_pause(idx)
+                else:
+                    self.player.play_and_pause(self.storage.database['player_info']['idx'])
                 time.sleep(0.1)
 
             # 加载当前播放列表
             elif key == ord('p'):
-                if len(self.presentsongs) == 0:
+                if len(self.storage.database['player_info']['player_list']) == 0:
                     continue
-                self.stack.append([datatype, title, datalist, offset, index])
-                self.datatype = self.presentsongs[0]
-                self.title = self.presentsongs[1]
-                self.datalist = self.presentsongs[2]
-                self.offset = self.presentsongs[3]
-                self.index = self.presentsongs[4]
+                self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+                self.datatype = self.storage.database['player_info']['player_list_type']
+                self.title = self.storage.database['player_info']['player_list_title']
+                self.datalist = []
+                for i in self.storage.database['player_info']['player_list']:
+                    self.datalist.append(self.storage.database['songs'][i])
+                self.index = self.storage.database['player_info']['idx']
+                self.offset = self.storage.database['player_info']['idx'] / self.step * self.step
                 if self.resume_play:
-                    self.player.play(self.datatype, self.datalist, self.index)
+                    self.storage.database['player_info']['idx'] = -1
+                    self.player.play_and_pause(self.index)
                     self.resume_play = False
 
             # 播放模式切换
             elif key == ord('P'):
-                self.player.playing_mode = (self.player.playing_mode + 1) % 4
+                self.storage.database['player_info']['playing_mode'] = \
+                    (self.storage.database['player_info']['playing_mode'] + 1) % 5
 
             # 添加到打碟歌单
             elif key == ord('a'):
@@ -354,19 +344,13 @@ class Menu:
                 if datatype == 'help':
                     webbrowser.open_new_tab('https://github.com/darknessomi/musicbox')
 
-            self.ui.build_process_bar(self.player.playing_id, self.player.process_location, self.player.process_length,self.player.playing_flag,
-                                      self.player.pause_flag, self.player.playing_mode)
+            self.ui.build_process_bar(self.player.process_location, self.player.process_length,
+                                      self.player.playing_flag,
+                                      self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
 
         self.player.stop()
-        sfile = file(Constant.conf_dir + "/flavor.json", 'w')
-        data = {
-            'account': self.account,
-            'collection': self.collection,
-            'presentsongs': self.presentsongs
-        }
-        sfile.write(json.dumps(data))
-        sfile.close()
+        self.storage.save()
         curses.endwin()
 
     def dispatch_enter(self, idx):
@@ -444,7 +428,7 @@ class Menu:
             ui = self.ui
             # no need to do stack.append, Otherwise there will be a bug when you input key 'h' to return
             # if idx in range(1, 5):
-            #    self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+            # self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
             self.index = 0
             self.offset = 0
             if idx == 0:
@@ -473,7 +457,7 @@ class Menu:
         # 排行榜
         netease = self.netease
         if idx == 0:
-            self.datalist=netease.return_toplists()
+            self.datalist = netease.return_toplists()
             self.title += ' > 排行榜'
             self.datatype = 'toplists'
 
@@ -513,16 +497,18 @@ class Menu:
             # 未登录
             if self.userid is None:
                 # 使用本地存储了账户登录
-                if self.account:
-                    user_info = netease.login(self.account[0], self.account[1])
+                if self.storage.database['user']['username'] != "":
+                    user_info = netease.login(self.storage.database['user']['username'],
+                                              self.storage.database['user']['password'])
                 # 本地没有存储账户，或本地账户失效，则引导录入
-                if self.account == {} or user_info['code'] != 200:
+                if self.storage.database['user']['username'] == "" or user_info['code'] != 200:
                     data = self.ui.build_login()
                     # 取消登录
                     if data == -1:
                         return
                     user_info = data[0]
-                    self.account = data[1]
+                    self.storage.database['user']['username'] = data[1][0]
+                    self.storage.database['user']['password'] = data[1][1]
 
                 self.username = user_info['profile']['nickname']
                 self.userid = user_info['account']['id']

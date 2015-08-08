@@ -16,12 +16,15 @@ from api import NetEase
 import hashlib
 from time import time
 from scrollstring import *
+from storage import Storage
+import logger
 
+log = logger.getLogger(__name__)
 
 class Ui:
     def __init__(self):
         self.screen = curses.initscr()
-        self.screen.timeout(500) # the screen refresh every 500ms
+        self.screen.timeout(100) # the screen refresh every 100ms
         # charactor break buffer
         curses.cbreak()
         self.screen.keypad(1)
@@ -40,7 +43,7 @@ class Ui:
         self.update_space()
         self.lyric = ""
         self.now_lyric = ""
-        
+        self.storage = Storage()
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()
@@ -78,7 +81,7 @@ class Ui:
         #                        curses.color_pair(4))
 
         self.screen.refresh()
-    def build_process_bar(self, song_id, now_playing, total_length, playing_flag, pause_flag, playing_mode):
+    def build_process_bar(self, now_playing, total_length, playing_flag, pause_flag, playing_mode):
         curses.noecho()
         self.screen.move(3, 1)
         self.screen.clrtoeol()
@@ -130,30 +133,25 @@ class Ui:
             process = "单曲循环 " + process
         elif playing_mode == 3:
             process = "随机播放 " + process
+        elif playing_mode == 4:
+            process = "随机循环 " + process
         else:
             pass
         self.screen.addstr(3, self.startcol-2, process, curses.color_pair(1))
 
-        lyric = self.lyric
-        key = now_minute + ":" + now_second
-        for line in lyric:
-            if key in line:
-                self.now_lyric = line
-
+        song = self.storage.database["songs"][
+            self.storage.database["player_info"]["player_list"][self.storage.database["player_info"]["idx"]]
+        ]
+        if 'lyric' not in song.keys() or len(song["lyric"]) <= 0:
+            self.now_lyric = "[00:00.00]暂无歌词 ~>_<~ \n"
+        else:
+            key = now_minute + ":" + now_second
+            for line in song["lyric"]:
+                if key in line:
+                    self.now_lyric = line
         self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
-
         self.screen.addstr(4, self.startcol-2, str(self.now_lyric), curses.color_pair(3))
-
         self.screen.refresh()
-
-        if now_second == "01" and now_minute == "00":
-            self.lyric = self.netease.song_lyric(song_id)
-            if self.lyric == []:
-                self.lyric = "[00:02.00]暂无歌词 ~>_<~ \n"
-            self.lyric = self.lyric.split('\n')
-            # sfile = file("lyric.json", 'w')
-            # sfile.write(str(self.lyric))
-            # sfile.close()
 
     def build_loading(self):
         self.screen.addstr(7, self.startcol, '享受高品质音乐，loading...', curses.color_pair(1))
@@ -286,7 +284,7 @@ class Ui:
                                            curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 10, self.startcol, str(i) + '.' + datalist[i - 1])
-                self.screen.timeout(500)
+                self.screen.timeout(100)
 
             elif datatype == 'help':
                 for i in range(offset, min(len(datalist), offset + step)):
@@ -393,21 +391,21 @@ class Ui:
         self.screen.addstr(14, self.startcol, '请键入对应数字:', curses.color_pair(2))
         self.screen.refresh()
         x = self.screen.getch()
-        self.screen.timeout(500) # restore the screen timeout
+        self.screen.timeout(100) # restore the screen timeout
         return x
 
     def get_account(self):
         self.screen.timeout(-1) # disable the screen timeout
         curses.echo()
         account = self.screen.getstr(8, self.startcol+6,60)
-        self.screen.timeout(500) # restore the screen timeout
+        self.screen.timeout(100) # restore the screen timeout
         return account
 
     def get_password(self):
         self.screen.timeout(-1) # disable the screen timeout
         curses.noecho()
         password = self.screen.getstr(9, self.startcol+6,60)
-        self.screen.timeout(500) # restore the screen timeout
+        self.screen.timeout(100) # restore the screen timeout
         return password
 
     def get_param(self, prompt_string):
