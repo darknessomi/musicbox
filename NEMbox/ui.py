@@ -148,6 +148,8 @@ class Ui:
 
         if now_second == "01" and now_minute == "00":
             self.lyric = self.netease.song_lyric(song_id)
+            if self.lyric == []:
+                self.lyric = "[00:02.00]暂无歌词 ~>_<~ \n"
             self.lyric = self.lyric.split('\n')
             # sfile = file("lyric.json", 'w')
             # sfile.write(str(self.lyric))
