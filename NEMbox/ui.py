@@ -10,7 +10,6 @@
 网易云音乐 Ui
 '''
 import re
-import string
 import curses
 import terminalsize
 from api import NetEase
@@ -141,15 +140,18 @@ class Ui:
             if key in line:
                 self.now_lyric = line
 
+        self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
+
         self.screen.addstr(4, self.startcol-2, str(self.now_lyric), curses.color_pair(3))
 
         self.screen.refresh()
 
-        if now_second == "01":
+        if now_second == "01" and now_minute == "00":
             self.lyric = self.netease.song_lyric(song_id)
-            sfile = file("ly.json", 'w')
-            sfile.write(str(self.lyric))
-            sfile.close()
+            self.lyric = self.lyric.split('\n')
+            # sfile = file("lyric.json", 'w')
+            # sfile.write(str(self.lyric))
+            # sfile.close()
 
     def build_loading(self):
         self.screen.addstr(7, self.startcol, '享受高品质音乐，loading...', curses.color_pair(1))
