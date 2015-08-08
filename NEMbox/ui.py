@@ -16,7 +16,7 @@ from api import NetEase
 import hashlib
 from time import time
 from scrollstring import *
-
+from storage import Storage
 
 class Ui:
     def __init__(self):
@@ -38,7 +38,6 @@ class Ui:
         self.startcol = int(float(self.x)/5)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
-        
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()

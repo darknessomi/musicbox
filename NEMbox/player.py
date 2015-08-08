@@ -97,21 +97,22 @@ class Player:
         self.popen_recall(self.recall, item['mp3_url'])
 
     def generate_shuffle_playing_list(self):
-        self.info["playing_list"].clear()
+        del self.info["playing_list"][:]
         for i in range(0, len(self.info["player_list"])):
-            self.info["playing_list"].push(i)
+            self.info["playing_list"].append(i)
         random.shuffle(self.info["playing_list"])
+        self.info["ridx"] = 0
 
     def new_player_list(self, type, title, datalist, offset):
         self.info["player_list_type"] = type
         self.info["player_list_title"] = title
         self.info["idx"] = offset
-        self.info["play_list"].clear()
-        self.info["playing_list"].clear()
+        del self.info["player_list"][:]
+        del self.info["playing_list"][:]
         self.info["ridx"] = 0
         for song in datalist:
-            self.info["play_list"].push(song["song_id"])
-            self.songs[song["song_id"]] = song
+            self.info["player_list"].append(str(song["song_id"]))
+            self.songs[str(song["song_id"])] = song
 
     def play_and_pause(self, idx):
         # if same playlists && idx --> same song :: pause/resume it
@@ -121,9 +122,9 @@ class Player:
             else:
                 self.pause()
         else:
-            self.idx = idx
+            self.info["idx"] = idx
 
-                # if it's playing
+            # if it's playing
             if self.playing_flag:
                 self.switch()
 
@@ -148,16 +149,18 @@ class Player:
                 return
 
     def pause(self):
+        if not self.playing_flag and not self.popen_handler:
+            return
         self.pause_flag = True
         os.kill(self.popen_handler.pid, signal.SIGSTOP)
-        item = self.songs[self.idx]
+        item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time(),
                                pause=True)
 
     def resume(self):
         self.pause_flag = False
         os.kill(self.popen_handler.pid, signal.SIGCONT)
-        item = self.songs[self.idx]
+        item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
 
     def next_idx(self):
@@ -174,8 +177,22 @@ class Player:
         elif self.info["playing_mode"] == 3:
             if self.info["ridx"] >= len(self.info["playing_list"]):
                 self.generate_shuffle_playing_list()
+                try:
+                    now_songs = self.info["playing_list"].index(self.info["idx"])
+                    temp = self.info["playing_list"][0]
+                    self.info["playing_list"][0] = self.info["playing_list"][now_songs]
+                    self.info["playing_list"][now_songs] = temp
+                except:
+                    self.generate_shuffle_playing_list()
             elif self.info["playing_list"][self.info["ridx"]] != self.info["idx"]:
                 self.generate_shuffle_playing_list()
+                try:
+                    now_songs = self.info["playing_list"].index(self.info["idx"])
+                    temp = self.info["playing_list"][0]
+                    self.info["playing_list"][0] = self.info["playing_list"][now_songs]
+                    self.info["playing_list"][now_songs] = temp
+                except:
+                    self.generate_shuffle_playing_list()
             self.info["ridx"] += 1
             if self.info["ridx"] >= len(self.info["playing_list"]):
                 self.stop()
@@ -184,8 +201,22 @@ class Player:
         elif self.info["playing_mode"] == 4:
             if self.info["ridx"] >= len(self.info["playing_list"]):
                 self.generate_shuffle_playing_list()
+                try:
+                    now_songs = self.info["playing_list"].index(self.info["idx"])
+                    temp = self.info["playing_list"][0]
+                    self.info["playing_list"][0] = self.info["playing_list"][now_songs]
+                    self.info["playing_list"][now_songs] = temp
+                except:
+                    self.generate_shuffle_playing_list()
             elif self.info["playing_list"][self.info["ridx"]] != self.info["idx"]:
                 self.generate_shuffle_playing_list()
+                try:
+                    now_songs = self.info["playing_list"].index(self.info["idx"])
+                    temp = self.info["playing_list"][0]
+                    self.info["playing_list"][0] = self.info["playing_list"][now_songs]
+                    self.info["playing_list"][now_songs] = temp
+                except:
+                    self.generate_shuffle_playing_list()
             self.info["ridx"] = (self.info["ridx"] + 1) % len(self.info["player_list"])
             self.info["idx"] = self.info["playing_list"][self.info["ridx"]]
         else:
@@ -215,7 +246,7 @@ class Player:
                 self.generate_shuffle_playing_list()
             self.info["ridx"] -= 1
             if self.info["ridx"] < 0:
-                self.stop()
+                self.info["ridx"] = 0
                 return
             self.info["idx"] = self.info["playing_list"][self.info["ridx"]]
         elif self.info["playing_mode"] == 4:
@@ -239,40 +270,40 @@ class Player:
         time.sleep(0.01)
         self.info["playing_mode"] = 3
         self.generate_shuffle_playing_list()
-        self.info["ridx"] = 0
+        self.info["idx"] = self.info["playing_list"][self.info["ridx"]]
         self.recall()
 
     def volume_up(self):
-        self.volume = self.volume + 7
-        if (self.volume > 100):
-            self.volume = 100
+        self.info["playing_volume"] = self.info["playing_volume"] + 7
+        if (self.info["playing_volume"] > 100):
+            self.info["playing_volume"] = 100
         if not self.playing_flag:
             return
         try:
-            self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
+            self.popen_handler.stdin.write("V " + str(self.info["playing_volume"]) + "\n")
         except:
             self.switch()
 
     def volume_down(self):
-        self.volume = self.volume - 7
-        if (self.volume < 0):
-            self.volume = 0
+        self.info["playing_volume"] = self.info["playing_volume"] - 7
+        if (self.info["playing_volume"] < 0):
+            self.info["playing_volume"] = 0
         if not self.playing_flag:
             return
         try:
-            self.popen_handler.stdin.write("V " + str(self.volume) + "\n")
+            self.popen_handler.stdin.write("V " + str(self.info["playing_volume"]) + "\n")
         except:
             self.switch()
 
     def update_size(self):
         try:
             self.ui.update_size()
-            item = self.songs[self.idx]
+            item = self.songs[self.info["player_list"][self.info["idx"]]]
             if self.playing_flag:
                 self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'],
                                        time.time())
             if self.pause_flag:
                 self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'],
                                        time.time(), pause=True)
-        except IndexError:
+        except:
             pass

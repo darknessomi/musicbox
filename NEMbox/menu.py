@@ -107,7 +107,7 @@ class Menu:
         self.START = time.time() // 1
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
         self.ui.build_process_bar(self.player.process_location, self.player.process_length, self.player.playing_flag,
-                                  self.player.pause_flag, self.player.playing_mode)
+                                  self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
         while True:
             datatype = self.datatype
@@ -133,7 +133,10 @@ class Menu:
 
             # 退出并清除用户信息
             if key == ord('w'):
-                self.storage.database['user'] = {}
+                self.storage.database['user'] = {
+                    "username": "",
+                    "password": "",
+                }
                 break
 
             # 上移
@@ -207,14 +210,14 @@ class Menu:
 
             # 播放下一曲
             elif key == ord(']'):
-                if len(self.storage.database["play_info"]["player_list"]) == 0:
+                if len(self.storage.database["player_info"]["player_list"]) == 0:
                     continue
                 self.player.next()
                 time.sleep(0.1)
 
             # 播放上一曲
             elif key == ord('['):
-                if len(self.storage.database["play_info"]["player_list"]) == 0:
+                if len(self.storage.database["player_info"]["player_list"]) == 0:
                     continue
                 self.player.prev()
                 time.sleep(0.1)
@@ -229,7 +232,7 @@ class Menu:
 
             # 随机播放
             elif key == ord('?'):
-                if len(self.storage.database["play_info"]["player_list"]) == 0:
+                if len(self.storage.database["player_info"]["player_list"]) == 0:
                     continue
                 self.player.shuffle()
                 time.sleep(0.1)
@@ -237,10 +240,12 @@ class Menu:
             # 播放、暂停
             elif key == ord(' '):
                 if datatype == 'songs':
-                    self.storage.new_player_list('songs', self.title, self.datalist, self.index)
+                    self.resume_play = False
+                    self.player.new_player_list('songs', self.title, self.datalist, -1)
                     self.player.play_and_pause(idx)
                 elif datatype == 'djchannels':
-                    self.storage.new_player_list('djchannels', self.title, self.datalist, self.index)
+                    self.resume_play = False
+                    self.player.new_player_list('djchannels', self.title, self.datalist, -1)
                     self.player.play_and_pause(idx)
                 else:
                     self.player.play_and_pause(self.storage.database['player_info']['idx'])
@@ -248,21 +253,20 @@ class Menu:
 
             # 加载当前播放列表
             elif key == ord('p'):
-                if len(self.storage.database['player_info']['playing_list']) == 0:
+                if len(self.storage.database['player_info']['player_list']) == 0:
                     continue
+                self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+                self.datatype = self.storage.database['player_info']['player_list_type']
+                self.title = self.storage.database['player_info']['player_list_title']
+                self.datalist = []
+                for i in self.storage.database['player_info']['player_list']:
+                    self.datalist.append(self.storage.database['songs'][i])
+                self.index = self.storage.database['player_info']['idx']
+                self.offset = self.storage.database['player_info']['idx'] / self.step * self.step
                 if self.resume_play:
-                    self.datatype = self.storage.database['player_info']['player_type']
-                    self.title = self.storage.database['player_info']['player_title']
-                    self.datalist = []
-                    for i in self.storage.database['player_info']['player_list']:
-                        self.datalist.push(self.storage.database['songs'][i])
-                    self.index = self.storage.database['player_info']['idx']
-                    self.offset = self.storage.database['player_info']['idx'] / self.step * self.step
-                    self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+                    self.storage.database['player_info']['idx'] = -1
                     self.player.play_and_pause(self.index)
                     self.resume_play = False
-                else:
-                    continue
 
             # 播放模式切换
             elif key == ord('P'):
@@ -342,7 +346,7 @@ class Menu:
 
             self.ui.build_process_bar(self.player.process_location, self.player.process_length,
                                       self.player.playing_flag,
-                                      self.player.pause_flag, self.player.playing_mode)
+                                      self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
 
         self.player.stop()
