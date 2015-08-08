@@ -40,6 +40,7 @@ class Player:
         self.process_location = 0
         self.process_first = False
         self.playing_mode = 0
+        self.playing_id = ""
     def popen_recall(self, onExit, popenArgs):
         """
         Runs the given args in a subprocess.Popen, and then calls the function
@@ -105,6 +106,7 @@ class Player:
         self.playing_flag = True
         item = self.songs[self.idx]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
+        self.playing_id = item['song_id']
         self.popen_recall(self.recall, item['mp3_url'])
 
     def play(self, datatype, songs, idx):
@@ -158,12 +160,14 @@ class Player:
         os.kill(self.popen_handler.pid, signal.SIGSTOP)
         item = self.songs[self.idx]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time(), pause=True)
+        self.playing_id = item['song_id']
 
     def resume(self):
         self.pause_flag = False
         os.kill(self.popen_handler.pid, signal.SIGCONT)
         item = self.songs[self.idx]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
+        self.playing_id = item['song_id']
 
     def next(self):
         self.stop()
@@ -202,7 +206,9 @@ class Player:
             item = self.songs[self.idx]
             if self.playing_flag:
                 self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
+                self.playing_id = item['song_id']
             if self.pause_flag:
                 self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time(), pause=True)
+                self.playing_id = item['song_id']
         except IndexError:
             pass

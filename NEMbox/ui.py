@@ -9,7 +9,7 @@
 '''
 网易云音乐 Ui
 '''
-
+import re
 import curses
 import terminalsize
 from api import NetEase
@@ -38,6 +38,8 @@ class Ui:
         self.startcol = int(float(self.x)/5)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
+        self.lyric = ""
+        self.now_lyric = ""
         
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
@@ -47,7 +49,6 @@ class Ui:
         self.screen.clrtoeol()
         self.screen.move(2, 1)
         self.screen.clrtoeol()
-
         if pause:
             self.screen.addstr(1, self.indented_startcol, '_ _ z Z Z ' + quality, curses.color_pair(3))
         else:
@@ -56,6 +57,7 @@ class Ui:
         self.screen.addstr(1, min(self.indented_startcol + 18, self.x-1), 
                 song_name + self.space + artist + '  < ' + album_name + ' >', 
                 curses.color_pair(4))
+
 
         # The following script doesn't work. It is intended to scroll the playinfo
         # Scrollstring works by determining how long since it is created, but 
@@ -76,7 +78,7 @@ class Ui:
         #                        curses.color_pair(4))
 
         self.screen.refresh()
-    def build_process_bar(self, now_playing, total_length, playing_flag, pause_flag, playing_mode):
+    def build_process_bar(self, song_id, now_playing, total_length, playing_flag, pause_flag, playing_mode):
         curses.noecho()
         self.screen.move(3, 1)
         self.screen.clrtoeol()
@@ -131,7 +133,25 @@ class Ui:
         else:
             pass
         self.screen.addstr(3, self.startcol-2, process, curses.color_pair(1))
+
+        lyric = self.lyric
+        key = now_minute + ":" + now_second
+        for line in lyric:
+            if key in line:
+                self.now_lyric = line
+
+        self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
+
+        self.screen.addstr(4, self.startcol-2, str(self.now_lyric), curses.color_pair(3))
+
         self.screen.refresh()
+
+        if now_second == "01" and now_minute == "00":
+            self.lyric = self.netease.song_lyric(song_id)
+            self.lyric = self.lyric.split('\n')
+            # sfile = file("lyric.json", 'w')
+            # sfile.write(str(self.lyric))
+            # sfile.close()
 
     def build_loading(self):
         self.screen.addstr(7, self.startcol, '享受高品质音乐，loading...', curses.color_pair(1))
