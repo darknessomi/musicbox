@@ -42,6 +42,7 @@ class Player:
         self.storage = Storage()
         self.info = self.storage.database["player_info"]
         self.songs = self.storage.database["songs"]
+        self.playing_id = -1
 
     def popen_recall(self, onExit, popenArgs):
         """
