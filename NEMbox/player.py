@@ -20,6 +20,10 @@ import random
 import re
 from ui import Ui
 from storage import Storage
+from api import NetEase
+import logger
+
+log = logger.getLogger(__name__)
 
 # carousel x in [left, right]
 carousel = lambda left, right, x: left if (x > right) else (right if x < left else x)
@@ -50,11 +54,9 @@ class Player:
         def runInThread(onExit, popenArgs):
             self.popen_handler = subprocess.Popen(['mpg123', '-R', ], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                                   stderr=subprocess.PIPE)
-            # self.popen_handler.stdin.write("SILENCE\n")
             self.popen_handler.stdin.write("V " + str(self.info["playing_volume"]) + "\n")
             self.popen_handler.stdin.write("L " + popenArgs + "\n")
             self.process_first = True
-            # self.popen_handler.wait()
             while (True):
                 if self.playing_flag == False:
                     break
@@ -82,8 +84,22 @@ class Player:
                 onExit()
             return
 
+        def getLyric():
+            if 'lyric' not in self.songs[str(self.playing_id)].keys():
+                self.songs[str(self.playing_id)]["lyric"] = []
+            if len(self.songs[str(self.playing_id)]["lyric"]) > 0:
+                return
+            netease = NetEase()
+            lyric = netease.song_lyric(self.playing_id)
+            if (not lyric == []) or lyric == '未找到歌词':
+                lyric = lyric.split('\n')
+            self.songs[str(self.playing_id)]["lyric"] = lyric
+            return
+
         thread = threading.Thread(target=runInThread, args=(onExit, popenArgs))
         thread.start()
+        lyric_download_thread = threading.Thread(target=getLyric, args=())
+        lyric_download_thread.start()
         # returns immediately after the thread starts
         return thread
 
@@ -94,6 +110,7 @@ class Player:
         self.playing_flag = True
         item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
+        self.playing_id = item['song_id']
         self.popen_recall(self.recall, item['mp3_url'])
 
     def generate_shuffle_playing_list(self):
@@ -162,6 +179,7 @@ class Player:
         os.kill(self.popen_handler.pid, signal.SIGCONT)
         item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
+        self.playing_id = item['song_id']
 
     def next_idx(self):
         if self.info["idx"] < 0 or self.info["idx"] >= len(self.info["player_list"]):

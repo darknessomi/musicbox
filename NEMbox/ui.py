@@ -9,7 +9,7 @@
 '''
 网易云音乐 Ui
 '''
-
+import re
 import curses
 import terminalsize
 from api import NetEase
@@ -17,11 +17,14 @@ import hashlib
 from time import time
 from scrollstring import *
 from storage import Storage
+import logger
+
+log = logger.getLogger(__name__)
 
 class Ui:
     def __init__(self):
         self.screen = curses.initscr()
-        self.screen.timeout(500) # the screen refresh every 500ms
+        self.screen.timeout(100) # the screen refresh every 100ms
         # charactor break buffer
         curses.cbreak()
         self.screen.keypad(1)
@@ -38,6 +41,9 @@ class Ui:
         self.startcol = int(float(self.x)/5)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
+        self.lyric = ""
+        self.now_lyric = ""
+        self.storage = Storage()
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()
@@ -46,7 +52,6 @@ class Ui:
         self.screen.clrtoeol()
         self.screen.move(2, 1)
         self.screen.clrtoeol()
-
         if pause:
             self.screen.addstr(1, self.indented_startcol, '_ _ z Z Z ' + quality, curses.color_pair(3))
         else:
@@ -55,6 +60,7 @@ class Ui:
         self.screen.addstr(1, min(self.indented_startcol + 18, self.x-1), 
                 song_name + self.space + artist + '  < ' + album_name + ' >', 
                 curses.color_pair(4))
+
 
         # The following script doesn't work. It is intended to scroll the playinfo
         # Scrollstring works by determining how long since it is created, but 
@@ -132,6 +138,19 @@ class Ui:
         else:
             pass
         self.screen.addstr(3, self.startcol-2, process, curses.color_pair(1))
+
+        song = self.storage.database["songs"][
+            self.storage.database["player_info"]["player_list"][self.storage.database["player_info"]["idx"]]
+        ]
+        if 'lyric' not in song.keys() or len(song["lyric"]) <= 0:
+            self.now_lyric = "[00:00.00]暂无歌词 ~>_<~ \n"
+        else:
+            key = now_minute + ":" + now_second
+            for line in song["lyric"]:
+                if key in line:
+                    self.now_lyric = line
+        self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
+        self.screen.addstr(4, self.startcol-2, str(self.now_lyric), curses.color_pair(3))
         self.screen.refresh()
 
     def build_loading(self):
@@ -265,7 +284,7 @@ class Ui:
                                            curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 10, self.startcol, str(i) + '.' + datalist[i - 1])
-                self.screen.timeout(500)
+                self.screen.timeout(100)
 
             elif datatype == 'help':
                 for i in range(offset, min(len(datalist), offset + step)):
@@ -372,21 +391,21 @@ class Ui:
         self.screen.addstr(14, self.startcol, '请键入对应数字:', curses.color_pair(2))
         self.screen.refresh()
         x = self.screen.getch()
-        self.screen.timeout(500) # restore the screen timeout
+        self.screen.timeout(100) # restore the screen timeout
         return x
 
     def get_account(self):
         self.screen.timeout(-1) # disable the screen timeout
         curses.echo()
         account = self.screen.getstr(8, self.startcol+6,60)
-        self.screen.timeout(500) # restore the screen timeout
+        self.screen.timeout(100) # restore the screen timeout
         return account
 
     def get_password(self):
         self.screen.timeout(-1) # disable the screen timeout
         curses.noecho()
         password = self.screen.getstr(9, self.startcol+6,60)
-        self.screen.timeout(500) # restore the screen timeout
+        self.screen.timeout(100) # restore the screen timeout
         return password
 
     def get_param(self, prompt_string):
