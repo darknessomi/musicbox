@@ -239,6 +239,13 @@ class Menu:
 
             # 播放、暂停
             elif key == ord(' '):
+                try:
+                    if self.datalist[idx] == self.storage.database["songs"][str(self.player.playing_id)]:
+                        self.player.play_and_pause(self.storage.database['player_info']['idx'])
+                        time.sleep(0.1)
+                        continue
+                except:
+                    pass
                 if datatype == 'songs':
                     self.resume_play = False
                     self.player.new_player_list('songs', self.title, self.datalist, -1)
