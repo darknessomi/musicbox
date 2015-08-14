@@ -10,6 +10,7 @@ Class to stores everything into a json file.
 from const import Constant
 import json
 
+
 class Singleton(object):
     """Singleton Class
     This is a class to make some class being a Singleton class.
@@ -23,6 +24,7 @@ class Singleton(object):
                 self._init = True
                 other init method
     """
+
     def __new__(cls, *args, **kwargs):
         if not hasattr(cls, '_instance'):
             orig = super(Singleton, cls)
@@ -70,9 +72,9 @@ class Storage(Singleton):
         if hasattr(self, '_init'):
             return
         self._init = True
-        self.version = 1
+        self.version = 2
         self.database = {
-            "version": 1,
+            "version": 2,
             "user": {
                 "username": "",
                 "password": "",
@@ -89,6 +91,7 @@ class Storage(Singleton):
                 "ridx": 0,
                 "playing_volume": 60,
             },
+            "cache": False
         }
         self.storage_path = Constant.conf_dir + "/database.json"
         self.file = None
@@ -106,8 +109,11 @@ class Storage(Singleton):
         if self.database["version"] == self.version:
             return
         else:
-            #Should do some update. Like    if self.database["version"] == 2 : self.database.["version"] = 3
-            pass
+            # Should do some update. Like    if self.database["version"] == 2 : self.database.["version"] = 3
+            #update database form version 1 to version 2
+            if self.database["version"] == 1:
+                self.database["version"] = 2
+                self.database["cache"] = False
             return self.check_version()
 
     def save(self):
