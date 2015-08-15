@@ -31,5 +31,5 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--version", help="show this version and exit", action="store_true")
 args = parser.parse_args()
 if args.version:
-    print "NetEase-MusicBox 0.1.7.1"
+    print "NetEase-MusicBox 0.1.7.2"
     sys.exit()

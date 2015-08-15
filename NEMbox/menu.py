@@ -24,6 +24,7 @@ from const import Constant
 import logger
 import signal
 from storage import Storage
+from cache import Cache
 
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
@@ -79,6 +80,7 @@ class Menu:
         self.storage.load()
         self.collection = self.storage.database['collections'][0]
         self.player = Player()
+        self.cache = Cache()
         self.ui = Ui()
         self.netease = NetEase()
         self.screen = curses.initscr()
@@ -99,6 +101,7 @@ class Menu:
 
     def send_kill(self, signum, fram):
         self.player.stop()
+        self.cache.quit()
         self.storage.save()
         curses.endwin()
         sys.exit()
@@ -357,6 +360,7 @@ class Menu:
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
 
         self.player.stop()
+        self.cache.quit()
         self.storage.save()
         curses.endwin()
 

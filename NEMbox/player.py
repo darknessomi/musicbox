@@ -21,6 +21,7 @@ import re
 from ui import Ui
 from storage import Storage
 from api import NetEase
+from cache import Cache
 import logger
 
 log = logger.getLogger(__name__)
@@ -43,6 +44,8 @@ class Player:
         self.info = self.storage.database["player_info"]
         self.songs = self.storage.database["songs"]
         self.playing_id = -1
+        self.cache = Cache()
+
 
     def popen_recall(self, onExit, popenArgs):
         """
@@ -97,7 +100,18 @@ class Player:
             self.songs[str(self.playing_id)]["lyric"] = lyric
             return
 
-        thread = threading.Thread(target=runInThread, args=(onExit, popenArgs))
+        def cacheSong(song_id, song_url):
+            def cacheExit(song_id, path):
+                self.songs[str(song_id)]['cache'] = path
+            self.cache.add(song_id, song_url, cacheExit)
+            self.cache.start_download()
+
+        if 'cache' in popenArgs.keys() and os.path.isfile(popenArgs['cache']):
+            thread = threading.Thread(target=runInThread, args=(onExit, popenArgs['cache']))
+        else:
+            thread = threading.Thread(target=runInThread, args=(onExit, popenArgs['mp3_url']))
+            cache_thread = threading.Thread(target=cacheSong, args=(popenArgs['song_id'], popenArgs['mp3_url']))
+            cache_thread.start()
         thread.start()
         lyric_download_thread = threading.Thread(target=getLyric, args=())
         lyric_download_thread.start()
@@ -112,7 +126,7 @@ class Player:
         item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
         self.playing_id = item['song_id']
-        self.popen_recall(self.recall, item['mp3_url'])
+        self.popen_recall(self.recall, item)
 
     def generate_shuffle_playing_list(self):
         del self.info["playing_list"][:]
