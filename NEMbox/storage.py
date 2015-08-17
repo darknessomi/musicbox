@@ -8,28 +8,9 @@ Class to stores everything into a json file.
 '''
 
 from const import Constant
+from singleton import Singleton
 import json
 
-
-class Singleton(object):
-    """Singleton Class
-    This is a class to make some class being a Singleton class.
-    Such as database class or config class.
-
-    usage:
-        class xxx(Singleton):
-            def __init__(self):
-                if hasattr(self, '_init'):
-                    return
-                self._init = True
-                other init method
-    """
-
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, '_instance'):
-            orig = super(Singleton, cls)
-            cls._instance = orig.__new__(cls, *args, **kwargs)
-        return cls._instance
 
 
 class Storage(Singleton):
@@ -72,9 +53,9 @@ class Storage(Singleton):
         if hasattr(self, '_init'):
             return
         self._init = True
-        self.version = 2
+        self.version = 3
         self.database = {
-            "version": 2,
+            "version": 3,
             "user": {
                 "username": "",
                 "password": "",
@@ -90,8 +71,7 @@ class Storage(Singleton):
                 "idx": 0,
                 "ridx": 0,
                 "playing_volume": 60,
-            },
-            "cache": False
+            }
         }
         self.storage_path = Constant.conf_dir + "/database.json"
         self.file = None
@@ -103,18 +83,23 @@ class Storage(Singleton):
             self.file.close()
         except:
             self.__init__()
-        self.check_version()
+        if not self.check_version():
+            self.save()
 
     def check_version(self):
         if self.database["version"] == self.version:
-            return
+            return True
         else:
             # Should do some update. Like    if self.database["version"] == 2 : self.database.["version"] = 3
             #update database form version 1 to version 2
             if self.database["version"] == 1:
                 self.database["version"] = 2
                 self.database["cache"] = False
-            return self.check_version()
+            elif self.database["version"] == 2:
+                self.database["version"] = 3
+                self.database.pop("cache")
+            self.check_version()
+            return False
 
     def save(self):
         self.file = file(self.storage_path, 'w')

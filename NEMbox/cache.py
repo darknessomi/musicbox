@@ -7,14 +7,14 @@
 Class to cache songs into local storage.
 '''
 
-from storage import Singleton
+from singleton import Singleton
 import threading
 import subprocess
 from const import Constant
+from config import Config
 import os
 import logger
 import signal
-from storage import Storage
 
 log = logger.getLogger(__name__)
 
@@ -25,12 +25,14 @@ class Cache(Singleton):
             return
         self._init = True
         self.const = Constant()
+        self.config = Config()
         self.download_lock = threading.Lock()
         self.check_lock = threading.Lock()
         self.downloading = []
         self.aria2c = None
         self.stop = False
-        self.enable = Storage().database['cache']
+        self.enable = self.config.get_item("cache")
+        self.aria2c_parameters = self.config.get_item("aria2c_parameters")
 
     def start_download(self):
         check = self.download_lock.acquire(False)
@@ -53,9 +55,10 @@ class Cache(Singleton):
             output_path = Constant.download_dir
             output_file = str(song_id) + ".mp3"
             try:
-                self.aria2c = subprocess.Popen(
-                    ['aria2c', '--auto-file-renaming=false', '--allow-overwrite=true', '-d', output_path, '-o',
-                     output_file, url],
+                para = ['aria2c', '--auto-file-renaming=false', '--allow-overwrite=true', '-d', output_path, '-o',
+                        output_file, url]
+                para[1:1] = self.aria2c_parameters
+                self.aria2c = subprocess.Popen(para,
                     stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE)

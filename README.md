@@ -8,7 +8,7 @@ NetEase-MusicBox
 
 [![](https://img.shields.io/travis/joyent/node/v0.6.svg)]()
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
-[![versions](https://img.shields.io/badge/versions%20-%20%200.1.7.2-blue.svg)]()
+[![versions](https://img.shields.io/badge/versions%20-%20%200.1.7.5-blue.svg)]()
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
 ![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)
@@ -113,6 +113,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-08-17 版本 0.1.7.5    新增用户配置文件
 
 2015-08-09 版本 0.1.7.1    修正无法暂停错误
 
