@@ -153,6 +153,12 @@ class Player:
             self.info["player_list"].append(str(song["song_id"]))
             if str(song["song_id"]) not in self.songs.keys():
                 self.songs[str(song["song_id"])] = song
+            else:
+                database_song = self.songs[str(song["song_id"])]
+                if (database_song["song_name"] != song["song_name"]
+                    or database_song["quality"] != song["quality"]):
+                    self.songs[str(song["song_id"])] = song
+
 
     def play_and_pause(self, idx):
         # if same playlists && idx --> same song :: pause/resume it
