@@ -21,6 +21,7 @@ from api import NetEase
 from player import Player
 from ui import Ui
 from const import Constant
+from config import Config
 import logger
 import signal
 from storage import Storage
@@ -71,6 +72,7 @@ class Menu:
     def __init__(self):
         reload(sys)
         sys.setdefaultencoding('UTF-8')
+        self.config = Config()
         self.datatype = 'main'
         self.title = '网易云音乐'
         self.datalist = ['排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单', 'DJ节目', '打碟', '收藏', '搜索', '帮助']

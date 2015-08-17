@@ -22,6 +22,7 @@ from ui import Ui
 from storage import Storage
 from api import NetEase
 from cache import Cache
+from config import Config
 import logger
 
 log = logger.getLogger(__name__)
@@ -32,6 +33,7 @@ carousel = lambda left, right, x: left if (x > right) else (right if x < left el
 
 class Player:
     def __init__(self):
+        self.config = Config()
         self.ui = Ui()
         self.popen_handler = None
         # flag stop, prevent thread start
@@ -45,6 +47,7 @@ class Player:
         self.songs = self.storage.database["songs"]
         self.playing_id = -1
         self.cache = Cache()
+        self.mpg123_parameters = self.config.get_item("mpg123_parameters")
 
 
     def popen_recall(self, onExit, popenArgs):
@@ -56,7 +59,10 @@ class Player:
         """
 
         def runInThread(onExit, popenArgs):
-            self.popen_handler = subprocess.Popen(['mpg123', '-R', ], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            para = ['mpg123', '-R']
+            para[1:1] = self.mpg123_parameters
+            self.popen_handler = subprocess.Popen(para, stdin=subprocess.PIPE,
+                                                  stdout=subprocess.PIPE,
                                                   stderr=subprocess.PIPE)
             self.popen_handler.stdin.write("V " + str(self.info["playing_volume"]) + "\n")
             self.popen_handler.stdin.write("L " + popenArgs + "\n")
@@ -103,6 +109,7 @@ class Player:
         def cacheSong(song_id, song_url):
             def cacheExit(song_id, path):
                 self.songs[str(song_id)]['cache'] = path
+
             self.cache.add(song_id, song_url, cacheExit)
             self.cache.start_download()
 
@@ -144,7 +151,8 @@ class Player:
         self.info["ridx"] = 0
         for song in datalist:
             self.info["player_list"].append(str(song["song_id"]))
-            self.songs[str(song["song_id"])] = song
+            if str(song["song_id"]) not in self.songs.keys():
+                self.songs[str(song["song_id"])] = song
 
     def play_and_pause(self, idx):
         # if same playlists && idx --> same song :: pause/resume it

@@ -20,32 +20,32 @@ import logger
 import hashlib
 import random
 import base64
-
+from config import Config
 # 歌曲榜单地址
-top_list_all={
-    0:['云音乐新歌榜','/discover/toplist?id=3779629'],
-    1:['云音乐热歌榜','/discover/toplist?id=3778678'],
-    2:['网易原创歌曲榜','/discover/toplist?id=2884035'],
-    3:['云音乐飙升榜','/discover/toplist?id=19723756'],
-    4:['云音乐电音榜','/discover/toplist?id=10520166'],
-    5:['UK排行榜周榜','/discover/toplist?id=180106'],
-    6:['美国Billboard周榜','/discover/toplist?id=60198'],
-    7:['KTV嗨榜','/discover/toplist?id=21845217'],
-    8:['iTunes榜','/discover/toplist?id=11641012'],
-    9:['Hit FM Top榜','/discover/toplist?id=120001'],
-    10:['日本Oricon周榜','/discover/toplist?id=60131'],
-    11:['韩国Melon排行榜周榜','/discover/toplist?id=3733003'],
-    12:['韩国Mnet排行榜周榜','/discover/toplist?id=60255'],
-    13:['韩国Melon原声周榜','/discover/toplist?id=46772709'],
-    14:['中国TOP排行榜(港台榜)','/discover/toplist?id=112504'],
-    15:['中国TOP排行榜(内地榜)','/discover/toplist?id=64016'],
-    16:['香港电台中文歌曲龙虎榜','/discover/toplist?id=10169002'],
-    17:['华语金曲榜','/discover/toplist?id=4395559'],
-    18:['中国嘻哈榜','/discover/toplist?id=1899724'],
-    19:['法国 NRJ EuroHot 30周榜','/discover/toplist?id=27135204'],
-    20:['台湾Hito排行榜','/discover/toplist?id=112463'],
-    21:['Beatport全球电子舞曲榜','/discover/toplist?id=3812895']
-    }
+top_list_all = {
+    0: ['云音乐新歌榜', '/discover/toplist?id=3779629'],
+    1: ['云音乐热歌榜', '/discover/toplist?id=3778678'],
+    2: ['网易原创歌曲榜', '/discover/toplist?id=2884035'],
+    3: ['云音乐飙升榜', '/discover/toplist?id=19723756'],
+    4: ['云音乐电音榜', '/discover/toplist?id=10520166'],
+    5: ['UK排行榜周榜', '/discover/toplist?id=180106'],
+    6: ['美国Billboard周榜', '/discover/toplist?id=60198'],
+    7: ['KTV嗨榜', '/discover/toplist?id=21845217'],
+    8: ['iTunes榜', '/discover/toplist?id=11641012'],
+    9: ['Hit FM Top榜', '/discover/toplist?id=120001'],
+    10: ['日本Oricon周榜', '/discover/toplist?id=60131'],
+    11: ['韩国Melon排行榜周榜', '/discover/toplist?id=3733003'],
+    12: ['韩国Mnet排行榜周榜', '/discover/toplist?id=60255'],
+    13: ['韩国Melon原声周榜', '/discover/toplist?id=46772709'],
+    14: ['中国TOP排行榜(港台榜)', '/discover/toplist?id=112504'],
+    15: ['中国TOP排行榜(内地榜)', '/discover/toplist?id=64016'],
+    16: ['香港电台中文歌曲龙虎榜', '/discover/toplist?id=10169002'],
+    17: ['华语金曲榜', '/discover/toplist?id=4395559'],
+    18: ['中国嘻哈榜', '/discover/toplist?id=1899724'],
+    19: ['法国 NRJ EuroHot 30周榜', '/discover/toplist?id=27135204'],
+    20: ['台湾Hito排行榜', '/discover/toplist?id=112463'],
+    21: ['Beatport全球电子舞曲榜', '/discover/toplist?id=3812895']
+}
 
 default_timeout = 10
 
@@ -62,12 +62,13 @@ def encrypted_id(id):
     song_id = bytearray(id)
     magic_len = len(magic)
     for i in xrange(len(song_id)):
-        song_id[i] = song_id[i]^magic[i%magic_len]
+        song_id[i] = song_id[i] ^ magic[i % magic_len]
     m = hashlib.md5(song_id)
     result = m.digest().encode('base64')[:-1]
     result = result.replace('/', '_')
     result = result.replace('+', '-')
     return result
+
 
 # 登录加密算法, 基于https://github.com/stkevintan/nw_musicbox脚本实现
 def encrypted_login(username, password):
@@ -86,6 +87,7 @@ def encrypted_login(username, password):
     }
     return data
 
+
 def encrypted_phonelogin(username, password):
     text = {
         'phone': username,
@@ -102,6 +104,7 @@ def encrypted_phonelogin(username, password):
     }
     return data
 
+
 def aesEncrypt(text, secKey):
     pad = 16 - len(text) % 16
     text = text + pad * chr(pad)
@@ -110,13 +113,16 @@ def aesEncrypt(text, secKey):
     ciphertext = base64.b64encode(ciphertext)
     return ciphertext
 
+
 def rsaEncrypt(text, pubKey, modulus):
     text = text[::-1]
-    rs = int(text.encode('hex'), 16)**int(pubKey, 16)%int(modulus, 16)
+    rs = int(text.encode('hex'), 16) ** int(pubKey, 16) % int(modulus, 16)
     return format(rs, 'x').zfill(256)
+
 
 def createSecretKey(size):
     return (''.join(map(lambda xx: (hex(ord(xx))[2:]), os.urandom(size))))[0:16]
+
 
 # list去重
 def uniq(arr):
@@ -124,24 +130,27 @@ def uniq(arr):
     arr2.sort(key=arr.index)
     return arr2
 
+
 # 获取高音质mp3 url
 def geturl(song):
-    if song['hMusic']:
+    config = Config()
+    quality = Config().get_item("music_quality")
+    if song['hMusic'] and quality <= 0:
         music = song['hMusic']
         quality = 'HD'
-    elif song['mMusic']:
+    elif song['mMusic'] and quality <= 1:
         music = song['mMusic']
         quality = 'MD'
-    elif song['lMusic']:
+    elif song['lMusic'] and quality <= 2:
         music = song['lMusic']
         quality = 'LD'
     else:
         return song['mp3Url'], ''
 
-    quality = quality + ' {0}k'.format(music['bitrate']/1000)
+    quality = quality + ' {0}k'.format(music['bitrate'] / 1000)
     song_id = str(music['dfsId'])
     enc_id = encrypted_id(song_id)
-    url = "http://m%s.music.126.net/%s/%s.mp3"%(random.randrange(1,3), enc_id, song_id)
+    url = "http://m%s.music.126.net/%s/%s.mp3" % (random.randrange(1, 3), enc_id, song_id)
     return url, quality
 
 
@@ -163,7 +172,7 @@ class NetEase:
         self.playlist_class_dict = {}
 
     def return_toplists(self):
-        temp=[]
+        temp = []
         for i in range(len(top_list_all)):
             temp.append(top_list_all[i][0])
         return temp
@@ -211,7 +220,8 @@ class NetEase:
 
     # 用户歌单
     def user_playlist(self, uid, offset=0, limit=100):
-        action = 'http://music.163.com/api/user/playlist/?offset=' + str(offset) + '&limit=' + str(limit) + '&uid=' + str(uid)
+        action = 'http://music.163.com/api/user/playlist/?offset=' + str(offset) + '&limit=' + str(
+            limit) + '&uid=' + str(uid)
         try:
             data = self.httpRequest('GET', action)
             return data['playlist']
@@ -241,7 +251,8 @@ class NetEase:
 
     # 歌单（网友精选碟） hot||new http://music.163.com/#/discover/playlist/
     def top_playlists(self, category='全部', order='hot', offset=0, limit=50):
-        action = 'http://music.163.com/api/playlist/list?cat=' + category + '&order=' + order + '&offset=' + str(offset) + '&total=' + ('true' if offset else 'false') + '&limit=' + str(limit)
+        action = 'http://music.163.com/api/playlist/list?cat=' + category + '&order=' + order + '&offset=' + str(
+            offset) + '&total=' + ('true' if offset else 'false') + '&limit=' + str(limit)
         try:
             data = self.httpRequest('GET', action)
             return data['playlists']
@@ -280,7 +291,7 @@ class NetEase:
             return []
 
     # 热门单曲 http://music.163.com/discover/toplist?id=
-    def top_songlist(self,idx=0, offset=0, limit=100):
+    def top_songlist(self, idx=0, offset=0, limit=100):
         action = 'http://music.163.com' + top_list_all[idx][1]
         try:
             connection = requests.get(action, headers=self.header, timeout=default_timeout)
@@ -349,7 +360,8 @@ class NetEase:
 
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
     def djchannels(self, stype=0, offset=0, limit=50):
-        action = 'http://music.163.com/discover/djchannel?type=' + str(stype) + '&offset=' + str(offset) + '&limit=' + str(limit)
+        action = 'http://music.163.com/discover/djchannel?type=' + str(stype) + '&offset=' + str(
+            offset) + '&limit=' + str(limit)
         try:
             connection = requests.get(action, headers=self.header, timeout=default_timeout)
             connection.encoding = 'UTF-8'
@@ -379,12 +391,12 @@ class NetEase:
         if dig_type == 'songs':
             for i in range(0, len(data)):
                 url, quality = geturl(data[i])
-                
+
                 if data[i]['album'] != None:
                     album_name = data[i]['album']['name']
                 else:
                     album_name = '未知专辑'
-                    
+
                 song_info = {
                     'song_id': data[i]['id'],
                     'artist': [],
