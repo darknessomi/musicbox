@@ -202,7 +202,7 @@ class NetEase:
         pattern = re.compile(r'^0\d{2,3}\d{7,8}$|^1[34578]\d{9}$')
         if (pattern.match(username)):
             return self.phone_login(username, password)
-        action = 'http://music.163.com/weapi/login/'
+        action = 'https://music.163.com/weapi/login/'
         data = encrypted_login(username, password)
         try:
             return self.httpRequest('POST', action, data)
@@ -211,7 +211,7 @@ class NetEase:
 
     # 手机登录
     def phone_login(self, username, password):
-        action = 'http://music.163.com/weapi/login/cellphone'
+        action = 'https://music.163.com/weapi/login/cellphone'
         data = encrypted_phonelogin(username, password)
         try:
             return self.httpRequest('POST', action, data)

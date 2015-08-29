@@ -2,7 +2,7 @@ NetEase-MusicBox
 =================
 
 
-####Thanks vellow, hbprotoss, Catofes, 尘埃, chaserhkj, Ma233, 20015jjw, mchome, stkevintan
+#### Thanks vellow, hbprotoss, Catofes, 尘埃, chaserhkj, Ma233, 20015jjw, mchome, stkevintan
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
@@ -113,6 +113,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-08-29 版本 0.1.7.6    使用SSL登录
 
 2015-08-17 版本 0.1.7.5    新增用户配置文件
 
