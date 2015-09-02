@@ -6,7 +6,7 @@ NetEase-MusicBox
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
-[![](https://img.shields.io/travis/joyent/node/v0.6.svg)]()
+[![](https://img.shields.io/pypi/dm/NetEase-MusicBox.svg)]()
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.python.org/pypi/NetEase-MusicBox/)
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
