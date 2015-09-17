@@ -190,6 +190,9 @@ class Player:
             self.playing_flag = False
             try:
                 self.popen_handler.stdin.write("Q\n")
+            except:
+                pass
+            try:
                 self.popen_handler.kill()
             except:
                 return
