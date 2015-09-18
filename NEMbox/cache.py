@@ -50,10 +50,12 @@ class Cache(Singleton):
             data = self.downloading.pop()
             self.check_lock.release()
             song_id = data[0]
-            url = data[1]
-            onExit = data[2]
+            song_name = data[1]
+            artist = data[2]
+            url = data[3]
+            onExit = data[4]
             output_path = Constant.download_dir
-            output_file = str(song_id) + ".mp3"
+            output_file = str(artist) + " - " + str(song_name) + ".mp3"
             try:
                 para = ['aria2c', '--auto-file-renaming=false', '--allow-overwrite=true', '-d', output_path, '-o',
                         output_file, url]
@@ -71,9 +73,9 @@ class Cache(Singleton):
         self.download_lock.release()
 
 
-    def add(self, song_id, url, onExit):
+    def add(self, song_id, song_name, artist, url, onExit):
         self.check_lock.acquire()
-        self.downloading.append([song_id, url, onExit])
+        self.downloading.append([song_id, song_name, artist, url, onExit])
         self.check_lock.release()
 
     def quit(self):

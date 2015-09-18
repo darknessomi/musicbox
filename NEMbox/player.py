@@ -106,18 +106,18 @@ class Player:
             self.songs[str(self.playing_id)]["lyric"] = lyric
             return
 
-        def cacheSong(song_id, song_url):
+        def cacheSong(song_id, song_name, artist, song_url):
             def cacheExit(song_id, path):
                 self.songs[str(song_id)]['cache'] = path
 
-            self.cache.add(song_id, song_url, cacheExit)
+            self.cache.add(song_id, song_name, artist, song_url, cacheExit)
             self.cache.start_download()
 
         if 'cache' in popenArgs.keys() and os.path.isfile(popenArgs['cache']):
             thread = threading.Thread(target=runInThread, args=(onExit, popenArgs['cache']))
         else:
             thread = threading.Thread(target=runInThread, args=(onExit, popenArgs['mp3_url']))
-            cache_thread = threading.Thread(target=cacheSong, args=(popenArgs['song_id'], popenArgs['mp3_url']))
+            cache_thread = threading.Thread(target=cacheSong, args=(popenArgs['song_id'], popenArgs['song_name'], popenArgs['artist'], popenArgs['mp3_url']))
             cache_thread.start()
         thread.start()
         lyric_download_thread = threading.Thread(target=getLyric, args=())
