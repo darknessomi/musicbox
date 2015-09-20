@@ -2,7 +2,7 @@ NetEase-MusicBox
 =================
 
 
-#### Thanks vellow, hbprotoss, Catofes, 尘埃, chaserhkj, Ma233, 20015jjw, mchome, stkevintan
+#### Thanks vellow, hbprotoss, Catofes, 尘埃, chaserhkj, Ma233, 20015jjw, mchome, stkevintan，ayanamimcy
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
@@ -21,7 +21,7 @@ NetEase-MusicBox
 4. 网易新碟推荐
 5. 网易精选歌单
 6. 网易DJ节目
-7. 私人歌单
+7. 私人歌单，每日推荐
 8. 随心打碟
 9. 本地收藏
 10. 播放进度及播放模式显示
@@ -113,6 +113,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-09-20 版本 0.1.8.0    隐藏不常用的打碟功能，新增每日推荐功能
 
 2015-08-29 版本 0.1.7.6    使用SSL登录
 
