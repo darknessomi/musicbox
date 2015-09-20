@@ -170,6 +170,7 @@ class NetEase:
             'appver': '1.5.2'
         }
         self.playlist_class_dict = {}
+        self.session = requests.Session()
 
     def return_toplists(self):
         temp = []
@@ -184,10 +185,10 @@ class NetEase:
     def rawHttpRequest(self, method, action, query=None, urlencoded=None, callback=None, timeout=None):
         if (method == 'GET'):
             url = action if (query == None) else (action + '?' + query)
-            connection = requests.get(url, headers=self.header, timeout=default_timeout)
+            connection = self.session.get(url, headers=self.header, timeout=default_timeout)
 
         elif (method == 'POST'):
-            connection = requests.post(
+            connection = self.session.post(
                 action,
                 data=query,
                 headers=self.header,
@@ -225,6 +226,20 @@ class NetEase:
         try:
             data = self.httpRequest('GET', action)
             return data['playlist']
+        except:
+            return []
+
+    # 每日推荐歌单
+    def recommend_playlist(self):
+        action = 'http://music.163.com/discover/recommend/taste'
+        try:
+            page = self.session.get(action, headers=self.header, timeout=default_timeout)
+            song_ids = re.findall(r'/song\?id=(\d+)', page.text)
+            data = map(self.song_detail, song_ids)
+            result = []
+            for foo in range(len(data)):
+                result.append(data[foo][0])
+            return result
         except:
             return []
 
