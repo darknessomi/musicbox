@@ -33,6 +33,10 @@ class Cache(Singleton):
         self.stop = False
         self.enable = self.config.get_item("cache")
         self.aria2c_parameters = self.config.get_item("aria2c_parameters")
+        self.song_id = 0
+
+    def get_playing(self):
+        return self.song_id
 
     def start_download(self):
         check = self.download_lock.acquire(False)
@@ -50,6 +54,7 @@ class Cache(Singleton):
             data = self.downloading.pop()
             self.check_lock.release()
             song_id = data[0]
+            self.song_id = song_id
             song_name = data[1]
             artist = data[2]
             url = data[3]

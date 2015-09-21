@@ -61,6 +61,9 @@ shortcut = [
     ['r', 'Remove    ', '删除当前条目'],
     ['Shift+j', 'Move Down ', '向下移动当前条目'],
     ['Shift+k', 'Move Up   ', '向上移动当前条目'],
+    [',', 'Like FM   ', '喜爱 FM'],
+    ['.', 'Trash FM  ', '删除 FM'],
+    ['/', 'Next FM   ', '下一 FM'],
     ['q', 'Quit      ', '退出'],
     ["w", 'Quit&Clear', '退出并清除用户信息']
 ]
@@ -75,7 +78,7 @@ class Menu:
         self.config = Config()
         self.datatype = 'main'
         self.title = '网易云音乐'
-        self.datalist = ['排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单', 'DJ节目', '每日推荐', '收藏', '搜索', '帮助']
+        self.datalist = ['排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单', 'DJ节目', '每日推荐', '私人FM', '搜索', '帮助']
         self.offset = 0
         self.index = 0
         self.storage = Storage()
@@ -240,6 +243,25 @@ class Menu:
                 if len(self.storage.database["player_info"]["player_list"]) == 0:
                     continue
                 self.player.shuffle()
+                time.sleep(0.1)
+
+            # 喜爱FM
+            elif key == ord(','):
+                self.netease.fm_like(self.cache.get_playing())
+
+            # 删除FM
+            elif key == ord('.'):
+                if len(self.storage.database["player_info"]["player_list"]) == 0:
+                    continue
+                self.player.next()
+                self.netease.fm_trash(self.cache.get_playing())
+                time.sleep(0.1)
+
+            # 下一FM
+            elif key == ord('/'):
+                if len(self.storage.database["player_info"]["player_list"]) == 0:
+                    continue
+                self.player.next()
                 time.sleep(0.1)
 
             # 播放、暂停
@@ -562,11 +584,35 @@ class Menu:
             myplaylist = self.netease.recommend_playlist()
             self.datalist = self.netease.dig_info(myplaylist, self.datatype)
 
-        # 收藏
+        # 私人FM
         elif idx == 7:
             self.datatype = 'songs'
-            self.title += ' > 收藏'
-            self.datalist = self.collection
+            self.title += ' > 私人FM'
+            if self.userid is None:
+                # 使用本地存储了账户登录
+                if self.storage.database['user']['username'] != "":
+                    user_info = netease.login(self.storage.database['user']['username'],
+                                              self.storage.database['user']['password'])
+                # 本地没有存储账户，或本地账户失效，则引导录入
+                if self.storage.database['user']['username'] == "" or user_info['code'] != 200:
+                    data = self.ui.build_login()
+                    # 取消登录
+                    if data == -1:
+                        return
+                    user_info = data[0]
+                    self.storage.database['user']['username'] = data[1][0]
+                    self.storage.database['user']['password'] = data[1][1]
+
+                self.username = user_info['profile']['nickname']
+                self.userid = user_info['account']['id']
+            #
+            myplaylist = []
+            count = 0
+            while(count<20):
+                myplaylist += self.netease.personal_fm()
+                count += 1
+                time.sleep(0.2)
+            self.datalist = self.netease.dig_info(myplaylist, self.datatype)
 
         # 搜索
         elif idx == 8:
