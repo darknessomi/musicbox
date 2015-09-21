@@ -243,6 +243,41 @@ class NetEase:
         except:
             return []
 
+    #私人FM
+    def personal_fm(self):
+        action = 'http://music.163.com/api/radio/get'
+        try:
+            data = self.httpRequest('GET', action)
+            return data['data']
+        except:
+            return []
+
+    #FMlike
+    def fm_like(self, songid, like=True, time=25, alg='itembased'):
+        if like:
+            action = 'http://music.163.com/api/radio/like?alg='+alg+'&trackId='+str(songid)+'&like=true&time='+str(time)
+        else:
+            action = 'http://music.163.com/api/radio/like?alg='+alg+'&trackId='+str(songid)+'&like=false&time='+str(time)
+        try:
+            data = self.httpRequest('GET', action)
+            if data['code'] == 200:
+                return data
+            else:
+                return []
+        except:
+            return []
+
+    def fm_trash(self, songid, time=25, alg='RT'):
+        action = 'http://music.163.com/api/radio/trash/add?alg='+alg+'&songId='+str(songid)+'&time='+str(time)
+        try:
+            data = self.httpRequest('GET', action)
+            if data['code'] == 200:
+                return data
+            else:
+                return []
+        except:
+            return []
+
     # 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002) *(type)*
     def search(self, s, stype=1, offset=0, total='true', limit=60):
         action = 'http://music.163.com/api/search/get'

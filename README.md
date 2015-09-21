@@ -54,6 +54,9 @@ NetEase-MusicBox
 	<tr> <td>R</td> <td>Remove</td> <td>删除当前条目</td> </tr>
 	<tr> <td>⇧+J</td> <td>Move Down</td> <td>向下移动当前项目</td> </tr>
 	<tr> <td>⇧+K</td> <td>Move Up</td> <td>向上移动当前项目</td> </tr>
+	<tr> <td>,</td> <td>Like FM</td> <td>喜爱 FM</td> </tr>
+	<tr> <td>.</td> <td>Trash FM</td> <td>删除 FM</td> </tr>
+	<tr> <td>/</td> <td>Next FM</td> <td>下一FM</td> </tr>
 	<tr> <td>Q</td> <td>Quit</td> <td>退出</td> </tr>
 	<tr> <td>W</td> <td>Quit&Clear</td> <td>退出并清除用户信息</td> </tr>
 </table>
@@ -113,6 +116,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-09-22 版本 0.1.8.1    隐藏不常用的收藏功能，新增电台FM功能
 
 2015-09-20 版本 0.1.8.0    隐藏不常用的打碟功能，新增每日推荐功能
 
