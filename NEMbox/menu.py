@@ -61,7 +61,7 @@ shortcut = [
     ['r', 'Remove    ', '删除当前条目'],
     ['Shift+j', 'Move Down ', '向下移动当前条目'],
     ['Shift+k', 'Move Up   ', '向上移动当前条目'],
-    [',', 'Like FM   ', '喜爱 FM'],
+    [',', 'Like      ', '喜爱'],
     ['.', 'Trash FM  ', '删除 FM'],
     ['/', 'Next FM   ', '下一 FM'],
     ['q', 'Quit      ', '退出'],
@@ -245,7 +245,7 @@ class Menu:
                 self.player.shuffle()
                 time.sleep(0.1)
 
-            # 喜爱FM
+            # 喜爱
             elif key == ord(','):
                 self.netease.fm_like(self.cache.get_playing())
 

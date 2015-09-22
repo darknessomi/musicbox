@@ -243,7 +243,7 @@ class NetEase:
         except:
             return []
 
-    #私人FM
+    # 私人FM
     def personal_fm(self):
         action = 'http://music.163.com/api/radio/get'
         try:
@@ -252,7 +252,7 @@ class NetEase:
         except:
             return []
 
-    #FMlike
+    # like
     def fm_like(self, songid, like=True, time=25, alg='itembased'):
         if like:
             action = 'http://music.163.com/api/radio/like?alg='+alg+'&trackId='+str(songid)+'&like=true&time='+str(time)
@@ -267,6 +267,7 @@ class NetEase:
         except:
             return []
 
+    # FM trash
     def fm_trash(self, songid, time=25, alg='RT'):
         action = 'http://music.163.com/api/radio/trash/add?alg='+alg+'&songId='+str(songid)+'&time='+str(time)
         try:

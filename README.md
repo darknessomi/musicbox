@@ -23,7 +23,7 @@ NetEase-MusicBox
 6. 网易DJ节目
 7. 私人歌单，每日推荐
 8. 随心打碟
-9. 本地收藏
+9. 本地收藏，随时加❤
 10. 播放进度及播放模式显示
 11. Vimer式快捷键让操作丝般顺滑
 12. 可使用数字快捷键
@@ -54,7 +54,7 @@ NetEase-MusicBox
 	<tr> <td>R</td> <td>Remove</td> <td>删除当前条目</td> </tr>
 	<tr> <td>⇧+J</td> <td>Move Down</td> <td>向下移动当前项目</td> </tr>
 	<tr> <td>⇧+K</td> <td>Move Up</td> <td>向上移动当前项目</td> </tr>
-	<tr> <td>,</td> <td>Like FM</td> <td>喜爱 FM</td> </tr>
+	<tr> <td>,</td> <td>Like</td> <td>喜爱</td> </tr>
 	<tr> <td>.</td> <td>Trash FM</td> <td>删除 FM</td> </tr>
 	<tr> <td>/</td> <td>Next FM</td> <td>下一FM</td> </tr>
 	<tr> <td>Q</td> <td>Quit</td> <td>退出</td> </tr>
@@ -117,7 +117,9 @@ Enjoy it !
 
 ### 更新日志
 
-2015-09-22 版本 0.1.8.1    隐藏不常用的收藏功能，新增电台FM功能
+2015-09-22 版本 0.1.8.2    新增加❤功能
+
+2015-09-21 版本 0.1.8.1    隐藏不常用的收藏功能，新增电台FM功能
 
 2015-09-20 版本 0.1.8.0    隐藏不常用的打碟功能，新增每日推荐功能
 
