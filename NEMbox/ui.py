@@ -307,52 +307,64 @@ class Ui:
         netease = self.netease
         if stype == 'songs':
             song_name = self.get_param('搜索歌曲：')
-            try:
-                data = netease.search(song_name, stype=1)
-                song_ids = []
-                if 'songs' in data['result']:
-                    if 'mp3Url' in data['result']['songs']:
-                        songs = data['result']['songs']
-
-                    # if search song result do not has mp3Url
-                    # send ids to get mp3Url
-                    else:
-                        for i in range(0, len(data['result']['songs'])):
-                            song_ids.append(data['result']['songs'][i]['id'])
-                        songs = netease.songs_detail(song_ids)
-                    return netease.dig_info(songs, 'songs')
-            except:
+            if song_name == '/return':
                 return []
+            else:
+                try:
+                    data = netease.search(song_name, stype=1)
+                    song_ids = []
+                    if 'songs' in data['result']:
+                        if 'mp3Url' in data['result']['songs']:
+                            songs = data['result']['songs']
+
+                        # if search song result do not has mp3Url
+                        # send ids to get mp3Url
+                        else:
+                            for i in range(0, len(data['result']['songs'])):
+                                song_ids.append(data['result']['songs'][i]['id'])
+                            songs = netease.songs_detail(song_ids)
+                        return netease.dig_info(songs, 'songs')
+                except:
+                    return []
 
         elif stype == 'artists':
             artist_name = self.get_param('搜索艺术家：')
-            try:
-                data = netease.search(artist_name, stype=100)
-                if 'artists' in data['result']:
-                    artists = data['result']['artists']
-                    return netease.dig_info(artists, 'artists')
-            except:
+            if artist_name == '/return':
                 return []
+            else:
+                try:
+                    data = netease.search(artist_name, stype=100)
+                    if 'artists' in data['result']:
+                        artists = data['result']['artists']
+                        return netease.dig_info(artists, 'artists')
+                except:
+                    return []
 
         elif stype == 'albums':
-            artist_name = self.get_param('搜索专辑：')
-            try:
-                data = netease.search(artist_name, stype=10)
-                if 'albums' in data['result']:
-                    albums = data['result']['albums']
-                    return netease.dig_info(albums, 'albums')
-            except:
+            albums_name = self.get_param('搜索专辑：')
+            if albums_name == '/return':
                 return []
+            else:
+                try:
+                    data = netease.search(albums_name, stype=10)
+                    if 'albums' in data['result']:
+                        albums = data['result']['albums']
+                        return netease.dig_info(albums, 'albums')
+                except:
+                    return []
 
         elif stype == 'search_playlist':
-            artist_name = self.get_param('搜索网易精选集：')
-            try:
-                data = netease.search(artist_name, stype=1000)
-                if 'playlists' in data['result']:
-                    playlists = data['result']['playlists']
-                    return netease.dig_info(playlists, 'top_playlists')
-            except:
+            search_playlist = self.get_param('搜索网易精选集：')
+            if search_playlist == '/return':
                 return []
+            else:
+                try:
+                    data = netease.search(search_playlist, stype=1000)
+                    if 'playlists' in data['result']:
+                        playlists = data['result']['playlists']
+                        return netease.dig_info(playlists, 'top_playlists')
+                except:
+                    return []
 
         return []
 
@@ -416,7 +428,9 @@ class Ui:
         self.screen.addstr(5, self.startcol, prompt_string, curses.color_pair(1))
         self.screen.refresh()
         info = self.screen.getstr(10, self.startcol, 60)
-        if info.strip() is '':
+        if info == '':
+            return '/return'
+        elif info.strip() is '':
             return self.get_param(prompt_string)
         else:
             return info
