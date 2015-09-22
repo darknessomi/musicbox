@@ -48,7 +48,7 @@ class Player:
         self.playing_id = -1
         self.cache = Cache()
         self.mpg123_parameters = self.config.get_item("mpg123_parameters")
-
+        self.end_callback = None
 
     def popen_recall(self, onExit, popenArgs):
         """
@@ -117,7 +117,8 @@ class Player:
             thread = threading.Thread(target=runInThread, args=(onExit, popenArgs['cache']))
         else:
             thread = threading.Thread(target=runInThread, args=(onExit, popenArgs['mp3_url']))
-            cache_thread = threading.Thread(target=cacheSong, args=(popenArgs['song_id'], popenArgs['song_name'], popenArgs['artist'], popenArgs['mp3_url']))
+            cache_thread = threading.Thread(target=cacheSong, args=(
+            popenArgs['song_id'], popenArgs['song_name'], popenArgs['artist'], popenArgs['mp3_url']))
             cache_thread.start()
         thread.start()
         lyric_download_thread = threading.Thread(target=getLyric, args=())
@@ -129,6 +130,8 @@ class Player:
         return self.playing_id
 
     def recall(self):
+        if self.info["idx"] >= len(self.info["player_list"]) and self.end_callback != None:
+            self.end_callback()
         if self.info["idx"] < 0 or self.info["idx"] >= len(self.info["player_list"]):
             self.stop()
             return
@@ -162,6 +165,18 @@ class Player:
                     or database_song["quality"] != song["quality"]):
                     self.songs[str(song["song_id"])] = song
 
+    def append_songs(self, datalist):
+        for song in datalist:
+            self.info["player_list"].append(str(song["song_id"]))
+            if str(song["song_id"]) not in self.songs.keys():
+                self.songs[str(song["song_id"])] = song
+            else:
+                database_song = self.songs[str(song["song_id"])]
+                if (database_song["song_name"] != song["song_name"]
+                    or database_song["quality"] != song["quality"]):
+                    self.songs[str(song["song_id"])] = song
+        if len(datalist) > 0 and self.info["playing_mode"] == 3 or self.info["playing_mode"] == 4:
+            self.generate_shuffle_playing_list()
 
     def play_and_pause(self, idx):
         # if same playlists && idx --> same song :: pause/resume it
@@ -248,9 +263,9 @@ class Player:
                     self.generate_shuffle_playing_list()
             self.info["ridx"] += 1
             if self.info["ridx"] >= len(self.info["playing_list"]):
-                self.stop()
-                return
-            self.info["idx"] = self.info["playing_list"][self.info["ridx"]]
+                self.info["idx"] = len(self.info["playing_list"])
+            else:
+                self.info["idx"] = self.info["playing_list"][self.info["ridx"]]
         elif self.info["playing_mode"] == 4:
             if self.info["ridx"] >= len(self.info["playing_list"]):
                 self.generate_shuffle_playing_list()
