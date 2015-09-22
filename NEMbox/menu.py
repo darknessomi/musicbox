@@ -247,14 +247,14 @@ class Menu:
 
             # 喜爱
             elif key == ord(','):
-                self.netease.fm_like(self.cache.get_playing())
+                self.netease.fm_like(self.player.get_playing_id())
 
             # 删除FM
             elif key == ord('.'):
                 if len(self.storage.database["player_info"]["player_list"]) == 0:
                     continue
                 self.player.next()
-                self.netease.fm_trash(self.cache.get_playing())
+                self.netease.fm_trash(self.player.get_playing_id())
                 time.sleep(0.1)
 
             # 下一FM

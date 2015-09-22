@@ -125,6 +125,9 @@ class Player:
         # returns immediately after the thread starts
         return thread
 
+    def get_playing_id(self):
+        return self.playing_id
+
     def recall(self):
         if self.info["idx"] < 0 or self.info["idx"] >= len(self.info["player_list"]):
             self.stop()
