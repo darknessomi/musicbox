@@ -84,6 +84,8 @@ class Ui:
         self.screen.refresh()
 
     def build_process_bar(self, now_playing, total_length, playing_flag, pause_flag, playing_mode):
+        if (self.storage.database["player_info"]["idx"] >= len(self.storage.database["player_info"]["player_list"])):
+            return
         curses.noecho()
         self.screen.move(3, 1)
         self.screen.clrtoeol()
