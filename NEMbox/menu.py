@@ -145,6 +145,8 @@ class Menu:
                 self.storage.database['user'] = {
                     "username": "",
                     "password": "",
+                    "user_id": "",
+                    "nickname": "",
                 }
                 break
 
@@ -249,8 +251,7 @@ class Menu:
 
             # 喜爱
             elif key == ord(','):
-                if self.datatype == 'fmsongs':
-                    self.netease.fm_like(self.player.get_playing_id())
+                self.netease.fm_like(self.player.get_playing_id())
 
             # 删除FM
             elif key == ord('.'):
@@ -263,10 +264,11 @@ class Menu:
 
             # 下一FM
             elif key == ord('/'):
-                if len(self.storage.database["player_info"]["player_list"]) == 0:
-                    continue
-                self.player.next()
-                time.sleep(0.1)
+                if self.datatype == 'fmsongs':
+                    if len(self.storage.database["player_info"]["player_list"]) == 0:
+                        continue
+                    self.player.next()
+                    time.sleep(0.1)
 
             # 播放、暂停
             elif key == ord(' '):
@@ -592,23 +594,28 @@ class Menu:
         elif idx == 4:
             # 未登录
             if self.userid is None:
-                # 使用本地存储了账户登录
-                if self.storage.database['user']['username'] != "":
-                    user_info = netease.login(self.storage.database['user']['username'],
-                                              self.storage.database['user']['password'])
-                # 本地没有存储账户，或本地账户失效，则引导录入
-                if self.storage.database['user']['username'] == "" or user_info['code'] != 200:
-                    data = self.ui.build_login()
-                    # 取消登录
-                    if data == -1:
-                        return
-                    user_info = data[0]
-                    self.storage.database['user']['username'] = data[1][0]
-                    self.storage.database['user']['password'] = data[1][1]
+                if self.storage.database['user']['user_id'] == "":
+                    # 使用本地存储了账户登录
+                    if self.storage.database['user']['username'] != "":
+                        user_info = netease.login(self.storage.database['user']['username'],
+                                                  self.storage.database['user']['password'])
+                    # 本地没有存储账户，或本地账户失效，则引导录入
+                    if self.storage.database['user']['username'] == "" or user_info['code'] != 200:
+                        data = self.ui.build_login()
+                        # 取消登录
+                        if data == -1:
+                            return
+                        user_info = data[0]
+                        self.storage.database['user']['username'] = data[1][0]
+                        self.storage.database['user']['password'] = data[1][1]
+                        self.storage.database['user']['user_id'] = user_info['account']['id']
+                        self.storage.database['user']['nickname'] = user_info['profile']['nickname']
 
-                self.username = user_info['profile']['nickname']
-                self.userid = user_info['account']['id']
+                    self.username = user_info['profile']['nickname']
+                    self.userid = user_info['account']['id']
+                else: self.userid = self.storage.database['user']['user_id']
             # 读取登录之后的用户歌单
+            self.username = self.storage.database['user']['nickname']
             myplaylist = netease.user_playlist(self.userid)
             self.datatype = 'top_playlists'
             self.datalist = netease.dig_info(myplaylist, self.datatype)
