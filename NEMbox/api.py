@@ -439,7 +439,7 @@ class NetEase:
 
     def dig_info(self, data, dig_type):
         temp = []
-        if dig_type == 'songs':
+        if dig_type == 'songs' or dig_type == 'fmsongs':
             for i in range(0, len(data)):
                 url, quality = geturl(data[i])
 

@@ -51,7 +51,6 @@ class Cache(Singleton):
             data = self.downloading.pop()
             self.check_lock.release()
             song_id = data[0]
-            self.song_id = song_id
             song_name = data[1]
             artist = data[2]
             url = data[3]

@@ -96,6 +96,7 @@ class Menu:
         self.userid = None
         self.username = None
         self.resume_play = True
+        self.at_playing_list = False
         signal.signal(signal.SIGWINCH, self.change_term)
         signal.signal(signal.SIGINT, self.send_kill)
         self.START = time.time()
@@ -210,6 +211,7 @@ class Menu:
                 self.datalist = up[2]
                 self.offset = up[3]
                 self.index = up[4]
+                self.at_playing_list = False;
 
             # 搜索
             elif key == ord('f'):
@@ -251,21 +253,24 @@ class Menu:
 
             # 删除FM
             elif key == ord('.'):
-                if len(self.storage.database["player_info"]["player_list"]) == 0:
-                    continue
-                self.player.next()
-                self.netease.fm_trash(self.player.get_playing_id())
-                time.sleep(0.1)
+                if self.datatype == 'fmsongs':
+                    if len(self.storage.database["player_info"]["player_list"]) == 0:
+                        continue
+                    self.player.next()
+                    self.netease.fm_trash(self.player.get_playing_id())
+                    time.sleep(0.1)
 
             # 下一FM
             elif key == ord('/'):
-                if len(self.storage.database["player_info"]["player_list"]) == 0:
-                    continue
-                self.player.next()
-                time.sleep(0.1)
+                if self.datatype == 'fmsongs':
+                    if len(self.storage.database["player_info"]["player_list"]) == 0:
+                        continue
+                    self.player.next()
+                    time.sleep(0.1)
 
             # 播放、暂停
             elif key == ord(' '):
+                # If not open a new playing list, just play and pause.
                 try:
                     if self.datalist[idx] == self.storage.database["songs"][str(self.player.playing_id)]:
                         self.player.play_and_pause(self.storage.database['player_info']['idx'])
@@ -273,14 +278,26 @@ class Menu:
                         continue
                 except:
                     pass
+                # If change to a new playing list. Add playing list and play.
                 if datatype == 'songs':
                     self.resume_play = False
                     self.player.new_player_list('songs', self.title, self.datalist, -1)
+                    self.player.end_callback = None
                     self.player.play_and_pause(idx)
+                    self.at_playing_list = True
                 elif datatype == 'djchannels':
                     self.resume_play = False
                     self.player.new_player_list('djchannels', self.title, self.datalist, -1)
+                    self.player.end_callback = None
                     self.player.play_and_pause(idx)
+                    self.at_playing_list = True
+                elif datatype == 'fmsongs':
+                    self.resume_play = False
+                    self.storage.database['player_info']['playing_mode'] = 0
+                    self.player.new_player_list('fmsongs', self.title, self.datalist, -1)
+                    self.player.end_callback = self.fm_callback
+                    self.player.play_and_pause(idx)
+                    self.at_playing_list = True
                 else:
                     self.player.play_and_pause(self.storage.database['player_info']['idx'])
                 time.sleep(0.1)
@@ -289,7 +306,9 @@ class Menu:
             elif key == ord('p'):
                 if len(self.storage.database['player_info']['player_list']) == 0:
                     continue
-                self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+                if not self.at_playing_list:
+                    self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+                    self.at_playing_list = True
                 self.datatype = self.storage.database['player_info']['player_list_type']
                 self.title = self.storage.database['player_info']['player_list_title']
                 self.datalist = []
@@ -298,6 +317,10 @@ class Menu:
                 self.index = self.storage.database['player_info']['idx']
                 self.offset = self.storage.database['player_info']['idx'] / self.step * self.step
                 if self.resume_play:
+                    if self.datatype == "fmsongs":
+                        self.player.end_callback = self.fm_callback
+                    else:
+                        self.player.end_callback = None
                     self.storage.database['player_info']['idx'] = -1
                     self.player.play_and_pause(self.index)
                     self.resume_play = False
@@ -487,6 +510,44 @@ class Menu:
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
 
+    def fm_callback(self):
+        log.debug("FM CallBack.")
+        data = self.get_new_fm()
+        self.player.append_songs(data)
+        if self.datatype == 'fmsongs':
+            if len(self.storage.database['player_info']['player_list']) == 0:
+                return
+            self.datatype = self.storage.database['player_info']['player_list_type']
+            self.title = self.storage.database['player_info']['player_list_title']
+            self.datalist = []
+            for i in self.storage.database['player_info']['player_list']:
+                self.datalist.append(self.storage.database['songs'][i])
+            self.index = self.storage.database['player_info']['idx']
+            self.offset = self.storage.database['player_info']['idx'] / self.step * self.step
+
+    def get_new_fm(self):
+        if self.userid is None:
+            # 使用本地存储了账户登录
+            if self.storage.database['user']['username'] != "":
+                user_info = self.netease.login(self.storage.database['user']['username'],
+                                               self.storage.database['user']['password'])
+            # 本地没有存储账户，或本地账户失效，则引导录入
+            if self.storage.database['user']['username'] == "" or user_info['code'] != 200:
+                data = self.ui.build_login()
+                # 取消登录
+                if data == -1:
+                    return
+                user_info = data[0]
+                self.storage.database['user']['username'] = data[1][0]
+                self.storage.database['user']['password'] = data[1][1]
+
+            self.username = user_info['profile']['nickname']
+            self.userid = user_info['account']['id']
+        myplaylist = []
+        for count in range(0, 1):
+            myplaylist += self.netease.personal_fm()
+            time.sleep(0.2)
+        return self.netease.dig_info(myplaylist, "fmsongs")
 
     def choice_channel(self, idx):
         # 排行榜
@@ -586,33 +647,9 @@ class Menu:
 
         # 私人FM
         elif idx == 7:
-            self.datatype = 'songs'
+            self.datatype = 'fmsongs'
             self.title += ' > 私人FM'
-            if self.userid is None:
-                # 使用本地存储了账户登录
-                if self.storage.database['user']['username'] != "":
-                    user_info = netease.login(self.storage.database['user']['username'],
-                                              self.storage.database['user']['password'])
-                # 本地没有存储账户，或本地账户失效，则引导录入
-                if self.storage.database['user']['username'] == "" or user_info['code'] != 200:
-                    data = self.ui.build_login()
-                    # 取消登录
-                    if data == -1:
-                        return
-                    user_info = data[0]
-                    self.storage.database['user']['username'] = data[1][0]
-                    self.storage.database['user']['password'] = data[1][1]
-
-                self.username = user_info['profile']['nickname']
-                self.userid = user_info['account']['id']
-            #
-            myplaylist = []
-            count = 0
-            while(count<20):
-                myplaylist += self.netease.personal_fm()
-                count += 1
-                time.sleep(0.2)
-            self.datalist = self.netease.dig_info(myplaylist, self.datatype)
+            self.datalist = self.get_new_fm()
 
         # 搜索
         elif idx == 8:
