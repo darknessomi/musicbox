@@ -249,8 +249,7 @@ class Menu:
 
             # 喜爱
             elif key == ord(','):
-                if self.datatype == 'fmsongs':
-                    self.netease.fm_like(self.player.get_playing_id())
+                self.netease.fm_like(self.player.get_playing_id())
 
             # 删除FM
             elif key == ord('.'):
@@ -263,10 +262,11 @@ class Menu:
 
             # 下一FM
             elif key == ord('/'):
-                if len(self.storage.database["player_info"]["player_list"]) == 0:
-                    continue
-                self.player.next()
-                time.sleep(0.1)
+                if self.datatype == 'fmsongs':
+                    if len(self.storage.database["player_info"]["player_list"]) == 0:
+                        continue
+                    self.player.next()
+                    time.sleep(0.1)
 
             # 播放、暂停
             elif key == ord(' '):
