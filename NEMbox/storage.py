@@ -10,6 +10,7 @@ Class to stores everything into a json file.
 from const import Constant
 from singleton import Singleton
 import json
+import cPickle as pickle
 
 
 
@@ -53,12 +54,14 @@ class Storage(Singleton):
         if hasattr(self, '_init'):
             return
         self._init = True
-        self.version = 3
+        self.version = 4
         self.database = {
-            "version": 3,
+            "version": 4,
             "user": {
                 "username": "",
                 "password": "",
+                "user_id": "",
+                "nickname": "",
             },
             "collections": [[]],
             "songs": {},
@@ -90,14 +93,16 @@ class Storage(Singleton):
         if self.database["version"] == self.version:
             return True
         else:
-            # Should do some update. Like    if self.database["version"] == 2 : self.database.["version"] = 3
-            #update database form version 1 to version 2
+            # Should do some update.
             if self.database["version"] == 1:
                 self.database["version"] = 2
                 self.database["cache"] = False
             elif self.database["version"] == 2:
                 self.database["version"] = 3
                 self.database.pop("cache")
+            elif self.database["version"] == 3:
+                self.database["version"] = 4
+                self.database["user"] = {'username': '', 'password': '', 'user_id': '', 'nickname': ''}
             self.check_version()
             return False
 
