@@ -14,6 +14,7 @@ import re
 import os
 import json
 import requests
+import requests.utils
 from Crypto.Cipher import AES
 from bs4 import BeautifulSoup
 import logger
@@ -171,6 +172,9 @@ class NetEase:
         }
         self.playlist_class_dict = {}
         self.session = requests.Session()
+
+    def return_session(self):
+        return requests.utils.dict_from_cookiejar(self.session.cookies)
 
     def return_toplists(self):
         temp = []

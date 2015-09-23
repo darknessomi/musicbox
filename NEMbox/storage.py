@@ -11,6 +11,7 @@ from const import Constant
 from singleton import Singleton
 import json
 import cPickle as pickle
+import requests, requests.utils
 
 
 
@@ -77,13 +78,18 @@ class Storage(Singleton):
             }
         }
         self.storage_path = Constant.conf_dir + "/database.json"
+        self.cookie_path = Constant.conf_dir + "/cookie"
         self.file = None
+        self.cookie = None
 
     def load(self):
         try:
             self.file = file(self.storage_path, 'r')
             self.database = json.loads(self.file.read())
             self.file.close()
+            with open(self.cookie_path) as f:
+                self.cookie = requests.utils.cookiejar_from_dict(pickle.load(f))
+
         except:
             self.__init__()
         if not self.check_version():
@@ -110,6 +116,8 @@ class Storage(Singleton):
         self.file = file(self.storage_path, 'w')
         self.file.write(json.dumps(self.database))
         self.file.close()
+        with open(self.cookie_path, 'w') as f:
+            pickle.dump(self.cookie, f)
 
 
 

@@ -148,6 +148,7 @@ class Menu:
                     "user_id": "",
                     "nickname": "",
                 }
+                self.storage.database["cookie"] = {}
                 break
 
             # 上移
@@ -611,11 +612,14 @@ class Menu:
                         self.storage.database['user']['user_id'] = user_info['account']['id']
                         self.storage.database['user']['nickname'] = user_info['profile']['nickname']
 
+                    self.storage.cookie = netease.return_session()
                     self.username = user_info['profile']['nickname']
                     self.userid = user_info['account']['id']
-                else: self.userid = self.storage.database['user']['user_id']
+                else:
+                    self.userid = self.storage.database['user']['user_id']
             # 读取登录之后的用户歌单
             self.username = self.storage.database['user']['nickname']
+            netease.cookies = self.storage.cookie
             myplaylist = netease.user_playlist(self.userid)
             self.datatype = 'top_playlists'
             self.datalist = netease.dig_info(myplaylist, self.datatype)
