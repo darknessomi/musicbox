@@ -25,6 +25,10 @@ import logger
 import signal
 from storage import Storage
 from cache import Cache
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
@@ -110,6 +114,12 @@ class Menu:
         self.storage.save()
         curses.endwin()
         sys.exit()
+
+    def check_version(self):
+        # 检查更新
+        tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version())))
+        root = tree.getroot()
+        return root[0][4][0][0].text
 
     def start(self):
         self.START = time.time() // 1

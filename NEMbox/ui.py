@@ -45,6 +45,7 @@ class Ui:
         self.lyric = ""
         self.now_lyric = ""
         self.storage = Storage()
+        self.newversion = False
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()
