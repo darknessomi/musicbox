@@ -14,14 +14,15 @@ import re
 import os
 import json
 import requests
-import requests.utils
 from Crypto.Cipher import AES
+from cookielib import LWPCookieJar
 from bs4 import BeautifulSoup
 import logger
 import hashlib
 import random
 import base64
 from config import Config
+from storage import Storage
 # 歌曲榜单地址
 top_list_all = {
     0: ['云音乐新歌榜', '/discover/toplist?id=3779629'],
@@ -172,9 +173,13 @@ class NetEase:
         }
         self.playlist_class_dict = {}
         self.session = requests.Session()
+        self.storage = Storage()
+        self.session.cookies = LWPCookieJar(self.storage.cookie_path)
+        try:
+            self.session.cookies.load()
+        except:
+            self.session.cookies.save()
 
-    def return_session(self):
-        return requests.utils.dict_from_cookiejar(self.session.cookies)
 
     def return_toplists(self):
         temp = []
@@ -199,6 +204,15 @@ class NetEase:
                 timeout=default_timeout
             )
 
+        elif (method == 'Login_POST'):
+            connection = self.session.post(
+                action,
+                data=query,
+                headers=self.header,
+                timeout=default_timeout
+            )
+            self.session.cookies.save()
+
         connection.encoding = "UTF-8"
         return connection.text
 
@@ -210,7 +224,7 @@ class NetEase:
         action = 'https://music.163.com/weapi/login/'
         data = encrypted_login(username, password)
         try:
-            return self.httpRequest('POST', action, data)
+            return self.httpRequest('Login_POST', action, data)
         except:
             return {'code': 501}
 
@@ -219,7 +233,7 @@ class NetEase:
         action = 'https://music.163.com/weapi/login/cellphone'
         data = encrypted_phonelogin(username, password)
         try:
-            return self.httpRequest('POST', action, data)
+            return self.httpRequest('Login_POST', action, data)
         except:
             return {'code': 501}
 
@@ -237,6 +251,7 @@ class NetEase:
     def recommend_playlist(self):
         action = 'http://music.163.com/discover/recommend/taste'
         try:
+            self.session.cookies.load()
             page = self.session.get(action, headers=self.header, timeout=default_timeout)
             song_ids = re.findall(r'/song\?id=(\d+)', page.text)
             data = map(self.song_detail, song_ids)
