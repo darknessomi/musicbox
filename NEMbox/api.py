@@ -455,6 +455,14 @@ class NetEase:
                 continue
 
         return channels
+    # 获取版本
+    def get_version(self):
+        action = 'https://pypi.python.org/pypi?:action=doap&name=NetEase-MusicBox'
+        try:
+            data = requests.get(action)
+            return data.content
+        except:
+            return []
 
     def dig_info(self, data, dig_type):
         temp = []

@@ -16,6 +16,7 @@ import sys
 import os
 import time
 import webbrowser
+import platform
 from api import NetEase
 from player import Player
 from ui import Ui
@@ -25,6 +26,10 @@ import logger
 import signal
 from storage import Storage
 from cache import Cache
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
@@ -111,12 +116,29 @@ class Menu:
         curses.endwin()
         sys.exit()
 
-    def start(self):
+    def alert(self, version):
+        latest = Menu().check_version()
+        if latest != version:
+            if platform.system() == 'Darwin':
+                os.system('/usr/bin/osascript -e \'display notification "MusicBox Update is available"sound name "/System/Library/Sounds/Ping.aiff"\'')
+                time.sleep(0.5)
+                os.system('/usr/bin/osascript -e \'display notification "NetEase-MusicBox installed version:' + version + '\nNetEase-MusicBox latest version:' + latest + '"\'')
+            else:
+                os.system('/usr/bin/notify-send "MusicBox Update is available"')
+
+    def check_version(self):
+        # 检查更新
+        tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version())))
+        root = tree.getroot()
+        return root[0][4][0][0].text
+
+    def start(self, version):
         self.START = time.time() // 1
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
         self.ui.build_process_bar(self.player.process_location, self.player.process_length, self.player.playing_flag,
                                   self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+        alert_flag = True
         while True:
             datatype = self.datatype
             title = self.title
@@ -410,6 +432,9 @@ class Menu:
                                       self.player.playing_flag,
                                       self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
+            if alert_flag:
+                Menu().alert(version)
+                alert_flag = False
 
         self.player.stop()
         self.cache.quit()
