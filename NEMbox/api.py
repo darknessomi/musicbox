@@ -245,7 +245,7 @@ class NetEase:
             data = self.httpRequest('GET', action)
             return data['playlist']
         except:
-            return []
+            return -1
 
     # 每日推荐歌单
     def recommend_playlist(self):
@@ -260,7 +260,7 @@ class NetEase:
                 result.append(data[foo][0])
             return result
         except:
-            return []
+            return -1
 
     # 私人FM
     def personal_fm(self):
@@ -269,7 +269,7 @@ class NetEase:
             data = self.httpRequest('GET', action)
             return data['data']
         except:
-            return []
+            return -1
 
     # like
     def fm_like(self, songid, like=True, time=25, alg='itembased'):
@@ -282,9 +282,9 @@ class NetEase:
             if data['code'] == 200:
                 return data
             else:
-                return []
+                return -1
         except:
-            return []
+            return -1
 
     # FM trash
     def fm_trash(self, songid, time=25, alg='RT'):
@@ -294,9 +294,9 @@ class NetEase:
             if data['code'] == 200:
                 return data
             else:
-                return []
+                return -1
         except:
-            return []
+            return -1
 
     # 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002) *(type)*
     def search(self, s, stype=1, offset=0, total='true', limit=60):
@@ -455,6 +455,14 @@ class NetEase:
                 continue
 
         return channels
+    # 获取版本
+    def get_version(self):
+        action = 'https://pypi.python.org/pypi?:action=doap&name=NetEase-MusicBox'
+        try:
+            data = requests.get(action)
+            return data.content
+        except:
+            return []
 
     def dig_info(self, data, dig_type):
         temp = []

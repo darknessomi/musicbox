@@ -16,6 +16,7 @@ import sys
 import os
 import time
 import webbrowser
+import platform
 from api import NetEase
 from player import Player
 from ui import Ui
@@ -25,6 +26,10 @@ import logger
 import signal
 from storage import Storage
 from cache import Cache
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
@@ -92,8 +97,8 @@ class Menu:
         self.step = 10
         self.stack = []
         self.djstack = []
-        self.userid = None
-        self.username = None
+        self.userid = self.storage.database["user"]["user_id"]
+        self.username = self.storage.database["user"]["nickname"]
         self.resume_play = True
         self.at_playing_list = False
         signal.signal(signal.SIGWINCH, self.change_term)
@@ -111,12 +116,29 @@ class Menu:
         curses.endwin()
         sys.exit()
 
-    def start(self):
+    def alert(self, version):
+        latest = Menu().check_version()
+        if latest != version:
+            if platform.system() == 'Darwin':
+                os.system('/usr/bin/osascript -e \'display notification "MusicBox Update is available"sound name "/System/Library/Sounds/Ping.aiff"\'')
+                time.sleep(0.5)
+                os.system('/usr/bin/osascript -e \'display notification "NetEase-MusicBox installed version:' + version + '\nNetEase-MusicBox latest version:' + latest + '"\'')
+            else:
+                os.system('/usr/bin/notify-send "MusicBox Update is available"')
+
+    def check_version(self):
+        # 检查更新
+        tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version())))
+        root = tree.getroot()
+        return root[0][4][0][0].text
+
+    def start(self, version):
         self.START = time.time() // 1
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
         self.ui.build_process_bar(self.player.process_location, self.player.process_length, self.player.playing_flag,
                                   self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+        alert_flag = True
         while True:
             datatype = self.datatype
             title = self.title
@@ -147,7 +169,10 @@ class Menu:
                     "user_id": "",
                     "nickname": "",
                 }
-                os.remove(self.storage.cookie_path)
+                try:
+                    os.remove(self.storage.cookie_path)
+                except:
+                    break
                 break
 
             # 上移
@@ -251,7 +276,7 @@ class Menu:
 
             # 喜爱
             elif key == ord(','):
-                self.netease.fm_like(self.player.get_playing_id())
+                self.request_api(self.netease.fm_like, self.player.get_playing_id())
 
             # 删除FM
             elif key == ord('.'):
@@ -259,7 +284,7 @@ class Menu:
                     if len(self.storage.database["player_info"]["player_list"]) == 0:
                         continue
                     self.player.next()
-                    self.netease.fm_trash(self.player.get_playing_id())
+                    self.request_api(self.netease.fm_trash, self.player.get_playing_id())
                     time.sleep(0.1)
 
             # 下一FM
@@ -407,6 +432,9 @@ class Menu:
                                       self.player.playing_flag,
                                       self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
+            if alert_flag:
+                Menu().alert(version)
+                alert_flag = False
 
         self.player.stop()
         self.cache.quit()
@@ -527,32 +555,37 @@ class Menu:
             self.index = self.storage.database['player_info']['idx']
             self.offset = self.storage.database['player_info']['idx'] / self.step * self.step
 
-    def get_new_fm(self):
-        if self.userid is None:
-            if self.storage.database['user']['user_id'] == "":
-                # 使用本地存储了账户登录
-                if self.storage.database['user']['username'] != "":
-                    user_info = self.netease.login(self.storage.database['user']['username'],
-                                              self.storage.database['user']['password'])
-                # 本地没有存储账户，或本地账户失效，则引导录入
-                if self.storage.database['user']['username'] == "" or user_info['code'] != 200:
-                    data = self.ui.build_login()
-                    # 取消登录
-                    if data == -1:
-                        return
-                    user_info = data[0]
-                    self.storage.database['user']['username'] = data[1][0]
-                    self.storage.database['user']['password'] = data[1][1]
-                    self.storage.database['user']['user_id'] = user_info['account']['id']
-                    self.storage.database['user']['nickname'] = user_info['profile']['nickname']
+    def request_api(self, func, *args):
+        if self.storage.database['user']['user_id'] != "":
+            result = func(*args)
+            if result != -1:
+                return result
+        log.debug("Re Login.")
+        user_info = {}
+        if self.storage.database['user']['username'] != "":
+            user_info = self.netease.login(self.storage.database['user']['username'],
+                                           self.storage.database['user']['password'])
+        if self.storage.database['user']['username'] == "" or user_info['code'] != 200:
+            data = self.ui.build_login()
+            # 取消登录
+            if data == -1:
+                return -1
+            user_info = data[0]
+            self.storage.database['user']['username'] = data[1][0]
+            self.storage.database['user']['password'] = data[1][1]
+            self.storage.database['user']['user_id'] = user_info['account']['id']
+            self.storage.database['user']['nickname'] = user_info['profile']['nickname']
+        self.userid = self.storage.database["user"]["user_id"]
+        self.username = self.storage.database["user"]["nickname"]
+        return func(*args)
 
-                self.username = user_info['profile']['nickname']
-                self.userid = user_info['account']['id']
-            else:
-                self.userid = self.storage.database['user']['user_id']
+    def get_new_fm(self):
         myplaylist = []
         for count in range(0, 1):
-            myplaylist += self.netease.personal_fm()
+            data = self.request_api(self.netease.personal_fm)
+            if data == -1:
+                break
+            myplaylist += data
             time.sleep(0.2)
         return self.netease.dig_info(myplaylist, "fmsongs")
 
@@ -597,32 +630,9 @@ class Menu:
 
         # 我的歌单
         elif idx == 4:
-            # 未登录
-            if self.userid is None:
-                if self.storage.database['user']['user_id'] == "":
-                    # 使用本地存储了账户登录
-                    if self.storage.database['user']['username'] != "":
-                        user_info = netease.login(self.storage.database['user']['username'],
-                                                  self.storage.database['user']['password'])
-                    # 本地没有存储账户，或本地账户失效，则引导录入
-                    if self.storage.database['user']['username'] == "" or user_info['code'] != 200:
-                        data = self.ui.build_login()
-                        # 取消登录
-                        if data == -1:
-                            return
-                        user_info = data[0]
-                        self.storage.database['user']['username'] = data[1][0]
-                        self.storage.database['user']['password'] = data[1][1]
-                        self.storage.database['user']['user_id'] = user_info['account']['id']
-                        self.storage.database['user']['nickname'] = user_info['profile']['nickname']
-
-                    self.username = user_info['profile']['nickname']
-                    self.userid = user_info['account']['id']
-                else:
-                    self.userid = self.storage.database['user']['user_id']
-            # 读取登录之后的用户歌单
-            self.username = self.storage.database['user']['nickname']
-            myplaylist = netease.user_playlist(self.userid)
+            myplaylist = self.request_api(self.netease.user_playlist, self.userid)
+            if myplaylist == -1:
+                return
             self.datatype = 'top_playlists'
             self.datalist = netease.dig_info(myplaylist, self.datatype)
             self.title += ' > ' + self.username + ' 的歌单'
@@ -637,30 +647,9 @@ class Menu:
         elif idx == 6:
             self.datatype = 'songs'
             self.title += ' > 每日推荐'
-            if self.userid is None:
-                if self.storage.database['user']['user_id'] == "":
-                    # 使用本地存储了账户登录
-                    if self.storage.database['user']['username'] != "":
-                        user_info = netease.login(self.storage.database['user']['username'],
-                                                  self.storage.database['user']['password'])
-                    # 本地没有存储账户，或本地账户失效，则引导录入
-                    if self.storage.database['user']['username'] == "" or user_info['code'] != 200:
-                        data = self.ui.build_login()
-                        # 取消登录
-                        if data == -1:
-                            return
-                        user_info = data[0]
-                        self.storage.database['user']['username'] = data[1][0]
-                        self.storage.database['user']['password'] = data[1][1]
-                        self.storage.database['user']['user_id'] = user_info['account']['id']
-                        self.storage.database['user']['nickname'] = user_info['profile']['nickname']
-
-                    self.username = user_info['profile']['nickname']
-                    self.userid = user_info['account']['id']
-                else:
-                    self.userid = self.storage.database['user']['user_id']
-            #
-            myplaylist = self.netease.recommend_playlist()
+            myplaylist = self.request_api(self.netease.recommend_playlist)
+            if myplaylist == -1:
+                return
             self.datalist = self.netease.dig_info(myplaylist, self.datatype)
 
         # 私人FM
