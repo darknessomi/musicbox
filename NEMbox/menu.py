@@ -98,7 +98,7 @@ class Menu:
         self.stack = []
         self.djstack = []
         self.userid = self.storage.database["user"]["user_id"]
-        self.username = self.storage.database["user"]["username"]
+        self.username = self.storage.database["user"]["nickname"]
         self.resume_play = True
         self.at_playing_list = False
         signal.signal(signal.SIGWINCH, self.change_term)
@@ -576,7 +576,7 @@ class Menu:
             self.storage.database['user']['user_id'] = user_info['account']['id']
             self.storage.database['user']['nickname'] = user_info['profile']['nickname']
         self.userid = self.storage.database["user"]["user_id"]
-        self.username = self.storage.database["user"]["username"]
+        self.username = self.storage.database["user"]["nickname"]
         return func(*args)
 
     def get_new_fm(self):
