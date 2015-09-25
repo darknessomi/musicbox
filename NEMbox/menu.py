@@ -582,7 +582,10 @@ class Menu:
     def get_new_fm(self):
         myplaylist = []
         for count in range(0, 1):
-            myplaylist += self.request_api(self.netease.personal_fm)
+            data = self.request_api(self.netease.personal_fm)
+            if data == -1:
+                break
+            myplaylist += data
             time.sleep(0.2)
         return self.netease.dig_info(myplaylist, "fmsongs")
 
@@ -628,6 +631,8 @@ class Menu:
         # 我的歌单
         elif idx == 4:
             myplaylist = self.request_api(self.netease.user_playlist, self.userid)
+            if myplaylist == -1:
+                return
             self.datatype = 'top_playlists'
             self.datalist = netease.dig_info(myplaylist, self.datatype)
             self.title += ' > ' + self.username + ' 的歌单'
@@ -643,6 +648,8 @@ class Menu:
             self.datatype = 'songs'
             self.title += ' > 每日推荐'
             myplaylist = self.request_api(self.netease.recommend_playlist)
+            if myplaylist == -1:
+                return
             self.datalist = self.netease.dig_info(myplaylist, self.datatype)
 
         # 私人FM
