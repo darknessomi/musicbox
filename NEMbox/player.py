@@ -136,6 +136,7 @@ class Player:
             self.stop()
             return
         self.playing_flag = True
+        self.pause_flag = False
         item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
         self.playing_id = item['song_id']
