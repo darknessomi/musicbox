@@ -132,13 +132,19 @@ class Menu:
         root = tree.getroot()
         return root[0][4][0][0].text
 
-    def start(self, version):
+    def start_fork(self, version):
+        pid = os.fork()
+        if pid == 0:
+            Menu().alert(version)
+        else:
+            Menu().start()
+
+    def start(self):
         self.START = time.time() // 1
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
         self.ui.build_process_bar(self.player.process_location, self.player.process_length, self.player.playing_flag,
                                   self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
-        alert_flag = True
         while True:
             datatype = self.datatype
             title = self.title
@@ -238,7 +244,7 @@ class Menu:
                 self.datalist = up[2]
                 self.offset = up[3]
                 self.index = up[4]
-                self.at_playing_list = False;
+                self.at_playing_list = False
 
             # 搜索
             elif key == ord('f'):
@@ -432,9 +438,6 @@ class Menu:
                                       self.player.playing_flag,
                                       self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
             self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
-            if alert_flag:
-                Menu().alert(version)
-                alert_flag = False
 
         self.player.stop()
         self.cache.quit()

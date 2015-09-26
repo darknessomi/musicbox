@@ -10,12 +10,12 @@ from menu import Menu
 import argparse
 import sys
 
-version = "0.1.9.2"
+version = "0.1.9.3"
 
 def start():
     nembox_menu = Menu()
     try:
-        nembox_menu.start(version)
+        nembox_menu.start_fork(version)
     except:
         # clean up terminal while failed
         nembox_menu.screen.keypad(1)
