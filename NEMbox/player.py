@@ -133,6 +133,7 @@ class Player:
         if self.info["idx"] >= len(self.info["player_list"]) and self.end_callback != None:
             self.end_callback()
         if self.info["idx"] < 0 or self.info["idx"] >= len(self.info["player_list"]):
+            self.info["idx"] = 0
             self.stop()
             return
         self.playing_flag = True
