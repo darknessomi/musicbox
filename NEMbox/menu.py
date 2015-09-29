@@ -305,7 +305,7 @@ class Menu:
             elif key == ord(' '):
                 # If not open a new playing list, just play and pause.
                 try:
-                    if self.datalist[idx] == self.storage.database["songs"][str(self.player.playing_id)]:
+                    if self.datalist[idx]['song_id'] == self.player.playing_id:
                         self.player.play_and_pause(self.storage.database['player_info']['idx'])
                         time.sleep(0.1)
                         continue
