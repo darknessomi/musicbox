@@ -170,6 +170,8 @@ class Ui:
         self.screen.clrtobot()
         self.screen.addstr(5, self.startcol, title, curses.color_pair(1))
 
+        mouse_pointer = "☛  "
+
         if len(datalist) == 0:
             self.screen.addstr(8, self.startcol, '这里什么都没有 -，-')
 
@@ -177,7 +179,7 @@ class Ui:
             if datatype == 'main':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 9, self.indented_startcol, '-> ' + str(i) + '. ' + datalist[i],
+                        self.screen.addstr(i - offset + 9, self.indented_startcol, mouse_pointer + str(i) + '. ' + datalist[i],
                                            curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 9, self.startcol, str(i) + '. ' + datalist[i])
@@ -188,7 +190,7 @@ class Ui:
                     # this item is focus
                     if i == index:
                         self.screen.addstr(i - offset + 8, 0, ' ' * self.startcol)
-                        lead = '-> ' + str(i) + '. '
+                        lead = mouse_pointer + str(i) + '. '
                         self.screen.addstr(i - offset + 8, self.indented_startcol, lead, curses.color_pair(2))
                         name = str(datalist[i]['song_name'] + self.space + datalist[i][
                             'artist'] + '  < ' + datalist[i]['album_name'] + ' >')
@@ -214,7 +216,7 @@ class Ui:
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.screen.addstr(i - offset + 9, self.indented_startcol,
-                                           '-> ' + str(i) + '. ' + datalist[i]['artists_name'] + self.space + str(
+                                           mouse_pointer + str(i) + '. ' + datalist[i]['artists_name'] + self.space + str(
                                                datalist[i]['alias']), curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 9, self.startcol,
@@ -225,7 +227,7 @@ class Ui:
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.screen.addstr(i - offset + 9, self.indented_startcol,
-                                           '-> ' + str(i) + '. ' + datalist[i]['albums_name'] + self.space +
+                                           mouse_pointer + str(i) + '. ' + datalist[i]['albums_name'] + self.space +
                                            datalist[i][
                                                'artists_name'], curses.color_pair(2))
                     else:
@@ -237,7 +239,7 @@ class Ui:
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.screen.addstr(i - offset + 9, self.indented_startcol,
-                                           '-> ' + str(i) + '. ' + datalist[i]['title'],
+                                           mouse_pointer + str(i) + '. ' + datalist[i]['title'],
                                            curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 9, self.startcol, str(i) + '. ' + datalist[i]['title'])
@@ -247,7 +249,7 @@ class Ui:
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.screen.addstr(i - offset + 9, self.indented_startcol,
-                                           '-> ' + str(i) + '. ' + datalist[i]['playlists_name'] + self.space +
+                                           mouse_pointer + str(i) + '. ' + datalist[i]['playlists_name'] + self.space +
                                            datalist[i]['creator_name'], curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 9, self.startcol,
@@ -258,7 +260,7 @@ class Ui:
             elif datatype == 'toplists':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 9, self.indented_startcol, '-> ' + str(i) + '. ' + datalist[i],
+                        self.screen.addstr(i - offset + 9, self.indented_startcol, mouse_pointer + str(i) + '. ' + datalist[i],
                                            curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 9, self.startcol, str(i) + '. ' + datalist[i])
@@ -267,7 +269,7 @@ class Ui:
             elif datatype == 'playlist_classes' or datatype == 'playlist_class_detail':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 9, self.indented_startcol, '-> ' + str(i) + '. ' + datalist[i],
+                        self.screen.addstr(i - offset + 9, self.indented_startcol, mouse_pointer + str(i) + '. ' + datalist[i],
                                            curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 9, self.startcol, str(i) + '. ' + datalist[i])
@@ -276,7 +278,7 @@ class Ui:
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.screen.addstr(i - offset + 8, self.indented_startcol,
-                                           '-> ' + str(i) + '. ' + datalist[i]['song_name'],
+                                           mouse_pointer + str(i) + '. ' + datalist[i]['song_name'],
                                            curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 8, self.startcol, str(i) + '. ' + datalist[i]['song_name'])
@@ -289,7 +291,7 @@ class Ui:
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.screen.addstr(i - offset + 10, self.indented_startcol,
-                                           '-> ' + str(i) + '.' + datalist[i - 1],
+                                           mouse_pointer + str(i) + '.' + datalist[i - 1],
                                            curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 10, self.startcol, str(i) + '.' + datalist[i - 1])
@@ -299,7 +301,7 @@ class Ui:
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.screen.addstr(i - offset + 9, self.indented_startcol,
-                                           '-> ' + str(i) + '. \'' + (datalist[i][0].upper() + '\'').ljust(11) +
+                                           mouse_pointer + str(i) + '. \'' + (datalist[i][0].upper() + '\'').ljust(11) +
                                            datalist[i][
                                                1] + '   ' + datalist[i][2], curses.color_pair(2))
                     else:
