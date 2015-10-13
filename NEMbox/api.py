@@ -17,6 +17,7 @@ import requests
 from Crypto.Cipher import AES
 from cookielib import LWPCookieJar
 from bs4 import BeautifulSoup
+import time
 import logger
 import hashlib
 import random
@@ -177,6 +178,21 @@ class NetEase:
         self.session.cookies = LWPCookieJar(self.storage.cookie_path)
         try:
             self.session.cookies.load()
+            self.file = file(self.storage.cookie_path, 'r')
+            cookie = self.file.read()
+            self.file.close()
+            pattern = re.compile(r'\d{4}-\d{2}-\d{2}')
+            str = pattern.findall(cookie)
+            if str:
+                if str[0] < time.strftime('%Y-%m-%d',time.localtime(time.time())):
+                    self.storage.database['user'] = {
+                    "username": "",
+                    "password": "",
+                    "user_id": "",
+                    "nickname": "",
+                    }
+                    self.storage.save()
+                    os.remove(self.storage.cookie_path)
         except:
             self.session.cookies.save()
 
