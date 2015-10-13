@@ -18,7 +18,7 @@ class Config(Singleton):
         self.const = Constant()
         self.config_file_path = self.const.conf_dir + "/config.json"
         self.default_config = {
-            "version": 1,
+            "version": 2,
             "cache": {
                 "value": False,
                 "default": False,
@@ -94,6 +94,26 @@ class Config(Singleton):
         else:
             # Should do some update. Like    if self.database["version"] == 2 : self.database.["version"] = 3
             # update database form version 1 to version 2
+            if self.config["version"] == 1:
+                self.config["version"] = 2
+                self.config["global_play_pause"] = {
+                    "value": "<ctrl><alt>p",
+                    "default": "<ctrl><alt>p",
+                    "describe": "Global keybind for play/pause."
+                                "Uses gtk notation for keybinds."
+                }
+                self.config["global_next"] = {
+                    "value": "<ctrl><alt>j",
+                    "default": "<ctrl><alt>j",
+                    "describe": "Global keybind for next song."
+                                "Uses gtk notation for keybinds."
+                }
+                self.config["global_previous"] = {
+                    "value": "<ctrl><alt>k",
+                    "default": "<ctrl><alt>k",
+                    "describe": "Global keybind for previous song."
+                                "Uses gtk notation for keybinds."
+                }
             self.check_version()
             return False
 

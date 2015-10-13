@@ -424,7 +424,7 @@ class Menu:
 
             # 从当前列表移除
             elif key == ord('r'):
-                if datatype != 'main' and len(datalist) != 0:
+                if (datatype == 'songs' or datatype == 'djchannels') and len(datalist) != 0:
                     self.datalist.pop(idx)
                     self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx)
 
