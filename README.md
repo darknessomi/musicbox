@@ -27,6 +27,7 @@ NetEase-MusicBox
 10. 播放进度及播放模式显示
 11. Vimer式快捷键让操作丝般顺滑
 12. 可使用数字快捷键
+13. 可使用自定义全局快捷键
 
 ### 键盘快捷键
 
@@ -74,7 +75,14 @@ NetEase-MusicBox
 	
 	$ sudo pip install NetEase-MusicBox
 
-	$ sudo apt-get install mpg123		
+	$ sudo apt-get install mpg123	
+	
+#### 可选功能依赖 && 配置文件
+
+1. ``` aria2 ``` 用于缓存歌曲
+2. ``` python-keybinder ``` 用于支持全局快捷键
+
+配置文件地址: ``` ~/.netease-musicbox ```
 
 #### 已测试的系统兼容列表
 
@@ -116,6 +124,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-10-13 版本 0.1.9.5    新增自定义全局快捷键功能
 
 2015-09-25 版本 0.1.9.4    修复部分列表无法暂停问题
 
