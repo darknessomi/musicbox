@@ -39,7 +39,26 @@ class Config(Singleton):
                 "default": 0,
                 "describe": "Select the quality of the music. May be useful at the terrible network connection. "
                             "0 for high quality, 1 for medium and 2 for low."
+            },
+            "global_play_pause": {
+                "value": "<ctrl><alt>p",
+                "default": "<ctrl><alt>p",
+                "describe": "Global keybind for play/pause."
+                            "Uses gtk notation for keybinds."
+            },
+            "global_next": {
+                "value": "<ctrl><alt>j",
+                "default": "<ctrl><alt>j",
+                "describe": "Global keybind for next song."
+                            "Uses gtk notation for keybinds."
+            },
+            "global_previous": {
+                "value": "<ctrl><alt>k",
+                "default": "<ctrl><alt>k",
+                "describe": "Global keybind for previous song."
+                            "Uses gtk notation for keybinds."
             }
+
         }
         self.config = {}
         if not os.path.isfile(self.config_file_path):

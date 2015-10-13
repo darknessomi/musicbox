@@ -31,6 +31,16 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 
+log = logger.getLogger(__name__)
+
+try:
+    import keybinder
+    bind_global = True
+except ImportError:
+    bind_global = False
+    log.warn("keybinder module not installed.")
+    log.warn("Not binding global hotkeys.")
+
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
     os.mkdir(Constant.conf_dir)
@@ -71,8 +81,6 @@ shortcut = [
     ['q', 'Quit      ', '退出'],
     ["w", 'Quit&Clear', '退出并清除用户信息']
 ]
-
-log = logger.getLogger(__name__)
 
 
 class Menu:
@@ -139,12 +147,37 @@ class Menu:
         else:
             Menu().start()
 
+    def play_pause(self):
+        if len(self.storage.database["player_info"]["player_list"]) == 0:
+            return
+        if self.player.pause_flag:
+            self.player.resume()
+        else:
+            self.player.pause()
+        time.sleep(0.1)
+
+    def next_song(self):
+        if len(self.storage.database["player_info"]["player_list"]) == 0:
+            return
+        self.player.next()
+        time.sleep(0.1)
+
+    def previous_song(self):
+        if len(self.storage.database["player_info"]["player_list"]) == 0:
+            return
+        self.player.prev()
+        time.sleep(0.1)
+
     def start(self):
         self.START = time.time() // 1
         self.ui.build_menu(self.datatype, self.title, self.datalist, self.offset, self.index, self.step, self.START)
         self.ui.build_process_bar(self.player.process_location, self.player.process_length, self.player.playing_flag,
                                   self.player.pause_flag, self.storage.database['player_info']['playing_mode'])
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+        if bind_global:
+            keybinder.bind(self.config.get_item("global_play_pause"), self.play_pause)
+            keybinder.bind(self.config.get_item("global_next"), self.next_song)
+            keybinder.bind(self.config.get_item("global_previous"), self.previous_song)
         while True:
             datatype = self.datatype
             title = self.title
@@ -156,6 +189,8 @@ class Menu:
             djstack = self.djstack
             self.screen.timeout(500)
             key = self.screen.getch()
+            if bind_global:
+                keybinder.gtk.main_iteration(False)
             self.ui.screen.refresh()
 
             # term resize
@@ -253,17 +288,11 @@ class Menu:
 
             # 播放下一曲
             elif key == ord(']'):
-                if len(self.storage.database["player_info"]["player_list"]) == 0:
-                    continue
-                self.player.next()
-                time.sleep(0.1)
+                self.next_song()
 
             # 播放上一曲
             elif key == ord('['):
-                if len(self.storage.database["player_info"]["player_list"]) == 0:
-                    continue
-                self.player.prev()
-                time.sleep(0.1)
+                self.previous_song()
 
             # 增加音量
             elif key == ord('='):
