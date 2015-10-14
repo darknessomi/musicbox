@@ -48,13 +48,12 @@ class Ui:
         self.storage = Storage()
         self.newversion = False
 
-    def notify(self, summary, body):
+    def notify(self, summary, song, album, artist):
         with open(os.devnull, 'w') as fnull:
             if platform.system() == "Darwin":
-                subprocess.call(["/usr/bin/osascript", "-e", 'display notification "{1} {2}"'.format(summary, body)], stdout = fnull, stderr = fnull)
+                os.system('/usr/bin/osascript -e \'display notification "' + summary + ' ' + song + '\nin ' + album + ' by ' + artist +'"\'')
             else:
-                subprocess.call(["/usr/bin/notify-send", "-a", "MusicBox", summary, body], stdout = fnull, stderr = fnull)
-
+                os.system('/usr/bin/notify-send "' + summary + song + ' in ' + album + ' by ' + artist + '"')
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()
