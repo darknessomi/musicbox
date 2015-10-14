@@ -81,6 +81,7 @@ NetEase-MusicBox
 
 1. ``` aria2 ``` 用于缓存歌曲
 2. ``` python-keybinder ``` 用于支持全局快捷键
+3. ``` libnotify-bin ``` 用于支持消息提示
 
 配置文件地址: ``` ~/.netease-musicbox ```
 
