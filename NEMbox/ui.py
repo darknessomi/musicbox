@@ -18,6 +18,7 @@ from time import time
 from scrollstring import *
 from storage import Storage
 import logger
+import os, subprocess, platform
 
 log = logger.getLogger(__name__)
 
@@ -47,6 +48,14 @@ class Ui:
         self.storage = Storage()
         self.newversion = False
 
+    def notify(self, summary, body):
+        with open(os.devnull, 'w') as fnull:
+            if platform.system() == "Darwin":
+                subprocess.call(["/usr/bin/osascript", "-e", 'display notification "{1} {2}"'.format(summary, body)], stdout = fnull, stderr = fnull)
+            else:
+                subprocess.call(["/usr/bin/notify-send", summary, body], stdout = fnull, stderr = fnull)
+
+
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()
         # refresh top 2 line
@@ -65,7 +74,7 @@ class Ui:
 
 
         # The following script doesn't work. It is intended to scroll the playinfo
-        # Scrollstring works by determining how long since it is created, but 
+        # Scrollstring works by determining how long since it is created, but
         # playinfo is created everytime the screen refreshes (every 500ms), unlike
         # the menu. Is there a workaround?
 
@@ -74,12 +83,12 @@ class Ui:
         # decides whether to scoll
         # if truelen(name) <= self.x - self.indented_startcol - 18:
         #     self.screen.addstr(1, min(self.indented_startcol + 18, self.x-1),
-        #                        name, 
+        #                        name,
         #                        curses.color_pair(4))
         # else:
         #     name = scrollstring(name + '  ', start)
         #     self.screen.addstr(1, min(self.indented_startcol + 18, self.x-1),
-        #                        str(name), 
+        #                        str(name),
         #                        curses.color_pair(4))
 
         self.screen.refresh()
