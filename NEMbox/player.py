@@ -140,6 +140,7 @@ class Player:
         self.pause_flag = False
         item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
+        self.ui.notify("Now playing",  item['song_name'] + "<br/>in " + item['album_name'] + '<br/>by ' + item['artist'])
         self.playing_id = item['song_id']
         self.popen_recall(self.recall, item)
 
