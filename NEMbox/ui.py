@@ -53,7 +53,7 @@ class Ui:
             if platform.system() == "Darwin":
                 subprocess.call(["/usr/bin/osascript", "-e", 'display notification "{1} {2}"'.format(summary, body)], stdout = fnull, stderr = fnull)
             else:
-                subprocess.call(["/usr/bin/notify-send", summary, body], stdout = fnull, stderr = fnull)
+                subprocess.call(["/usr/bin/notify-send", "-a", "MusicBox", summary, body], stdout = fnull, stderr = fnull)
 
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
