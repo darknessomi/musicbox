@@ -18,7 +18,7 @@ from time import time
 from scrollstring import *
 from storage import Storage
 import logger
-import os, subprocess, platform
+import os, platform
 
 log = logger.getLogger(__name__)
 
@@ -49,11 +49,10 @@ class Ui:
         self.newversion = False
 
     def notify(self, summary, song, album, artist):
-        with open(os.devnull, 'w') as fnull:
-            if platform.system() == "Darwin":
-                os.system('/usr/bin/osascript -e \'display notification "' + summary + ' ' + song + '\nin ' + album + ' by ' + artist +'"\'')
-            else:
-                os.system('/usr/bin/notify-send "' + summary + song + ' in ' + album + ' by ' + artist + '"')
+        if platform.system() == "Darwin":
+            os.system('/usr/bin/osascript -e \'display notification "' + summary + ' ' + song + '\nin ' + album + ' by ' + artist +'"\'')
+        else:
+            os.system('/usr/bin/notify-send "' + summary + song + ' in ' + album + ' by ' + artist + '"')
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()
