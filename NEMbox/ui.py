@@ -31,6 +31,7 @@ class Ui:
         curses.cbreak()
         self.screen.keypad(1)
         self.netease = NetEase()
+
         curses.start_color()
         curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
         curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)
@@ -49,10 +50,11 @@ class Ui:
         self.newversion = False
 
     def notify(self, summary, song, album, artist):
-        if platform.system() == "Darwin":
-            os.system('/usr/bin/osascript -e \'display notification "' + summary + ' ' + song + '\nin ' + album + ' by ' + artist +'"\'')
-        else:
-            os.system('/usr/bin/notify-send "' + summary + song + ' in ' + album + ' by ' + artist + '"')
+        if summary != "disable":
+            if platform.system() == "Darwin":
+                os.system('/usr/bin/osascript -e \'display notification "' + summary + ' ' + song + '\nin ' + album + ' by ' + artist +'"\'')
+            else:
+                os.system('/usr/bin/notify-send "' + summary + song + ' in ' + album + ' by ' + artist + '"')
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()

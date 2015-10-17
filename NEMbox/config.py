@@ -18,7 +18,7 @@ class Config(Singleton):
         self.const = Constant()
         self.config_file_path = self.const.conf_dir + "/config.json"
         self.default_config = {
-            "version": 2,
+            "version": 3,
             "cache": {
                 "value": False,
                 "default": False,
@@ -57,6 +57,11 @@ class Config(Singleton):
                 "default": "<ctrl><alt>k",
                 "describe": "Global keybind for previous song."
                             "Uses gtk notation for keybinds."
+            },
+            "notifier": {
+                "value": True,
+                "default": True,
+                "describe": "Notifier when switching songs."
             }
 
         }
@@ -113,6 +118,13 @@ class Config(Singleton):
                     "default": "<ctrl><alt>k",
                     "describe": "Global keybind for previous song."
                                 "Uses gtk notation for keybinds."
+                }
+            elif self.config["version"] == 2:
+                self.config["version"] = 3
+                self.config["notifier"] = {
+                    "value": True,
+                    "default": True,
+                    "describe": "Notifier when switching songs."
                 }
             self.check_version()
             return False
