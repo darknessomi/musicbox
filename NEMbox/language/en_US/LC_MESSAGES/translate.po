@@ -1,0 +1,338 @@
+# musicbox translate.
+# Copyright (C) 2015 imomi.info
+# darknessomi <4399.omi@gmail.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"POT-Creation-Date: 2015-10-21 21:11+0800\n"
+"PO-Revision-Date: 2015-10-21 21:28+0800\n"
+"Last-Translator: darknessomi <4399.omi@gmail.com>\n"
+"Language-Team: \n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 1.8.5\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Basepath: ../../..\n"
+"X-Poedit-SearchPath-0: menu.py\n"
+"X-Poedit-SearchPath-1: api.py\n"
+"X-Poedit-SearchPath-2: ui.py\n"
+
+#: api.py:36
+msgid "云音乐新歌榜"
+msgstr "Cloud music song list"
+
+#: api.py:37
+msgid "云音乐热歌榜"
+msgstr "Cloud music hot song list"
+
+#: api.py:38
+msgid "网易原创歌曲榜"
+msgstr "Netease original songs list"
+
+#: api.py:39
+msgid "云音乐飙升榜"
+msgstr "Cloud music soared list"
+
+#: api.py:40
+msgid "云音乐电音榜"
+msgstr "Cloud music electronic music charts"
+
+#: api.py:41
+msgid "UK排行榜周榜"
+msgstr "UK weekly chart"
+
+#: api.py:42
+msgid "美国Billboard周榜"
+msgstr "US Billboard weekly chart"
+
+#: api.py:43
+msgid "KTV嗨榜"
+msgstr "KTV Standings"
+
+#: api.py:44
+msgid "iTunes榜"
+msgstr "iTunes Chart"
+
+#: api.py:45
+msgid "Hit FM Top榜"
+msgstr "Hit FM Top Chart"
+
+#: api.py:46
+msgid "日本Oricon周榜"
+msgstr "Japan Oricon weekly chart"
+
+#: api.py:47
+msgid "韩国Melon排行榜周榜"
+msgstr "Korea Melon weekly chart"
+
+#: api.py:48
+msgid "韩国Mnet排行榜周榜"
+msgstr "Korea Mnet weekly chart"
+
+#: api.py:49
+msgid "韩国Melon原声周榜"
+msgstr "Korean Melon Soundtrack weekly chart"
+
+#: api.py:50
+msgid "中国TOP排行榜(港台榜)"
+msgstr "China TOP ranking(RTHK list)"
+
+#: api.py:51
+msgid "中国TOP排行榜(内地榜)"
+msgstr "China TOP ranking(Mainland standings)"
+
+#: api.py:52
+msgid "香港电台中文歌曲龙虎榜"
+msgstr "Radio Television Hong Kong Chinese Songs Charts"
+
+#: api.py:53
+msgid "华语金曲榜"
+msgstr "Chinese songs list"
+
+#: api.py:54
+msgid "中国嘻哈榜"
+msgstr "Chinese Hip-Hop chart"
+
+#: api.py:55
+msgid "法国 NRJ EuroHot 30周榜"
+msgstr "France NRJ EuroHot 30 weekly chart"
+
+#: api.py:56
+msgid "台湾Hito排行榜"
+msgstr "Taiwan Hito Leaderboard"
+
+#: api.py:57
+msgid "Beatport全球电子舞曲榜"
+msgstr "Beatport global electronic dance chart"
+
+#: api.py:499
+msgid "未知专辑"
+msgstr "Unknown Album"
+
+#: api.py:516
+msgid "未知艺术家"
+msgstr "Unknown Artist"
+
+#: api.py:557 menu.py:99
+msgid "DJ节目"
+msgstr "Disc jockey"
+
+#: menu.py:98
+msgid "网易云音乐"
+msgstr "Netease cloud music"
+
+#: menu.py:99
+msgid "排行榜"
+msgstr "Top"
+
+#: menu.py:99 menu.py:703
+msgid "艺术家"
+msgstr "Artists"
+
+#: menu.py:99
+msgid "新碟上架"
+msgstr "New album"
+
+#: menu.py:99
+msgid "精选歌单"
+msgstr "Featured Songs Playlist"
+
+#: menu.py:99
+msgid "我的歌单"
+msgstr "My songs"
+
+#: menu.py:99
+msgid "每日推荐"
+msgstr "Daily Recommended"
+
+#: menu.py:99
+msgid "私人FM"
+msgstr "Private FM"
+
+#: menu.py:99
+msgid "搜索"
+msgstr "Search"
+
+#: menu.py:99
+msgid "帮助"
+msgstr "Help"
+
+#: menu.py:412
+msgid "网易云音乐 > 打碟"
+msgstr "Netease > DJing"
+
+#: menu.py:426
+msgid "网易云音乐 > 收藏"
+msgstr "Netease > Collection"
+
+#: menu.py:564
+msgid "精选歌单搜索列表"
+msgstr "Featured song playlist search"
+
+#: menu.py:569
+msgid "歌曲搜索列表"
+msgstr "Song Search"
+
+#: menu.py:574
+msgid "艺术家搜索列表"
+msgstr "Artist Search"
+
+#: menu.py:579
+msgid "专辑搜索列表"
+msgstr "Album Search"
+
+#: menu.py:635
+msgid " > 排行榜"
+msgstr " > Leaderboard"
+
+#: menu.py:642
+msgid " > 艺术家"
+msgstr " > Artists"
+
+#: menu.py:649
+msgid " > 新碟上架"
+msgstr " > New album"
+
+#: menu.py:656
+msgid "全站置顶"
+msgstr "Full Site Top"
+
+#: menu.py:661
+msgid "分类精选"
+msgstr "Featured Categories"
+
+#: menu.py:666
+msgid " > 精选歌单"
+msgstr " > Featured Songs Playlist"
+
+#: menu.py:676
+msgid " 的歌单"
+msgstr " Playlist"
+
+#: menu.py:681
+msgid " > DJ节目"
+msgstr " > DJ program"
+
+#: menu.py:687
+msgid " > 每日推荐"
+msgstr " > Daily Recommended"
+
+#: menu.py:696
+msgid " > 私人FM"
+msgstr " > Private FM"
+
+#: menu.py:702
+msgid " > 搜索"
+msgstr " > Search"
+
+#: menu.py:703
+msgid "歌曲"
+msgstr "Song"
+
+#: menu.py:703
+msgid "专辑"
+msgstr "Albums"
+
+#: menu.py:703
+msgid "网易精选集"
+msgstr "NetEase Collection"
+
+#: menu.py:708
+msgid " > 帮助"
+msgstr " > Help"
+
+#: ui.py:148
+msgid "顺序播放 "
+msgstr "Order of play "
+
+#: ui.py:150
+msgid "顺序循环 "
+msgstr "Loop "
+
+#: ui.py:152
+msgid "单曲循环 "
+msgstr "Single loop "
+
+#: ui.py:154
+msgid "随机播放 "
+msgstr "Shuffle Playback "
+
+#: ui.py:156
+msgid "随机循环 "
+msgstr "Shuffle loop "
+
+#: ui.py:165
+msgid "[00:00.00]暂无歌词 ~>_<~ \n"
+msgstr "[00:00.00]No lyrics ~>_<~ \n"
+
+#: ui.py:176
+msgid "享受高品质音乐，loading..."
+msgstr "Enjoy high quality music，loading..."
+
+#: ui.py:188
+msgid "这里什么都没有 -，-"
+msgstr "Nothing Here -，-"
+
+#: ui.py:302
+msgid "选择搜索类型:"
+msgstr "Select the search type:"
+
+#: ui.py:324
+msgid "NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存"
+msgstr "NetEase-MusicBox based on Python, all copyright music from Netease, local without saving"
+
+#: ui.py:325
+msgid "按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~"
+msgstr "Press [G] to goto Github for more information to help improve, or expressed support for the Star ~"
+
+#: ui.py:326
+msgid "Build with love to music by omi"
+msgstr "Built for the love of music by omi"
+
+#: ui.py:334
+msgid "搜索歌曲："
+msgstr "Search Songs:"
+
+#: ui.py:356
+msgid "搜索艺术家："
+msgstr "Search Artist:"
+
+#: ui.py:369
+msgid "搜索专辑："
+msgstr "Search Album:"
+
+#: ui.py:382
+msgid "搜索网易精选集："
+msgstr "Search Netease Collection:"
+
+#: ui.py:415
+msgid "请输入登录信息(支持手机登陆)"
+msgstr "Please enter your login information"
+
+#: ui.py:416
+msgid "账号:"
+msgstr "Username:"
+
+#: ui.py:417
+msgid "密码:"
+msgstr "Password:"
+
+#: ui.py:425
+msgid "艾玛，登录信息好像不对呢 (O_O)#"
+msgstr "Oops, it seems wrong login information (O_O)#"
+
+#: ui.py:426
+msgid "[1] 再试一次"
+msgstr "[1] Try again"
+
+#: ui.py:427
+msgid "[2] 稍后再试"
+msgstr "[2] Try again later"
+
+#: ui.py:428
+msgid "请键入对应数字:"
+msgstr "Please type the corresponding response:"

@@ -17,6 +17,7 @@ import os
 import time
 import webbrowser
 import platform
+import gettext
 from api import NetEase
 from player import Player
 from ui import Ui
@@ -40,6 +41,11 @@ except ImportError:
     bind_global = False
     log.warn("keybinder module not installed.")
     log.warn("Not binding global hotkeys.")
+
+try:
+    gettext.translation('translate', localedir='language', languages=['en_US']).install()
+except IOError:
+    log.warn("language module not installed.")
 
 home = os.path.expanduser("~")
 if os.path.isdir(Constant.conf_dir) is False:
@@ -89,8 +95,8 @@ class Menu:
         sys.setdefaultencoding('UTF-8')
         self.config = Config()
         self.datatype = 'main'
-        self.title = '网易云音乐'
-        self.datalist = ['排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单', 'DJ节目', '每日推荐', '私人FM', '搜索', '帮助']
+        self.title = _('网易云音乐')
+        self.datalist = [_('排行榜'), _('艺术家'), _('新碟上架'), _('精选歌单'), _('我的歌单'), _('DJ节目'), _('每日推荐'), _('私人FM'), _('搜索'), _('帮助')]
         self.offset = 0
         self.index = 0
         self.storage = Storage()
@@ -403,7 +409,7 @@ class Menu:
             elif key == ord('z'):
                 self.stack.append([datatype, title, datalist, offset, index])
                 self.datatype = 'songs'
-                self.title = '网易云音乐 > 打碟'
+                self.title = _('网易云音乐 > 打碟')
                 self.datalist = self.djstack
                 self.offset = 0
                 self.index = 0
@@ -417,7 +423,7 @@ class Menu:
             elif key == ord('c'):
                 self.stack.append([datatype, title, datalist, offset, index])
                 self.datatype = 'songs'
-                self.title = '网易云音乐 > 收藏'
+                self.title = _('网易云音乐 > 收藏')
                 self.datalist = self.collection
                 self.offset = 0
                 self.index = 0
@@ -555,22 +561,22 @@ class Menu:
                 # 搜索结果可以用top_playlists处理
                 self.datatype = 'top_playlists'
                 self.datalist = ui.build_search('search_playlist')
-                self.title = '精选歌单搜索列表'
+                self.title = _('精选歌单搜索列表')
 
             elif idx == 1:
                 self.datatype = 'songs'
                 self.datalist = ui.build_search('songs')
-                self.title = '歌曲搜索列表'
+                self.title = _('歌曲搜索列表')
 
             elif idx == 2:
                 self.datatype = 'artists'
                 self.datalist = ui.build_search('artists')
-                self.title = '艺术家搜索列表'
+                self.title = _('艺术家搜索列表')
 
             elif idx == 3:
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
-                self.title = '专辑搜索列表'
+                self.title = _('专辑搜索列表')
 
     def fm_callback(self):
         log.debug("FM CallBack.")
@@ -626,38 +632,38 @@ class Menu:
         netease = self.netease
         if idx == 0:
             self.datalist = netease.return_toplists()
-            self.title += ' > 排行榜'
+            self.title += _(' > 排行榜')
             self.datatype = 'toplists'
 
         # 艺术家
         elif idx == 1:
             artists = netease.top_artists()
             self.datalist = netease.dig_info(artists, 'artists')
-            self.title += ' > 艺术家'
+            self.title += _(' > 艺术家')
             self.datatype = 'artists'
 
         # 新碟上架
         elif idx == 2:
             albums = netease.new_albums()
             self.datalist = netease.dig_info(albums, 'albums')
-            self.title += ' > 新碟上架'
+            self.title += _(' > 新碟上架')
             self.datatype = 'albums'
 
         # 精选歌单
         elif idx == 3:
             self.datalist = [
                 {
-                    'title': '全站置顶',
+                    'title': _('全站置顶'),
                     'datatype': 'top_playlists',
                     'callback': netease.top_playlists
                 },
                 {
-                    'title': '分类精选',
+                    'title': _('分类精选'),
                     'datatype': 'playlist_classes',
                     'callback': netease.playlist_classes
                 }
             ]
-            self.title += ' > 精选歌单'
+            self.title += _(' > 精选歌单')
             self.datatype = 'playlists'
 
         # 我的歌单
@@ -667,18 +673,18 @@ class Menu:
                 return
             self.datatype = 'top_playlists'
             self.datalist = netease.dig_info(myplaylist, self.datatype)
-            self.title += ' > ' + self.username + ' 的歌单'
+            self.title += ' > ' + self.username + _(' 的歌单')
 
         # DJ节目
         elif idx == 5:
             self.datatype = 'djchannels'
-            self.title += ' > DJ节目'
+            self.title += _(' > DJ节目')
             self.datalist = netease.djchannels()
 
         # 每日推荐
         elif idx == 6:
             self.datatype = 'songs'
-            self.title += ' > 每日推荐'
+            self.title += _(' > 每日推荐')
             myplaylist = self.request_api(self.netease.recommend_playlist)
             if myplaylist == -1:
                 return
@@ -687,19 +693,19 @@ class Menu:
         # 私人FM
         elif idx == 7:
             self.datatype = 'fmsongs'
-            self.title += ' > 私人FM'
+            self.title += _(' > 私人FM')
             self.datalist = self.get_new_fm()
 
         # 搜索
         elif idx == 8:
             self.datatype = 'search'
-            self.title += ' > 搜索'
-            self.datalist = ['歌曲', '艺术家', '专辑', '网易精选集']
+            self.title += _(' > 搜索')
+            self.datalist = [_('歌曲'), _('艺术家'), _('专辑'), _('网易精选集')]
 
         # 帮助
         elif idx == 9:
             self.datatype = 'help'
-            self.title += ' > 帮助'
+            self.title += _(' > 帮助')
             self.datalist = shortcut
 
         self.offset = 0
