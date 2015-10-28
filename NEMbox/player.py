@@ -179,9 +179,9 @@ class Player:
                 self.songs[str(song["song_id"])] = song
             else:
                 database_song = self.songs[str(song["song_id"])]
-                if (database_song["song_name"] != song["song_name"]
-                    or database_song["quality"] != song["quality"]
-                    or database_song["mp3_url"] != song["mp3_url"]):
+                if database_song["song_name"] != song["song_name"] or \
+                  database_song["quality"] != song["quality"] or \
+                  database_song["mp3_url"] != song["mp3_url"]:
                     if "cache" in self.songs[str(song["song_id"])].keys():
                         song["cache"] = self.songs[str(song["song_id"])]["cache"]
                     self.songs[str(song["song_id"])] = song
