@@ -119,7 +119,7 @@ class Player:
         else:
             thread = threading.Thread(target=runInThread, args=(onExit, popenArgs['mp3_url']))
             cache_thread = threading.Thread(target=cacheSong, args=(
-            popenArgs['song_id'], popenArgs['song_name'], popenArgs['artist'], popenArgs['mp3_url']))
+                popenArgs['song_id'], popenArgs['song_name'], popenArgs['artist'], popenArgs['mp3_url']))
             cache_thread.start()
         thread.start()
         lyric_download_thread = threading.Thread(target=getLyric, args=())
@@ -179,8 +179,11 @@ class Player:
                 self.songs[str(song["song_id"])] = song
             else:
                 database_song = self.songs[str(song["song_id"])]
-                if (database_song["song_name"] != song["song_name"]
-                    or database_song["quality"] != song["quality"]):
+                if database_song["song_name"] != song["song_name"] or \
+                  database_song["quality"] != song["quality"] or \
+                  database_song["mp3_url"] != song["mp3_url"]:
+                    if "cache" in self.songs[str(song["song_id"])].keys():
+                        song["cache"] = self.songs[str(song["song_id"])]["cache"]
                     self.songs[str(song["song_id"])] = song
         if len(datalist) > 0 and self.info["playing_mode"] == 3 or self.info["playing_mode"] == 4:
             self.generate_shuffle_playing_list()
