@@ -83,7 +83,16 @@ NetEase-MusicBox
 2. ``` python-keybinder ``` 用于支持全局快捷键
 3. ``` libnotify-bin ``` 用于支持消息提示
 
-配置文件地址: ``` ~/.netease-musicbox ```
+配置文件地址: ``` ~/.netease-musicbox ```  
+由于歌曲 API 只接受中国大陆地区访问，港澳台及海外用户请自行在```config.json```中设置代理
+
+```
+"mpg123_parameters": {
+    "default": [], 
+    "describe": "The additional parameters when mpg123 start.", 
+    "value": ["-p", "http://ip:port"]
+}
+```
 
 #### 已测试的系统兼容列表
 
