@@ -12,6 +12,7 @@
 
 import curses
 import locale
+import threading
 import sys
 import os
 import time
@@ -76,6 +77,7 @@ shortcut = [
     ['Shift+j', 'Move Down ', '向下移动当前条目'],
     ['Shift+k', 'Move Up   ', '向上移动当前条目'],
     [',', 'Like      ', '喜爱'],
+    ['Shfit+c', 'Cache ', '缓存歌曲到本地'],
     ['.', 'Trash FM  ', '删除 FM'],
     ['/', 'Next FM   ', '下一 FM'],
     ['q', 'Quit      ', '退出'],
@@ -476,6 +478,13 @@ class Menu:
             elif key == ord('g'):
                 if datatype == 'help':
                     webbrowser.open_new_tab('https://github.com/darknessomi/musicbox')
+
+            # 开始下载
+            elif key == ord("C"):
+                s = self.datalist[idx]
+                cache_thread = threading.Thread(target=self.player.cacheSong1time, args=(
+                    s['song_id'], s['song_name'], s['artist'], s['mp3_url']))
+                cache_thread.start()
 
             self.ui.build_process_bar(self.player.process_location, self.player.process_length,
                                       self.player.playing_flag,
