@@ -218,12 +218,28 @@ class Menu:
 
             # 上移
             elif key == ord('k'):
-                self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx - 1)
+                # turn page if at beginning
+                if idx == offset:
+                    if offset == 0:
+                        continue
+                    self.offset -= step
+                    # 移动光标到最后一列
+                    self.index = offset - 1
+                else:
+                    self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx - 1)
                 self.START = time.time()
 
             # 下移
             elif key == ord('j'):
-                self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx + 1)
+                # turn page if at end
+                if idx == min( len(datalist), offset + step) - 1:
+                    if offset + step >= len( datalist ):
+                        continue
+                    self.offset += step
+                    # 移动光标到第一列
+                    self.index = offset + step
+                else:
+                    self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx + 1)
                 self.START = time.time()
 
             # 数字快捷键
