@@ -223,11 +223,10 @@ class Menu:
                     if offset == 0:
                         continue
                     self.offset -= step
-
                     # 移动光标到最后一列
                     self.index = offset - 1
                 else:
-                    self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx-1 ) 
+                    self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx - 1)
                 self.START = time.time()
 
             # 下移
@@ -240,7 +239,7 @@ class Menu:
                     # 移动光标到第一列
                     self.index = offset + step
                 else:
-                    self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx+1 )
+                    self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx + 1)
                 self.START = time.time()
 
             # 数字快捷键
