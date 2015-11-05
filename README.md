@@ -11,7 +11,7 @@ NetEase-MusicBox
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.python.org/pypi/NetEase-MusicBox/)
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
-[![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)](https://www.python.org/downloads/)
+[![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)](https://pypi.python.org/pypi/NetEase-MusicBox/)
 
 ### 功能特性
 
