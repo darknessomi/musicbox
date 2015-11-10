@@ -19,7 +19,7 @@ from scrollstring import *
 from storage import Storage
 import logger
 import os, platform
-import subprocess
+
 log = logger.getLogger(__name__)
 
 
