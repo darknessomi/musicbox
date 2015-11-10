@@ -97,7 +97,7 @@ class Menu:
         self.storage.load()
         self.collection = self.storage.database['collections'][0]
         self.player = Player()
-        self.player.song_changed_callback = self.song_changed_callback
+        self.player.playing_song_changed_callback = self.song_changed_callback
         self.cache = Cache()
         self.ui = Ui()
         self.netease = NetEase()
@@ -393,7 +393,7 @@ class Menu:
 
             # 加载当前播放列表
             elif key == ord('p'):
-                self.show_playing_list()
+                self.show_playing_song()
 
 
             # 播放模式切换
@@ -586,7 +586,7 @@ class Menu:
                 self.title = '专辑搜索列表'
 
 
-    def show_playing_list(self):
+    def show_playing_song(self):
         if len(self.storage.database['player_info']['player_list']) == 0:
             return
         if not self.at_playing_list:
@@ -610,7 +610,7 @@ class Menu:
 
     def song_changed_callback(self):
         if self.at_playing_list:
-            self.show_playing_list()
+            self.show_playing_song()
 
     def fm_callback(self):
         log.debug("FM CallBack.")

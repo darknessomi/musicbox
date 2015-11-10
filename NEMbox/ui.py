@@ -19,9 +19,12 @@ from scrollstring import *
 from storage import Storage
 import logger
 import os, platform
-
+import subprocess
 log = logger.getLogger(__name__)
 
+
+def escape_quote(text):
+    return text.replace('\'', '\\\'').replace('\"', '\'\'')
 
 class Ui:
     def __init__(self):
@@ -52,14 +55,13 @@ class Ui:
     def notify(self, summary, song, album, artist):
         if summary != "disable":
             cmd = ""
+            content = escape_quote("%s %s\nin %s by %s" % (summary, song, album, artist))
             if platform.system() == "Darwin":
-                cmd = '/usr/bin/osascript -e $\'display notification "' + summary + ' ' + song.replace('\'', "\\\'") + '\nin ' + album + ' by ' + artist +'"\''
+                cmd = '/usr/bin/osascript -e $\'display notification "' + content + '"\''
             else:
-                cmd = '/usr/bin/notify-send "' + summary + song.replace('\'', "\x27") + ' in ' + album + ' by ' + artist + '"'
+                cmd = '/usr/bin/notify-send "' + content + '"'
 
-            log.debug(cmd)
             os.system(cmd)
-
 
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
