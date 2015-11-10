@@ -67,6 +67,7 @@ shortcut = [
     ['-', 'Volume-          ', '音量减少'],
     ['m', 'Menu             ', '主菜单'],
     ['p', 'Present/History  ', '当前/历史播放列表'],
+    ["i", 'Music Info       ', '当前音乐信息'],
     ['Shift+p', 'Playing Mode     ', '播放模式切换'],
     ['a', 'Add              ', '添加曲目到打碟'],
     ['z', 'DJ list          ', '打碟列表'],
@@ -79,8 +80,7 @@ shortcut = [
     ['.', 'Trash FM  ', '删除 FM'],
     ['/', 'Next FM   ', '下一 FM'],
     ['q', 'Quit      ', '退出'],
-    ["w", 'Quit&Clear', '退出并清除用户信息'],
-    ["i", 'Music Info', '当前音乐信息']
+    ["w", 'Quit&Clear', '退出并清除用户信息']
 ]
 
 
