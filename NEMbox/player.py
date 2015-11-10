@@ -50,6 +50,7 @@ class Player:
         self.notifier = self.config.get_item("notifier")
         self.mpg123_parameters = self.config.get_item("mpg123_parameters")
         self.end_callback = None
+        self.song_changed_callback = None
 
     def popen_recall(self, onExit, popenArgs):
         """
@@ -299,6 +300,8 @@ class Player:
             self.info["idx"] = self.info["playing_list"][self.info["ridx"]]
         else:
             self.info["idx"] += 1
+        if self.song_changed_callback is not None:
+            self.song_changed_callback()
 
     def next(self):
         self.stop()
@@ -336,6 +339,8 @@ class Player:
             self.info["idx"] = self.info["playing_list"][self.info["ridx"]]
         else:
             self.info["idx"] -= 1
+        if self.song_changed_callback is not None:
+            self.song_changed_callback()
 
     def prev(self):
         self.stop()

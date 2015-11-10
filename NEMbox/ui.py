@@ -51,10 +51,16 @@ class Ui:
 
     def notify(self, summary, song, album, artist):
         if summary != "disable":
+            cmd = ""
             if platform.system() == "Darwin":
-                os.system('/usr/bin/osascript -e \'display notification "' + summary + ' ' + song + '\nin ' + album + ' by ' + artist +'"\'')
+                cmd = '/usr/bin/osascript -e $\'display notification "' + summary + ' ' + song.replace('\'', "\\\'") + '\nin ' + album + ' by ' + artist +'"\''
             else:
-                os.system('/usr/bin/notify-send "' + summary + song + ' in ' + album + ' by ' + artist + '"')
+                cmd = '/usr/bin/notify-send "' + summary + song.replace('\'', "\x27") + ' in ' + album + ' by ' + artist + '"'
+
+            log.debug(cmd)
+            os.system(cmd)
+
+
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()

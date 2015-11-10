@@ -97,6 +97,7 @@ class Menu:
         self.storage.load()
         self.collection = self.storage.database['collections'][0]
         self.player = Player()
+        self.player.song_changed_callback = self.song_changed_callback
         self.cache = Cache()
         self.ui = Ui()
         self.netease = NetEase()
@@ -392,26 +393,8 @@ class Menu:
 
             # 加载当前播放列表
             elif key == ord('p'):
-                if len(self.storage.database['player_info']['player_list']) == 0:
-                    continue
-                if not self.at_playing_list:
-                    self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
-                    self.at_playing_list = True
-                self.datatype = self.storage.database['player_info']['player_list_type']
-                self.title = self.storage.database['player_info']['player_list_title']
-                self.datalist = []
-                for i in self.storage.database['player_info']['player_list']:
-                    self.datalist.append(self.storage.database['songs'][i])
-                self.index = self.storage.database['player_info']['idx']
-                self.offset = self.storage.database['player_info']['idx'] / self.step * self.step
-                if self.resume_play:
-                    if self.datatype == "fmsongs":
-                        self.player.end_callback = self.fm_callback
-                    else:
-                        self.player.end_callback = None
-                    self.storage.database['player_info']['idx'] = -1
-                    self.player.play_and_pause(self.index)
-                    self.resume_play = False
+                self.show_playing_list()
+
 
             # 播放模式切换
             elif key == ord('P'):
@@ -601,6 +584,33 @@ class Menu:
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
+
+
+    def show_playing_list(self):
+        if len(self.storage.database['player_info']['player_list']) == 0:
+            return
+        if not self.at_playing_list:
+            self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+            self.at_playing_list = True
+        self.datatype = self.storage.database['player_info']['player_list_type']
+        self.title = self.storage.database['player_info']['player_list_title']
+        self.datalist = []
+        for i in self.storage.database['player_info']['player_list']:
+            self.datalist.append(self.storage.database['songs'][i])
+        self.index = self.storage.database['player_info']['idx']
+        self.offset = self.storage.database['player_info']['idx'] / self.step * self.step
+        if self.resume_play:
+            if self.datatype == "fmsongs":
+                self.player.end_callback = self.fm_callback
+            else:
+                self.player.end_callback = None
+            self.storage.database['player_info']['idx'] = -1
+            self.player.play_and_pause(self.index)
+            self.resume_play = False
+
+    def song_changed_callback(self):
+        if self.at_playing_list:
+            self.show_playing_list()
 
     def fm_callback(self):
         log.debug("FM CallBack.")
