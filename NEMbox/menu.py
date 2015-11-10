@@ -79,7 +79,8 @@ shortcut = [
     ['.', 'Trash FM  ', '删除 FM'],
     ['/', 'Next FM   ', '下一 FM'],
     ['q', 'Quit      ', '退出'],
-    ["w", 'Quit&Clear', '退出并清除用户信息']
+    ["w", 'Quit&Clear', '退出并清除用户信息'],
+    ["i", 'Music Info', '当前音乐信息']
 ]
 
 
@@ -492,6 +493,10 @@ class Menu:
             elif key == ord('g'):
                 if datatype == 'help':
                     webbrowser.open_new_tab('https://github.com/darknessomi/musicbox')
+
+            elif key == ord('i'):
+                if self.player.playing_id != -1:
+                    webbrowser.open_new_tab('http://music.163.com/#/song?id=' + str(self.player.playing_id))
 
             self.ui.build_process_bar(self.player.process_location, self.player.process_length,
                                       self.player.playing_flag,
