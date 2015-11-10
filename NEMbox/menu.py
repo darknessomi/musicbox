@@ -67,6 +67,7 @@ shortcut = [
     ['-', 'Volume-          ', '音量减少'],
     ['m', 'Menu             ', '主菜单'],
     ['p', 'Present/History  ', '当前/历史播放列表'],
+    ["i", 'Music Info       ', '当前音乐信息'],
     ['Shift+p', 'Playing Mode     ', '播放模式切换'],
     ['a', 'Add              ', '添加曲目到打碟'],
     ['z', 'DJ list          ', '打碟列表'],
@@ -97,6 +98,7 @@ class Menu:
         self.storage.load()
         self.collection = self.storage.database['collections'][0]
         self.player = Player()
+        self.player.playing_song_changed_callback = self.song_changed_callback
         self.cache = Cache()
         self.ui = Ui()
         self.netease = NetEase()
@@ -392,26 +394,8 @@ class Menu:
 
             # 加载当前播放列表
             elif key == ord('p'):
-                if len(self.storage.database['player_info']['player_list']) == 0:
-                    continue
-                if not self.at_playing_list:
-                    self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
-                    self.at_playing_list = True
-                self.datatype = self.storage.database['player_info']['player_list_type']
-                self.title = self.storage.database['player_info']['player_list_title']
-                self.datalist = []
-                for i in self.storage.database['player_info']['player_list']:
-                    self.datalist.append(self.storage.database['songs'][i])
-                self.index = self.storage.database['player_info']['idx']
-                self.offset = self.storage.database['player_info']['idx'] / self.step * self.step
-                if self.resume_play:
-                    if self.datatype == "fmsongs":
-                        self.player.end_callback = self.fm_callback
-                    else:
-                        self.player.end_callback = None
-                    self.storage.database['player_info']['idx'] = -1
-                    self.player.play_and_pause(self.index)
-                    self.resume_play = False
+                self.show_playing_song()
+
 
             # 播放模式切换
             elif key == ord('P'):
@@ -492,6 +476,10 @@ class Menu:
             elif key == ord('g'):
                 if datatype == 'help':
                     webbrowser.open_new_tab('https://github.com/darknessomi/musicbox')
+
+            elif key == ord('i'):
+                if self.player.playing_id != -1:
+                    webbrowser.open_new_tab('http://music.163.com/#/song?id=' + str(self.player.playing_id))
 
             self.ui.build_process_bar(self.player.process_location, self.player.process_length,
                                       self.player.playing_flag,
@@ -601,6 +589,33 @@ class Menu:
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
+
+
+    def show_playing_song(self):
+        if len(self.storage.database['player_info']['player_list']) == 0:
+            return
+        if not self.at_playing_list:
+            self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+            self.at_playing_list = True
+        self.datatype = self.storage.database['player_info']['player_list_type']
+        self.title = self.storage.database['player_info']['player_list_title']
+        self.datalist = []
+        for i in self.storage.database['player_info']['player_list']:
+            self.datalist.append(self.storage.database['songs'][i])
+        self.index = self.storage.database['player_info']['idx']
+        self.offset = self.storage.database['player_info']['idx'] / self.step * self.step
+        if self.resume_play:
+            if self.datatype == "fmsongs":
+                self.player.end_callback = self.fm_callback
+            else:
+                self.player.end_callback = None
+            self.storage.database['player_info']['idx'] = -1
+            self.player.play_and_pause(self.index)
+            self.resume_play = False
+
+    def song_changed_callback(self):
+        if self.at_playing_list:
+            self.show_playing_song()
 
     def fm_callback(self):
         log.debug("FM CallBack.")

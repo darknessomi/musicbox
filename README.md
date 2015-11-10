@@ -47,6 +47,7 @@ NetEase-MusicBox
     <tr> <td>?</td> <td>Shuffle</td> <td>手气不错</td> </tr>
 	<tr> <td>M</td> <td>Menu</td> <td>主菜单</td> </tr>
 	<tr> <td>P</td> <td>Present/History</td> <td>当前/历史播放列表</td> </tr>
+	<tr> <td>I</td> <td>Music Info</td> <td>当前音乐信息</td> </tr>
 	<tr> <td>⇧+P</td> <td>Playing Mode</td> <td>播放模式切换</td> </tr>
 	<tr> <td>A</td> <td>Add</td> <td>添加曲目到打碟</td> </tr>
 	<tr> <td>Z</td> <td>DJ list</td> <td>打碟列表</td> </tr>
@@ -134,6 +135,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-11-10 版本 0.2.0.4    优化切换歌曲时歌单显示, 新增显示歌曲信息功能
 
 2015-11-09 版本 0.2.0.2    修复崩溃错误, 优化榜单排序
 
