@@ -55,8 +55,9 @@ class Ui:
     def notify(self, summary, song, album, artist):
         if summary != "disable":
             cmd = ""
-            content = escape_quote("%s %s\nin %s by %s" % (summary, song, album, artist))
+            content = "%s %s\nin %s by %s" % (summary, song, album, artist)
             if platform.system() == "Darwin":
+                content = escape_quote(content)
                 cmd = '/usr/bin/osascript -e $\'display notification "' + content + '"\''
             else:
                 cmd = '/usr/bin/notify-send "' + content + '"'
