@@ -300,7 +300,7 @@ class Ui:
                         self.screen.addstr(i - offset + 8, self.startcol, str(i) + '. ' + datalist[i]['song_name'])
 
             elif datatype == 'search':
-                self.screen.move(4, 1)
+                self.screen.move(6, 1)
                 self.screen.clrtobot()
                 self.screen.timeout(-1)
                 self.screen.addstr(8, self.startcol, '选择搜索类型:', curses.color_pair(1))
