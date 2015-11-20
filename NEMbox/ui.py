@@ -55,7 +55,7 @@ class Ui:
         # Set cursor to invisible.
         try:
             curses.curs_set(0)
-        except Exception:
+        except curses.error:
             # The terminal does not supports the visibility requested.
             pass
 
