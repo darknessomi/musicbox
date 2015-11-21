@@ -74,7 +74,7 @@ NetEase-MusicBox
 
 ### Linux安装
 	
-	$ sudo pip install NetEase-MusicBox
+	$ sudo pip2 install NetEase-MusicBox
 
 	$ sudo apt-get install mpg123	
 	
