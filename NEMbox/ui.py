@@ -55,8 +55,9 @@ class Ui:
     def notify(self, summary, song, album, artist):
         if summary != "disable":
             cmd = ""
-            content = escape_quote("%s %s\nin %s by %s" % (summary, song, album, artist))
+            content = "%s %s\nin %s by %s" % (summary, song, album, artist)
             if platform.system() == "Darwin":
+                content = escape_quote(content)
                 cmd = '/usr/bin/osascript -e $\'display notification "' + content + '"\''
             else:
                 cmd = '/usr/bin/notify-send "' + content + '"'
@@ -299,7 +300,7 @@ class Ui:
                         self.screen.addstr(i - offset + 8, self.startcol, str(i) + '. ' + datalist[i]['song_name'])
 
             elif datatype == 'search':
-                self.screen.move(4, 1)
+                self.screen.move(6, 1)
                 self.screen.clrtobot()
                 self.screen.timeout(-1)
                 self.screen.addstr(8, self.startcol, '选择搜索类型:', curses.color_pair(1))
