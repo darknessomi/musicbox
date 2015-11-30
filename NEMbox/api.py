@@ -417,6 +417,10 @@ class NetEase:
         action = 'http://music.163.com/api/song/detail?ids=[' + (',').join(tmpids) + ']'
         try:
             data = self.httpRequest('GET', action)
+
+            # the order of data['songs'] is no longer the same as tmpids, so just make the order back
+            data["songs"].sort(key=lambda song: tmpids.index(str(song["id"])))
+
             return data['songs']
         except:
             return []

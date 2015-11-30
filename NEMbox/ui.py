@@ -23,6 +23,9 @@ import os, platform
 log = logger.getLogger(__name__)
 
 
+def escape_quote(text):
+    return text.replace('\'', '\\\'').replace('\"', '\'\'')
+
 class Ui:
     def __init__(self):
         self.screen = curses.initscr()
@@ -51,10 +54,16 @@ class Ui:
 
     def notify(self, summary, song, album, artist):
         if summary != "disable":
+            cmd = ""
+            content = "%s %s\nin %s by %s" % (summary, song, album, artist)
             if platform.system() == "Darwin":
-                os.system('/usr/bin/osascript -e \'display notification "' + summary + ' ' + song + '\nin ' + album + ' by ' + artist +'"\'')
+                content = escape_quote(content)
+                cmd = '/usr/bin/osascript -e $\'display notification "' + content + '"\''
             else:
-                os.system('/usr/bin/notify-send "' + summary + song + ' in ' + album + ' by ' + artist + '"')
+                cmd = '/usr/bin/notify-send "' + content + '"'
+
+            os.system(cmd)
+
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()
@@ -291,7 +300,7 @@ class Ui:
                         self.screen.addstr(i - offset + 8, self.startcol, str(i) + '. ' + datalist[i]['song_name'])
 
             elif datatype == 'search':
-                self.screen.move(4, 1)
+                self.screen.move(6, 1)
                 self.screen.clrtobot()
                 self.screen.timeout(-1)
                 self.screen.addstr(8, self.startcol, '选择搜索类型:', curses.color_pair(1))

@@ -11,7 +11,7 @@ NetEase-MusicBox
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.python.org/pypi/NetEase-MusicBox/)
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
-[![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)](https://www.python.org/downloads/)
+[![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)](https://pypi.python.org/pypi/NetEase-MusicBox/)
 
 ### 功能特性
 
@@ -47,6 +47,7 @@ NetEase-MusicBox
     <tr> <td>?</td> <td>Shuffle</td> <td>手气不错</td> </tr>
 	<tr> <td>M</td> <td>Menu</td> <td>主菜单</td> </tr>
 	<tr> <td>P</td> <td>Present/History</td> <td>当前/历史播放列表</td> </tr>
+	<tr> <td>I</td> <td>Music Info</td> <td>当前音乐信息</td> </tr>
 	<tr> <td>⇧+P</td> <td>Playing Mode</td> <td>播放模式切换</td> </tr>
 	<tr> <td>A</td> <td>Add</td> <td>添加曲目到打碟</td> </tr>
 	<tr> <td>Z</td> <td>DJ list</td> <td>打碟列表</td> </tr>
@@ -73,7 +74,7 @@ NetEase-MusicBox
 
 ### Linux安装
 	
-	$ sudo pip install NetEase-MusicBox
+	$ sudo pip2 install NetEase-MusicBox
 
 	$ sudo apt-get install mpg123	
 	
@@ -134,6 +135,14 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-11-28 版本 0.2.0.5    错误修复
+
+2015-11-10 版本 0.2.0.4    优化切换歌曲时歌单显示, 新增显示歌曲信息功能
+
+2015-11-09 版本 0.2.0.2    修复崩溃错误, 优化榜单排序
+
+2015-11-05 版本 0.2.0.1    优化列表翻页功能
 
 2015-10-31 版本 0.2.0.0    新增部分操作的提醒功能
 
