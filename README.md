@@ -56,6 +56,7 @@ NetEase-MusicBox
 	<tr> <td>R</td> <td>Remove</td> <td>删除当前条目</td> </tr>
 	<tr> <td>⇧+J</td> <td>Move Down</td> <td>向下移动当前项目</td> </tr>
 	<tr> <td>⇧+K</td> <td>Move Up</td> <td>向上移动当前项目</td> </tr>
+	<tr> <td>⇧+C</td> <td>Cache</td> <td>缓存歌曲到本地</td> </tr>
 	<tr> <td>,</td> <td>Like</td> <td>喜爱</td> </tr>
 	<tr> <td>.</td> <td>Trash FM</td> <td>删除 FM</td> </tr>
 	<tr> <td>/</td> <td>Next FM</td> <td>下一FM</td> </tr>
@@ -135,6 +136,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2015-12-02 版本 0.2.0.6    新增手动缓存功能
 
 2015-11-28 版本 0.2.0.5    错误修复
 
