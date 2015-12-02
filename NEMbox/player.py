@@ -390,3 +390,15 @@ class Player:
                                        time.time(), pause=True)
         except:
             pass
+
+
+    def cacheSong1time(self, song_id, song_name, artist, song_url):
+        def cacheExit(song_id, path):
+            self.songs[str(song_id)]['cache'] = path
+            self.cache.enable = False
+
+        self.cache.enable = True
+        self.cache.add(song_id, song_name, artist, song_url, cacheExit)
+        self.cache.start_download()
+
+
