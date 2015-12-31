@@ -55,12 +55,12 @@ class Ui:
     def notify(self, summary, song, album, artist):
         if summary != "disable":
             cmd = ""
-            content = "%s %s\nin %s by %s" % (summary, song, album, artist)
+            body = "%s\nin %s by %s" % (song, album, artist)
             if platform.system() == "Darwin":
-                content = escape_quote(content)
+                content = escape_quote(summary + ': ' + body)
                 cmd = '/usr/bin/osascript -e $\'display notification "' + content + '"\''
             else:
-                cmd = '/usr/bin/notify-send "' + content + '"'
+                cmd = '/usr/bin/notify-send -a NetEase-MusicBox "%s" "%s"' % (summary, body)
 
             os.system(cmd)
 

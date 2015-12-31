@@ -10,7 +10,7 @@ from menu import Menu
 import argparse
 import sys
 
-version = "0.2.0.5"
+version = "0.2.0.7"
 
 def start():
     nembox_menu = Menu()

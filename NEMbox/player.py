@@ -143,9 +143,7 @@ class Player:
         item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
         if self.notifier == True:
-            self.ui.notify("Now playing: ", item['song_name'], item['album_name'], item['artist'])
-        else:
-            self.ui.notify("disable", item['song_name'], item['album_name'], item['artist'])
+            self.ui.notify("Now playing", item['song_name'], item['album_name'], item['artist'])
         self.playing_id = item['song_id']
         self.popen_recall(self.recall, item)
 
@@ -390,3 +388,15 @@ class Player:
                                        time.time(), pause=True)
         except:
             pass
+
+
+    def cacheSong1time(self, song_id, song_name, artist, song_url):
+        def cacheExit(song_id, path):
+            self.songs[str(song_id)]['cache'] = path
+            self.cache.enable = False
+
+        self.cache.enable = True
+        self.cache.add(song_id, song_name, artist, song_url, cacheExit)
+        self.cache.start_download()
+
+
