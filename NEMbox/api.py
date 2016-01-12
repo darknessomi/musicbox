@@ -79,7 +79,8 @@ def encrypted_login(username, password):
     text = {
         'username': username,
         'password': password,
-        'rememberLogin': 'true'
+        'rememberLogin': 'true',
+        'csrf_token': createSecretKey(32)
     }
     text = json.dumps(text)
     secKey = createSecretKey(16)
@@ -108,7 +109,8 @@ def encrypted_phonelogin(username, password):
     text = {
         'phone': username,
         'password': password,
-        'rememberLogin': 'true'
+        'rememberLogin': 'true',
+        'csrf_token': createSecretKey(32)
     }
     text = json.dumps(text)
     secKey = createSecretKey(16)
