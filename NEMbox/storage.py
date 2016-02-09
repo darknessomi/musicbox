@@ -39,6 +39,7 @@ class Storage(Singleton):
                 album_name str
                 quality str
                 lyric str
+                tlyric str
         player_info dict:
             player_list list:
                 songs_id(int)
