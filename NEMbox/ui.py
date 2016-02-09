@@ -169,12 +169,15 @@ class Ui:
             self.now_lyric = "[00:00.00]暂无歌词 ~>_<~ \n"
         else:
             key = now_minute + ":" + now_second
-            for index, line in enumerate(song["lyric"]):
+            for line in song["lyric"]:
                 if key in line:
                     if 'tlyric' not in song.keys() or len(song["tlyric"]) <= 0:
                         self.now_lyric = line
                     else:
-                        self.now_lyric = song["tlyric"][index] + "//" + line
+                        self.now_lyric = line
+                        for tline in song["tlyric"]:
+                            if key in tline:
+                                self.now_lyric = tline + "//" + self.now_lyric
         self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
         self.screen.addstr(4, self.startcol - 2, str(self.now_lyric), curses.color_pair(3))
         self.screen.refresh()
