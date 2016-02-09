@@ -165,9 +165,6 @@ class Ui:
         song = self.storage.database["songs"][
             self.storage.database["player_info"]["player_list"][self.storage.database["player_info"]["idx"]]
         ]
-        with open("/home/xiangru/Documents/tools/musicbox/log.txt", 'w') as f:
-            f.write(str(song))
-
         if 'lyric' not in song.keys() or len(song["lyric"]) <= 0:
             self.now_lyric = "[00:00.00]暂无歌词 ~>_<~ \n"
         else:
