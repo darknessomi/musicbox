@@ -483,7 +483,7 @@ class NetEase:
         try:
             data = self.httpRequest('GET', action)
             if data['tlyric']['lyric'] != None:
-                lyric_info = data['tlyric']['lyric']
+                lyric_info = data['tlyric']['lyric'][1:]
             else:
                 lyric_info = '未找到歌词翻译'
             return lyric_info
