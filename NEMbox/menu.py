@@ -86,6 +86,14 @@ shortcut = [
 ]
 
 
+# Create a notification
+def notify(message):
+    if platform.system() == 'Darwin':
+        os.system('/usr/bin/osascript -e \'display notification "' + message + '"\'')
+    else:
+        os.system('/usr/bin/notify-send "' + message + '"')
+
+
 class Menu:
     def __init__(self):
         reload(sys)
@@ -333,10 +341,9 @@ class Menu:
             elif key == ord(','):
                 return_data = self.request_api(self.netease.fm_like, self.player.get_playing_id())
                 if return_data != -1:
-                    if platform.system() == 'Darwin':
-                        os.system('/usr/bin/osascript -e \'display notification "Added successfully"\'')
-                    else:
-                        os.system('/usr/bin/notify-send "Added successfully"')
+                    notify("Added Successfully!")
+                else:
+                    notify("Existing Song!")
 
             # 删除FM
             elif key == ord('.'):

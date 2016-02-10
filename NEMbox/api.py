@@ -275,7 +275,6 @@ class NetEase:
         except:
             return -1
 
-
     # 每日推荐歌单
     def recommend_playlist(self):
         try:
