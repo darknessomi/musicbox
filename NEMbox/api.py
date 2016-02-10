@@ -478,6 +478,18 @@ class NetEase:
         except:
             return []
 
+    def song_tlyric(self, music_id):
+        action = "http://music.163.com/api/song/lyric?os=osx&id=" + str(music_id) + "&lv=-1&kv=-1&tv=-1"
+        try:
+            data = self.httpRequest('GET', action)
+            if data['tlyric']['lyric'] != None:
+                lyric_info = data['tlyric']['lyric'][1:]
+            else:
+                lyric_info = '未找到歌词翻译'
+            return lyric_info
+        except:
+            return []
+
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
     def djchannels(self, stype=0, offset=0, limit=50):
         action = 'http://music.163.com/discover/djchannel?type=' + str(stype) + '&offset=' + str(
