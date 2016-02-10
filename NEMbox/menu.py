@@ -353,10 +353,7 @@ class Menu:
                     self.player.next()
                     return_data = self.request_api(self.netease.fm_trash, self.player.get_playing_id())
                     if return_data != -1:
-                        if platform.system() == 'Darwin':
-                            os.system('/usr/bin/osascript -e \'display notification "Deleted successfully"\'')
-                        else:
-                            os.system('/usr/bin/notify-send "Deleted successfully"')
+                        notify("Deleted Successfully.")
                     time.sleep(0.1)
 
             # 下一FM
@@ -431,10 +428,7 @@ class Menu:
             elif key == ord('s'):
                 if (datatype == 'songs' or datatype == 'djchannels') and len(datalist) != 0:
                     self.collection.append(datalist[idx])
-                    if platform.system() == 'Darwin':
-                        os.system('/usr/bin/osascript -e \'display notification "Added successfully"\'')
-                    else:
-                        os.system('/usr/bin/notify-send "Added successfully"')
+                    notify("Added Successfully!")
 
             # 加载收藏歌曲
             elif key == ord('c'):
