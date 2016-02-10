@@ -177,7 +177,7 @@ class Ui:
                         self.now_lyric = line
                         for tline in song["tlyric"]:
                             if key in tline:
-                                self.now_lyric = tline + "//" + self.now_lyric
+                                self.now_lyric = tline + " || " + self.now_lyric
         self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
         self.screen.addstr(4, self.startcol - 2, str(self.now_lyric), curses.color_pair(3))
         self.screen.refresh()
