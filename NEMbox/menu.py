@@ -510,6 +510,9 @@ class Menu:
         index = self.index
         self.stack.append([datatype, title, datalist, offset, index])
 
+        if idx > len(self.datalist):
+            return False
+
         if datatype == 'main':
             self.choice_channel(idx)
 
