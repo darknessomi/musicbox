@@ -244,14 +244,20 @@ class Player:
         if not self.playing_flag and not self.popen_handler:
             return
         self.pause_flag = True
-        os.kill(self.popen_handler.pid, signal.SIGSTOP)
+        try:
+            self.popen_handler.stdin.write("P\n")
+        except:
+            self.switch()
         item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time(),
                                pause=True)
 
     def resume(self):
         self.pause_flag = False
-        os.kill(self.popen_handler.pid, signal.SIGCONT)
+        try:
+            self.popen_handler.stdin.write("P\n")
+        except:
+            self.switch()
         item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
         self.playing_id = item['song_id']
