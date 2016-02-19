@@ -24,6 +24,7 @@ import random
 import base64
 from config import Config
 from storage import Storage
+
 # 歌曲榜单地址
 top_list_all = {
     0: ['云音乐新歌榜', '/discover/toplist?id=3779629'],
@@ -80,6 +81,18 @@ def encrypted_login(username, password):
         'password': password,
         'rememberLogin': 'true'
     }
+    text = json.dumps(text)
+    secKey = createSecretKey(16)
+    encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
+    encSecKey = rsaEncrypt(secKey, pubKey, modulus)
+    data = {
+        'params': encText,
+        'encSecKey': encSecKey
+    }
+    return data
+
+
+def encrypted_request(text):
     text = json.dumps(text)
     secKey = createSecretKey(16)
     encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
@@ -184,18 +197,17 @@ class NetEase:
             pattern = re.compile(r'\d{4}-\d{2}-\d{2}')
             str = pattern.findall(cookie)
             if str:
-                if str[0] < time.strftime('%Y-%m-%d',time.localtime(time.time())):
+                if str[0] < time.strftime('%Y-%m-%d', time.localtime(time.time())):
                     self.storage.database['user'] = {
-                    "username": "",
-                    "password": "",
-                    "user_id": "",
-                    "nickname": "",
+                        "username": "",
+                        "password": "",
+                        "user_id": "",
+                        "nickname": "",
                     }
                     self.storage.save()
                     os.remove(self.storage.cookie_path)
         except:
             self.session.cookies.save()
-
 
     def return_toplists(self):
         temp = []
@@ -214,18 +226,18 @@ class NetEase:
 
         elif (method == 'POST'):
             connection = self.session.post(
-                action,
-                data=query,
-                headers=self.header,
-                timeout=default_timeout
+                    action,
+                    data=query,
+                    headers=self.header,
+                    timeout=default_timeout
             )
 
         elif (method == 'Login_POST'):
             connection = self.session.post(
-                action,
-                data=query,
-                headers=self.header,
-                timeout=default_timeout
+                    action,
+                    data=query,
+                    headers=self.header,
+                    timeout=default_timeout
             )
             self.session.cookies.save()
 
@@ -256,27 +268,44 @@ class NetEase:
     # 用户歌单
     def user_playlist(self, uid, offset=0, limit=100):
         action = 'http://music.163.com/api/user/playlist/?offset=' + str(offset) + '&limit=' + str(
-            limit) + '&uid=' + str(uid)
+                limit) + '&uid=' + str(uid)
         try:
             data = self.httpRequest('GET', action)
             return data['playlist']
         except:
             return -1
 
+
     # 每日推荐歌单
     def recommend_playlist(self):
-        action = 'http://music.163.com/discover/recommend/taste'
         try:
+            action = 'http://music.163.com/weapi/v1/discovery/recommend/songs?csrf_token='
             self.session.cookies.load()
-            page = self.session.get(action, headers=self.header, timeout=default_timeout)
-            song_ids = re.findall(r'/song\?id=(\d+)', page.text)
+            csrf = ""
+            for cookie in self.session.cookies:
+                if cookie.name == "__csrf":
+                    csrf = cookie.value
+            if csrf == "":
+                return False
+            action += csrf
+            req = {
+                "offset": 0,
+                "total": True,
+                "limit": 20,
+                "csrf_token": csrf
+            }
+            page = self.session.post(action, data=encrypted_request(req), headers=self.header, timeout=default_timeout)
+            results = json.loads(page.text)["recommend"]
+            song_ids = []
+            for result in results:
+                song_ids.append(result["id"])
             data = map(self.song_detail, song_ids)
             result = []
             for foo in range(len(data)):
                 result.append(data[foo][0])
             return result
         except:
-            return -1
+            return False
 
     # 私人FM
     def personal_fm(self):
@@ -290,9 +319,11 @@ class NetEase:
     # like
     def fm_like(self, songid, like=True, time=25, alg='itembased'):
         if like:
-            action = 'http://music.163.com/api/radio/like?alg='+alg+'&trackId='+str(songid)+'&like=true&time='+str(time)
+            action = 'http://music.163.com/api/radio/like?alg=' + alg + '&trackId=' + str(
+                    songid) + '&like=true&time=' + str(time)
         else:
-            action = 'http://music.163.com/api/radio/like?alg='+alg+'&trackId='+str(songid)+'&like=false&time='+str(time)
+            action = 'http://music.163.com/api/radio/like?alg=' + alg + '&trackId=' + str(
+                    songid) + '&like=false&time=' + str(time)
         try:
             data = self.httpRequest('GET', action)
             if data['code'] == 200:
@@ -304,7 +335,7 @@ class NetEase:
 
     # FM trash
     def fm_trash(self, songid, time=25, alg='RT'):
-        action = 'http://music.163.com/api/radio/trash/add?alg='+alg+'&songId='+str(songid)+'&time='+str(time)
+        action = 'http://music.163.com/api/radio/trash/add?alg=' + alg + '&songId=' + str(songid) + '&time=' + str(time)
         try:
             data = self.httpRequest('GET', action)
             if data['code'] == 200:
@@ -338,7 +369,7 @@ class NetEase:
     # 歌单（网友精选碟） hot||new http://music.163.com/#/discover/playlist/
     def top_playlists(self, category='全部', order='hot', offset=0, limit=50):
         action = 'http://music.163.com/api/playlist/list?cat=' + category + '&order=' + order + '&offset=' + str(
-            offset) + '&total=' + ('true' if offset else 'false') + '&limit=' + str(limit)
+                offset) + '&total=' + ('true' if offset else 'false') + '&limit=' + str(limit)
         try:
             data = self.httpRequest('GET', action)
             return data['playlists']
@@ -447,11 +478,22 @@ class NetEase:
         except:
             return []
 
+    def song_tlyric(self, music_id):
+        action = "http://music.163.com/api/song/lyric?os=osx&id=" + str(music_id) + "&lv=-1&kv=-1&tv=-1"
+        try:
+            data = self.httpRequest('GET', action)
+            if data['tlyric']['lyric'] != None:
+                lyric_info = data['tlyric']['lyric'][1:]
+            else:
+                lyric_info = '未找到歌词翻译'
+            return lyric_info
+        except:
+            return []
 
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
     def djchannels(self, stype=0, offset=0, limit=50):
         action = 'http://music.163.com/discover/djchannel?type=' + str(stype) + '&offset=' + str(
-            offset) + '&limit=' + str(limit)
+                offset) + '&limit=' + str(limit)
         try:
             connection = requests.get(action, headers=self.header, timeout=default_timeout)
             connection.encoding = 'UTF-8'
@@ -475,6 +517,7 @@ class NetEase:
                 continue
 
         return channels
+
     # 获取版本
     def get_version(self):
         action = 'https://pypi.python.org/pypi?:action=doap&name=NetEase-MusicBox'

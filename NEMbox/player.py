@@ -103,9 +103,23 @@ class Player:
                 return
             netease = NetEase()
             lyric = netease.song_lyric(self.playing_id)
-            if (not lyric == []) or lyric == '未找到歌词':
-                lyric = lyric.split('\n')
+            if lyric == [] or lyric == '未找到歌词':
+                return
+            lyric = lyric.split('\n')
             self.songs[str(self.playing_id)]["lyric"] = lyric
+            return
+
+        def gettLyric():
+            if 'tlyric' not in self.songs[str(self.playing_id)].keys():
+                self.songs[str(self.playing_id)]["tlyric"] = []
+            if len(self.songs[str(self.playing_id)]["tlyric"]) > 0:
+                return
+            netease = NetEase()
+            tlyric = netease.song_tlyric(self.playing_id)
+            if tlyric == [] or tlyric == '未找到歌词翻译':
+                return
+            tlyric = tlyric.split('\n')
+            self.songs[str(self.playing_id)]["tlyric"] = tlyric
             return
 
         def cacheSong(song_id, song_name, artist, song_url):
@@ -125,6 +139,8 @@ class Player:
         thread.start()
         lyric_download_thread = threading.Thread(target=getLyric, args=())
         lyric_download_thread.start()
+        tlyric_download_thread = threading.Thread(target=gettLyric, args=())
+        tlyric_download_thread.start()
         # returns immediately after the thread starts
         return thread
 
@@ -143,9 +159,7 @@ class Player:
         item = self.songs[self.info["player_list"][self.info["idx"]]]
         self.ui.build_playinfo(item['song_name'], item['artist'], item['album_name'], item['quality'], time.time())
         if self.notifier == True:
-            self.ui.notify("Now playing: ", item['song_name'], item['album_name'], item['artist'])
-        else:
-            self.ui.notify("disable", item['song_name'], item['album_name'], item['artist'])
+            self.ui.notify("Now playing", item['song_name'], item['album_name'], item['artist'])
         self.playing_id = item['song_id']
         self.popen_recall(self.recall, item)
 

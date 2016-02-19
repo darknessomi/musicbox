@@ -49,18 +49,19 @@ class Ui:
         self.update_space()
         self.lyric = ""
         self.now_lyric = ""
+        self.tlyric = ""
         self.storage = Storage()
         self.newversion = False
 
     def notify(self, summary, song, album, artist):
         if summary != "disable":
             cmd = ""
-            content = "%s %s\nin %s by %s" % (summary, song, album, artist)
+            body = "%s\nin %s by %s" % (song, album, artist)
             if platform.system() == "Darwin":
-                content = escape_quote(content)
+                content = escape_quote(summary + ': ' + body)
                 cmd = '/usr/bin/osascript -e $\'display notification "' + content + '"\''
             else:
-                cmd = '/usr/bin/notify-send "' + content + '"'
+                cmd = '/usr/bin/notify-send -a NetEase-MusicBox "%s" "%s"' % (summary, body)
 
             os.system(cmd)
 
@@ -161,7 +162,6 @@ class Ui:
         else:
             pass
         self.screen.addstr(3, self.startcol - 2, process, curses.color_pair(1))
-
         song = self.storage.database["songs"][
             self.storage.database["player_info"]["player_list"][self.storage.database["player_info"]["idx"]]
         ]
@@ -171,7 +171,13 @@ class Ui:
             key = now_minute + ":" + now_second
             for line in song["lyric"]:
                 if key in line:
-                    self.now_lyric = line
+                    if 'tlyric' not in song.keys() or len(song["tlyric"]) <= 0:
+                        self.now_lyric = line
+                    else:
+                        self.now_lyric = line
+                        for tline in song["tlyric"]:
+                            if key in tline:
+                                self.now_lyric = tline + " || " + self.now_lyric
         self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
         self.screen.addstr(4, self.startcol - 2, str(self.now_lyric), curses.color_pair(3))
         self.screen.refresh()

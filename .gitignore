@@ -67,3 +67,6 @@ out.gif
 
 # ignore swp files
 NEMbox/*.swp
+
+# ignore TEST files
+TEST
