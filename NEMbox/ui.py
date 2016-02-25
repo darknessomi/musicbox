@@ -17,6 +17,7 @@ import hashlib
 from time import time
 from scrollstring import *
 from storage import Storage
+from config import Config
 import logger
 import os, platform
 
@@ -51,6 +52,7 @@ class Ui:
         self.now_lyric = ""
         self.tlyric = ""
         self.storage = Storage()
+        self.config = Config()
         self.newversion = False
 
     def notify(self, summary, song, album, artist):
@@ -176,7 +178,7 @@ class Ui:
                     else:
                         self.now_lyric = line
                         for tline in song["tlyric"]:
-                            if key in tline:
+                            if key in tline and self.config.get_item("translation"):
                                 self.now_lyric = tline + " || " + self.now_lyric
         self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
         self.screen.addstr(4, self.startcol - 2, str(self.now_lyric), curses.color_pair(3))

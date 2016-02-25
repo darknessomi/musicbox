@@ -18,7 +18,7 @@ class Config(Singleton):
         self.const = Constant()
         self.config_file_path = self.const.conf_dir + "/config.json"
         self.default_config = {
-            "version": 3,
+            "version": 4,
             "cache": {
                 "value": False,
                 "default": False,
@@ -62,6 +62,11 @@ class Config(Singleton):
                 "value": True,
                 "default": True,
                 "describe": "Notifier when switching songs."
+            },
+            "translation": {
+                "value": True,
+                "default": True,
+                "describe": "Foreign language lyrics translation."
             }
 
         }
@@ -125,6 +130,13 @@ class Config(Singleton):
                     "value": True,
                     "default": True,
                     "describe": "Notifier when switching songs."
+                }
+            elif self.config["version"] == 3:
+                self.config["version"] = 4
+                self.config["translation"] = {
+                    "value": True,
+                    "default": True,
+                    "describe": "Foreign language lyrics translation."
                 }
             self.check_version()
             return False
