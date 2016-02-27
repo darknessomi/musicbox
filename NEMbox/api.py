@@ -132,7 +132,7 @@ def aesEncrypt(text, secKey):
 
 def rsaEncrypt(text, pubKey, modulus):
     text = text[::-1]
-    rs = int(text.encode('hex'), 16) ** int(pubKey, 16) % int(modulus, 16)
+    rs = pow(int(text.encode('hex'), 16),  int(pubKey, 16), int(modulus, 16))
     return format(rs, 'x').zfill(256)
 
 
