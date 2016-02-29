@@ -130,7 +130,7 @@ class Menu:
 
     def alert(self, version):
         latest = Menu().check_version()
-        if latest != version:
+        if latest != version and latest != 0:
             if platform.system() == 'Darwin':
                 os.system('/usr/bin/osascript -e \'display notification "MusicBox Update is available"sound name "/System/Library/Sounds/Ping.aiff"\'')
                 time.sleep(0.5)
@@ -140,9 +140,12 @@ class Menu:
 
     def check_version(self):
         # 检查更新
-        tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version())))
-        root = tree.getroot()
-        return root[0][4][0][0].text
+        try:
+            tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version())))
+            root = tree.getroot()
+            return root[0][4][0][0].text
+        except:
+            return 0
 
     def start_fork(self, version):
         pid = os.fork()
