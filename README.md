@@ -2,7 +2,7 @@ NetEase-MusicBox
 =================
 
 
-#### Thanks vellow, hbprotoss, Catofes, 尘埃, chaserhkj, Ma233, 20015jjw, mchome, stkevintan, ayanamimcy
+#### [感谢](https://github.com/darknessomi/musicbox/graphs/contributors)为 MusicBox 的开发付出过努力的每一个人！
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
