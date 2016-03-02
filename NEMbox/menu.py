@@ -128,7 +128,7 @@ class Menu:
         curses.endwin()
         sys.exit()
 
-    def alert(self, version):
+    def update_alert(self, version):
         latest = Menu().check_version()
         if latest != version and latest != 0:
             if platform.system() == 'Darwin':
@@ -139,8 +139,15 @@ class Menu:
                 os.system('/usr/bin/notify-send "MusicBox Update is available"')
 
     def check_version(self):
-        # 检查更新
+        # 检查更新 && 签到
         try:
+            mobilesignin = self.netease.daily_signin(0)
+            if  mobilesignin != -1 and mobilesignin['code'] != -2:
+                os.system('/usr/bin/osascript -e \'display notification "Mobile signin success"sound name "/System/Library/Sounds/Ping.aiff"\'')
+            time.sleep(0.5)
+            pcsignin = self.netease.daily_signin(1)
+            if pcsignin != -1 and pcsignin['code'] != -2:
+                os.system('/usr/bin/osascript -e \'display notification "PC signin success"sound name "/System/Library/Sounds/Ping.aiff"\'')
             tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version())))
             root = tree.getroot()
             return root[0][4][0][0].text
@@ -150,7 +157,7 @@ class Menu:
     def start_fork(self, version):
         pid = os.fork()
         if pid == 0:
-            Menu().alert(version)
+            Menu().update_alert(version)
         else:
             Menu().start()
 

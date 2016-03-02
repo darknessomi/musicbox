@@ -75,41 +75,7 @@ def encrypted_id(id):
 
 
 # 登录加密算法, 基于https://github.com/stkevintan/nw_musicbox脚本实现
-def encrypted_login(username, password):
-    text = {
-        'username': username,
-        'password': password,
-        'rememberLogin': 'true'
-    }
-    text = json.dumps(text)
-    secKey = createSecretKey(16)
-    encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
-    encSecKey = rsaEncrypt(secKey, pubKey, modulus)
-    data = {
-        'params': encText,
-        'encSecKey': encSecKey
-    }
-    return data
-
-
 def encrypted_request(text):
-    text = json.dumps(text)
-    secKey = createSecretKey(16)
-    encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
-    encSecKey = rsaEncrypt(secKey, pubKey, modulus)
-    data = {
-        'params': encText,
-        'encSecKey': encSecKey
-    }
-    return data
-
-
-def encrypted_phonelogin(username, password):
-    text = {
-        'phone': username,
-        'password': password,
-        'rememberLogin': 'true'
-    }
     text = json.dumps(text)
     secKey = createSecretKey(16)
     encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
@@ -250,7 +216,12 @@ class NetEase:
         if (pattern.match(username)):
             return self.phone_login(username, password)
         action = 'https://music.163.com/weapi/login/'
-        data = encrypted_login(username, password)
+        text = {
+            'username': username,
+            'password': password,
+            'rememberLogin': 'true'
+        }
+        data = encrypted_request(text)
         try:
             return self.httpRequest('Login_POST', action, data)
         except:
@@ -259,11 +230,28 @@ class NetEase:
     # 手机登录
     def phone_login(self, username, password):
         action = 'https://music.163.com/weapi/login/cellphone'
-        data = encrypted_phonelogin(username, password)
+        text = {
+            'phone': username,
+            'password': password,
+            'rememberLogin': 'true'
+        }
+        data = encrypted_request(text)
         try:
             return self.httpRequest('Login_POST', action, data)
         except:
             return {'code': 501}
+
+    # 每日签到
+    def daily_signin(self, type):
+        action = 'http://music.163.com/weapi/point/dailyTask'
+        text = {
+            'type': type
+        }
+        data = encrypted_request(text)
+        try:
+            return self.httpRequest('POST', action, data)
+        except:
+            return -1
 
     # 用户歌单
     def user_playlist(self, uid, offset=0, limit=100):
