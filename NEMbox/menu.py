@@ -138,16 +138,28 @@ class Menu:
             else:
                 os.system('/usr/bin/notify-send "MusicBox Update is available"')
 
+    def signin_alert(self, type):
+        if type == 0:
+            if platform.system() == 'Darwin':
+                os.system('/usr/bin/osascript -e \'display notification "Mobile signin success"sound name "/System/Library/Sounds/Ping.aiff"\'')
+            else:
+                os.system('/usr/bin/notify-send "Mobile signin success"')
+        else:
+            if platform.system() == 'Darwin':
+                os.system('/usr/bin/osascript -e \'display notification "PC signin success"sound name "/System/Library/Sounds/Ping.aiff"\'')
+            else:
+                os.system('/usr/bin/notify-send "PC signin success"')
+
     def check_version(self):
         # 检查更新 && 签到
         try:
             mobilesignin = self.netease.daily_signin(0)
             if  mobilesignin != -1 and mobilesignin['code'] != -2:
-                os.system('/usr/bin/osascript -e \'display notification "Mobile signin success"sound name "/System/Library/Sounds/Ping.aiff"\'')
+                self.signin_alert(0)
             time.sleep(0.5)
             pcsignin = self.netease.daily_signin(1)
             if pcsignin != -1 and pcsignin['code'] != -2:
-                os.system('/usr/bin/osascript -e \'display notification "PC signin success"sound name "/System/Library/Sounds/Ping.aiff"\'')
+                self.signin_alert(1)
             tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version())))
             root = tree.getroot()
             return root[0][4][0][0].text
