@@ -101,7 +101,7 @@ NetEase-MusicBox
 <table>
 	<tr> <td>OS X</td> <td>10.11 / 10.10 / 10.9</td> </tr>
 	<tr> <td>Ubuntu</td> <td>14.04</td> </tr>
-	<tr> <td>Kali</td> <td>1.1.0 / 2.0</td> </tr>
+	<tr> <td>Kali</td> <td>1.1.0 / 2.0 / Rolling</td> </tr>
 	<tr> <td>CentOS</td> <td>7</td> </tr>
 	<tr> <td>openSUSE</td> <td>13.2</td> </tr>
 	<tr> <td>Fedora</td> <td>22</td> </tr>
