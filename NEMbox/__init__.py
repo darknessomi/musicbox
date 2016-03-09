@@ -5,12 +5,14 @@
 网易云音乐 Entry
 '''
 
-import curses, traceback
+import curses
+import traceback
 from menu import Menu
 import argparse
 import sys
 
 version = "0.2.1.5"
+
 
 def start():
     nembox_menu = Menu()
@@ -36,5 +38,5 @@ if args.version:
     curses.endwin()
     print 'NetEase-MusicBox installed version:' + version
     if latest != version:
-        print 'NetEase-MusicBox latest version:' + latest
+        print 'NetEase-MusicBox latest version:' + str(latest)
     sys.exit()

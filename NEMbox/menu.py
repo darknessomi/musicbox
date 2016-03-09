@@ -154,7 +154,7 @@ class Menu:
         # 检查更新 && 签到
         try:
             mobilesignin = self.netease.daily_signin(0)
-            if  mobilesignin != -1 and mobilesignin['code'] != -2:
+            if mobilesignin != -1 and mobilesignin['code'] != -2:
                 self.signin_alert(0)
             time.sleep(0.5)
             pcsignin = self.netease.daily_signin(1)
@@ -252,20 +252,20 @@ class Menu:
                     # 移动光标到最后一列
                     self.index = offset - 1
                 else:
-                    self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx - 1)
+                    self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx - 1)
                 self.START = time.time()
 
             # 下移
             elif key == ord('j'):
                 # turn page if at end
-                if idx == min( len(datalist), offset + step) - 1:
-                    if offset + step >= len( datalist ):
+                if idx == min(len(datalist), offset + step) - 1:
+                    if offset + step >= len(datalist):
                         continue
                     self.offset += step
                     # 移动光标到第一列
                     self.index = offset + step
                 else:
-                    self.index = carousel(offset, min( len(datalist), offset + step) - 1, idx + 1)
+                    self.index = carousel(offset, min(len(datalist), offset + step) - 1, idx + 1)
                 self.START = time.time()
 
             # 数字快捷键
@@ -419,7 +419,6 @@ class Menu:
             # 加载当前播放列表
             elif key == ord('p'):
                 self.show_playing_song()
-
 
             # 播放模式切换
             elif key == ord('P'):
@@ -623,7 +622,6 @@ class Menu:
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
-
 
     def show_playing_song(self):
         if len(self.storage.database['player_info']['player_list']) == 0:

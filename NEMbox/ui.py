@@ -14,18 +14,19 @@ import curses
 import terminalsize
 from api import NetEase
 import hashlib
-from time import time
 from scrollstring import *
 from storage import Storage
 from config import Config
 import logger
-import os, platform
+import os
+import platform
 
 log = logger.getLogger(__name__)
 
 
 def escape_quote(text):
     return text.replace('\'', '\\\'').replace('\"', '\'\'')
+
 
 class Ui:
     def __init__(self):
@@ -67,7 +68,6 @@ class Ui:
 
             os.system(cmd)
 
-
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()
         # refresh top 2 line
@@ -83,7 +83,6 @@ class Ui:
         self.screen.addstr(1, min(self.indented_startcol + 18, self.x - 1),
                            song_name + self.space + artist + '  < ' + album_name + ' >',
                            curses.color_pair(4))
-
 
         # The following script doesn't work. It is intended to scroll the playinfo
         # Scrollstring works by determining how long since it is created, but
@@ -268,7 +267,6 @@ class Ui:
                     else:
                         self.screen.addstr(i - offset + 9, self.startcol, str(i) + '. ' + datalist[i]['title'])
 
-
             elif datatype == 'top_playlists':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
@@ -280,7 +278,6 @@ class Ui:
                                            str(i) + '. ' + datalist[i]['playlists_name'] + self.space + datalist[i][
                                                'creator_name'])
 
-
             elif datatype == 'toplists':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
@@ -288,7 +285,6 @@ class Ui:
                                            curses.color_pair(2))
                     else:
                         self.screen.addstr(i - offset + 9, self.startcol, str(i) + '. ' + datalist[i])
-
 
             elif datatype == 'playlist_classes' or datatype == 'playlist_class_detail':
                 for i in range(offset, min(len(datalist), offset + step)):
