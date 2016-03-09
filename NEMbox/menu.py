@@ -86,6 +86,13 @@ shortcut = [
 ]
 
 
+def notify(msg):
+    if platform.system() == 'Darwin':
+        os.system('/usr/bin/osascript -e \'display notification "' + msg + '"\'')
+    else:
+        os.system('/usr/bin/notify-send "' + msg + '"')
+
+
 class Menu:
     def __init__(self):
         reload(sys)
@@ -355,10 +362,9 @@ class Menu:
             elif key == ord(','):
                 return_data = self.request_api(self.netease.fm_like, self.player.get_playing_id())
                 if return_data != -1:
-                    if platform.system() == 'Darwin':
-                        os.system('/usr/bin/osascript -e \'display notification "Added successfully"\'')
-                    else:
-                        os.system('/usr/bin/notify-send "Added successfully"')
+                    notify("Added successfully!")
+                else:
+                    notify("Existing song!")
 
             # 删除FM
             elif key == ord('.'):
@@ -368,10 +374,7 @@ class Menu:
                     self.player.next()
                     return_data = self.request_api(self.netease.fm_trash, self.player.get_playing_id())
                     if return_data != -1:
-                        if platform.system() == 'Darwin':
-                            os.system('/usr/bin/osascript -e \'display notification "Deleted successfully"\'')
-                        else:
-                            os.system('/usr/bin/notify-send "Deleted successfully"')
+                        notify("Deleted successfully!")
                     time.sleep(0.1)
 
             # 下一FM
