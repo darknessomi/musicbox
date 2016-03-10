@@ -52,8 +52,6 @@ setup(
     name='NetEase-MusicBox',
     version='0.2.1.6',
     packages=find_packages(),
-
-    include_package_data=True,
     install_requires=get_install_requires('requirements.txt'),
 
     entry_points={
@@ -67,5 +65,4 @@ setup(
     url='https://github.com/darknessomi/musicbox',
     description='A sexy command line interface musicbox',
     keywords=['music', 'netease', 'cli', 'player'],
-    zip_safe=False,
 )
