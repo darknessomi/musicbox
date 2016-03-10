@@ -12,7 +12,6 @@ from singleton import Singleton
 import json
 
 
-
 class Storage(Singleton):
     def __init__(self):
         """
@@ -111,5 +110,3 @@ class Storage(Singleton):
         self.file = file(self.storage_path, 'w')
         self.file.write(json.dumps(self.database))
         self.file.close()
-
-
