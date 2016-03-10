@@ -34,7 +34,18 @@ ________     __________________________  _____ _     _
 
 '''
 
+import os
 from setuptools import setup, find_packages
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+
+def get_install_requires(filename):
+    req = []
+    path = os.path.join(HERE, filename)
+    if os.path.exists(path):
+        with open(path) as f:
+            req = [l.strip() for l in f.xreadlines() if not l.isspace()]
+    return req
 
 
 setup(
@@ -43,12 +54,7 @@ setup(
     packages=find_packages(),
 
     include_package_data=True,
-
-    install_requires=[
-        'requests',
-        'BeautifulSoup4',
-        'pycrypto',
-    ],
+    install_requires=get_install_requires('requirements.txt'),
 
     entry_points={
         'console_scripts': [

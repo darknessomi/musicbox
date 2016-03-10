@@ -1,0 +1,3 @@
+requests==2.9.1
+BeautifulSoup4==4.4.1
+pycrypto==2.6.1
