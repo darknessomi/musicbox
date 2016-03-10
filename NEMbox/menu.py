@@ -86,13 +86,6 @@ shortcut = [
 ]
 
 
-def notify(msg):
-    if platform.system() == 'Darwin':
-        os.system('/usr/bin/osascript -e \'display notification "' + msg + '"\'')
-    else:
-        os.system('/usr/bin/notify-send "' + msg + '"')
-
-
 class Menu:
     def __init__(self):
         reload(sys)
@@ -124,6 +117,18 @@ class Menu:
         signal.signal(signal.SIGINT, self.send_kill)
         self.START = time.time()
 
+    def notify(self, msg, type):
+        if type == 0:
+            if platform.system() == 'Darwin':
+                os.system('/usr/bin/osascript -e \'display notification "' + msg + '"\'')
+            else:
+                os.system('/usr/bin/notify-send "' + msg + '"')
+        else:
+            if platform.system() == 'Darwin':
+                os.system('/usr/bin/osascript -e \'display notification "' + msg + '"sound name "/System/Library/Sounds/Ping.aiff"\'')
+            else:
+                os.system('/usr/bin/notify-send "' + msg + '"')
+
     def change_term(self, signum, frame):
         self.ui.screen.clear()
         self.ui.screen.refresh()
@@ -138,35 +143,20 @@ class Menu:
     def update_alert(self, version):
         latest = Menu().check_version()
         if latest != version and latest != 0:
-            if platform.system() == 'Darwin':
-                os.system('/usr/bin/osascript -e \'display notification "MusicBox Update is available"sound name "/System/Library/Sounds/Ping.aiff"\'')
-                time.sleep(0.5)
-                os.system('/usr/bin/osascript -e \'display notification "NetEase-MusicBox installed version:' + version + '\nNetEase-MusicBox latest version:' + latest + '"\'')
-            else:
-                os.system('/usr/bin/notify-send "MusicBox Update is available"')
-
-    def signin_alert(self, type):
-        if type == 0:
-            if platform.system() == 'Darwin':
-                os.system('/usr/bin/osascript -e \'display notification "Mobile signin success"sound name "/System/Library/Sounds/Ping.aiff"\'')
-            else:
-                os.system('/usr/bin/notify-send "Mobile signin success"')
-        else:
-            if platform.system() == 'Darwin':
-                os.system('/usr/bin/osascript -e \'display notification "PC signin success"sound name "/System/Library/Sounds/Ping.aiff"\'')
-            else:
-                os.system('/usr/bin/notify-send "PC signin success"')
+            self.notify("MusicBox Update is available", 0)
+            time.sleep(0.5)
+            self.notify("NetEase-MusicBox installed version:" + version, 0)
 
     def check_version(self):
         # 检查更新 && 签到
         try:
             mobilesignin = self.netease.daily_signin(0)
             if mobilesignin != -1 and mobilesignin['code'] != -2:
-                self.signin_alert(0)
+                self.notify("Mobile signin success", 1)
             time.sleep(0.5)
             pcsignin = self.netease.daily_signin(1)
             if pcsignin != -1 and pcsignin['code'] != -2:
-                self.signin_alert(1)
+                self.notify("PC signin success", 1)
             tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version())))
             root = tree.getroot()
             return root[0][4][0][0].text
@@ -362,9 +352,9 @@ class Menu:
             elif key == ord(','):
                 return_data = self.request_api(self.netease.fm_like, self.player.get_playing_id())
                 if return_data != -1:
-                    notify("Added successfully!")
+                    self.notify("Added successfully!", 0)
                 else:
-                    notify("Existing song!")
+                    self.notify("Existing song!", 0)
 
             # 删除FM
             elif key == ord('.'):
@@ -374,7 +364,7 @@ class Menu:
                     self.player.next()
                     return_data = self.request_api(self.netease.fm_trash, self.player.get_playing_id())
                     if return_data != -1:
-                        notify("Deleted successfully!")
+                        self.notify("Deleted successfully!", 0)
                     time.sleep(0.1)
 
             # 下一FM
@@ -448,10 +438,7 @@ class Menu:
             elif key == ord('s'):
                 if (datatype == 'songs' or datatype == 'djchannels') and len(datalist) != 0:
                     self.collection.append(datalist[idx])
-                    if platform.system() == 'Darwin':
-                        os.system('/usr/bin/osascript -e \'display notification "Added successfully"\'')
-                    else:
-                        os.system('/usr/bin/notify-send "Added successfully"')
+                    self.notify("Added successfully", 0)
 
             # 加载收藏歌曲
             elif key == ord('c'):
