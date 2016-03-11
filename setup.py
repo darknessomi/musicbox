@@ -34,25 +34,18 @@ ________     __________________________  _____ _     _
 
 '''
 
-import os
 from setuptools import setup, find_packages
-HERE = os.path.abspath(os.path.dirname(__file__))
-
-
-def get_install_requires(filename):
-    req = []
-    path = os.path.join(HERE, filename)
-    if os.path.exists(path):
-        with open(path) as f:
-            req = [l.strip() for l in f.xreadlines() if not l.isspace()]
-    return req
-
 
 setup(
     name='NetEase-MusicBox',
-    version='0.2.1.7',
+    version='0.2.1.8',
     packages=find_packages(),
-    install_requires=get_install_requires('requirements.txt'),
+    include_package_data=True,
+    install_requires=[
+        'requests',
+        'BeautifulSoup4',
+        'pycrypto',
+    ],
 
     entry_points={
         'console_scripts': [
