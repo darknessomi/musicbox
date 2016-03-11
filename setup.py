@@ -50,7 +50,7 @@ def get_install_requires(filename):
 
 setup(
     name='NetEase-MusicBox',
-    version='0.2.1.6',
+    version='0.2.1.7',
     packages=find_packages(),
     install_requires=get_install_requires('requirements.txt'),
 
