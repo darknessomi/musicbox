@@ -41,5 +41,4 @@ def show_lyrics():
 def show_lyrics_new_process():
     p = Process(target=show_lyrics)
     p.start()
-    os.system("notify-send 123")
     # p.join()
