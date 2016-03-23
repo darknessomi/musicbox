@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # osdlyrics.py --- desktop lyrics for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
-# @Authors: Xiangru Lian
 
 from PyQt4 import QtGui, QtCore, QtDBus
 import sys

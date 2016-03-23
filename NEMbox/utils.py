@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # utils.py --- utils for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
-# @Authors: Xiangru Lian
 
 import platform
 import os
