@@ -11,7 +11,6 @@ from menu import Menu
 import argparse
 from osdlyrics import show_lyrics_new_process
 import sys
-import os
 
 version = "0.2.1.8"
 

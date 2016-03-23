@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Author: Xiangru Lian
+
 from PyQt4 import QtGui, QtCore, QtDBus
 import sys
 import os
