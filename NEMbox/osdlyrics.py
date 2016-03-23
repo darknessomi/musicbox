@@ -9,6 +9,7 @@ class Lyrics(QtGui.QWidget):
         self.initUI()
 
     def initUI(self):
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.resize(900, 150)
         self.text = u"OSD Lyrics for Musicbox"
         self.setWindowTitle("Lyrics")
