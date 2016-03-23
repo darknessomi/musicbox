@@ -19,6 +19,7 @@ from storage import Storage
 from config import Config
 import logger
 import os
+import dbus
 from utils import notify
 
 log = logger.getLogger(__name__)
@@ -175,6 +176,8 @@ class Ui:
                             if key in tline and self.config.get_item("translation"):
                                 self.now_lyric = tline + " || " + self.now_lyric
         self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
+        bus = dbus.SessionBus().get_object('org.musicbox.Bus', '/')
+        bus.refresh_lyrics(self.now_lyric, dbus_interface="local.__init__.py.Lyrics")
         self.screen.addstr(4, self.startcol - 2, str(self.now_lyric), curses.color_pair(3))
         self.screen.refresh()
 

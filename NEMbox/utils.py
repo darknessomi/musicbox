@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: Xiangru Lian
+# https://techbase.kde.org/Development/Tutorials/Python_introduction_to_signals_and_slots
 
 import platform
-
+import sys
 
 def notify_command_osx(msg, msg_type, t=None):
     command = '/usr/bin/osascript -e \'display notification "' + msg 
