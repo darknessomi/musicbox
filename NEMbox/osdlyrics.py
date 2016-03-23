@@ -27,7 +27,7 @@ class Lyrics(QtGui.QWidget):
         qp.end()
 
     def drawText(self, event, qp):
-        qp.setPen(QtGui.QColor(0, 0, 0))
+        qp.setPen(QtGui.QColor(128, 0, 128))
         qp.setFont(QtGui.QFont('Decorative', 16))
         qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
