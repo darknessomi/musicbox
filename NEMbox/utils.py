@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Author: Xiangru Lian
+# utils.py --- utils for musicbox
+# Copyright (c) 2015-2016 omi & Contributors
+# @Authors: Xiangru Lian
 
 import platform
 import os
