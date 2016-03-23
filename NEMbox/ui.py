@@ -19,7 +19,7 @@ from storage import Storage
 from config import Config
 import logger
 import os
-import platform
+from utils import notify
 
 log = logger.getLogger(__name__)
 
@@ -60,13 +60,8 @@ class Ui:
         if summary != "disable":
             cmd = ""
             body = "%s\nin %s by %s" % (song, album, artist)
-            if platform.system() == "Darwin":
-                content = escape_quote(summary + ': ' + body)
-                cmd = '/usr/bin/osascript -e $\'display notification "' + content + '"\''
-            else:
-                cmd = '/usr/bin/notify-send -a NetEase-MusicBox "%s" "%s"' % (summary, body)
-
-            os.system(cmd)
+            content = escape_quote(summary + ': ' + body)
+            notify(content)
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()
