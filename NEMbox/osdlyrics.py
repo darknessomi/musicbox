@@ -30,7 +30,7 @@ if  pyqt_activity:
 
         def initUI(self):
             self.setStyleSheet("background:" + config.get_item("osdlyrics_background"))
-            self.resize(900, 150)
+            self.resize(600, 60)
             self.text = u"OSD Lyrics for Musicbox"
             self.setWindowTitle("Lyrics")
             self.show()
