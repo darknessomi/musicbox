@@ -74,14 +74,19 @@ class Config(Singleton):
                 "describe": "Desktop lyrics for musicbox."
             },
             "osdlyrics_color": {
-                "value": [128, 0, 128],
-                "default": [128, 0, 128],
+                "value": [225, 248, 113],
+                "default": [225, 248, 113],
                 "describe": "Desktop lyrics RGB Color."
             },
             "osdlyrics_font": {
                 "value": ['Decorative', 16],
                 "default": ['Decorative', 16],
                 "describe": "Desktop lyrics font-family and font-size."
+            },
+            "osdlyrics_background": {
+                "value": "rgba(100, 100, 100, 120)",
+                "default": "rgba(100, 100, 100, 120)",
+                "describe": "Desktop lyrics background color."
             },
         }
         self.config = {}
@@ -160,14 +165,19 @@ class Config(Singleton):
                     "describe": "Desktop lyrics for musicbox."
                 }
                 self.config["osdlyrics_color"] = {
-                    "value": [128, 0, 128],
-                    "default": [128, 0, 128],
+                    "value": [225, 248, 113],
+                    "default": [225, 248, 113],
                     "describe": "Desktop lyrics RGB Color."
                 }
                 self.config["osdlyrics_font"] = {
                     "value": ['Decorative', 16],
                     "default": ['Decorative', 16],
                     "describe": "Desktop lyrics font-family and font-size."
+                }
+                self.config["osdlyrics_background"] = {
+                    "value": "rgba(100, 100, 100, 120)",
+                    "default": "rgba(100, 100, 100, 120)",
+                    "describe": "Desktop lyrics background color."
                 }
             self.check_version()
             return False

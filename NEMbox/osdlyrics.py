@@ -29,7 +29,7 @@ if  pyqt_activity:
             self.initUI()
 
         def initUI(self):
-            self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+            self.setStyleSheet("background:" + config.get_item("osdlyrics_background"))
             self.resize(900, 150)
             self.text = u"OSD Lyrics for Musicbox"
             self.setWindowTitle("Lyrics")
@@ -80,5 +80,8 @@ if  pyqt_activity:
 
 def show_lyrics_new_process():
     if  pyqt_activity and config.get_item("osdlyrics"):
-        p = Process(target=show_lyrics)
-        p.start()
+        try:
+            p = Process(target=show_lyrics)
+            p.start()
+        except:
+            pass
