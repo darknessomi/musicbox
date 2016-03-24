@@ -30,10 +30,37 @@ if  pyqt_activity:
 
         def initUI(self):
             self.setStyleSheet("background:" + config.get_item("osdlyrics_background"))
-            self.resize(900, 150)
+            self.setAttribute(QtCore.Qt.WA_NoSystemBackground)
+            if config.get_item("osdlyrics_transparent"):
+                self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+            # self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
+            self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
+            self.setAttribute(QtCore.Qt.WA_X11DoNotAcceptFocus)
+            self.setFocusPolicy(QtCore.Qt.NoFocus)
+            self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+            self.setWindowFlags(QtCore.Qt.X11BypassWindowManagerHint)
+            self.setMinimumSize(600,50)
+            self.resize(600, 60)
+            scn = QtGui.QApplication.desktop().screenNumber(QtGui.QApplication.desktop().cursor().pos())
+            br = QtGui.QApplication.desktop().screenGeometry(scn).bottomRight()
+            frameGeo = self.frameGeometry()
+            frameGeo.moveBottomRight(br)
+            self.move(frameGeo.topLeft())
             self.text = u"OSD Lyrics for Musicbox"
             self.setWindowTitle("Lyrics")
             self.show()
+
+        def mousePressEvent(self, event):
+            self.mpos = event.pos()
+
+        def mouseMoveEvent(self, event):
+            if (event.buttons() and QtCore.Qt.LeftButton):
+                diff = event.pos() - self.mpos;
+                newpos = self.pos() + diff
+                self.move(newpos)
+
+        def wheelEvent(self, event):
+            self.resize(self.width()+event.delta(), self.height())
 
         def paintEvent(self, event):
             qp = QtGui.QPainter()
@@ -44,10 +71,11 @@ if  pyqt_activity:
         def drawText(self, event, qp):
             osdlyrics_color = config.get_item("osdlyrics_color")
             osdlyrics_font = config.get_item("osdlyrics_font")
-            qp.setPen(QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1], osdlyrics_color[2]))
-            qp.setFont(QtGui.QFont(osdlyrics_font[0], osdlyrics_font[1]))
-            qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
-
+            font = QtGui.QFont(osdlyrics_font[0], osdlyrics_font[1])
+            pen = QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1], osdlyrics_color[2])
+            qp.setFont(font)
+            qp.setPen(pen)
+            qp.drawText(event.rect(), QtCore.Qt.AlignCenter | QtCore.Qt.TextWordWrap, self.text)
 
     class LyricsAdapter(QtDBus.QDBusAbstractAdaptor):
         QtCore.Q_CLASSINFO("D-Bus Interface", "local.musicbox.Lyrics")
@@ -82,6 +110,7 @@ def show_lyrics_new_process():
     if  pyqt_activity and config.get_item("osdlyrics"):
         try:
             p = Process(target=show_lyrics)
+            p.daemon = True
             p.start()
         except:
             pass

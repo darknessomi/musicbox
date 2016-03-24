@@ -7,7 +7,7 @@ NetEase-MusicBox
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
 [![](https://img.shields.io/pypi/dm/NetEase-MusicBox.svg)](https://pypi.python.org/pypi/NetEase-MusicBox/)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt) 
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.python.org/pypi/NetEase-MusicBox/)
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 
@@ -64,35 +64,41 @@ NetEase-MusicBox
 	<tr> <td>W</td> <td>Quit&Clear</td> <td>退出并清除用户信息</td> </tr>
 </table>
 
-	
+
 
 
 ### Mac安装
-	
+
 	$ sudo pip install NetEase-MusicBox
 
 	$ brew install mpg123
 
 ### Linux安装
-	
+#### Ubuntu/Debian
+
 	$ sudo pip2 install NetEase-MusicBox
 
-	$ sudo apt-get install mpg123	
-	
+	$ sudo apt-get install mpg123
+
+#### Arch Linux
+
+    $ pacaur -S netease-musicbox-git
+
 #### 可选功能依赖 && 配置文件
 
 1. ``` aria2 ``` 用于缓存歌曲
 2. ``` python-keybinder ``` 用于支持全局快捷键
 3. ``` libnotify-bin ``` 用于支持消息提示
-4. ``` pyqt python-dbus dbns qt(with-d-bus) ``` 用于支持桌面歌词
+4. ``` pyqt python-dbus dbus qt ``` 用于支持桌面歌词 (Mac 用户需要 ```brew
+   install qt --with-d-bus``` 获取支持 DBus 的 Qt.)
 
 配置文件地址: ``` ~/.netease-musicbox ``` 可配置缓存，快捷键，消息，歌词
 由于歌曲 API 只接受中国大陆地区访问，港澳台及海外用户请自行在```config.json```中设置代理
 
 ```
 "mpg123_parameters": {
-    "default": [], 
-    "describe": "The additional parameters when mpg123 start.", 
+    "default": [],
+    "describe": "The additional parameters when mpg123 start.",
     "value": ["-p", "http://ip:port"]
 }
 ```
@@ -106,13 +112,14 @@ NetEase-MusicBox
 	<tr> <td>CentOS</td> <td>7</td> </tr>
 	<tr> <td>openSUSE</td> <td>13.2</td> </tr>
 	<tr> <td>Fedora</td> <td>22</td> </tr>
+	<tr> <td>Arch</td> <td>Rolling</td> </tr>
 </table>
 
 
 #### 错误处理
 
 1. pkg_resources.DistributionNotFound: requests
-	
+
 	$ sudo pip install requests
 
     如果是运行 $ musicbox 出错
@@ -124,11 +131,11 @@ NetEase-MusicBox
 	$ sudo apt-get install python-pip
 
 3. ImportError: No module named setuptools
-    
+
     $ sudo easy_install pip
-    
+
     $ sudo apt-get install python-setuptools
-	
+
 ### 使用
 
 	$ musicbox
@@ -182,7 +189,7 @@ Enjoy it !
 
 [更多>>](Change Log.md)
 
-### The MIT License (MIT) 
+### The MIT License (MIT)
 
 CopyRight (c) 2015 omi  &lt;<a href="4399.omi@gmail.com">4399.omi@gmail.com</a>&gt;
 
@@ -203,5 +210,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-
