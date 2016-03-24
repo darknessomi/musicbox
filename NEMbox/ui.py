@@ -181,8 +181,11 @@ class Ui:
                                 self.now_lyric = tline + " || " + self.now_lyric
         self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
         if dbus_activity and self.config.get_item("osdlyrics"):
-            bus = dbus.SessionBus().get_object('org.musicbox.Bus', '/')
-            bus.refresh_lyrics(self.now_lyric, dbus_interface="local.musicbox.Lyrics")
+            try:
+                bus = dbus.SessionBus().get_object('org.musicbox.Bus', '/')
+                bus.refresh_lyrics(self.now_lyric, dbus_interface="local.musicbox.Lyrics")
+            except:
+                pass
         self.screen.addstr(4, self.startcol - 2, str(self.now_lyric), curses.color_pair(3))
         self.screen.refresh()
 

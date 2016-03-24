@@ -12,7 +12,7 @@ import argparse
 from osdlyrics import show_lyrics_new_process
 import sys
 
-version = "0.2.1.8"
+version = "0.2.2.0"
 
 
 def start():

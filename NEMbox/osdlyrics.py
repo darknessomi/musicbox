@@ -48,6 +48,7 @@ if  pyqt_activity:
             qp.setFont(QtGui.QFont(osdlyrics_font[0], osdlyrics_font[1]))
             qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
+
     class LyricsAdapter(QtDBus.QDBusAbstractAdaptor):
         QtCore.Q_CLASSINFO("D-Bus Interface", "local.musicbox.Lyrics")
         QtCore.Q_CLASSINFO("D-Bus Introspection",
@@ -75,7 +76,7 @@ if  pyqt_activity:
             QtDBus.QDBusConnection.sessionBus().registerObject('/', lyrics)
             sys.exit(app.exec_())
         except:
-            return 0
+            pass
 
 def show_lyrics_new_process():
     if  pyqt_activity and config.get_item("osdlyrics"):

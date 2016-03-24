@@ -130,20 +130,20 @@ class Menu:
     def update_alert(self, version):
         latest = Menu().check_version()
         if latest != version and latest != 0:
-            self.notify("MusicBox Update is available", 1)
+            notify("MusicBox Update is available", 1)
             time.sleep(0.5)
-            self.notify("NetEase-MusicBox installed version:" + version + "\nNetEase-MusicBox latest version:" + latest, 0)
+            notify("NetEase-MusicBox installed version:" + version + "\nNetEase-MusicBox latest version:" + latest, 0)
 
     def check_version(self):
         # 检查更新 && 签到
         try:
             mobilesignin = self.netease.daily_signin(0)
             if mobilesignin != -1 and mobilesignin['code'] != -2:
-                self.notify("Mobile signin success", 1)
+                notify("Mobile signin success", 1)
             time.sleep(0.5)
             pcsignin = self.netease.daily_signin(1)
             if pcsignin != -1 and pcsignin['code'] != -2:
-                self.notify("PC signin success", 1)
+                notify("PC signin success", 1)
             tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version())))
             root = tree.getroot()
             return root[0][4][0][0].text
