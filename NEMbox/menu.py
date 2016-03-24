@@ -20,6 +20,7 @@ import webbrowser
 from api import NetEase
 from player import Player
 from ui import Ui
+from osdlyrics import show_lyrics_new_process
 from const import Constant
 from config import Config
 import logger
@@ -188,6 +189,7 @@ class Menu:
             keybinder.bind(self.config.get_item("global_play_pause"), self.play_pause)
             keybinder.bind(self.config.get_item("global_next"), self.next_song)
             keybinder.bind(self.config.get_item("global_previous"), self.previous_song)
+        show_lyrics_new_process()
         while True:
             datatype = self.datatype
             title = self.title

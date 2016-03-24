@@ -82,6 +82,7 @@ def show_lyrics_new_process():
     if  pyqt_activity and config.get_item("osdlyrics"):
         try:
             p = Process(target=show_lyrics)
+            p.daemon = True
             p.start()
         except:
             pass
