@@ -18,11 +18,17 @@ from scrollstring import *
 from storage import Storage
 from config import Config
 import logger
-import os
-import platform
+from utils import notify
 
 log = logger.getLogger(__name__)
 
+try:
+    import dbus
+    dbus_activity = True
+except ImportError:
+    dbus_activity = False
+    log.warn("dbus module not installed.")
+    log.warn("Osdlyrics Not Available.")
 
 def escape_quote(text):
     return text.replace('\'', '\\\'').replace('\"', '\'\'')
@@ -58,15 +64,9 @@ class Ui:
 
     def notify(self, summary, song, album, artist):
         if summary != "disable":
-            cmd = ""
             body = "%s\nin %s by %s" % (song, album, artist)
-            if platform.system() == "Darwin":
-                content = escape_quote(summary + ': ' + body)
-                cmd = '/usr/bin/osascript -e $\'display notification "' + content + '"\''
-            else:
-                cmd = '/usr/bin/notify-send -a NetEase-MusicBox "%s" "%s"' % (summary, body)
-
-            os.system(cmd)
+            content = escape_quote(summary + ': ' + body)
+            notify(content)
 
     def build_playinfo(self, song_name, artist, album_name, quality, start, pause=False):
         curses.noecho()
@@ -180,6 +180,12 @@ class Ui:
                             if key in tline and self.config.get_item("translation"):
                                 self.now_lyric = tline + " || " + self.now_lyric
         self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
+        if dbus_activity and self.config.get_item("osdlyrics"):
+            try:
+                bus = dbus.SessionBus().get_object('org.musicbox.Bus', '/')
+                bus.refresh_lyrics(self.now_lyric, dbus_interface="local.musicbox.Lyrics")
+            except:
+                pass
         self.screen.addstr(4, self.startcol - 2, str(self.now_lyric), curses.color_pair(3))
         self.screen.refresh()
 

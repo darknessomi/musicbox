@@ -9,14 +9,16 @@ import curses
 import traceback
 from menu import Menu
 import argparse
+from osdlyrics import show_lyrics_new_process
 import sys
 
-version = "0.2.1.8"
+version = "0.2.2.0"
 
 
 def start():
     nembox_menu = Menu()
     try:
+        show_lyrics_new_process()
         nembox_menu.start_fork(version)
     except:
         # clean up terminal while failed
