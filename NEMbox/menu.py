@@ -17,7 +17,6 @@ import sys
 import os
 import time
 import webbrowser
-import platform
 from api import NetEase
 from player import Player
 from ui import Ui
@@ -25,6 +24,7 @@ from const import Constant
 from config import Config
 import logger
 import signal
+from utils import notify
 from storage import Storage
 from cache import Cache
 try:
@@ -85,7 +85,6 @@ shortcut = [
     ["w", 'Quit&Clear', '退出并清除用户信息']
 ]
 
-
 class Menu:
     def __init__(self):
         reload(sys)
@@ -116,18 +115,6 @@ class Menu:
         signal.signal(signal.SIGWINCH, self.change_term)
         signal.signal(signal.SIGINT, self.send_kill)
         self.START = time.time()
-
-    def notify(self, msg, type):
-        if type == 0:
-            if platform.system() == 'Darwin':
-                os.system('/usr/bin/osascript -e \'display notification "' + msg + '"\'')
-            else:
-                os.system('/usr/bin/notify-send "' + msg + '"')
-        else:
-            if platform.system() == 'Darwin':
-                os.system('/usr/bin/osascript -e \'display notification "' + msg + '"sound name "/System/Library/Sounds/Ping.aiff"\'')
-            else:
-                os.system('/usr/bin/notify-send "' + msg + '"')
 
     def change_term(self, signum, frame):
         self.ui.screen.clear()
@@ -352,9 +339,9 @@ class Menu:
             elif key == ord(','):
                 return_data = self.request_api(self.netease.fm_like, self.player.get_playing_id())
                 if return_data != -1:
-                    self.notify("Added successfully!", 0)
+                    notify("Added successfully!", 0)
                 else:
-                    self.notify("Existing song!", 0)
+                    notify("Existing song!", 0)
 
             # 删除FM
             elif key == ord('.'):
@@ -364,7 +351,7 @@ class Menu:
                     self.player.next()
                     return_data = self.request_api(self.netease.fm_trash, self.player.get_playing_id())
                     if return_data != -1:
-                        self.notify("Deleted successfully!", 0)
+                        notify("Deleted successfully!", 0)
                     time.sleep(0.1)
 
             # 下一FM
@@ -438,7 +425,7 @@ class Menu:
             elif key == ord('s'):
                 if (datatype == 'songs' or datatype == 'djchannels') and len(datalist) != 0:
                     self.collection.append(datalist[idx])
-                    self.notify("Added successfully", 0)
+                    notify("Added successfully", 0)
 
             # 加载收藏歌曲
             elif key == ord('c'):
