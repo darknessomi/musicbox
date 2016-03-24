@@ -71,10 +71,11 @@ if  pyqt_activity:
         def drawText(self, event, qp):
             osdlyrics_color = config.get_item("osdlyrics_color")
             osdlyrics_font = config.get_item("osdlyrics_font")
-            qp.setPen(QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1], osdlyrics_color[2]))
-            qp.setFont(QtGui.QFont(osdlyrics_font[0], osdlyrics_font[1]))
+            font = QtGui.QFont(osdlyrics_font[0], osdlyrics_font[1])
+            pen = QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1], osdlyrics_color[2])
+            qp.setFont(font)
+            qp.setPen(pen)
             qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
-
 
     class LyricsAdapter(QtDBus.QDBusAbstractAdaptor):
         QtCore.Q_CLASSINFO("D-Bus Interface", "local.musicbox.Lyrics")
