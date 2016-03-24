@@ -18,7 +18,7 @@ class Config(Singleton):
         self.const = Constant()
         self.config_file_path = self.const.conf_dir + "/config.json"
         self.default_config = {
-            "version": 4,
+            "version": 5,
             "cache": {
                 "value": False,
                 "default": False,
@@ -67,6 +67,11 @@ class Config(Singleton):
                 "value": True,
                 "default": True,
                 "describe": "Foreign language lyrics translation."
+            },
+            "osdlyrics": {
+                "value": False,
+                "default": False,
+                "describe": "Desktop lyrics for musicbox."
             }
 
         }
@@ -137,6 +142,13 @@ class Config(Singleton):
                     "value": True,
                     "default": True,
                     "describe": "Foreign language lyrics translation."
+                }
+            elif self.config["version"] == 4:
+                self.config["version"] = 5
+                self.config["osdlyrics"] = {
+                    "value": False,
+                    "default": False,
+                    "describe": "Desktop lyrics for musicbox."
                 }
             self.check_version()
             return False

@@ -6,9 +6,12 @@
 import sys
 import os
 import logger
+from config import Config
 from multiprocessing import Process
 
 log = logger.getLogger(__name__)
+
+config = Config()
 
 try:
     from PyQt4 import QtGui, QtCore, QtDBus
@@ -22,6 +25,7 @@ if  pyqt_activity:
     class Lyrics(QtGui.QWidget):
         def __init__(self):
             super(Lyrics, self).__init__()
+            self.__dbusAdaptor = LyricsAdapter(self)
             self.initUI()
 
         def initUI(self):
@@ -30,11 +34,6 @@ if  pyqt_activity:
             self.text = u"OSD Lyrics for Musicbox"
             self.setWindowTitle("Lyrics")
             self.show()
-
-        @QtCore.pyqtSlot(str)
-        def refresh_lyrics(self, text):
-            self.text = text
-            self.repaint()
 
         def paintEvent(self, event):
             qp = QtGui.QPainter()
@@ -47,16 +46,33 @@ if  pyqt_activity:
             qp.setFont(QtGui.QFont('Decorative', 16))
             qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
+    class LyricsAdapter(QtDBus.QDBusAbstractAdaptor):
+        QtCore.Q_CLASSINFO("D-Bus Interface", "local.musicbox.Lyrics")
+        QtCore.Q_CLASSINFO("D-Bus Introspection",
+        '  <interface name="local.musicbox.Lyrics">\n'
+        '    <method name="refresh_lyrics">\n'
+        '      <arg direction="in" type="s" name="lyric"/>\n'
+        '    </method>\n'
+        '  </interface>\n')
+
+        def __init__(self, parent):
+            super(LyricsAdapter, self).__init__(parent)
+
+        @QtCore.pyqtSlot(str)
+        def refresh_lyrics(self, text):
+            self.parent().text = text
+            self.parent().repaint()
+
+
     def show_lyrics():
         app = QtGui.QApplication(sys.argv)
         # lyrics_receiver = LyricsReceiver()
         lyrics = Lyrics()
         QtDBus.QDBusConnection.sessionBus().registerService('org.musicbox.Bus')
-        QtDBus.QDBusConnection.sessionBus().registerObject('/', lyrics, QtDBus.QDBusConnection.ExportAllSlots)
+        QtDBus.QDBusConnection.sessionBus().registerObject('/', lyrics)
         sys.exit(app.exec_())
 
 def show_lyrics_new_process():
-    if  pyqt_activity:
+    if  pyqt_activity and config.get_item("osdlyrics"):
         p = Process(target=show_lyrics)
         p.start()
-        # p.join()
