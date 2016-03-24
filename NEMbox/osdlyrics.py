@@ -39,6 +39,7 @@ if  pyqt_activity:
             self.setFocusPolicy(QtCore.Qt.NoFocus)
             self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
             self.setWindowFlags(QtCore.Qt.X11BypassWindowManagerHint)
+            self.setMinimumSize(600,50)
             self.resize(600, 60)
             scn = QtGui.QApplication.desktop().screenNumber(QtGui.QApplication.desktop().cursor().pos())
             br = QtGui.QApplication.desktop().screenGeometry(scn).bottomRight()
@@ -57,6 +58,9 @@ if  pyqt_activity:
                 diff = event.pos() - self.mpos;
                 newpos = self.pos() + diff
                 self.move(newpos)
+
+        def wheelEvent(self, event):
+            self.resize(self.width()+event.delta(), self.height())
 
         def paintEvent(self, event):
             qp = QtGui.QPainter()
