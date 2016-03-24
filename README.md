@@ -74,10 +74,15 @@ NetEase-MusicBox
 	$ brew install mpg123
 
 ### Linux安装
+#### Ubuntu/Debian
 
 	$ sudo pip2 install NetEase-MusicBox
 
 	$ sudo apt-get install mpg123
+
+#### Arch Linux
+
+    $ pacaur -S netease-musicbox-git
 
 #### 可选功能依赖 && 配置文件
 
