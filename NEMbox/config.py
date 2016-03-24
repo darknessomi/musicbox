@@ -72,8 +72,17 @@ class Config(Singleton):
                 "value": False,
                 "default": False,
                 "describe": "Desktop lyrics for musicbox."
-            }
-
+            },
+            "osdlyrics_color": {
+                "value": [128, 0, 128],
+                "default": [128, 0, 128],
+                "describe": "Desktop lyrics RGB Color."
+            },
+            "osdlyrics_font": {
+                "value": ['Decorative', 16],
+                "default": ['Decorative', 16],
+                "describe": "Desktop lyrics font-family and font-size."
+            },
         }
         self.config = {}
         if not os.path.isfile(self.config_file_path):
@@ -149,6 +158,16 @@ class Config(Singleton):
                     "value": False,
                     "default": False,
                     "describe": "Desktop lyrics for musicbox."
+                }
+                self.config["osdlyrics_color"] = {
+                    "value": [128, 0, 128],
+                    "default": [128, 0, 128],
+                    "describe": "Desktop lyrics RGB Color."
+                }
+                self.config["osdlyrics_font"] = {
+                    "value": ['Decorative', 16],
+                    "default": ['Decorative', 16],
+                    "describe": "Desktop lyrics font-family and font-size."
                 }
             self.check_version()
             return False

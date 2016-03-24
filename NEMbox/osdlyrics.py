@@ -42,8 +42,10 @@ if  pyqt_activity:
             qp.end()
 
         def drawText(self, event, qp):
-            qp.setPen(QtGui.QColor(128, 0, 128))
-            qp.setFont(QtGui.QFont('Decorative', 16))
+            osdlyrics_color = config.get_item("osdlyrics_color")
+            osdlyrics_font = config.get_item("osdlyrics_font")
+            qp.setPen(QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1], osdlyrics_color[2]))
+            qp.setFont(QtGui.QFont(osdlyrics_font[0], osdlyrics_font[1]))
             qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
 
     class LyricsAdapter(QtDBus.QDBusAbstractAdaptor):
@@ -65,12 +67,15 @@ if  pyqt_activity:
 
 
     def show_lyrics():
-        app = QtGui.QApplication(sys.argv)
-        # lyrics_receiver = LyricsReceiver()
-        lyrics = Lyrics()
-        QtDBus.QDBusConnection.sessionBus().registerService('org.musicbox.Bus')
-        QtDBus.QDBusConnection.sessionBus().registerObject('/', lyrics)
-        sys.exit(app.exec_())
+        try:
+            app = QtGui.QApplication(sys.argv)
+            # lyrics_receiver = LyricsReceiver()
+            lyrics = Lyrics()
+            QtDBus.QDBusConnection.sessionBus().registerService('org.musicbox.Bus')
+            QtDBus.QDBusConnection.sessionBus().registerObject('/', lyrics)
+            sys.exit(app.exec_())
+        except:
+            return 0
 
 def show_lyrics_new_process():
     if  pyqt_activity and config.get_item("osdlyrics"):
