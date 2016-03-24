@@ -31,7 +31,8 @@ if  pyqt_activity:
         def initUI(self):
             self.setStyleSheet("background:" + config.get_item("osdlyrics_background"))
             self.setAttribute(QtCore.Qt.WA_NoSystemBackground)
-            self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+            if config.get_item("osdlyrics_transparent"):
+                self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
             # self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
             self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
             self.setAttribute(QtCore.Qt.WA_X11DoNotAcceptFocus)

@@ -73,6 +73,11 @@ class Config(Singleton):
                 "default": False,
                 "describe": "Desktop lyrics for musicbox."
             },
+            "osdlyrics_transparent": {
+                "value": False,
+                "default": False,
+                "describe": "Desktop lyrics transparent bg."
+            },
             "osdlyrics_color": {
                 "value": [225, 248, 113],
                 "default": [225, 248, 113],
