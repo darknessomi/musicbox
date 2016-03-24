@@ -84,8 +84,9 @@ NetEase-MusicBox
 1. ``` aria2 ``` 用于缓存歌曲
 2. ``` python-keybinder ``` 用于支持全局快捷键
 3. ``` libnotify-bin ``` 用于支持消息提示
+4. ``` pyqt python-dbus dbns qt(with-d-bus) ``` 用于支持桌面歌词
 
-配置文件地址: ``` ~/.netease-musicbox ```  
+配置文件地址: ``` ~/.netease-musicbox ``` 可配置缓存，快捷键，消息，歌词
 由于歌曲 API 只接受中国大陆地区访问，港澳台及海外用户请自行在```config.json```中设置代理
 
 ```
@@ -136,6 +137,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2016-03-24 版本 0.2.2.0    新增桌面歌词功能
 
 2016-03-10 版本 0.2.1.6    已知错误修复，代码优化
 
