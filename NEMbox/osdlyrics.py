@@ -30,10 +30,32 @@ if  pyqt_activity:
 
         def initUI(self):
             self.setStyleSheet("background:" + config.get_item("osdlyrics_background"))
+            self.setAttribute(QtCore.Qt.WA_NoSystemBackground)
+            self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+            # self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
+            self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
+            self.setAttribute(QtCore.Qt.WA_X11DoNotAcceptFocus)
+            self.setFocusPolicy(QtCore.Qt.NoFocus)
+            self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+            self.setWindowFlags(QtCore.Qt.X11BypassWindowManagerHint)
             self.resize(600, 60)
+            scn = QtGui.QApplication.desktop().screenNumber(QtGui.QApplication.desktop().cursor().pos())
+            br = QtGui.QApplication.desktop().screenGeometry(scn).bottomRight()
+            frameGeo = self.frameGeometry()
+            frameGeo.moveBottomRight(br)
+            self.move(frameGeo.topLeft())
             self.text = u"OSD Lyrics for Musicbox"
             self.setWindowTitle("Lyrics")
             self.show()
+
+        def mousePressEvent(self, event):
+            self.mpos = event.pos()
+
+        def mouseMoveEvent(self, event):
+            if (event.buttons() and QtCore.Qt.LeftButton):
+                diff = event.pos() - self.mpos;
+                newpos = self.pos() + diff
+                self.move(newpos)
 
         def paintEvent(self, event):
             qp = QtGui.QPainter()
