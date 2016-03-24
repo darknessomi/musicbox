@@ -75,7 +75,7 @@ if  pyqt_activity:
             pen = QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1], osdlyrics_color[2])
             qp.setFont(font)
             qp.setPen(pen)
-            qp.drawText(event.rect(), QtCore.Qt.AlignCenter, self.text)
+            qp.drawText(event.rect(), QtCore.Qt.AlignCenter | QtCore.Qt.TextWordWrap, self.text)
 
     class LyricsAdapter(QtDBus.QDBusAbstractAdaptor):
         QtCore.Q_CLASSINFO("D-Bus Interface", "local.musicbox.Lyrics")
