@@ -167,7 +167,10 @@ class Ui:
             self.storage.database["player_info"]["player_list"][self.storage.database["player_info"]["idx"]]
         ]
         if 'lyric' not in song.keys() or len(song["lyric"]) <= 0:
-            self.now_lyric = "[00:00.00]暂无歌词 ~>_<~ \n"
+            self.now_lyric = "暂无歌词 ~>_<~ \n"
+            if dbus_activity and self.config.get_item("osdlyrics"):
+                self.now_playing = song['song_name'] + " - " + song['artist'] + "\n"
+
         else:
             key = now_minute + ":" + now_second
             for line in song["lyric"]:
@@ -183,7 +186,10 @@ class Ui:
         if dbus_activity and self.config.get_item("osdlyrics"):
             try:
                 bus = dbus.SessionBus().get_object('org.musicbox.Bus', '/')
-                bus.refresh_lyrics(self.now_lyric, dbus_interface="local.musicbox.Lyrics")
+                if self.now_lyric == "暂无歌词 ~>_<~ \n":
+                    bus.refresh_lyrics(self.now_playing, dbus_interface="local.musicbox.Lyrics")
+                else:
+                    bus.refresh_lyrics(self.now_lyric, dbus_interface="local.musicbox.Lyrics")
             except:
                 pass
         self.screen.addstr(4, self.startcol - 2, str(self.now_lyric), curses.color_pair(3))
