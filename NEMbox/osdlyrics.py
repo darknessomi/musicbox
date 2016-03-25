@@ -30,15 +30,17 @@ if  pyqt_activity:
 
         def initUI(self):
             self.setStyleSheet("background:" + config.get_item("osdlyrics_background"))
-            # self.setAttribute(QtCore.Qt.WA_NoSystemBackground)
             if config.get_item("osdlyrics_transparent"):
                 self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-            # self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
             self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
             self.setAttribute(QtCore.Qt.WA_X11DoNotAcceptFocus)
             self.setFocusPolicy(QtCore.Qt.NoFocus)
             self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-            self.setWindowFlags(QtCore.Qt.X11BypassWindowManagerHint)
+            if config.get_item("osdlyrics_on_top"):
+                self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+            else:
+                if config.get_item("osdlyrics_window_border"):
+                    self.setWindowFlags(QtCore.Qt.X11BypassWindowManagerHint)
             self.setMinimumSize(600,50)
             self.resize(600, 60)
             scn = QtGui.QApplication.desktop().screenNumber(QtGui.QApplication.desktop().cursor().pos())

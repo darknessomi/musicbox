@@ -18,7 +18,7 @@ class Config(Singleton):
         self.const = Constant()
         self.config_file_path = self.const.conf_dir + "/config.json"
         self.default_config = {
-            "version": 5,
+            "version": 6,
             "cache": {
                 "value": False,
                 "default": False,
@@ -92,6 +92,16 @@ class Config(Singleton):
                 "value": "rgba(100, 100, 100, 120)",
                 "default": "rgba(100, 100, 100, 120)",
                 "describe": "Desktop lyrics background color."
+            },
+            "osdlyrics_on_top": {
+                "value": True,
+                "default": True,
+                "describe": "Desktop lyrics OnTopHint."
+            },
+            "osdlyrics_window_border": {
+                "value": True,
+                "default": True,
+                "describe": "Desktop lyrics show window border."
             },
         }
         self.config = {}
@@ -188,6 +198,18 @@ class Config(Singleton):
                     "value": False,
                     "default": False,
                     "describe": "Desktop lyrics transparent bg."
+                }
+            elif self.config["version"] == 5:
+                self.config["version"] = 6
+                self.config["osdlyrics_on_top"] = {
+                    "value": True,
+                    "default": True,
+                    "describe": "Desktop lyrics OnTopHint."
+                }
+                self.config["osdlyrics_window_border"] = {
+                    "value": True,
+                    "default": True,
+                    "describe": "Desktop lyrics show window border."
                 }
             self.check_version()
             return False
