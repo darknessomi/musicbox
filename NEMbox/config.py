@@ -18,7 +18,7 @@ class Config(Singleton):
         self.const = Constant()
         self.config_file_path = self.const.conf_dir + "/config.json"
         self.default_config = {
-            "version": 4,
+            "version": 5,
             "cache": {
                 "value": False,
                 "default": False,
@@ -67,8 +67,32 @@ class Config(Singleton):
                 "value": True,
                 "default": True,
                 "describe": "Foreign language lyrics translation."
-            }
-
+            },
+            "osdlyrics": {
+                "value": False,
+                "default": False,
+                "describe": "Desktop lyrics for musicbox."
+            },
+            "osdlyrics_transparent": {
+                "value": False,
+                "default": False,
+                "describe": "Desktop lyrics transparent bg."
+            },
+            "osdlyrics_color": {
+                "value": [225, 248, 113],
+                "default": [225, 248, 113],
+                "describe": "Desktop lyrics RGB Color."
+            },
+            "osdlyrics_font": {
+                "value": ['Decorative', 16],
+                "default": ['Decorative', 16],
+                "describe": "Desktop lyrics font-family and font-size."
+            },
+            "osdlyrics_background": {
+                "value": "rgba(100, 100, 100, 120)",
+                "default": "rgba(100, 100, 100, 120)",
+                "describe": "Desktop lyrics background color."
+            },
         }
         self.config = {}
         if not os.path.isfile(self.config_file_path):
@@ -137,6 +161,33 @@ class Config(Singleton):
                     "value": True,
                     "default": True,
                     "describe": "Foreign language lyrics translation."
+                }
+            elif self.config["version"] == 4:
+                self.config["version"] = 5
+                self.config["osdlyrics"] = {
+                    "value": False,
+                    "default": False,
+                    "describe": "Desktop lyrics for musicbox."
+                }
+                self.config["osdlyrics_color"] = {
+                    "value": [225, 248, 113],
+                    "default": [225, 248, 113],
+                    "describe": "Desktop lyrics RGB Color."
+                }
+                self.config["osdlyrics_font"] = {
+                    "value": ['Decorative', 16],
+                    "default": ['Decorative', 16],
+                    "describe": "Desktop lyrics font-family and font-size."
+                }
+                self.config["osdlyrics_background"] = {
+                    "value": "rgba(100, 100, 100, 120)",
+                    "default": "rgba(100, 100, 100, 120)",
+                    "describe": "Desktop lyrics background color."
+                }
+                self.config["osdlyrics_transparent"] = {
+                    "value": False,
+                    "default": False,
+                    "describe": "Desktop lyrics transparent bg."
                 }
             self.check_version()
             return False
