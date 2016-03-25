@@ -30,7 +30,7 @@ if  pyqt_activity:
 
         def initUI(self):
             self.setStyleSheet("background:" + config.get_item("osdlyrics_background"))
-            self.setAttribute(QtCore.Qt.WA_NoSystemBackground)
+            # self.setAttribute(QtCore.Qt.WA_NoSystemBackground)
             if config.get_item("osdlyrics_transparent"):
                 self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
             # self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
@@ -55,7 +55,7 @@ if  pyqt_activity:
 
         def mouseMoveEvent(self, event):
             if (event.buttons() and QtCore.Qt.LeftButton):
-                diff = event.pos() - self.mpos;
+                diff = event.pos() - self.mpos
                 newpos = self.pos() + diff
                 self.move(newpos)
 

@@ -184,6 +184,11 @@ class Config(Singleton):
                     "default": "rgba(100, 100, 100, 120)",
                     "describe": "Desktop lyrics background color."
                 }
+                self.config["osdlyrics_transparent"] = {
+                    "value": False,
+                    "default": False,
+                    "describe": "Desktop lyrics transparent bg."
+                }
             self.check_version()
             return False
 

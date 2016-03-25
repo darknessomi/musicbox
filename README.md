@@ -25,9 +25,10 @@ NetEase-MusicBox
 8. 随心打碟
 9. 本地收藏，随时加❤
 10. 播放进度及播放模式显示
-11. Vimer式快捷键让操作丝般顺滑
-12. 可使用数字快捷键
-13. 可使用自定义全局快捷键
+11. 现在播放及桌面歌词显示
+12. Vimer式快捷键让操作丝般顺滑
+13. 可使用数字快捷键
+14. 可使用自定义全局快捷键
 
 ### 键盘快捷键
 
@@ -74,6 +75,7 @@ NetEase-MusicBox
 	$ brew install mpg123
 
 ### Linux安装
+
 #### Ubuntu/Debian
 
 	$ sudo pip2 install NetEase-MusicBox
@@ -90,7 +92,7 @@ NetEase-MusicBox
 2. ``` python-keybinder ``` 用于支持全局快捷键
 3. ``` libnotify-bin ``` 用于支持消息提示
 4. ``` pyqt python-dbus dbus qt ``` 用于支持桌面歌词 (Mac 用户需要 ```brew
-   install qt --with-d-bus``` 获取支持 DBus 的 Qt.)
+   install qt --with-d-bus``` 获取支持 DBus 的 Qt)
 
 配置文件地址: ``` ~/.netease-musicbox ``` 可配置缓存，快捷键，消息，歌词
 由于歌曲 API 只接受中国大陆地区访问，港澳台及海外用户请自行在```config.json```中设置代理
@@ -145,7 +147,7 @@ Enjoy it !
 
 ### 更新日志
 
-2016-03-24 版本 0.2.2.0    新增桌面歌词功能
+2016-03-25 版本 0.2.2.0    新增桌面歌词功能
 
 2016-03-10 版本 0.2.1.6    已知错误修复，代码优化
 
