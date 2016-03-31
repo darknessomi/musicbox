@@ -341,7 +341,7 @@ class NetEase:
             'type': stype,
             'offset': offset,
             'total': total,
-            'limit': 60
+            'limit': limit
         }
         return self.httpRequest('POST', action, data)
 
