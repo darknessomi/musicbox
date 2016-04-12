@@ -35,12 +35,10 @@ if  pyqt_activity:
             self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
             self.setAttribute(QtCore.Qt.WA_X11DoNotAcceptFocus)
             self.setFocusPolicy(QtCore.Qt.NoFocus)
-            self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
             if config.get_item("osdlyrics_on_top"):
-                self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+                self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.X11BypassWindowManagerHint)
             else:
-                if config.get_item("osdlyrics_window_border"):
-                    self.setWindowFlags(QtCore.Qt.X11BypassWindowManagerHint)
+                self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
             self.setMinimumSize(600,50)
             self.resize(600, 60)
             scn = QtGui.QApplication.desktop().screenNumber(QtGui.QApplication.desktop().cursor().pos())

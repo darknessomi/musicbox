@@ -98,11 +98,6 @@ class Config(Singleton):
                 "default": True,
                 "describe": "Desktop lyrics OnTopHint."
             },
-            "osdlyrics_window_border": {
-                "value": True,
-                "default": True,
-                "describe": "Desktop lyrics show window border."
-            },
         }
         self.config = {}
         if not os.path.isfile(self.config_file_path):
@@ -205,11 +200,6 @@ class Config(Singleton):
                     "value": True,
                     "default": True,
                     "describe": "Desktop lyrics OnTopHint."
-                }
-                self.config["osdlyrics_window_border"] = {
-                    "value": True,
-                    "default": True,
-                    "describe": "Desktop lyrics show window border."
                 }
             self.check_version()
             return False
