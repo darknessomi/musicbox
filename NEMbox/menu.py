@@ -541,7 +541,6 @@ class Menu:
 
         # 全站置顶歌单包含的歌曲
         elif datatype == 'top_playlists':
-            log.debug(datalist)
             playlist_id = datalist[idx]['playlist_id']
             songs = netease.playlist_detail(playlist_id)
             self.datatype = 'songs'
@@ -555,7 +554,6 @@ class Menu:
             self.datatype = 'playlist_class_detail'
             self.datalist = netease.dig_info(data, self.datatype)
             self.title += ' > ' + data
-            log.debug(self.datalist)
 
         # 某一分类的详情
         elif datatype == 'playlist_class_detail':
@@ -563,7 +561,6 @@ class Menu:
             data = self.datalist[idx]
             self.datatype = 'top_playlists'
             self.datalist = netease.dig_info(netease.top_playlists(data), self.datatype)
-            log.debug(self.datalist)
             self.title += ' > ' + data
 
         # 歌曲榜单
