@@ -29,8 +29,8 @@ class Cache(Singleton):
         self.downloading = []
         self.aria2c = None
         self.stop = False
-        self.enable = self.config.get_item("cache")
-        self.aria2c_parameters = self.config.get_item("aria2c_parameters")
+        self.enable = self.config.get_item('cache')
+        self.aria2c_parameters = self.config.get_item('aria2c_parameters')
 
     def start_download(self):
         check = self.download_lock.acquire(False)
@@ -53,7 +53,7 @@ class Cache(Singleton):
             url = data[3]
             onExit = data[4]
             output_path = Constant.download_dir
-            output_file = str(artist) + " - " + str(song_name) + ".mp3"
+            output_file = str(artist) + ' - ' + str(song_name) + '.mp3'
             try:
                 para = ['aria2c', '--auto-file-renaming=false',
                         '--allow-overwrite=true', '-d', output_path, '-o',
@@ -65,10 +65,10 @@ class Cache(Singleton):
                                                stderr=subprocess.PIPE)
                 self.aria2c.wait()
             except Exception:
-                log.debug(str(song_id) + " Cache Error")
+                log.debug(str(song_id) + ' Cache Error')
             if self.aria2c.returncode == 0:
-                log.debug(str(song_id) + " Cache OK")
-                onExit(song_id, output_path + "/" + output_file)
+                log.debug(str(song_id) + ' Cache OK')
+                onExit(song_id, output_path + '/' + output_file)
         self.download_lock.release()
 
     def add(self, song_id, song_name, artist, url, onExit):
