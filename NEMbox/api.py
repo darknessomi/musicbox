@@ -24,6 +24,7 @@ import random
 import base64
 from config import Config
 from storage import Storage
+from utils import notify
 
 # 歌曲榜单地址
 top_list_all = {
@@ -133,6 +134,13 @@ def geturl(song):
     song_id = str(music['dfsId'])
     enc_id = encrypted_id(song_id)
     url = "http://m%s.music.126.net/%s/%s.mp3" % (random.randrange(1, 3), enc_id, song_id)
+    return url, quality
+
+def geturl_new_api(song):
+    br_to_quality = {128000: 'MD 128k', 320000: 'HD 320k'}
+    alter = NetEase().songs_detail_new_api([song['id']])[0]
+    url = alter['url']
+    quality = br_to_quality.get(alter['br'], '')
     return url, quality
 
 
@@ -444,6 +452,24 @@ class NetEase:
         except:
             return []
 
+    def songs_detail_new_api(self, music_ids, bit_rate=320000):
+        action = 'http://music.163.com/weapi/song/enhance/player/url?csrf_token='
+        self.session.cookies.load()
+        csrf = ""
+        for cookie in self.session.cookies:
+            if cookie.name == "__csrf":
+                csrf = cookie.value
+        if csrf == "":
+            notify("You Need Login", 1)
+        action += csrf
+        data = {"ids": music_ids, "br": bit_rate, "csrf_token": csrf}
+        connection = self.session.post(action,
+                                       data=encrypted_request(data),
+                                       headers=self.header, )
+        result = json.loads(connection.content)
+        return result['data']
+
+
     # song id --> song url ( details )
     def song_detail(self, music_id):
         action = "http://music.163.com/api/song/detail/?id=" + str(music_id) + "&ids=[" + str(music_id) + "]"
@@ -602,3 +628,11 @@ class NetEase:
             temp = self.playlist_class_dict[data]
 
         return temp
+
+if __name__ == '__main__':
+    ne = NetEase()
+    print geturl_new_api(ne.songs_detail([27902910])[0]) #MD 128k, fallback
+    print ne.songs_detail_new_api([27902910])[0]['url']
+    print ne.songs_detail([405079776])[0]['mp3Url'] #old api
+    print requests.get(ne.songs_detail([405079776])[0][
+        'mp3Url']).status_code  #404
