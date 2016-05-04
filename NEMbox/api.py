@@ -24,6 +24,7 @@ import random
 import base64
 from config import Config
 from storage import Storage
+from utils import notify
 
 # 歌曲榜单地址
 top_list_all = {
@@ -459,7 +460,7 @@ class NetEase:
             if cookie.name == "__csrf":
                 csrf = cookie.value
         if csrf == "":
-            raise Exception('Need login')
+            notify("You Need Login", 1)
         action += csrf
         data = {"ids": music_ids, "br": bit_rate, "csrf_token": csrf}
         connection = self.session.post(action,
