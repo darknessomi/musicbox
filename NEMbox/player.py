@@ -24,9 +24,6 @@ import logger
 
 log = logger.getLogger(__name__)
 
-# carousel x in [left, right]
-carousel = lambda left, right, x: left if (x > right) else (right if x < left else x)
-
 
 class Player:
     def __init__(self):
@@ -51,10 +48,10 @@ class Player:
 
     def popen_recall(self, onExit, popenArgs):
         """
-        Runs the given args in a subprocess.Popen, and then calls the function
+        Runs the given args in subprocess.Popen, and then calls the function
         onExit when the subprocess completes.
-        onExit is a callable object, and popenArgs is a lists/tuple of args that
-        would give to subprocess.Popen.
+        onExit is a callable object, and popenArgs is a lists/tuple of args
+        that would give to subprocess.Popen.
         """
 
         def runInThread(onExit, arg):
@@ -83,7 +80,7 @@ class Player:
                         self.process_first = False
                         self.process_location = 0
                     else:
-                        self.process_location = self.process_length - process_location
+                        self.process_location = self.process_length - process_location  # NOQA
                     continue
                 elif strout[:2] == '@E':
                     # get a alternative url from new api

@@ -161,7 +161,8 @@ class Menu:
             ))))
             root = tree.getroot()
             return root[0][4][0][0].text
-        except:
+        except TypeError as e:
+            log.error(e)
             return 0
 
     def start_fork(self, version):
@@ -200,11 +201,9 @@ class Menu:
             self.config.get_item('global_previous'), self.previous_song)
 
     def unbind_keys(self):
-        keybinder.unbind(
-            self.config.get_item('global_play_pause'))
+        keybinder.unbind(self.config.get_item('global_play_pause'))
         keybinder.unbind(self.config.get_item('global_next'))
-        keybinder.unbind(
-            self.config.get_item('global_previous'))
+        keybinder.unbind(self.config.get_item('global_previous'))
 
     def start(self):
         self.START = time.time() // 1
@@ -290,7 +289,6 @@ class Menu:
                 else:
                     self.index = carousel(offset, min(
                         len(datalist), offset + step) - 1, idx + 1)
-                    log.info(self.index)
                 self.START = time.time()
 
             # 数字快捷键
@@ -419,7 +417,7 @@ class Menu:
                             'player_info']['idx'])
                         time.sleep(0.1)
                         continue
-                except Exception as e:
+                except (TypeError, KeyError) as e:
                     log.error(e)
                     pass
                 # If change to a new playing list. Add playing list and play.
