@@ -66,8 +66,8 @@ def encrypted_id(id):
     magic = bytearray('3go8&$8*3*3h0k(2)2')
     song_id = bytearray(id)
     magic_len = len(magic)
-    for i in xrange(len(song_id)):
-        song_id[i] = song_id[i] ^ magic[i % magic_len]
+    for i, sid in enumerate(song_id):
+        song_id[i] = sid ^ magic[i % magic_len]
     m = hashlib.md5(song_id)
     result = m.digest().encode('base64')[:-1]
     result = result.replace('/', '_')
@@ -116,7 +116,6 @@ def uniq(arr):
 
 # 获取高音质mp3 url
 def geturl(song):
-    config = Config()
     quality = Config().get_item("music_quality")
     if song['hMusic'] and quality <= 0:
         music = song['hMusic']
@@ -184,10 +183,7 @@ class NetEase:
             self.session.cookies.save()
 
     def return_toplists(self):
-        temp = []
-        for i in range(len(top_list_all)):
-            temp.append(top_list_all[i][0])
-        return temp
+        return [l[0] for l in top_list_all.values()]
 
     def httpRequest(self, method, action, query=None, urlencoded=None, callback=None, timeout=None):
         connection = json.loads(self.rawHttpRequest(method, action, query, urlencoded, callback, timeout))
@@ -296,10 +292,7 @@ class NetEase:
             for result in results:
                 song_ids.append(result["id"])
             data = map(self.song_detail, song_ids)
-            result = []
-            for foo in range(len(data)):
-                result.append(data[foo][0])
-            return result
+            return [data[i][0] for i in range(len(data))]
         except:
             return False
 
@@ -572,16 +565,16 @@ class NetEase:
                 temp.append(song_info)
 
         elif dig_type == 'artists':
-            temp = []
+            artists = []
             for i in range(0, len(data)):
                 artists_info = {
                     'artist_id': data[i]['id'],
                     'artists_name': data[i]['name'],
                     'alias': ''.join(data[i]['alias'])
                 }
-                temp.append(artists_info)
+                artists.append(artists_info)
 
-            return temp
+            return artists
 
         elif dig_type == 'albums':
             for i in range(0, len(data)):

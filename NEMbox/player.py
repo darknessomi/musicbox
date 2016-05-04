@@ -90,7 +90,12 @@ class Player:
                     #get a alternative url from new api
                     sid = popenArgs['song_id']
                     new_url = NetEase().songs_detail_new_api([sid])[0]['url']
-                    log.error('Song {} is not compatible with old api.'.format(sid))
+                    if new_url is None:
+                        log.warning(('Song {} is unavailable '
+                                     'due to copyright issue').format(sid))
+                        break
+                    log.error('Song {} is not compatible with old api.'.format(
+                        sid))
 
                     self.popen_handler.stdin.write("\nL " + new_url + "\n")
                     self.popen_handler.stdout.readline()
