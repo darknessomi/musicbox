@@ -66,7 +66,8 @@ class Player:
                                                   stderr=subprocess.PIPE)
             self.popen_handler.stdin.write("V " + str(self.info[
                 "playing_volume"]) + "\n")
-            self.popen_handler.stdin.write("L " + arg + "\n")
+            if arg:
+                self.popen_handler.stdin.write("L " + arg + "\n")
             self.process_first = True
             while True:
                 if self.playing_flag is False:
