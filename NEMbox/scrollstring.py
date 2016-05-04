@@ -1,23 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-
 from time import time
 import locale
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
-class scrollstring:
 
+class scrollstring:
     def __init__(self, content, START):
-        self.content = content # the true content of the string
-        self.display = content # the displayed string
-        self.START = START//1 # when this instance is created
+        self.content = content  # the true content of the string
+        self.display = content  # the displayed string
+        self.START = START // 1  # when this instance is created
         self.update()
 
     def update(self):
         self.display = self.content
-        curTime = time()//1
+        curTime = time() // 1
         offset = max(int((curTime - self.START) % len(self.content)) - 1, 0)
         while offset > 0:
             if self.display[0] > chr(127):
@@ -32,8 +31,8 @@ class scrollstring:
     def __repr__(self):
         return self.display
 
-
 # determine the display length of a string
+
 
 def truelen(string):
     """
@@ -50,4 +49,4 @@ def truelen(string):
     >>> truelen('')
     0
     """
-    return len(string) - sum(1 for c in string if c > chr(127))/3
+    return len(string) - sum(1 for c in string if c > chr(127)) / 3

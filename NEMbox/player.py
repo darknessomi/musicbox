@@ -13,7 +13,6 @@ import subprocess
 import threading
 import time
 import os
-import signal
 import random
 import re
 from ui import Ui
@@ -70,7 +69,7 @@ class Player:
             self.popen_handler.stdin.write("L " + arg + "\n")
             self.process_first = True
             while True:
-                if self.playing_flag == False:
+                if self.playing_flag is False:
                     break
                 try:
                     strout = self.popen_handler.stdout.readline()
@@ -87,10 +86,15 @@ class Player:
                         self.process_location = self.process_length - process_location
                     continue
                 elif strout[:2] == '@E':
-                    #get a alternative url from new api
+                    # get a alternative url from new api
                     sid = popenArgs['song_id']
                     new_url = NetEase().songs_detail_new_api([sid])[0]['url']
-                    log.error('Song {} is not compatible with old api.'.format(sid))
+                    if new_url is None:
+                        log.warning(('Song {} is unavailable '
+                                     'due to copyright issue').format(sid))
+                        break
+                    log.error('Song {} is not compatible with old api.'.format(
+                        sid))
 
                     self.popen_handler.stdin.write("\nL " + new_url + "\n")
                     self.popen_handler.stdout.readline()
@@ -161,7 +165,7 @@ class Player:
 
     def recall(self):
         if self.info["idx"] >= len(self.info[
-                "player_list"]) and self.end_callback != None:
+                "player_list"]) and self.end_callback is not None:
             self.end_callback()
         if self.info["idx"] < 0 or self.info["idx"] >= len(self.info[
                 "player_list"]):
@@ -174,7 +178,7 @@ class Player:
         self.ui.build_playinfo(item['song_name'], item['artist'],
                                item['album_name'], item['quality'],
                                time.time())
-        if self.notifier == True:
+        if self.notifier:
             self.ui.notify("Now playing", item['song_name'],
                            item['album_name'], item['artist'])
         self.playing_id = item['song_id']
@@ -212,8 +216,8 @@ class Player:
             else:
                 database_song = self.songs[str(song["song_id"])]
                 if database_song["song_name"] != song["song_name"] or \
-                  database_song["quality"] != song["quality"] or \
-                  database_song["mp3_url"] != song["mp3_url"]:
+                    database_song["quality"] != song["quality"] or \
+                        database_song["mp3_url"] != song["mp3_url"]:
                     if "cache" in self.songs[str(song["song_id"])].keys():
                         song["cache"] = self.songs[str(song["song_id"])][
                             "cache"]
@@ -292,7 +296,8 @@ class Player:
                 "player_list"]):
             self.stop()
             return
-        # Playing mode. 0 is ordered. 1 is orderde loop. 2 is single song loop. 3 is single random. 4 is random loop
+        # Playing mode. 0 is ordered. 1 is orderde loop.
+        # 2 is single song loop. 3 is single random. 4 is random loop
         if self.info["playing_mode"] == 0:
             self.info["idx"] += 1
         elif self.info["playing_mode"] == 1:
@@ -372,7 +377,8 @@ class Player:
                 "player_list"]):
             self.stop()
             return
-        # Playing mode. 0 is ordered. 1 is orderde loop. 2 is single song loop. 3 is single random. 4 is random loop
+        # Playing mode. 0 is ordered. 1 is orderde loop.
+        # 2 is single song loop. 3 is single random. 4 is random loop
         if self.info["playing_mode"] == 0:
             self.info["idx"] -= 1
         elif self.info["playing_mode"] == 1:

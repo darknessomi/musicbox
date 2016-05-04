@@ -6,18 +6,21 @@
 import platform
 import os
 
+
 def notify_command_osx(msg, msg_type, t=None):
-    command = '/usr/bin/osascript -e \'display notification "' + msg 
+    command = '/usr/bin/osascript -e \'display notification "' + msg
     if msg_type == 1:
         command += '"sound name "/System/Library/Sounds/Ping.aiff'
     command += '"\''
     return command
+
 
 def notify_command_linux(msg, t=None):
     command = '/usr/bin/notify-send "' + msg + '"'
     if t:
         command += " -t " + str(t)
     return command
+
 
 def notify(msg, msg_type=0, t=None):
     "Show system notification with duration t (ms)"

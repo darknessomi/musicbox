@@ -4,8 +4,6 @@
 # @Date:   2014-08-24 21:51:57
 # @Last Modified by:   omi
 # @Last Modified time: 2015-07-30 21:21:15
-
-
 '''
 网易云音乐 Api
 '''
@@ -56,7 +54,12 @@ default_timeout = 10
 
 log = logger.getLogger(__name__)
 
-modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7'
+modulus = (
+    '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7'
+    'b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280'
+    '104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932'
+    '575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b'
+    '3ece0462db0a22b8e7')
 nonce = '0CoJUm6Qyw8W8jud'
 pubKey = '010001'
 
@@ -66,8 +69,8 @@ def encrypted_id(id):
     magic = bytearray('3go8&$8*3*3h0k(2)2')
     song_id = bytearray(id)
     magic_len = len(magic)
-    for i in xrange(len(song_id)):
-        song_id[i] = song_id[i] ^ magic[i % magic_len]
+    for i, sid in enumerate(song_id):
+        song_id[i] = sid ^ magic[i % magic_len]
     m = hashlib.md5(song_id)
     result = m.digest().encode('base64')[:-1]
     result = result.replace('/', '_')
@@ -81,10 +84,7 @@ def encrypted_request(text):
     secKey = createSecretKey(16)
     encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
     encSecKey = rsaEncrypt(secKey, pubKey, modulus)
-    data = {
-        'params': encText,
-        'encSecKey': encSecKey
-    }
+    data = {'params': encText, 'encSecKey': encSecKey}
     return data
 
 
@@ -99,12 +99,13 @@ def aesEncrypt(text, secKey):
 
 def rsaEncrypt(text, pubKey, modulus):
     text = text[::-1]
-    rs = pow(int(text.encode('hex'), 16),  int(pubKey, 16), int(modulus, 16))
+    rs = pow(int(text.encode('hex'), 16), int(pubKey, 16), int(modulus, 16))
     return format(rs, 'x').zfill(256)
 
 
 def createSecretKey(size):
-    return (''.join(map(lambda xx: (hex(ord(xx))[2:]), os.urandom(size))))[0:16]
+    return (
+        ''.join(map(lambda xx: (hex(ord(xx))[2:]), os.urandom(size))))[0:16]
 
 
 # list去重
@@ -116,7 +117,6 @@ def uniq(arr):
 
 # 获取高音质mp3 url
 def geturl(song):
-    config = Config()
     quality = Config().get_item("music_quality")
     if song['hMusic'] and quality <= 0:
         music = song['hMusic']
@@ -133,8 +133,10 @@ def geturl(song):
     quality = quality + ' {0}k'.format(music['bitrate'] / 1000)
     song_id = str(music['dfsId'])
     enc_id = encrypted_id(song_id)
-    url = "http://m%s.music.126.net/%s/%s.mp3" % (random.randrange(1, 3), enc_id, song_id)
+    url = "http://m%s.music.126.net/%s/%s.mp3" % (random.randrange(1, 3),
+                                                  enc_id, song_id)
     return url, quality
+
 
 def geturl_new_api(song):
     br_to_quality = {128000: 'MD 128k', 320000: 'HD 320k'}
@@ -154,11 +156,10 @@ class NetEase:
             'Content-Type': 'application/x-www-form-urlencoded',
             'Host': 'music.163.com',
             'Referer': 'http://music.163.com/search/',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36'
+            'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36'
         }
-        self.cookies = {
-            'appver': '1.5.2'
-        }
+        self.cookies = {'appver': '1.5.2'}
         self.playlist_class_dict = {}
         self.session = requests.Session()
         self.storage = Storage()
@@ -171,7 +172,8 @@ class NetEase:
             pattern = re.compile(r'\d{4}-\d{2}-\d{2}')
             str = pattern.findall(cookie)
             if str:
-                if str[0] < time.strftime('%Y-%m-%d', time.localtime(time.time())):
+                if str[0] < time.strftime('%Y-%m-%d',
+                                          time.localtime(time.time())):
                     self.storage.database['user'] = {
                         "username": "",
                         "password": "",
@@ -184,35 +186,43 @@ class NetEase:
             self.session.cookies.save()
 
     def return_toplists(self):
-        temp = []
-        for i in range(len(top_list_all)):
-            temp.append(top_list_all[i][0])
-        return temp
+        return [l[0] for l in top_list_all.values()]
 
-    def httpRequest(self, method, action, query=None, urlencoded=None, callback=None, timeout=None):
-        connection = json.loads(self.rawHttpRequest(method, action, query, urlencoded, callback, timeout))
+    def httpRequest(self,
+                    method,
+                    action,
+                    query=None,
+                    urlencoded=None,
+                    callback=None,
+                    timeout=None):
+        connection = json.loads(self.rawHttpRequest(
+            method, action, query, urlencoded, callback, timeout))
         return connection
 
-    def rawHttpRequest(self, method, action, query=None, urlencoded=None, callback=None, timeout=None):
+    def rawHttpRequest(self,
+                       method,
+                       action,
+                       query=None,
+                       urlencoded=None,
+                       callback=None,
+                       timeout=None):
         if (method == 'GET'):
-            url = action if (query == None) else (action + '?' + query)
-            connection = self.session.get(url, headers=self.header, timeout=default_timeout)
+            url = action if (query is None) else (action + '?' + query)
+            connection = self.session.get(url,
+                                          headers=self.header,
+                                          timeout=default_timeout)
 
         elif (method == 'POST'):
-            connection = self.session.post(
-                    action,
-                    data=query,
-                    headers=self.header,
-                    timeout=default_timeout
-            )
+            connection = self.session.post(action,
+                                           data=query,
+                                           headers=self.header,
+                                           timeout=default_timeout)
 
         elif (method == 'Login_POST'):
-            connection = self.session.post(
-                    action,
-                    data=query,
-                    headers=self.header,
-                    timeout=default_timeout
-            )
+            connection = self.session.post(action,
+                                           data=query,
+                                           headers=self.header,
+                                           timeout=default_timeout)
             self.session.cookies.save()
 
         connection.encoding = "UTF-8"
@@ -252,9 +262,7 @@ class NetEase:
     # 每日签到
     def daily_signin(self, type):
         action = 'http://music.163.com/weapi/point/dailyTask'
-        text = {
-            'type': type
-        }
+        text = {'type': type}
         data = encrypted_request(text)
         try:
             return self.httpRequest('POST', action, data)
@@ -263,14 +271,13 @@ class NetEase:
 
     # 用户歌单
     def user_playlist(self, uid, offset=0, limit=100):
-        action = 'http://music.163.com/api/user/playlist/?offset=' + str(offset) + '&limit=' + str(
-                limit) + '&uid=' + str(uid)
+        action = 'http://music.163.com/api/user/playlist/?offset=' + str(
+            offset) + '&limit=' + str(limit) + '&uid=' + str(uid)
         try:
             data = self.httpRequest('GET', action)
             return data['playlist']
         except:
             return -1
-
 
     # 每日推荐歌单
     def recommend_playlist(self):
@@ -284,22 +291,17 @@ class NetEase:
             if csrf == "":
                 return False
             action += csrf
-            req = {
-                "offset": 0,
-                "total": True,
-                "limit": 20,
-                "csrf_token": csrf
-            }
-            page = self.session.post(action, data=encrypted_request(req), headers=self.header, timeout=default_timeout)
+            req = {"offset": 0, "total": True, "limit": 20, "csrf_token": csrf}
+            page = self.session.post(action,
+                                     data=encrypted_request(req),
+                                     headers=self.header,
+                                     timeout=default_timeout)
             results = json.loads(page.text)["recommend"]
             song_ids = []
             for result in results:
                 song_ids.append(result["id"])
             data = map(self.song_detail, song_ids)
-            result = []
-            for foo in range(len(data)):
-                result.append(data[foo][0])
-            return result
+            return [data[i][0] for i in range(len(data))]
         except:
             return False
 
@@ -316,10 +318,10 @@ class NetEase:
     def fm_like(self, songid, like=True, time=25, alg='itembased'):
         if like:
             action = 'http://music.163.com/api/radio/like?alg=' + alg + '&trackId=' + str(
-                    songid) + '&like=true&time=' + str(time)
+                songid) + '&like=true&time=' + str(time)
         else:
             action = 'http://music.163.com/api/radio/like?alg=' + alg + '&trackId=' + str(
-                    songid) + '&like=false&time=' + str(time)
+                songid) + '&like=false&time=' + str(time)
         try:
             data = self.httpRequest('GET', action)
             if data['code'] == 200:
@@ -331,7 +333,8 @@ class NetEase:
 
     # FM trash
     def fm_trash(self, songid, time=25, alg='RT'):
-        action = 'http://music.163.com/api/radio/trash/add?alg=' + alg + '&songId=' + str(songid) + '&time=' + str(time)
+        action = 'http://music.163.com/api/radio/trash/add?alg=' + alg + '&songId=' + str(
+            songid) + '&time=' + str(time)
         try:
             data = self.httpRequest('GET', action)
             if data['code'] == 200:
@@ -355,7 +358,8 @@ class NetEase:
 
     # 新碟上架 http://music.163.com/#/discover/album/
     def new_albums(self, offset=0, limit=50):
-        action = 'http://music.163.com/api/album/new?area=ALL&offset=' + str(offset) + '&total=true&limit=' + str(limit)
+        action = 'http://music.163.com/api/album/new?area=ALL&offset=' + str(
+            offset) + '&total=true&limit=' + str(limit)
         try:
             data = self.httpRequest('GET', action)
             return data['albums']
@@ -365,7 +369,8 @@ class NetEase:
     # 歌单（网友精选碟） hot||new http://music.163.com/#/discover/playlist/
     def top_playlists(self, category='全部', order='hot', offset=0, limit=50):
         action = 'http://music.163.com/api/playlist/list?cat=' + category + '&order=' + order + '&offset=' + str(
-                offset) + '&total=' + ('true' if offset else 'false') + '&limit=' + str(limit)
+            offset) + '&total=' + ('true' if offset else
+                                   'false') + '&limit=' + str(limit)
         try:
             data = self.httpRequest('GET', action)
             return data['playlists']
@@ -387,7 +392,8 @@ class NetEase:
 
     # 歌单详情
     def playlist_detail(self, playlist_id):
-        action = 'http://music.163.com/api/playlist/detail?id=' + str(playlist_id)
+        action = 'http://music.163.com/api/playlist/detail?id=' + str(
+            playlist_id)
         try:
             data = self.httpRequest('GET', action)
             return data['result']['tracks']
@@ -396,7 +402,8 @@ class NetEase:
 
     # 热门歌手 http://music.163.com/#/discover/artist/
     def top_artists(self, offset=0, limit=100):
-        action = 'http://music.163.com/api/artist/top?offset=' + str(offset) + '&total=false&limit=' + str(limit)
+        action = 'http://music.163.com/api/artist/top?offset=' + str(
+            offset) + '&total=false&limit=' + str(limit)
         try:
             data = self.httpRequest('GET', action)
             return data['artists']
@@ -407,7 +414,9 @@ class NetEase:
     def top_songlist(self, idx=0, offset=0, limit=100):
         action = 'http://music.163.com' + top_list_all[idx][1]
         try:
-            connection = requests.get(action, headers=self.header, timeout=default_timeout)
+            connection = requests.get(action,
+                                      headers=self.header,
+                                      timeout=default_timeout)
             connection.encoding = 'UTF-8'
             songids = re.findall(r'/song\?id=(\d+)', connection.text)
             if songids == []:
@@ -441,7 +450,8 @@ class NetEase:
         tmpids = ids[offset:]
         tmpids = tmpids[0:100]
         tmpids = map(str, tmpids)
-        action = 'http://music.163.com/api/song/detail?ids=[' + (',').join(tmpids) + ']'
+        action = 'http://music.163.com/api/song/detail?ids=[' + (
+            ',').join(tmpids) + ']'
         try:
             data = self.httpRequest('GET', action)
 
@@ -469,10 +479,10 @@ class NetEase:
         result = json.loads(connection.content)
         return result['data']
 
-
     # song id --> song url ( details )
     def song_detail(self, music_id):
-        action = "http://music.163.com/api/song/detail/?id=" + str(music_id) + "&ids=[" + str(music_id) + "]"
+        action = "http://music.163.com/api/song/detail/?id=" + str(
+            music_id) + "&ids=[" + str(music_id) + "]"
         try:
             data = self.httpRequest('GET', action)
             return data['songs']
@@ -481,10 +491,11 @@ class NetEase:
 
     # lyric http://music.163.com/api/song/lyric?os=osx&id= &lv=-1&kv=-1&tv=-1
     def song_lyric(self, music_id):
-        action = "http://music.163.com/api/song/lyric?os=osx&id=" + str(music_id) + "&lv=-1&kv=-1&tv=-1"
+        action = "http://music.163.com/api/song/lyric?os=osx&id=" + str(
+            music_id) + "&lv=-1&kv=-1&tv=-1"
         try:
             data = self.httpRequest('GET', action)
-            if data['lrc']['lyric'] != None:
+            if data['lrc']['lyric'] is not None:
                 lyric_info = data['lrc']['lyric']
             else:
                 lyric_info = '未找到歌词'
@@ -493,10 +504,11 @@ class NetEase:
             return []
 
     def song_tlyric(self, music_id):
-        action = "http://music.163.com/api/song/lyric?os=osx&id=" + str(music_id) + "&lv=-1&kv=-1&tv=-1"
+        action = "http://music.163.com/api/song/lyric?os=osx&id=" + str(
+            music_id) + "&lv=-1&kv=-1&tv=-1"
         try:
             data = self.httpRequest('GET', action)
-            if data['tlyric']['lyric'] != None:
+            if data['tlyric']['lyric'] is not None:
                 lyric_info = data['tlyric']['lyric'][1:]
             else:
                 lyric_info = '未找到歌词翻译'
@@ -506,10 +518,12 @@ class NetEase:
 
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
     def djchannels(self, stype=0, offset=0, limit=50):
-        action = 'http://music.163.com/discover/djchannel?type=' + str(stype) + '&offset=' + str(
-                offset) + '&limit=' + str(limit)
+        action = 'http://music.163.com/discover/djchannel?type=' + str(
+            stype) + '&offset=' + str(offset) + '&limit=' + str(limit)
         try:
-            connection = requests.get(action, headers=self.header, timeout=default_timeout)
+            connection = requests.get(action,
+                                      headers=self.header,
+                                      timeout=default_timeout)
             connection.encoding = 'UTF-8'
             channelids = re.findall(r'/dj\?id=(\d+)', connection.text)
             channelids = uniq(channelids)
@@ -522,10 +536,12 @@ class NetEase:
     def channel_detail(self, channelids, offset=0):
         channels = []
         for i in range(0, len(channelids)):
-            action = 'http://music.163.com/api/dj/program/detail?id=' + str(channelids[i])
+            action = 'http://music.163.com/api/dj/program/detail?id=' + str(
+                channelids[i])
             try:
                 data = self.httpRequest('GET', action)
-                channel = self.dig_info(data['program']['mainSong'], 'channels')
+                channel = self.dig_info(data['program']['mainSong'],
+                                        'channels')
                 channels.append(channel)
             except:
                 continue
@@ -547,7 +563,7 @@ class NetEase:
             for i in range(0, len(data)):
                 url, quality = geturl(data[i])
 
-                if data[i]['album'] != None:
+                if data[i]['album'] is not None:
                     album_name = data[i]['album']['name']
                 else:
                     album_name = '未知专辑'
@@ -564,7 +580,8 @@ class NetEase:
                     song_info['artist'] = data[i]['artist']
                 elif 'artists' in data[i]:
                     for j in range(0, len(data[i]['artists'])):
-                        song_info['artist'].append(data[i]['artists'][j]['name'])
+                        song_info['artist'].append(data[i]['artists'][j][
+                            'name'])
                     song_info['artist'] = ', '.join(song_info['artist'])
                 else:
                     song_info['artist'] = '未知艺术家'
@@ -572,16 +589,16 @@ class NetEase:
                 temp.append(song_info)
 
         elif dig_type == 'artists':
-            temp = []
+            artists = []
             for i in range(0, len(data)):
                 artists_info = {
                     'artist_id': data[i]['id'],
                     'artists_name': data[i]['name'],
                     'alias': ''.join(data[i]['alias'])
                 }
-                temp.append(artists_info)
+                artists.append(artists_info)
 
-            return temp
+            return artists
 
         elif dig_type == 'albums':
             for i in range(0, len(data)):
@@ -600,7 +617,6 @@ class NetEase:
                     'creator_name': data[i]['creator']['nickname']
                 }
                 temp.append(playlists_info)
-
 
         elif dig_type == 'channels':
             url, quality = geturl(data)
@@ -629,10 +645,11 @@ class NetEase:
 
         return temp
 
+
 if __name__ == '__main__':
     ne = NetEase()
-    print geturl_new_api(ne.songs_detail([27902910])[0]) #MD 128k, fallback
+    print geturl_new_api(ne.songs_detail([27902910])[0])  # MD 128k, fallback
     print ne.songs_detail_new_api([27902910])[0]['url']
-    print ne.songs_detail([405079776])[0]['mp3Url'] #old api
+    print ne.songs_detail([405079776])[0]['mp3Url']  # old api
     print requests.get(ne.songs_detail([405079776])[0][
-        'mp3Url']).status_code  #404
+        'mp3Url']).status_code  # 404

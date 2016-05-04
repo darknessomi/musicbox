@@ -4,7 +4,6 @@
 # Copyright (c) 2015-2016 omi & Contributors
 
 import sys
-import os
 import logger
 from config import Config
 from multiprocessing import Process
@@ -21,7 +20,8 @@ except ImportError:
     log.warn("PyQt4 module not installed.")
     log.warn("Osdlyrics Not Available.")
 
-if  pyqt_activity:
+if pyqt_activity:
+
     class Lyrics(QtGui.QWidget):
         def __init__(self):
             super(Lyrics, self).__init__()
@@ -29,19 +29,23 @@ if  pyqt_activity:
             self.initUI()
 
         def initUI(self):
-            self.setStyleSheet("background:" + config.get_item("osdlyrics_background"))
+            self.setStyleSheet("background:" + config.get_item(
+                "osdlyrics_background"))
             if config.get_item("osdlyrics_transparent"):
                 self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
             self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
             self.setAttribute(QtCore.Qt.WA_X11DoNotAcceptFocus)
             self.setFocusPolicy(QtCore.Qt.NoFocus)
             if config.get_item("osdlyrics_on_top"):
-                self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.X11BypassWindowManagerHint)
+                self.setWindowFlags(QtCore.Qt.FramelessWindowHint |
+                                    QtCore.Qt.WindowStaysOnTopHint |
+                                    QtCore.Qt.X11BypassWindowManagerHint)
             else:
                 self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-            self.setMinimumSize(600,50)
+            self.setMinimumSize(600, 50)
             self.resize(600, 60)
-            scn = QtGui.QApplication.desktop().screenNumber(QtGui.QApplication.desktop().cursor().pos())
+            scn = QtGui.QApplication.desktop().screenNumber(
+                QtGui.QApplication.desktop().cursor().pos())
             br = QtGui.QApplication.desktop().screenGeometry(scn).bottomRight()
             frameGeo = self.frameGeometry()
             frameGeo.moveBottomRight(br)
@@ -60,7 +64,7 @@ if  pyqt_activity:
                 self.move(newpos)
 
         def wheelEvent(self, event):
-            self.resize(self.width()+event.delta(), self.height())
+            self.resize(self.width() + event.delta(), self.height())
 
         def paintEvent(self, event):
             qp = QtGui.QPainter()
@@ -72,19 +76,22 @@ if  pyqt_activity:
             osdlyrics_color = config.get_item("osdlyrics_color")
             osdlyrics_font = config.get_item("osdlyrics_font")
             font = QtGui.QFont(osdlyrics_font[0], osdlyrics_font[1])
-            pen = QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1], osdlyrics_color[2])
+            pen = QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1],
+                               osdlyrics_color[2])
             qp.setFont(font)
             qp.setPen(pen)
-            qp.drawText(event.rect(), QtCore.Qt.AlignCenter | QtCore.Qt.TextWordWrap, self.text)
+            qp.drawText(event.rect(), QtCore.Qt.AlignCenter |
+                        QtCore.Qt.TextWordWrap, self.text)
 
     class LyricsAdapter(QtDBus.QDBusAbstractAdaptor):
         QtCore.Q_CLASSINFO("D-Bus Interface", "local.musicbox.Lyrics")
-        QtCore.Q_CLASSINFO("D-Bus Introspection",
-        '  <interface name="local.musicbox.Lyrics">\n'
-        '    <method name="refresh_lyrics">\n'
-        '      <arg direction="in" type="s" name="lyric"/>\n'
-        '    </method>\n'
-        '  </interface>\n')
+        QtCore.Q_CLASSINFO(
+            "D-Bus Introspection",
+            '  <interface name="local.musicbox.Lyrics">\n'
+            '    <method name="refresh_lyrics">\n'
+            '      <arg direction="in" type="s" name="lyric"/>\n'
+            '    </method>\n'
+            '  </interface>\n')
 
         def __init__(self, parent):
             super(LyricsAdapter, self).__init__(parent)
@@ -94,20 +101,21 @@ if  pyqt_activity:
             self.parent().text = text
             self.parent().repaint()
 
-
     def show_lyrics():
         try:
             app = QtGui.QApplication(sys.argv)
             # lyrics_receiver = LyricsReceiver()
             lyrics = Lyrics()
-            QtDBus.QDBusConnection.sessionBus().registerService('org.musicbox.Bus')
+            QtDBus.QDBusConnection.sessionBus().registerService(
+                'org.musicbox.Bus')
             QtDBus.QDBusConnection.sessionBus().registerObject('/', lyrics)
             sys.exit(app.exec_())
         except:
             pass
 
+
 def show_lyrics_new_process():
-    if  pyqt_activity and config.get_item("osdlyrics"):
+    if pyqt_activity and config.get_item("osdlyrics"):
         try:
             p = Process(target=show_lyrics)
             p.daemon = True
