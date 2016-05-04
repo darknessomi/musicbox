@@ -229,7 +229,7 @@ class Menu:
                 break
 
             # 上移
-            elif key == ord('k'):
+            elif key in (ord('k'), curses.KEY_UP):
                 # turn page if at beginning
                 if idx == offset:
                     if offset == 0:
@@ -242,7 +242,7 @@ class Menu:
                 self.START = time.time()
 
             # 下移
-            elif key == ord('j'):
+            elif key in (ord('j'), curses.KEY_DOWN):
                 # turn page if at end
                 if idx == min(len(datalist), offset + step) - 1:
                     if offset + step >= len(datalist):
@@ -286,7 +286,7 @@ class Menu:
                 self.index = (index + step) // step * step
 
             # 前进
-            elif key == ord('l') or key == 10:
+            elif key in (ord('l'), 10, curses.KEY_RIGHT):
                 if self.datatype == 'songs' or self.datatype == 'djchannels' or self.datatype == 'help' or len(self.datalist) <= 0:
                     continue
                 self.START = time.time()
@@ -296,7 +296,7 @@ class Menu:
                 self.offset = 0
 
             # 回退
-            elif key == ord('h'):
+            elif key in (ord('h'), curses.KEY_LEFT):
                 # if not main menu
                 if len(self.stack) == 1:
                     continue
