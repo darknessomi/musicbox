@@ -35,9 +35,9 @@ log = logger.getLogger(__name__)
 
 try:
     import keybinder
-    BIND_GLOBAL = True
+    BINDABLE = True
 except ImportError:
-    BIND_GLOBAL = False
+    BINDABLE = False
     log.warn('keybinder module not installed.')
     log.warn('Not binding global hotkeys.')
 
@@ -197,7 +197,7 @@ class Menu:
         time.sleep(0.5)
 
     def bind_keys(self):
-        if BIND_GLOBAL:
+        if BINDABLE:
             keybinder.bind(
                 self.config.get_item('global_play_pause'), self.play_pause)
             keybinder.bind(self.config.get_item('global_next'), self.next_song)
@@ -205,7 +205,7 @@ class Menu:
                 self.config.get_item('global_previous'), self.previous_song)
 
     def unbind_keys(self):
-        if BIND_GLOBAL:
+        if BINDABLE:
             keybinder.unbind(self.config.get_item('global_play_pause'))
             keybinder.unbind(self.config.get_item('global_next'))
             keybinder.unbind(self.config.get_item('global_previous'))
@@ -235,7 +235,7 @@ class Menu:
             stack = self.stack
             self.screen.timeout(500)
             key = self.screen.getch()
-            if BIND_GLOBAL:
+            if BINDABLE:
                 keybinder.gtk.main_iteration(False)
             self.ui.screen.refresh()
 
