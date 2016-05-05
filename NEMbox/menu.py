@@ -51,7 +51,6 @@ code = locale.getpreferredencoding()
 
 # carousel x in [left, right]
 def carousel(left, right, x):
-    assert left <= x <= right
     if x > right:
         return left
     elif x < left:
