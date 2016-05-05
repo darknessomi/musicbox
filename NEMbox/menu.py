@@ -38,18 +38,27 @@ try:
     bind_global = True
 except ImportError:
     bind_global = False
-    log.warn("keybinder module not installed.")
-    log.warn("Not binding global hotkeys.")
+    log.warn('keybinder module not installed.')
+    log.warn('Not binding global hotkeys.')
 
-home = os.path.expanduser("~")
+home = os.path.expanduser('~')
 if os.path.isdir(Constant.conf_dir) is False:
     os.mkdir(Constant.conf_dir)
 
-locale.setlocale(locale.LC_ALL, "")
+locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
+
 # carousel x in [left, right]
-carousel = lambda left, right, x: left if (x > right) else (right if x < left else x)
+def carousel(left, right, x):
+    assert left <= x <= right
+    if x > right:
+        return left
+    elif x < left:
+        return right
+    else:
+        return x
+
 
 # yapf: disable
 shortcut = [
@@ -68,12 +77,12 @@ shortcut = [
     ['-', 'Volume-          ', '音量减少'],
     ['m', 'Menu             ', '主菜单'],
     ['p', 'Present/History  ', '当前/历史播放列表'],
-    ["i", 'Music Info       ', '当前音乐信息'],
+    ['i', 'Music Info       ', '当前音乐信息'],
     ['Shift+p', 'Playing Mode     ', '播放模式切换'],
     ['a', 'Add              ', '添加曲目到打碟'],
-    ['z', 'DJ list          ', '打碟列表'],
-    ['s', 'Star             ', '添加到收藏'],
-    ['c', 'Collection', '收藏列表'],
+    ['z', 'DJ list          ', '打碟列表（退出后清空）'],
+    ['s', 'Star             ', '添加到本地收藏'],
+    ['c', 'Collection', '本地收藏列表'],
     ['r', 'Remove    ', '删除当前条目'],
     ['Shift+j', 'Move Down ', '向下移动当前条目'],
     ['Shift+k', 'Move Up   ', '向上移动当前条目'],
@@ -82,7 +91,7 @@ shortcut = [
     ['.', 'Trash FM  ', '删除 FM'],
     ['/', 'Next FM   ', '下一 FM'],
     ['q', 'Quit      ', '退出'],
-    ["w", 'Quit&Clear', '退出并清除用户信息']
+    ['w', 'Quit&Clear', '退出并清除用户信息']
 ]
 
 
@@ -94,7 +103,7 @@ class Menu:
         self.config = Config()
         self.datatype = 'main'
         self.title = '网易云音乐'
-        self.datalist = ['排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单', 'DJ节目', '每日推荐',
+        self.datalist = ['排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单', '主播电台', '每日推荐',
                          '私人FM', '搜索', '帮助']
         self.offset = 0
         self.index = 0
@@ -111,8 +120,8 @@ class Menu:
         self.step = 10
         self.stack = []
         self.djstack = []
-        self.userid = self.storage.database["user"]["user_id"]
-        self.username = self.storage.database["user"]["nickname"]
+        self.userid = self.storage.database['user']['user_id']
+        self.username = self.storage.database['user']['nickname']
         self.resume_play = True
         self.at_playing_list = False
         signal.signal(signal.SIGWINCH, self.change_term)
@@ -133,26 +142,27 @@ class Menu:
     def update_alert(self, version):
         latest = Menu().check_version()
         if latest != version and latest != 0:
-            notify("MusicBox Update is available", 1)
+            notify('MusicBox Update is available', 1)
             time.sleep(0.5)
-            notify("NetEase-MusicBox installed version:" + version +
-                   "\nNetEase-MusicBox latest version:" + latest, 0)
+            notify('NetEase-MusicBox installed version:' + version +
+                   '\nNetEase-MusicBox latest version:' + latest, 0)
 
     def check_version(self):
         # 检查更新 && 签到
         try:
             mobilesignin = self.netease.daily_signin(0)
             if mobilesignin != -1 and mobilesignin['code'] != -2:
-                notify("Mobile signin success", 1)
+                notify('Mobile signin success', 1)
             time.sleep(0.5)
             pcsignin = self.netease.daily_signin(1)
             if pcsignin != -1 and pcsignin['code'] != -2:
-                notify("PC signin success", 1)
+                notify('PC signin success', 1)
             tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version(
             ))))
             root = tree.getroot()
             return root[0][4][0][0].text
-        except:
+        except TypeError as e:
+            log.error(e)
             return 0
 
     def start_fork(self, version):
@@ -163,7 +173,7 @@ class Menu:
             Menu().start()
 
     def play_pause(self):
-        if len(self.storage.database["player_info"]["player_list"]) == 0:
+        if len(self.storage.database['player_info']['player_list']) == 0:
             return
         if self.player.pause_flag:
             self.player.resume()
@@ -172,16 +182,28 @@ class Menu:
         time.sleep(0.1)
 
     def next_song(self):
-        if len(self.storage.database["player_info"]["player_list"]) == 0:
+        if len(self.storage.database['player_info']['player_list']) == 0:
             return
         self.player.next()
         time.sleep(0.1)
 
     def previous_song(self):
-        if len(self.storage.database["player_info"]["player_list"]) == 0:
+        if len(self.storage.database['player_info']['player_list']) == 0:
             return
         self.player.prev()
         time.sleep(0.1)
+
+    def bind_keys(self):
+        keybinder.bind(
+            self.config.get_item('global_play_pause'), self.play_pause)
+        keybinder.bind(self.config.get_item('global_next'), self.next_song)
+        keybinder.bind(
+            self.config.get_item('global_previous'), self.previous_song)
+
+    def unbind_keys(self):
+        keybinder.unbind(self.config.get_item('global_play_pause'))
+        keybinder.unbind(self.config.get_item('global_next'))
+        keybinder.unbind(self.config.get_item('global_previous'))
 
     def start(self):
         self.START = time.time() // 1
@@ -194,11 +216,10 @@ class Menu:
         self.stack.append([self.datatype, self.title, self.datalist,
                            self.offset, self.index])
         if bind_global:
-            keybinder.bind(
-                self.config.get_item("global_play_pause"), self.play_pause)
-            keybinder.bind(self.config.get_item("global_next"), self.next_song)
-            keybinder.bind(
-                self.config.get_item("global_previous"), self.previous_song)
+            try:
+                self.bind_keys()
+            except KeyError as e:
+                log.warning(e)
         show_lyrics_new_process()
         while True:
             datatype = self.datatype
@@ -221,19 +242,24 @@ class Menu:
 
             # 退出
             if key == ord('q'):
+                try:
+                    self.unbind_keys()
+                except KeyError as e:
+                    log.warning(e)
                 break
 
             # 退出并清除用户信息
             if key == ord('w'):
                 self.storage.database['user'] = {
-                    "username": "",
-                    "password": "",
-                    "user_id": "",
-                    "nickname": "",
+                    'username': '',
+                    'password': '',
+                    'user_id': '',
+                    'nickname': '',
                 }
                 try:
                     os.remove(self.storage.cookie_path)
-                except:
+                except OSError as e:
+                    log.error(e)
                     break
                 break
 
@@ -267,7 +293,7 @@ class Menu:
 
             # 数字快捷键
             elif ord('0') <= key <= ord('9'):
-                if self.datatype == 'songs' or self.datatype == 'djchannels' or self.datatype == 'help':
+                if self.datatype == ('songs', 'djchannels', 'help'):
                     continue
                 idx = key - ord('0')
                 self.ui.build_menu(self.datatype, self.title, self.datalist,
@@ -299,8 +325,8 @@ class Menu:
 
             # 前进
             elif key == ord('l') or key == 10:
-                if self.datatype == 'songs' or self.datatype == 'djchannels' or self.datatype == 'help' or len(
-                        self.datalist) <= 0:
+                if self.datatype == ('songs', 'djchannels',
+                                     'help') or len(self.datalist) <= 0:
                     continue
                 self.START = time.time()
                 self.ui.build_loading()
@@ -345,8 +371,8 @@ class Menu:
 
             # 随机播放
             elif key == ord('?'):
-                if len(self.storage.database["player_info"][
-                        "player_list"]) == 0:
+                if len(self.storage.database['player_info'][
+                        'player_list']) == 0:
                     continue
                 self.player.shuffle()
                 time.sleep(0.1)
@@ -356,28 +382,28 @@ class Menu:
                 return_data = self.request_api(self.netease.fm_like,
                                                self.player.get_playing_id())
                 if return_data != -1:
-                    notify("Added successfully!", 0)
+                    notify('Added successfully!', 0)
                 else:
-                    notify("Existing song!", 0)
+                    notify('Existing song!', 0)
 
             # 删除FM
             elif key == ord('.'):
                 if self.datatype == 'fmsongs':
-                    if len(self.storage.database["player_info"][
-                            "player_list"]) == 0:
+                    if len(self.storage.database['player_info'][
+                            'player_list']) == 0:
                         continue
                     self.player.next()
                     return_data = self.request_api(
                         self.netease.fm_trash, self.player.get_playing_id())
                     if return_data != -1:
-                        notify("Deleted successfully!", 0)
+                        notify('Deleted successfully!', 0)
                     time.sleep(0.1)
 
             # 下一FM
             elif key == ord('/'):
                 if self.datatype == 'fmsongs':
-                    if len(self.storage.database["player_info"][
-                            "player_list"]) == 0:
+                    if len(self.storage.database['player_info'][
+                            'player_list']) == 0:
                         continue
                     self.player.next()
                     time.sleep(0.1)
@@ -391,7 +417,8 @@ class Menu:
                             'player_info']['idx'])
                         time.sleep(0.1)
                         continue
-                except:
+                except (TypeError, KeyError) as e:
+                    log.error(e)
                     pass
                 # If change to a new playing list. Add playing list and play.
                 if datatype == 'songs':
@@ -427,8 +454,9 @@ class Menu:
 
             # 播放模式切换
             elif key == ord('P'):
-                self.storage.database['player_info']['playing_mode'] = \
-                    (self.storage.database['player_info']['playing_mode'] + 1) % 5
+                self.storage.database['player_info']['playing_mode'] = (
+                    self.storage.database['player_info']['playing_mode'] +
+                    1) % 5
 
             # 添加到打碟歌单
             elif key == ord('a'):
@@ -446,18 +474,18 @@ class Menu:
                 self.offset = 0
                 self.index = 0
 
-            # 添加到收藏歌曲
+            # 添加到本地收藏
             elif key == ord('s'):
                 if (datatype == 'songs' or
                         datatype == 'djchannels') and len(datalist) != 0:
                     self.collection.append(datalist[idx])
-                    notify("Added successfully", 0)
+                    notify('Added successfully', 0)
 
-            # 加载收藏歌曲
+            # 加载本地收藏
             elif key == ord('c'):
                 self.stack.append([datatype, title, datalist, offset, index])
                 self.datatype = 'songs'
-                self.title = '网易云音乐 > 收藏'
+                self.title = '网易云音乐 > 本地收藏'
                 self.datalist = self.collection
                 self.offset = 0
                 self.index = 0
@@ -471,7 +499,7 @@ class Menu:
                         len(datalist), offset + step) - 1, idx)
 
             # 当前项目下移
-            elif key == ord("J"):
+            elif key == ord('J'):
                 if datatype != 'main' and len(
                         datalist) != 0 and idx + 1 != len(self.datalist):
                     self.START = time.time()
@@ -483,7 +511,7 @@ class Menu:
                         self.offset = offset + step
 
             # 当前项目上移
-            elif key == ord("K"):
+            elif key == ord('K'):
                 if datatype != 'main' and len(datalist) != 0 and idx != 0:
                     self.START = time.time()
                     song = self.datalist.pop(idx)
@@ -509,7 +537,7 @@ class Menu:
                         'https://github.com/darknessomi/musicbox')
 
             # 开始下载
-            elif key == ord("C"):
+            elif key == ord('C'):
                 s = self.datalist[idx]
                 cache_thread = threading.Thread(
                     target=self.player.cacheSong1time,
@@ -608,9 +636,6 @@ class Menu:
         # 搜索菜单
         elif datatype == 'search':
             ui = self.ui
-            # no need to do stack.append, Otherwise there will be a bug when you input key 'h' to return
-            # if idx in range(1, 5):
-            # self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
             self.index = 0
             self.offset = 0
             if idx == 0:
@@ -651,7 +676,7 @@ class Menu:
         self.offset = self.storage.database['player_info'][
             'idx'] / self.step * self.step
         if self.resume_play:
-            if self.datatype == "fmsongs":
+            if self.datatype == 'fmsongs':
                 self.player.end_callback = self.fm_callback
             else:
                 self.player.end_callback = None
@@ -664,7 +689,7 @@ class Menu:
             self.show_playing_song()
 
     def fm_callback(self):
-        log.debug("FM CallBack.")
+        log.debug('FM CallBack.')
         data = self.get_new_fm()
         self.player.append_songs(data)
         if self.datatype == 'fmsongs':
@@ -682,17 +707,17 @@ class Menu:
                 'idx'] / self.step * self.step
 
     def request_api(self, func, *args):
-        if self.storage.database['user']['user_id'] != "":
+        if self.storage.database['user']['user_id'] != '':
             result = func(*args)
             if result != -1:
                 return result
-        log.debug("Re Login.")
+        log.debug('Re Login.')
         user_info = {}
-        if self.storage.database['user']['username'] != "":
+        if self.storage.database['user']['username'] != '':
             user_info = self.netease.login(
                 self.storage.database['user']['username'],
                 self.storage.database['user']['password'])
-        if self.storage.database['user']['username'] == "" or user_info[
+        if self.storage.database['user']['username'] == '' or user_info[
                 'code'] != 200:
             data = self.ui.build_login()
             # 取消登录
@@ -705,8 +730,8 @@ class Menu:
                 'id']
             self.storage.database['user']['nickname'] = user_info['profile'][
                 'nickname']
-        self.userid = self.storage.database["user"]["user_id"]
-        self.username = self.storage.database["user"]["nickname"]
+        self.userid = self.storage.database['user']['user_id']
+        self.username = self.storage.database['user']['nickname']
         return func(*args)
 
     def get_new_fm(self):
@@ -717,7 +742,7 @@ class Menu:
                 break
             myplaylist += data
             time.sleep(0.2)
-        return self.netease.dig_info(myplaylist, "fmsongs")
+        return self.netease.dig_info(myplaylist, 'fmsongs')
 
     def choice_channel(self, idx):
         # 排行榜
@@ -767,10 +792,10 @@ class Menu:
             self.datalist = netease.dig_info(myplaylist, self.datatype)
             self.title += ' > ' + self.username + ' 的歌单'
 
-        # DJ节目
+        # 主播电台
         elif idx == 5:
             self.datatype = 'djchannels'
-            self.title += ' > DJ节目'
+            self.title += ' > 主播电台'
             self.datalist = netease.djchannels()
 
         # 每日推荐

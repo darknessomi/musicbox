@@ -93,24 +93,6 @@ class Ui:
             song_name + self.space + artist + '  < ' + album_name + ' >',
             curses.color_pair(4))
 
-        # The following script doesn't work. It is intended to scroll the playinfo
-        # Scrollstring works by determining how long since it is created, but
-        # playinfo is created everytime the screen refreshes (every 500ms), unlike
-        # the menu. Is there a workaround?
-
-        # name = song_name + self.space + artist + '  < ' + album_name + ' >'
-
-        # decides whether to scoll
-        # if truelen(name) <= self.x - self.indented_startcol - 18:
-        #     self.screen.addstr(1, min(self.indented_startcol + 18, self.x-1),
-        #                        name,
-        #                        curses.color_pair(4))
-        # else:
-        #     name = scrollstring(name + '  ', start)
-        #     self.screen.addstr(1, min(self.indented_startcol + 18, self.x-1),
-        #                        str(name),
-        #                        curses.color_pair(4))
-
         self.screen.refresh()
 
     def build_process_bar(self, now_playing, total_length, playing_flag,
@@ -160,7 +142,7 @@ class Ui:
             total_second = str(total_second)
         else:
             total_second = "0" + str(total_second)
-        process += "(" + now_minute + ":" + now_second + "/" + total_minute + ":" + total_second + ")"
+        process += "(" + now_minute + ":" + now_second + "/" + total_minute + ":" + total_second + ")"  # NOQA
         if playing_mode == 0:
             process = "顺序播放 " + process
         elif playing_mode == 1:
@@ -194,7 +176,7 @@ class Ui:
                         for tline in song["tlyric"]:
                             if key in tline and self.config.get_item(
                                     "translation"):
-                                self.now_lyric = tline + " || " + self.now_lyric
+                                self.now_lyric = tline + " || " + self.now_lyric  # NOQA
         self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
         if dbus_activity and self.config.get_item("osdlyrics"):
             try:
@@ -346,7 +328,7 @@ class Ui:
                         self.screen.addstr(i - offset + 9, self.startcol,
                                            str(i) + '. ' + datalist[i])
 
-            elif datatype == 'playlist_classes' or datatype == 'playlist_class_detail':
+            elif datatype in ('playlist_classes', 'playlist_class_detail'):
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.screen.addstr(i - offset + 9,

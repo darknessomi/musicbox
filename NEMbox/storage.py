@@ -16,7 +16,8 @@ class Storage(Singleton):
         Database stores every info.
 
         version int
-        #if value in file is unequal to value defined in this class. An database update will be applied.
+        #if value in file is unequal to value defined in this class.
+        #An database update will be applied.
         user dict:
             username str
             key str
