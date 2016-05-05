@@ -105,8 +105,7 @@ if pyqt_activity:
 
         app = QtGui.QApplication(sys.argv)
         lyrics = Lyrics()
-        QtDBus.QDBusConnection.sessionBus().registerService(
-            'org.musicbox.Bus')
+        QtDBus.QDBusConnection.sessionBus().registerService('org.musicbox.Bus')
         QtDBus.QDBusConnection.sessionBus().registerObject('/', lyrics)
         sys.exit(app.exec_())
 

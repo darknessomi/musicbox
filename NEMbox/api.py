@@ -279,7 +279,7 @@ class NetEase:
         try:
             data = self.httpRequest('GET', action)
             return data['playlist']
-        except requests.exceptions.RequestException as e:
+        except (requests.exceptions.RequestException, KeyError) as e:
             log.error(e)
             return -1
 

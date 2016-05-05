@@ -26,12 +26,12 @@ try:
     dbus_activity = True
 except ImportError:
     dbus_activity = False
-    log.warn("dbus module not installed.")
-    log.warn("Osdlyrics Not Available.")
+    log.warn('dbus module not installed.')
+    log.warn('Osdlyrics Not Available.')
 
 
 def escape_quote(text):
-    return text.replace('\'', '\\\'').replace('\"', '\'\'')
+    return text.replace('\'', '\\\'').replace('\'', '\'\'')
 
 
 class Ui:
@@ -55,16 +55,16 @@ class Ui:
         self.startcol = int(float(self.x) / 5)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
-        self.lyric = ""
-        self.now_lyric = ""
-        self.tlyric = ""
+        self.lyric = ''
+        self.now_lyric = ''
+        self.tlyric = ''
         self.storage = Storage()
         self.config = Config()
         self.newversion = False
 
     def notify(self, summary, song, album, artist):
-        if summary != "disable":
-            body = "%s\nin %s by %s" % (song, album, artist)
+        if summary != 'disable':
+            body = '%s\nin %s by %s' % (song, album, artist)
             content = escape_quote(summary + ': ' + body)
             notify(content)
 
@@ -97,8 +97,8 @@ class Ui:
 
     def build_process_bar(self, now_playing, total_length, playing_flag,
                           pause_flag, playing_mode):
-        if (self.storage.database["player_info"]["idx"] >=
-                len(self.storage.database["player_info"]["player_list"])):
+        if (self.storage.database['player_info']['idx'] >=
+                len(self.storage.database['player_info']['player_list'])):
             return
         curses.noecho()
         self.screen.move(3, 1)
@@ -111,82 +111,82 @@ class Ui:
             total_length = 1
         if now_playing > total_length or now_playing <= 0:
             now_playing = 0
-        process = "["
+        process = '['
         for i in range(0, 33):
             if i < now_playing / total_length * 33:
                 if (i + 1) > now_playing / total_length * 33:
                     if not pause_flag:
-                        process += ">"
+                        process += '>'
                         continue
-                process += "="
+                process += '='
             else:
-                process += " "
-        process += "] "
+                process += ' '
+        process += '] '
         now_minute = int(now_playing / 60)
         if now_minute > 9:
             now_minute = str(now_minute)
         else:
-            now_minute = "0" + str(now_minute)
+            now_minute = '0' + str(now_minute)
         now_second = int(now_playing - int(now_playing / 60) * 60)
         if now_second > 9:
             now_second = str(now_second)
         else:
-            now_second = "0" + str(now_second)
+            now_second = '0' + str(now_second)
         total_minute = int(total_length / 60)
         if total_minute > 9:
             total_minute = str(total_minute)
         else:
-            total_minute = "0" + str(total_minute)
+            total_minute = '0' + str(total_minute)
         total_second = int(total_length - int(total_length / 60) * 60)
         if total_second > 9:
             total_second = str(total_second)
         else:
-            total_second = "0" + str(total_second)
-        process += "(" + now_minute + ":" + now_second + "/" + total_minute + ":" + total_second + ")"  # NOQA
+            total_second = '0' + str(total_second)
+        process += '(' + now_minute + ':' + now_second + '/' + total_minute + ':' + total_second + ')'  # NOQA
         if playing_mode == 0:
-            process = "顺序播放 " + process
+            process = '顺序播放 ' + process
         elif playing_mode == 1:
-            process = "顺序循环 " + process
+            process = '顺序循环 ' + process
         elif playing_mode == 2:
-            process = "单曲循环 " + process
+            process = '单曲循环 ' + process
         elif playing_mode == 3:
-            process = "随机播放 " + process
+            process = '随机播放 ' + process
         elif playing_mode == 4:
-            process = "随机循环 " + process
+            process = '随机循环 ' + process
         else:
             pass
         self.screen.addstr(3, self.startcol - 2, process, curses.color_pair(1))
-        song = self.storage.database["songs"][
-            self.storage.database["player_info"]["player_list"][
-                self.storage.database["player_info"]["idx"]]]
-        if 'lyric' not in song.keys() or len(song["lyric"]) <= 0:
-            self.now_lyric = "暂无歌词 ~>_<~ \n"
-            if dbus_activity and self.config.get_item("osdlyrics"):
-                self.now_playing = song['song_name'] + " - " + song[
-                    'artist'] + "\n"
+        song = self.storage.database['songs'][
+            self.storage.database['player_info']['player_list'][
+                self.storage.database['player_info']['idx']]]
+        if 'lyric' not in song.keys() or len(song['lyric']) <= 0:
+            self.now_lyric = '暂无歌词 ~>_<~ \n'
+            if dbus_activity and self.config.get_item('osdlyrics'):
+                self.now_playing = song['song_name'] + ' - ' + song[
+                    'artist'] + '\n'
 
         else:
-            key = now_minute + ":" + now_second
-            for line in song["lyric"]:
+            key = now_minute + ':' + now_second
+            for line in song['lyric']:
                 if key in line:
-                    if 'tlyric' not in song.keys() or len(song["tlyric"]) <= 0:
+                    if 'tlyric' not in song.keys() or len(song['tlyric']) <= 0:
                         self.now_lyric = line
                     else:
                         self.now_lyric = line
-                        for tline in song["tlyric"]:
+                        for tline in song['tlyric']:
                             if key in tline and self.config.get_item(
-                                    "translation"):
-                                self.now_lyric = tline + " || " + self.now_lyric  # NOQA
-        self.now_lyric = re.sub('\[.*?\]', "", self.now_lyric)
-        if dbus_activity and self.config.get_item("osdlyrics"):
+                                    'translation'):
+                                self.now_lyric = tline + ' || ' + self.now_lyric  # NOQA
+        self.now_lyric = re.sub('\[.*?\]', '', self.now_lyric)
+        if dbus_activity and self.config.get_item('osdlyrics'):
             try:
                 bus = dbus.SessionBus().get_object('org.musicbox.Bus', '/')
-                if self.now_lyric == "暂无歌词 ~>_<~ \n":
+                if self.now_lyric == '暂无歌词 ~>_<~ \n':
                     bus.refresh_lyrics(self.now_playing,
-                                       dbus_interface="local.musicbox.Lyrics")
+                                       dbus_interface='local.musicbox.Lyrics')
                 else:
                     bus.refresh_lyrics(self.now_lyric,
-                                       dbus_interface="local.musicbox.Lyrics")
+                                       dbus_interface='local.musicbox.Lyrics')
             except Exception as e:
                 log.error(e)
                 pass
@@ -486,8 +486,8 @@ class Ui:
         self.screen.clrtobot()
         self.screen.addstr(5, self.startcol, '请输入登录信息(支持手机登陆)',
                            curses.color_pair(1))
-        self.screen.addstr(8, self.startcol, "账号:", curses.color_pair(1))
-        self.screen.addstr(9, self.startcol, "密码:", curses.color_pair(1))
+        self.screen.addstr(8, self.startcol, '账号:', curses.color_pair(1))
+        self.screen.addstr(9, self.startcol, '密码:', curses.color_pair(1))
         self.screen.move(8, 24)
         self.screen.refresh()
 
@@ -551,9 +551,9 @@ class Ui:
 
     def update_space(self):
         if self.x > 140:
-            self.space = "   -   "
+            self.space = '   -   '
         elif self.x > 80:
-            self.space = "  -  "
+            self.space = '  -  '
         else:
-            self.space = " - "
+            self.space = ' - '
         self.screen.refresh()
