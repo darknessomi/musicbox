@@ -194,16 +194,18 @@ class Menu:
         time.sleep(0.1)
 
     def bind_keys(self):
-        keybinder.bind(
-            self.config.get_item('global_play_pause'), self.play_pause)
-        keybinder.bind(self.config.get_item('global_next'), self.next_song)
-        keybinder.bind(
-            self.config.get_item('global_previous'), self.previous_song)
+        if bind_global:
+            keybinder.bind(
+                self.config.get_item('global_play_pause'), self.play_pause)
+            keybinder.bind(self.config.get_item('global_next'), self.next_song)
+            keybinder.bind(
+                self.config.get_item('global_previous'), self.previous_song)
 
     def unbind_keys(self):
-        keybinder.unbind(self.config.get_item('global_play_pause'))
-        keybinder.unbind(self.config.get_item('global_next'))
-        keybinder.unbind(self.config.get_item('global_previous'))
+        if bind_global:
+            keybinder.unbind(self.config.get_item('global_play_pause'))
+            keybinder.unbind(self.config.get_item('global_next'))
+            keybinder.unbind(self.config.get_item('global_previous'))
 
     def start(self):
         self.START = time.time() // 1
