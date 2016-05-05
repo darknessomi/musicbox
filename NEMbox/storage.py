@@ -83,7 +83,7 @@ class Storage(Singleton):
             self.file = file(self.storage_path, 'r')
             self.database = json.loads(self.file.read())
             self.file.close()
-        except:
+        except (ValueError, OSError):
             self.__init__()
         if not self.check_version():
             self.save()

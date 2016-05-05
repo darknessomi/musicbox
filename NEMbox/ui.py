@@ -187,7 +187,8 @@ class Ui:
                 else:
                     bus.refresh_lyrics(self.now_lyric,
                                        dbus_interface="local.musicbox.Lyrics")
-            except:
+            except Exception as e:
+                log.error(e)
                 pass
         self.screen.addstr(4, self.startcol - 2, str(self.now_lyric),
                            curses.color_pair(3))
@@ -416,7 +417,8 @@ class Ui:
                                     'id'])
                             songs = netease.songs_detail(song_ids)
                         return netease.dig_info(songs, 'songs')
-                except:
+                except Exception as e:
+                    log.error(e)
                     return []
 
         elif stype == 'artists':
@@ -429,7 +431,8 @@ class Ui:
                     if 'artists' in data['result']:
                         artists = data['result']['artists']
                         return netease.dig_info(artists, 'artists')
-                except:
+                except Exception as e:
+                    log.error(e)
                     return []
 
         elif stype == 'albums':
@@ -442,7 +445,8 @@ class Ui:
                     if 'albums' in data['result']:
                         albums = data['result']['albums']
                         return netease.dig_info(albums, 'albums')
-                except:
+                except Exception as e:
+                    log.error(e)
                     return []
 
         elif stype == 'search_playlist':
@@ -455,7 +459,8 @@ class Ui:
                     if 'playlists' in data['result']:
                         playlists = data['result']['playlists']
                         return netease.dig_info(playlists, 'top_playlists')
-                except:
+                except Exception as e:
+                    log.error(e)
                     return []
 
         return []
