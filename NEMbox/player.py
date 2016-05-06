@@ -65,6 +65,11 @@ class Player:
                 "playing_volume"]) + "\n")
             if arg:
                 self.popen_handler.stdin.write("L " + arg + "\n")
+            else:
+                self.next_idx()
+                onExit()
+                return
+
             self.process_first = True
             while True:
                 if self.playing_flag is False:
@@ -303,6 +308,7 @@ class Player:
             self.stop()
             return
         playlist_len = len(self.info["player_list"])
+        playinglist_len = len(self.info["playing_list"])
         # Playing mode. 0 is ordered. 1 is orderde loop.
         # 2 is single song loop. 3 is single random. 4 is random loop
         if self.info["playing_mode"] == 0:
@@ -311,7 +317,7 @@ class Player:
             self.info["idx"] = (self.info["idx"] + 1) % playlist_len
         elif self.info["playing_mode"] == 2:
             self.info["idx"] = self.info["idx"]
-        elif self.info["playing_mode"] == 3:
+        elif playinglist_len and self.info["ridx"] >= playinglist_len and self.info["playing_mode"] == 3:
             if self.info["ridx"] >= playlist_len:
                 self.generate_shuffle_playing_list()
                 try:
@@ -319,7 +325,7 @@ class Player:
                 except Exception as e:
                     log.error(e)
                     self.generate_shuffle_playing_list()
-            elif self.info["playing_list"][self.info["ridx"]] != self.info[
+            elif playinglist_len and self.info["ridx"] >= playinglist_len and self.info["playing_list"][self.info["ridx"]] != self.info[
                     "idx"]:
                 self.generate_shuffle_playing_list()
                 try:
@@ -332,7 +338,7 @@ class Player:
                 self.info["idx"] = playlist_len
             else:
                 self.info["idx"] = self.info["playing_list"][self.info["ridx"]]
-        elif self.info["playing_mode"] == 4:
+        elif playinglist_len and self.info["ridx"] >= playinglist_len and self.info["playing_mode"] == 4:
             if self.info["ridx"] >= playlist_len:
                 self.generate_shuffle_playing_list()
                 try:
@@ -366,6 +372,7 @@ class Player:
             self.stop()
             return
         playlist_len = len(self.info["player_list"])
+        playinglist_len = len(self.info["playing_list"])
         # Playing mode. 0 is ordered. 1 is orderde loop.
         # 2 is single song loop. 3 is single random. 4 is random loop
         if self.info["playing_mode"] == 0:
@@ -374,7 +381,7 @@ class Player:
             self.info["idx"] = (self.info["idx"] - 1) % playlist_len
         elif self.info["playing_mode"] == 2:
             self.info["idx"] = self.info["idx"]
-        elif self.info["playing_mode"] == 3:
+        elif playinglist_len and self.info["ridx"] >= playinglist_len and self.info["playing_mode"] == 3:
             if self.info["ridx"] >= playlist_len:
                 self.generate_shuffle_playing_list()
             elif self.info["playing_list"][self.info["ridx"]] != self.info[
@@ -385,7 +392,7 @@ class Player:
                 self.info["ridx"] = 0
                 return
             self.info["idx"] = self.info["playing_list"][self.info["ridx"]]
-        elif self.info["playing_mode"] == 4:
+        elif playinglist_len and self.info["ridx"] >= playinglist_len and self.info["playing_mode"] == 4:
             if self.info["ridx"] >= playlist_len:
                 self.generate_shuffle_playing_list()
             elif self.info["playing_list"][self.info["ridx"]] != self.info[
