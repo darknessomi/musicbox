@@ -109,12 +109,12 @@ class Config(Singleton):
             self.generate_config_file()
         try:
             f = file(self.config_file_path, 'r')
-        except:
+        except IOError:
             log.debug('Read config file error.')
             return
         try:
             self.config = json.loads(f.read())
-        except:
+        except ValueError:
             log.debug('Load config json data failed.')
             return
         f.close()

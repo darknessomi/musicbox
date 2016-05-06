@@ -12,7 +12,7 @@ import json
 
 class Storage(Singleton):
     def __init__(self):
-        """
+        '''
         Database stores every info.
 
         version int
@@ -48,34 +48,34 @@ class Storage(Singleton):
 
 
         :return:
-        """
+        '''
         if hasattr(self, '_init'):
             return
         self._init = True
         self.version = 4
         self.database = {
-            "version": 4,
-            "user": {
-                "username": "",
-                "password": "",
-                "user_id": "",
-                "nickname": "",
+            'version': 4,
+            'user': {
+                'username': '',
+                'password': '',
+                'user_id': '',
+                'nickname': '',
             },
-            "collections": [[]],
-            "songs": {},
-            "player_info": {
-                "player_list": [],
-                "player_list_type": "",
-                "player_list_title": "",
-                "playing_list": [],
-                "playing_mode": 0,
-                "idx": 0,
-                "ridx": 0,
-                "playing_volume": 60,
+            'collections': [[]],
+            'songs': {},
+            'player_info': {
+                'player_list': [],
+                'player_list_type': '',
+                'player_list_title': '',
+                'playing_list': [],
+                'playing_mode': 0,
+                'idx': 0,
+                'ridx': 0,
+                'playing_volume': 60,
             }
         }
-        self.storage_path = Constant.conf_dir + "/database.json"
-        self.cookie_path = Constant.conf_dir + "/cookie"
+        self.storage_path = Constant.conf_dir + '/database.json'
+        self.cookie_path = Constant.conf_dir + '/cookie'
         self.file = None
 
     def load(self):
@@ -83,25 +83,25 @@ class Storage(Singleton):
             self.file = file(self.storage_path, 'r')
             self.database = json.loads(self.file.read())
             self.file.close()
-        except:
+        except (ValueError, OSError, IOError):
             self.__init__()
         if not self.check_version():
             self.save()
 
     def check_version(self):
-        if self.database["version"] == self.version:
+        if self.database['version'] == self.version:
             return True
         else:
             # Should do some update.
-            if self.database["version"] == 1:
-                self.database["version"] = 2
-                self.database["cache"] = False
-            elif self.database["version"] == 2:
-                self.database["version"] = 3
-                self.database.pop("cache")
-            elif self.database["version"] == 3:
-                self.database["version"] = 4
-                self.database["user"] = {'username': '',
+            if self.database['version'] == 1:
+                self.database['version'] = 2
+                self.database['cache'] = False
+            elif self.database['version'] == 2:
+                self.database['version'] = 3
+                self.database.pop('cache')
+            elif self.database['version'] == 3:
+                self.database['version'] = 4
+                self.database['user'] = {'username': '',
                                          'password': '',
                                          'user_id': '',
                                          'nickname': ''}

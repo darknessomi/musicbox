@@ -35,9 +35,9 @@ log = logger.getLogger(__name__)
 
 try:
     import keybinder
-    bind_global = True
+    BINDABLE = True
 except ImportError:
-    bind_global = False
+    BINDABLE = False
     log.warn('keybinder module not installed.')
     log.warn('Not binding global hotkeys.')
 
@@ -51,7 +51,6 @@ code = locale.getpreferredencoding()
 
 # carousel x in [left, right]
 def carousel(left, right, x):
-    assert left <= x <= right
     if x > right:
         return left
     elif x < left:
@@ -172,8 +171,11 @@ class Menu:
         else:
             Menu().start()
 
+    def _is_playlist_empty(self):
+        return len(self.storage.database['player_info']['player_list']) == 0
+
     def play_pause(self):
-        if len(self.storage.database['player_info']['player_list']) == 0:
+        if self._is_playlist_empty():
             return
         if self.player.pause_flag:
             self.player.resume()
@@ -182,19 +184,19 @@ class Menu:
         time.sleep(0.1)
 
     def next_song(self):
-        if len(self.storage.database['player_info']['player_list']) == 0:
+        if self._is_playlist_empty():
             return
         self.player.next()
-        time.sleep(0.1)
+        time.sleep(0.5)
 
     def previous_song(self):
-        if len(self.storage.database['player_info']['player_list']) == 0:
+        if self._is_playlist_empty():
             return
         self.player.prev()
-        time.sleep(0.1)
+        time.sleep(0.5)
 
     def bind_keys(self):
-        if bind_global:
+        if BINDABLE:
             keybinder.bind(
                 self.config.get_item('global_play_pause'), self.play_pause)
             keybinder.bind(self.config.get_item('global_next'), self.next_song)
@@ -202,7 +204,7 @@ class Menu:
                 self.config.get_item('global_previous'), self.previous_song)
 
     def unbind_keys(self):
-        if bind_global:
+        if BINDABLE:
             keybinder.unbind(self.config.get_item('global_play_pause'))
             keybinder.unbind(self.config.get_item('global_next'))
             keybinder.unbind(self.config.get_item('global_previous'))
@@ -217,11 +219,10 @@ class Menu:
             self.storage.database['player_info']['playing_mode'])
         self.stack.append([self.datatype, self.title, self.datalist,
                            self.offset, self.index])
-        if bind_global:
-            try:
-                self.bind_keys()
-            except KeyError as e:
-                log.warning(e)
+        try:
+            self.bind_keys()
+        except KeyError as e:
+            log.warning(e)
         show_lyrics_new_process()
         while True:
             datatype = self.datatype
@@ -233,7 +234,7 @@ class Menu:
             stack = self.stack
             self.screen.timeout(500)
             key = self.screen.getch()
-            if bind_global:
+            if BINDABLE:
                 keybinder.gtk.main_iteration(False)
             self.ui.screen.refresh()
 
@@ -662,7 +663,7 @@ class Menu:
                 self.title = '专辑搜索列表'
 
     def show_playing_song(self):
-        if len(self.storage.database['player_info']['player_list']) == 0:
+        if self._is_playlist_empty():
             return
         if not self.at_playing_list:
             self.stack.append([self.datatype, self.title, self.datalist,
@@ -695,7 +696,7 @@ class Menu:
         data = self.get_new_fm()
         self.player.append_songs(data)
         if self.datatype == 'fmsongs':
-            if len(self.storage.database['player_info']['player_list']) == 0:
+            if self._is_playlist_empty():
                 return
             self.datatype = self.storage.database['player_info'][
                 'player_list_type']

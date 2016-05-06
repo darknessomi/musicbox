@@ -80,5 +80,6 @@ class Cache(Singleton):
         self.stop = True
         try:
             os.kill(self.aria2c.pid, signal.SIGKILL)
-        except:
+        except (AttributeError, OSError) as e:
+            log.error(e)
             pass

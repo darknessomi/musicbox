@@ -102,23 +102,16 @@ if pyqt_activity:
             self.parent().repaint()
 
     def show_lyrics():
-        try:
-            app = QtGui.QApplication(sys.argv)
-            # lyrics_receiver = LyricsReceiver()
-            lyrics = Lyrics()
-            QtDBus.QDBusConnection.sessionBus().registerService(
-                'org.musicbox.Bus')
-            QtDBus.QDBusConnection.sessionBus().registerObject('/', lyrics)
-            sys.exit(app.exec_())
-        except:
-            pass
+
+        app = QtGui.QApplication(sys.argv)
+        lyrics = Lyrics()
+        QtDBus.QDBusConnection.sessionBus().registerService('org.musicbox.Bus')
+        QtDBus.QDBusConnection.sessionBus().registerObject('/', lyrics)
+        sys.exit(app.exec_())
 
 
 def show_lyrics_new_process():
     if pyqt_activity and config.get_item("osdlyrics"):
-        try:
-            p = Process(target=show_lyrics)
-            p.daemon = True
-            p.start()
-        except:
-            pass
+        p = Process(target=show_lyrics)
+        p.daemon = True
+        p.start()
