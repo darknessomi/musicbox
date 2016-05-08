@@ -4,10 +4,10 @@
 '''
 Class to stores everything into a json file.
 '''
+import json
 
 from const import Constant
 from singleton import Singleton
-import json
 
 
 class Storage(Singleton):

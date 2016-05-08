@@ -5,9 +5,10 @@
 # @Last Modified by:   omi
 # @Last Modified time: 2014-08-25 18:01:59
 
+import os
+
 import logging
 import const
-import os
 
 FILE_NAME = const.Constant.log_path
 if os.path.isdir(const.Constant.conf_dir) is False:

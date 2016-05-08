@@ -7,15 +7,14 @@ Class to cache songs into local storage.
 
 import threading
 import subprocess
-
 import os
-import logger
 import signal
 
 from const import Constant
 from config import Config
 from singleton import Singleton
 from api import NetEase
+import logger
 
 log = logger.getLogger(__name__)
 

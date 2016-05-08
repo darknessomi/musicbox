@@ -15,6 +15,7 @@ import time
 import os
 import random
 import re
+
 from ui import Ui
 from storage import Storage
 from api import NetEase
@@ -25,7 +26,7 @@ import logger
 log = logger.getLogger(__name__)
 
 
-class Player:
+class Player(object):
     def __init__(self):
         self.config = Config()
         self.ui = Ui()

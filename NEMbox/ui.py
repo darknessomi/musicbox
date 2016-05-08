@@ -34,7 +34,7 @@ def escape_quote(text):
     return text.replace('\'', '\\\'').replace('\'', '\'\'')
 
 
-class Ui:
+class Ui(object):
     def __init__(self):
         self.screen = curses.initscr()
         self.screen.timeout(100)  # the screen refresh every 100ms
