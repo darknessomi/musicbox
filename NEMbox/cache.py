@@ -76,10 +76,13 @@ class Cache(Singleton):
             output_path = Constant.download_dir
             output_file = str(artist) + ' - ' + str(song_name) + '.mp3'
             full_path = os.path.join(output_path, output_file)
+
+            new_url = NetEase().songs_detail_new_api([song_id])[0]['url']
+            log.info('Old:{}. New:{}'.format(url, new_url))
             try:
                 para = ['aria2c', '--auto-file-renaming=false',
                         '--allow-overwrite=true', '-d', output_path, '-o',
-                        output_file, url]
+                        output_file, new_url]
                 para[1:1] = self.aria2c_parameters
                 self.aria2c = subprocess.Popen(para,
                                                stdin=subprocess.PIPE,
@@ -90,7 +93,6 @@ class Cache(Singleton):
                 log.warning(
                     '{}.\tAria2c is unavailable, fall back to wget'.format(e))
 
-                new_url = NetEase().songs_detail_new_api([song_id])[0]['url']
                 self._mkdir(output_path)
                 para = ['wget', '-O', full_path, new_url]
                 self.wget = subprocess.Popen(para,
