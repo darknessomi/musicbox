@@ -18,7 +18,8 @@ def notify_command_osx(msg, msg_type, t=None):
 def notify_command_linux(msg, t=None):
     command = '/usr/bin/notify-send "' + msg + '"'
     if t:
-        command += " -t " + str(t)
+        command += ' -t ' + str(t)
+    command += ' -h int:transient:1'
     return command
 
 

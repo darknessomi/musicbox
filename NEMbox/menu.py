@@ -408,7 +408,8 @@ class Menu:
                     if len(self.storage.database['player_info'][
                             'player_list']) == 0:
                         continue
-                    self.player.next()
+                    if self.player.end_callback:
+                        self.player.end_callback()
                     time.sleep(0.1)
 
             # 播放、暂停
