@@ -62,6 +62,13 @@ class Ui:
         self.config = Config()
         self.newversion = False
 
+        # Set cursor to invisible.
+        try:
+            curses.curs_set(0)
+        except curses.error:
+            # The terminal does not supports the visibility requested.
+            pass
+
     def notify(self, summary, song, album, artist):
         if summary != 'disable':
             body = '%s\nin %s by %s' % (song, album, artist)
