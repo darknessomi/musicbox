@@ -14,16 +14,14 @@ class Config(Singleton):
         if hasattr(self, '_init'):
             return
         self._init = True
-        self.const = Constant()
-        self.config_file_path = self.const.conf_dir + '/config.json'
+        self.config_file_path = Constant.config_path
         self.default_config = {
             'version': 6,
             'cache': {
                 'value': False,
                 'default': False,
-                'describe':
-                ('A toggle to enable cache function or not. '
-                 'Set value to true to enable it.')
+                'describe': ('A toggle to enable cache function or not. '
+                             'Set value to true to enable it.')
             },
             'mpg123_parameters': {
                 'value': [],
@@ -33,17 +31,15 @@ class Config(Singleton):
             'aria2c_parameters': {
                 'value': [],
                 'default': [],
-                'describe':
-                ('The additional parameters when '
-                 'aria2c start to download something.')
+                'describe': ('The additional parameters when '
+                             'aria2c start to download something.')
             },
             'music_quality': {
                 'value': 0,
                 'default': 0,
-                'describe':
-                ('Select the quality of the music. '
-                 'May be useful at the terrible network connection. '
-                 '0 for high quality, 1 for medium and 2 for low.')
+                'describe': ('Select the quality of the music. '
+                             'May be useful when network is terrible. '
+                             '0 for high quality, 1 for medium and 2 for low.')
             },
             'global_play_pause': {
                 'value': '<ctrl><alt>p',

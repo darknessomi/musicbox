@@ -97,6 +97,7 @@ class Player:
                         break
                     log.warning(
                         'Song {} is not compatible with old api.'.format(sid))
+                    popenArgs['mp3_url'] = new_url
 
                     self.popen_handler.stdin.write('\nL ' + new_url + '\n')
                     self.popen_handler.stdout.readline()
@@ -243,7 +244,7 @@ class Player:
             if self.playing_flag:
                 self.switch()
 
-                # start new play
+            # start new play
             else:
                 self.recall()
 

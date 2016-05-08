@@ -74,8 +74,8 @@ class Storage(Singleton):
                 'playing_volume': 60,
             }
         }
-        self.storage_path = Constant.conf_dir + '/database.json'
-        self.cookie_path = Constant.conf_dir + '/cookie'
+        self.storage_path = Constant.storage_path
+        self.cookie_path = Constant.cookie_path
         self.file = None
 
     def load(self):
