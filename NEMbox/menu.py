@@ -15,6 +15,8 @@ import sys
 import os
 import time
 import webbrowser
+import signal
+
 from api import NetEase
 from player import Player
 from ui import Ui
@@ -22,10 +24,10 @@ from osdlyrics import show_lyrics_new_process
 from const import Constant
 from config import Config
 import logger
-import signal
 from utils import notify
 from storage import Storage
 from cache import Cache
+
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
@@ -95,7 +97,7 @@ shortcut = [
 
 
 # yapf: enable
-class Menu:
+class Menu(object):
     def __init__(self):
         reload(sys)
         sys.setdefaultencoding('UTF-8')

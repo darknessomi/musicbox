@@ -145,7 +145,7 @@ def geturl_new_api(song):
     return url, quality
 
 
-class NetEase:
+class NetEase(object):
     def __init__(self):
         self.header = {
             'Accept': '*/*',

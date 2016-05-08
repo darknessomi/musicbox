@@ -15,6 +15,7 @@ import time
 import os
 import random
 import re
+
 from ui import Ui
 from storage import Storage
 from api import NetEase
@@ -25,7 +26,7 @@ import logger
 log = logger.getLogger(__name__)
 
 
-class Player:
+class Player(object):
     def __init__(self):
         self.config = Config()
         self.ui = Ui()
@@ -97,6 +98,7 @@ class Player:
                         break
                     log.warning(
                         'Song {} is not compatible with old api.'.format(sid))
+                    popenArgs['mp3_url'] = new_url
 
                     self.popen_handler.stdin.write('\nL ' + new_url + '\n')
                     self.popen_handler.stdout.readline()
@@ -243,7 +245,7 @@ class Player:
             if self.playing_flag:
                 self.switch()
 
-                # start new play
+            # start new play
             else:
                 self.recall()
 
