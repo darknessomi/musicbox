@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
-# @Last Modified by:   omi
-# @Last Modified time: 2015-08-02 20:57:35
 '''
 网易云音乐 Ui
 '''
@@ -11,13 +9,13 @@ import hashlib
 import re
 import curses
 
-import terminalsize
 from api import NetEase
 from scrollstring import scrollstring, truelen
 from storage import Storage
 from config import Config
-import logger
 from utils import notify
+import logger
+import terminalsize
 
 log = logger.getLogger(__name__)
 

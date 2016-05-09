@@ -9,6 +9,9 @@ import traceback
 import argparse
 import sys
 
+import gtk
+gtk.set_interactive(False)
+
 from menu import Menu
 
 version = "0.2.2.8"

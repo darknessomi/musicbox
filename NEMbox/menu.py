@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
-# @Last Modified by:   omi
-# @Last Modified time: 2015-08-02 20:55:11
 '''
 网易云音乐 Menu
 '''
@@ -23,10 +21,10 @@ from ui import Ui
 from osdlyrics import show_lyrics_new_process
 from const import Constant
 from config import Config
-import logger
 from utils import notify
 from storage import Storage
 from cache import Cache
+import logger
 
 try:
     import xml.etree.cElementTree as ET
