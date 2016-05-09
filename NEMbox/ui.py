@@ -21,6 +21,7 @@ log = logger.getLogger(__name__)
 
 try:
     import dbus
+
     dbus_activity = True
 except ImportError:
     dbus_activity = False
@@ -258,8 +259,7 @@ class Ui(object):
                                 datalist[i]['artist'],
                                 datalist[i]['album_name'])[:int(self.x * 2)])
 
-                    self.screen.addstr(iter_range - offset + 9, 0,
-                                       ' ' * self.x)
+                self.screen.addstr(iter_range - offset + 8, 0, ' ' * self.x)
 
             elif datatype == 'artists':
                 for i in range(offset, min(len(datalist), offset + step)):
@@ -414,7 +414,7 @@ class Ui(object):
                         else:
                             for i in range(0, len(data['result']['songs'])):
                                 song_ids.append(data['result']['songs'][i][
-                                    'id'])
+                                                    'id'])
                             songs = netease.songs_detail(song_ids)
                         return netease.dig_info(songs, 'songs')
                 except Exception as e:
