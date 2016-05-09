@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
-# @Last Modified by:   omi
-# @Last Modified time: 2015-08-02 20:57:35
 '''
 网易云音乐 Ui
 '''
@@ -11,13 +9,13 @@ import hashlib
 import re
 import curses
 
-import terminalsize
 from api import NetEase
 from scrollstring import scrollstring, truelen
 from storage import Storage
 from config import Config
-import logger
 from utils import notify
+import logger
+import terminalsize
 
 log = logger.getLogger(__name__)
 
@@ -234,9 +232,9 @@ class Ui(object):
                         self.screen.addstr(i - offset + 8,
                                            self.indented_startcol, lead,
                                            curses.color_pair(2))
-                        name = '{}{}{}  < {} >'.format(datalist[i][
-                            'song_name'], self.space, datalist[i][
-                                'artist'], datalist[i]['album_name'])
+                        name = '{}{}{}  < {} >'.format(
+                            datalist[i]['song_name'], self.space,
+                            datalist[i]['artist'], datalist[i]['album_name'])
 
                         # the length decides whether to scoll
                         if truelen(name) < self.x - self.startcol - 1:
@@ -253,11 +251,13 @@ class Ui(object):
                     else:
                         self.screen.addstr(i - offset + 8, 0,
                                            ' ' * self.startcol)
-                        self.screen.addstr(i - offset + 8, self.startcol, str(
-                            str(i) + '. ' + datalist[i]['song_name'] +
-                            self.space + datalist[i][
-                                'artist'] + '  < ' + datalist[i][
-                                    'album_name'] + ' >')[:int(self.x * 2)])
+                        self.screen.addstr(
+                            i - offset + 8, self.startcol,
+                            '{}. {}{}{}  < {} >'.format(
+                                i, datalist[i]['song_name'], self.space,
+                                datalist[i]['artist'],
+                                datalist[i]['album_name'])[:int(self.x * 2)])
+
                     self.screen.addstr(iter_range - offset + 9, 0,
                                        ' ' * self.x)
 
@@ -372,19 +372,19 @@ class Ui(object):
             elif datatype == 'help':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
-                        self.screen.addstr(i - offset + 9,
-                                           self.indented_startcol,
-                                           '-> ' + str(i) + '. \'' +
-                                           (datalist[i][0].upper() +
-                                            '\'').ljust(11) + datalist[i][
-                                                1] + '   ' + datalist[i][2],
-                                           curses.color_pair(2))
+                        self.screen.addstr(
+                            i - offset + 9, self.indented_startcol,
+                            '-> {}. \'{}{}   {}'.format(
+                                i, (datalist[i][0].upper() + '\'').ljust(11),
+                                datalist[i][1], datalist[i][2]),
+                            curses.color_pair(2))
                     else:
-                        self.screen.addstr(i - offset + 9, self.startcol,
-                                           str(i) + '. \'' +
-                                           (datalist[i][0].upper() +
-                                            '\'').ljust(11) + datalist[i][
-                                                1] + '   ' + datalist[i][2])
+                        self.screen.addstr(
+                            i - offset + 9, self.startcol,
+                            '{}. \'{}{}   {}'.format(
+                                i, (datalist[i][0].upper() + '\'').ljust(11),
+                                datalist[i][1], datalist[i][2]))
+
                 self.screen.addstr(
                     20, 6, 'NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存')
                 self.screen.addstr(21, 10,

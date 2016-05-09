@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
-# @Last Modified by:   omi
-# @Last Modified time: 2015-07-30 21:21:15
 '''
 网易云音乐 Api
 '''
@@ -11,18 +9,20 @@
 import re
 import os
 import json
-import requests
-from Crypto.Cipher import AES
-from cookielib import LWPCookieJar
-from bs4 import BeautifulSoup
 import time
-import logger
 import hashlib
 import random
 import base64
+
+from Crypto.Cipher import AES
+from cookielib import LWPCookieJar
+from bs4 import BeautifulSoup
+import requests
+
 from config import Config
 from storage import Storage
 from utils import notify
+import logger
 
 # 歌曲榜单地址
 top_list_all = {
