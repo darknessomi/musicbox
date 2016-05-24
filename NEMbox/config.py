@@ -3,9 +3,9 @@
 import json
 import os
 
-import logger
-from singleton import Singleton
-from const import Constant
+from . import logger
+from .singleton import Singleton
+from .const import Constant
 
 log = logger.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class Config(Singleton):
         if not os.path.isfile(self.config_file_path):
             self.generate_config_file()
         try:
-            f = file(self.config_file_path, 'r')
+            f = open(self.config_file_path, 'r')
         except IOError:
             log.debug('Read config file error.')
             return
@@ -119,12 +119,12 @@ class Config(Singleton):
             self.save_config_file()
 
     def generate_config_file(self):
-        f = file(self.config_file_path, 'w')
+        f = open(self.config_file_path, 'w')
         f.write(json.dumps(self.default_config, indent=2))
         f.close()
 
     def save_config_file(self):
-        f = file(self.config_file_path, 'w')
+        f = open(self.config_file_path, 'w')
         f.write(json.dumps(self.config, indent=2))
         f.close()
 

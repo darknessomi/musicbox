@@ -10,11 +10,11 @@ import subprocess
 import os
 import signal
 
-from const import Constant
-from config import Config
-from singleton import Singleton
-from api import NetEase
-import logger
+from .const import Constant
+from .config import Config
+from .singleton import Singleton
+from .api import NetEase
+from . import logger
 
 log = logger.getLogger(__name__)
 
