@@ -9,13 +9,13 @@ import hashlib
 import re
 import curses
 
-from api import NetEase
-from scrollstring import scrollstring, truelen
-from storage import Storage
-from config import Config
-from utils import notify
-import logger
-import terminalsize
+from .api import NetEase
+from .scrollstring import *
+from .storage import Storage
+from .config import Config
+from .utils import notify
+from . import logger
+from . import terminalsize
 
 log = logger.getLogger(__name__)
 
@@ -468,7 +468,7 @@ class Ui(object):
     def build_login(self):
         self.build_login_bar()
         local_account = self.get_account()
-        local_password = hashlib.md5(self.get_password()).hexdigest()
+        local_password = hashlib.md5(self.get_password().encode('u8')).hexdigest()
         login_info = self.netease.login(local_account, local_password)
         account = [local_account, local_password]
         if login_info['code'] != 200:
@@ -510,14 +510,14 @@ class Ui(object):
         curses.echo()
         account = self.screen.getstr(8, self.startcol + 6, 60)
         self.screen.timeout(100)  # restore the screen timeout
-        return account
+        return account.decode('u8')
 
     def get_password(self):
         self.screen.timeout(-1)  # disable the screen timeout
         curses.noecho()
         password = self.screen.getstr(9, self.startcol + 6, 60)
         self.screen.timeout(100)  # restore the screen timeout
-        return password
+        return password.decode('u8')
 
     def get_param(self, prompt_string):
         # keep playing info in line 1

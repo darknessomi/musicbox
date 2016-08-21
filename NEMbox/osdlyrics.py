@@ -4,10 +4,10 @@
 # Copyright (c) 2015-2016 omi & Contributors
 
 import sys
-
-import logger
-from config import Config
 from multiprocessing import Process
+
+from . import logger
+from .config import Config
 
 log = logger.getLogger(__name__)
 
@@ -51,7 +51,7 @@ if pyqt_activity:
             frameGeo = self.frameGeometry()
             frameGeo.moveBottomRight(br)
             self.move(frameGeo.topLeft())
-            self.text = u"OSD Lyrics for Musicbox"
+            self.text = "OSD Lyrics for Musicbox"
             self.setWindowTitle("Lyrics")
             self.show()
 
