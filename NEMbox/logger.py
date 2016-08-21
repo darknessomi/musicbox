@@ -4,9 +4,9 @@
 # @Date:   2014-08-24 21:51:57
 
 import os
-
 import logging
-import const
+
+from . import const
 
 FILE_NAME = const.Constant.log_path
 if os.path.isdir(const.Constant.conf_dir) is False:
