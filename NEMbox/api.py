@@ -529,7 +529,7 @@ class NetEase(object):
             music_id)
         try:
             data = self.httpRequest('GET', action)
-            if 'tlyric' in data and data['tlyric']['lyric'] is not None:
+            if 'tlyric' in data and data['tlyric'].get('lyric') is not None:
                 lyric_info = data['tlyric']['lyric'][1:]
             else:
                 lyric_info = '未找到歌词翻译'

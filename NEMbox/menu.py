@@ -706,7 +706,7 @@ class Menu(object):
                 self.datalist.append(self.storage.database['songs'][i])
             self.index = self.storage.database['player_info']['idx']
             self.offset = self.storage.database['player_info'][
-                'idx'] / self.step * self.step
+                'idx'] // self.step * self.step
 
     def request_api(self, func, *args):
         if self.storage.database['user']['user_id'] != '':
