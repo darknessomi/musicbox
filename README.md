@@ -76,6 +76,9 @@ NetEase-MusicBox
 
 ### Linux安装
 
+#### Fedora
+首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`。
+
 #### Ubuntu/Debian
 
 	$ sudo pip2 install NetEase-MusicBox
