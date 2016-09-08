@@ -13,16 +13,20 @@ import time
 import hashlib
 import random
 import base64
+import binascii
 
 from Crypto.Cipher import AES
-from cookielib import LWPCookieJar
+try:
+    from http.cookiejar import LWPCookieJar
+except ImportError:
+    from cookielib import LWPCookieJar
 from bs4 import BeautifulSoup
 import requests
 
-from config import Config
-from storage import Storage
-from utils import notify
-import logger
+from .config import Config
+from .storage import Storage
+from .utils import notify
+from . import logger
 
 # 歌曲榜单地址
 top_list_all = {
@@ -65,16 +69,17 @@ pubKey = '010001'
 
 # 歌曲加密算法, 基于https://github.com/yanunon/NeteaseCloudMusic脚本实现
 def encrypted_id(id):
-    magic = bytearray('3go8&$8*3*3h0k(2)2')
-    song_id = bytearray(id)
+    magic = bytearray('3go8&$8*3*3h0k(2)2', 'u8')
+    song_id = bytearray(id, 'u8')
     magic_len = len(magic)
     for i, sid in enumerate(song_id):
         song_id[i] = sid ^ magic[i % magic_len]
     m = hashlib.md5(song_id)
-    result = m.digest().encode('base64')[:-1]
-    result = result.replace('/', '_')
-    result = result.replace('+', '-')
-    return result
+    result = m.digest()
+    result = base64.b64encode(result)
+    result = result.replace(b'/', b'_')
+    result = result.replace(b'+', b'-')
+    return result.decode('u8')
 
 
 # 登录加密算法, 基于https://github.com/stkevintan/nw_musicbox脚本实现
@@ -89,22 +94,21 @@ def encrypted_request(text):
 
 def aesEncrypt(text, secKey):
     pad = 16 - len(text) % 16
-    text = text + pad * chr(pad)
+    text = text + chr(pad) * pad
     encryptor = AES.new(secKey, 2, '0102030405060708')
     ciphertext = encryptor.encrypt(text)
-    ciphertext = base64.b64encode(ciphertext)
+    ciphertext = base64.b64encode(ciphertext).decode('u8')
     return ciphertext
 
 
 def rsaEncrypt(text, pubKey, modulus):
     text = text[::-1]
-    rs = pow(int(text.encode('hex'), 16), int(pubKey, 16), int(modulus, 16))
+    rs = pow(int(binascii.hexlify(text), 16), int(pubKey, 16), int(modulus, 16))
     return format(rs, 'x').zfill(256)
 
 
 def createSecretKey(size):
-    return (
-        ''.join(map(lambda xx: (hex(ord(xx))[2:]), os.urandom(size))))[0:16]
+    return binascii.hexlify(os.urandom(size))[:16]
 
 
 # list去重
@@ -129,7 +133,7 @@ def geturl(song):
     else:
         return song['mp3Url'], ''
 
-    quality = quality + ' {0}k'.format(music['bitrate'] / 1000)
+    quality = quality + ' {0}k'.format(music['bitrate'] // 1000)
     song_id = str(music['dfsId'])
     enc_id = encrypted_id(song_id)
     url = 'http://m%s.music.126.net/%s/%s.mp3' % (random.randrange(1, 3),
@@ -165,7 +169,7 @@ class NetEase(object):
         self.session.cookies = LWPCookieJar(self.storage.cookie_path)
         try:
             self.session.cookies.load()
-            self.file = file(self.storage.cookie_path, 'r')
+            self.file = open(self.storage.cookie_path, 'r')
             cookie = self.file.read()
             self.file.close()
             pattern = re.compile(r'\d{4}-\d{2}-\d{2}')
@@ -231,7 +235,7 @@ class NetEase(object):
     # 登录
     def login(self, username, password):
         pattern = re.compile(r'^0\d{2,3}\d{7,8}$|^1[34578]\d{9}$')
-        if (pattern.match(username)):
+        if pattern.match(username):
             return self.phone_login(username, password)
         action = 'https://music.163.com/weapi/login/'
         text = {
@@ -305,7 +309,7 @@ class NetEase(object):
             for result in results:
                 song_ids.append(result['id'])
             data = map(self.song_detail, song_ids)
-            return [data[i][0] for i in range(len(data))]
+            return [d[0] for d in data]
         except (requests.exceptions.RequestException, ValueError) as e:
             log.error(e)
             return False
@@ -462,7 +466,7 @@ class NetEase(object):
     def songs_detail(self, ids, offset=0):
         tmpids = ids[offset:]
         tmpids = tmpids[0:100]
-        tmpids = map(str, tmpids)
+        tmpids = list(map(str, tmpids))
         action = 'http://music.163.com/api/song/detail?ids=[{}]'.format(  # NOQA
             ','.join(tmpids))
         try:
@@ -491,7 +495,7 @@ class NetEase(object):
         connection = self.session.post(action,
                                        data=encrypted_request(data),
                                        headers=self.header, )
-        result = json.loads(connection.content)
+        result = json.loads(connection.text)
         return result['data']
 
     # song id --> song url ( details )
@@ -525,7 +529,7 @@ class NetEase(object):
             music_id)
         try:
             data = self.httpRequest('GET', action)
-            if 'tlyric' in data and data['tlyric']['lyric'] is not None:
+            if 'tlyric' in data and data['tlyric'].get('lyric') is not None:
                 lyric_info = data['tlyric']['lyric'][1:]
             else:
                 lyric_info = '未找到歌词翻译'
@@ -576,7 +580,7 @@ class NetEase(object):
             return data.content
         except requests.exceptions.RequestException as e:
             log.error(e)
-            return []
+            return ""
 
     def dig_info(self, data, dig_type):
         temp = []
@@ -669,8 +673,8 @@ class NetEase(object):
 
 if __name__ == '__main__':
     ne = NetEase()
-    print geturl_new_api(ne.songs_detail([27902910])[0])  # MD 128k, fallback
-    print ne.songs_detail_new_api([27902910])[0]['url']
-    print ne.songs_detail([405079776])[0]['mp3Url']  # old api
-    print requests.get(ne.songs_detail([405079776])[0][
-        'mp3Url']).status_code  # 404
+    print(geturl_new_api(ne.songs_detail([27902910])[0]))  # MD 128k, fallback
+    print(ne.songs_detail_new_api([27902910])[0]['url'])
+    print(ne.songs_detail([405079776])[0]['mp3Url'])  # old api
+    print(requests.get(ne.songs_detail([405079776])[0][
+        'mp3Url']).status_code)  # 404
