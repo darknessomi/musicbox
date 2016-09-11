@@ -44,7 +44,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='NetEase-MusicBox',
-    version='0.2.2.10',
+    version='0.2.3.0',
     packages=find_packages(),
     install_requires=[
         'requests',
@@ -59,6 +59,7 @@ setup(
         ],
     },
 
+    license='MIT',
     author='omi',
     author_email='4399.omi@gmail.com',
     url='https://github.com/darknessomi/musicbox',
