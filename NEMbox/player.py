@@ -4,9 +4,19 @@
 # @Date:   2014-07-15 15:48:27
 # @Last Modified by:   omi
 # @Last Modified time: 2015-01-30 18:05:08
+from __future__ import unicode_literals
+
 '''
 网易云音乐 Player
 '''
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 # Let's make some noise
 
 import subprocess
@@ -27,6 +37,7 @@ log = logger.getLogger(__name__)
 
 
 class Player(object):
+
     def __init__(self):
         self.config = Config()
         self.ui = Ui()

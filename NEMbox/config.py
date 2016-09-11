@@ -1,5 +1,12 @@
 # encoding: UTF-8
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import open
+from future import standard_library
+standard_library.install_aliases()
 import json
 import os
 
@@ -11,6 +18,7 @@ log = logger.getLogger(__name__)
 
 
 class Config(Singleton):
+
     def __init__(self):
         if hasattr(self, '_init'):
             return

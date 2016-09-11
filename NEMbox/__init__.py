@@ -3,6 +3,13 @@
 '''
 网易云音乐 Entry
 '''
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 
 import curses
 import traceback
@@ -18,7 +25,7 @@ def start():
     nembox_menu = Menu()
     try:
         nembox_menu.start_fork(version)
-    except (OSError, TypeError):
+    except (OSError, TypeError, ValueError):
         # clean up terminal while failed
         nembox_menu.screen.keypad(1)
         curses.echo()

@@ -33,6 +33,12 @@ ________     __________________________  _____ _     _
 + ------------------------------------------ +
 
 '''
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
 
 from setuptools import setup, find_packages
 
@@ -44,6 +50,7 @@ setup(
         'requests',
         'BeautifulSoup4',
         'pycrypto',
+        'future'
     ],
 
     entry_points={

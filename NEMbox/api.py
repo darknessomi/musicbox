@@ -5,6 +5,18 @@
 '''
 网易云音乐 Api
 '''
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from builtins import chr
+from builtins import int
+from builtins import map
+from builtins import open
+from builtins import range
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 
 import re
 import os
@@ -16,10 +28,7 @@ import base64
 import binascii
 
 from Crypto.Cipher import AES
-try:
-    from http.cookiejar import LWPCookieJar
-except ImportError:
-    from cookielib import LWPCookieJar
+from http.cookiejar import LWPCookieJar
 from bs4 import BeautifulSoup
 import requests
 
@@ -103,7 +112,7 @@ def aesEncrypt(text, secKey):
 
 def rsaEncrypt(text, pubKey, modulus):
     text = text[::-1]
-    rs = pow(int(binascii.hexlify(text), 16), int(pubKey, 16), int(modulus, 16))
+    rs = pow(int(binascii.hexlify(text), 16), int(pubKey, 16)) % int(modulus, 16)
     return format(rs, 'x').zfill(256)
 
 
@@ -150,6 +159,7 @@ def geturl_new_api(song):
 
 
 class NetEase(object):
+
     def __init__(self):
         self.header = {
             'Accept': '*/*',
