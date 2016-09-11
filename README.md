@@ -10,6 +10,7 @@ NetEase-MusicBox
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.python.org/pypi/NetEase-MusicBox/)
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
+[![platform](https://img.shields.io/badge/python-3.5-green.svg)]()
 
 [![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)](https://pypi.python.org/pypi/NetEase-MusicBox/)
 
@@ -75,6 +76,9 @@ NetEase-MusicBox
 	$ brew install mpg123
 
 ### Linux安装
+
+#### Fedora
+首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`。
 
 #### Ubuntu/Debian
 
@@ -146,6 +150,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2016-09-11 版本 0.2.3.0    Python 2 和 3 支持
 
 2016-05-09 版本 0.2.2.10   修复最后一行歌名过长的问题
 

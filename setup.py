@@ -33,17 +33,24 @@ ________     __________________________  _____ _     _
 + ------------------------------------------ +
 
 '''
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
 
 from setuptools import setup, find_packages
 
 setup(
     name='NetEase-MusicBox',
-    version='0.2.2.10',
+    version='0.2.3.0',
     packages=find_packages(),
     install_requires=[
         'requests',
         'BeautifulSoup4',
         'pycrypto',
+        'future'
     ],
 
     entry_points={
@@ -52,6 +59,7 @@ setup(
         ],
     },
 
+    license='MIT',
     author='omi',
     author_email='4399.omi@gmail.com',
     url='https://github.com/darknessomi/musicbox',

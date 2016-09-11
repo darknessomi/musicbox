@@ -3,6 +3,13 @@
 # utils.py --- utils for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 import platform
 import os
 
@@ -29,7 +36,7 @@ def notify(msg, msg_type=0, t=None):
         command = notify_command_osx(msg, msg_type, t)
     else:
         command = notify_command_linux(msg, t)
-    os.system(command)
+    os.system(command.encode('u8'))
 
 
 if __name__ == "__main__":

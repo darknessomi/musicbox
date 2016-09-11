@@ -1,11 +1,18 @@
 #!/usr/bin/env python
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from builtins import int
+from future import standard_library
+standard_library.install_aliases()
 import os
 import shlex
 import struct
 import platform
 import subprocess
 
-import logger
+from . import logger
 
 log = logger.getLogger(__name__)
 
@@ -27,7 +34,7 @@ def get_terminal_size():
     if current_os in ['Linux', 'Darwin'] or current_os.startswith('CYGWIN'):
         tuple_xy = _get_terminal_size_linux()
     if tuple_xy is None:
-        print 'default'
+        print('default')
         tuple_xy = (80, 25)  # default value
     return tuple_xy
 
@@ -96,4 +103,4 @@ def _get_terminal_size_linux():
 
 if __name__ == '__main__':
     sizex, sizey = get_terminal_size()
-    print 'width =', sizex, 'height =', sizey
+    print('width =', sizex, 'height =', sizey)

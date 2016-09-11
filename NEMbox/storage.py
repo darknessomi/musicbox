@@ -4,13 +4,21 @@
 '''
 Class to stores everything into a json file.
 '''
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import open
+from future import standard_library
+standard_library.install_aliases()
 import json
 
-from const import Constant
-from singleton import Singleton
+from .const import Constant
+from .singleton import Singleton
 
 
 class Storage(Singleton):
+
     def __init__(self):
         '''
         Database stores every info.
@@ -80,7 +88,7 @@ class Storage(Singleton):
 
     def load(self):
         try:
-            self.file = file(self.storage_path, 'r')
+            self.file = open(self.storage_path, 'r')
             self.database = json.loads(self.file.read())
             self.file.close()
         except (ValueError, OSError, IOError):
@@ -109,6 +117,6 @@ class Storage(Singleton):
             return False
 
     def save(self):
-        self.file = file(self.storage_path, 'w')
-        self.file.write(json.dumps(self.database))
+        self.file = open(self.storage_path, 'w')
+        self.file.write(json.dumps(self.database).decode('u8'))
         self.file.close()
