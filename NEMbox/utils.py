@@ -36,7 +36,7 @@ def notify(msg, msg_type=0, t=None):
         command = notify_command_osx(msg, msg_type, t)
     else:
         command = notify_command_linux(msg, t)
-    os.system(command)
+    os.system(command.encode('u8'))
 
 
 if __name__ == "__main__":

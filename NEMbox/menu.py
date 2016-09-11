@@ -19,7 +19,6 @@ import locale
 import threading
 import sys
 import os
-import imp
 import time
 import signal
 import webbrowser
