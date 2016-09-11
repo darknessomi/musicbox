@@ -3,6 +3,13 @@
 # utils.py --- utils for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 import platform
 import os
 

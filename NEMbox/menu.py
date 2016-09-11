@@ -5,6 +5,14 @@
 '''
 网易云音乐 Menu
 '''
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 
 import curses
 import locale
@@ -15,6 +23,8 @@ import imp
 import time
 import signal
 import webbrowser
+import xml.etree.cElementTree as ET
+
 
 from .api import NetEase
 from .player import Player
@@ -26,10 +36,7 @@ from .utils import notify
 from .storage import Storage
 from .cache import Cache
 from . import logger
-try:
-    import xml.etree.cElementTree as ET
-except ImportError:
-    import xml.etree.ElementTree as ET
+
 
 log = logger.getLogger(__name__)
 

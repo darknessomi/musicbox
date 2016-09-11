@@ -5,12 +5,21 @@
 '''
 网易云音乐 Ui
 '''
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import range
+from builtins import str
+from builtins import int
+from future import standard_library
+standard_library.install_aliases()
 import hashlib
 import re
 import curses
 
 from .api import NetEase
-from .scrollstring import *
+from .scrollstring import truelen, scrollstring
 from .storage import Storage
 from .config import Config
 from .utils import notify
@@ -34,6 +43,7 @@ def escape_quote(text):
 
 
 class Ui(object):
+
     def __init__(self):
         self.screen = curses.initscr()
         self.screen.timeout(100)  # the screen refresh every 100ms
@@ -266,8 +276,8 @@ class Ui(object):
                     if i == index:
                         self.screen.addstr(
                             i - offset + 9, self.indented_startcol,
-                            '-> ' + str(i) + '. ' + datalist[i]['artists_name']
-                            + self.space + str(datalist[i]['alias']),
+                            '-> ' + str(i) + '. ' + datalist[i]['artists_name'] +
+                            self.space + str(datalist[i]['alias']),
                             curses.color_pair(2))
                     else:
                         self.screen.addstr(
@@ -281,9 +291,8 @@ class Ui(object):
                     if i == index:
                         self.screen.addstr(
                             i - offset + 9, self.indented_startcol,
-                            '-> ' + str(i) + '. ' + datalist[i]['albums_name']
-                            + self.space + datalist[i][
-                                'artists_name'], curses.color_pair(2))
+                            '-> ' + str(i) + '. ' + datalist[i]['albums_name'] +
+                            self.space + datalist[i]['artists_name'], curses.color_pair(2))
                     else:
                         self.screen.addstr(
                             i - offset + 9, self.startcol,
@@ -414,7 +423,7 @@ class Ui(object):
                         else:
                             for i in range(0, len(data['result']['songs'])):
                                 song_ids.append(data['result']['songs'][i][
-                                                    'id'])
+                                    'id'])
                             songs = netease.songs_detail(song_ids)
                         return netease.dig_info(songs, 'songs')
                 except Exception as e:
