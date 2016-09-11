@@ -18,6 +18,7 @@ log = logger.getLogger(__name__)
 
 
 class Config(Singleton):
+
     def __init__(self):
         if hasattr(self, '_init'):
             return

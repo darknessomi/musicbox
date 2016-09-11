@@ -17,6 +17,7 @@ code = locale.getpreferredencoding()
 
 
 class scrollstring(object):
+
     def __init__(self, content, START):
         self.content = content  # the true content of the string
         self.display = content  # the displayed string

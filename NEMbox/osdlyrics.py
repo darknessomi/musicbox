@@ -31,6 +31,7 @@ except ImportError:
 if pyqt_activity:
 
     class Lyrics(QtGui.QWidget):
+
         def __init__(self):
             super(Lyrics, self).__init__()
             self.__dbusAdaptor = LyricsAdapter(self)

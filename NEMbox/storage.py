@@ -18,6 +18,7 @@ from .singleton import Singleton
 
 
 class Storage(Singleton):
+
     def __init__(self):
         '''
         Database stores every info.

@@ -37,6 +37,7 @@ log = logger.getLogger(__name__)
 
 
 class Player(object):
+
     def __init__(self):
         self.config = Config()
         self.ui = Ui()

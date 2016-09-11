@@ -50,6 +50,7 @@ setup(
         'requests',
         'BeautifulSoup4',
         'pycrypto',
+        'future'
     ],
 
     entry_points={

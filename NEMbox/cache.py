@@ -27,6 +27,7 @@ log = logger.getLogger(__name__)
 
 
 class Cache(Singleton):
+
     def __init__(self):
         if hasattr(self, '_init'):
             return
@@ -43,7 +44,8 @@ class Cache(Singleton):
         self.aria2c_parameters = self.config.get_item('aria2c_parameters')
 
     def _is_cache_successful(self):
-        succ = lambda x: x and x.returncode == 0
+        def succ(x):
+            return x and x.returncode == 0
         return succ(self.aria2c) or succ(self.wget)
 
     def _kill_all(self):

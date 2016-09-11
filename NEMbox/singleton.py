@@ -5,6 +5,8 @@ from __future__ import absolute_import
 from builtins import super
 from future import standard_library
 standard_library.install_aliases()
+
+
 class Singleton(object):
     """Singleton Class
     This is a class to make some class being a Singleton class.

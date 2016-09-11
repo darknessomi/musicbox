@@ -98,10 +98,10 @@ class Ui(object):
         self.screen.clrtoeol()
         if pause:
             self.addstr(1, self.indented_startcol,
-                               '_ _ z Z Z ' + quality, curses.color_pair(3))
+                        '_ _ z Z Z ' + quality, curses.color_pair(3))
         else:
             self.addstr(1, self.indented_startcol,
-                               '♫  ♪ ♫  ♪ ' + quality, curses.color_pair(3))
+                        '♫  ♪ ♫  ♪ ' + quality, curses.color_pair(3))
 
         self.addstr(
             1, min(self.indented_startcol + 18, self.x - 1),
@@ -206,12 +206,12 @@ class Ui(object):
                 log.error(e)
                 pass
         self.addstr(4, self.startcol - 2, str(self.now_lyric),
-                           curses.color_pair(3))
+                    curses.color_pair(3))
         self.screen.refresh()
 
     def build_loading(self):
         self.addstr(7, self.startcol, '享受高品质音乐，loading...',
-                           curses.color_pair(1))
+                    curses.color_pair(1))
         self.screen.refresh()
 
     # start is the timestamp of this function being called
@@ -231,12 +231,12 @@ class Ui(object):
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.addstr(i - offset + 9,
-                                           self.indented_startcol,
-                                           '-> ' + str(i) + '. ' + datalist[i],
-                                           curses.color_pair(2))
+                                    self.indented_startcol,
+                                    '-> ' + str(i) + '. ' + datalist[i],
+                                    curses.color_pair(2))
                     else:
                         self.addstr(i - offset + 9, self.startcol,
-                                           str(i) + '. ' + datalist[i])
+                                    str(i) + '. ' + datalist[i])
 
             elif datatype == 'songs' or datatype == 'fmsongs':
                 iter_range = min(len(datalist), offset + step)
@@ -244,11 +244,11 @@ class Ui(object):
                     # this item is focus
                     if i == index:
                         self.addstr(i - offset + 8, 0,
-                                           ' ' * self.startcol)
+                                    ' ' * self.startcol)
                         lead = '-> ' + str(i) + '. '
                         self.addstr(i - offset + 8,
-                                           self.indented_startcol, lead,
-                                           curses.color_pair(2))
+                                    self.indented_startcol, lead,
+                                    curses.color_pair(2))
                         name = '{}{}{}  < {} >'.format(
                             datalist[i]['song_name'], self.space,
                             datalist[i]['artist'], datalist[i]['album_name'])
@@ -267,7 +267,7 @@ class Ui(object):
                                 curses.color_pair(2))
                     else:
                         self.addstr(i - offset + 8, 0,
-                                           ' ' * self.startcol)
+                                    ' ' * self.startcol)
                         self.addstr(
                             i - offset + 8, self.startcol,
                             '{}. {}{}{}  < {} >'.format(
@@ -337,23 +337,23 @@ class Ui(object):
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.addstr(i - offset + 9,
-                                           self.indented_startcol,
-                                           '-> ' + str(i) + '. ' + datalist[i],
-                                           curses.color_pair(2))
+                                    self.indented_startcol,
+                                    '-> ' + str(i) + '. ' + datalist[i],
+                                    curses.color_pair(2))
                     else:
                         self.addstr(i - offset + 9, self.startcol,
-                                           str(i) + '. ' + datalist[i])
+                                    str(i) + '. ' + datalist[i])
 
             elif datatype in ('playlist_classes', 'playlist_class_detail'):
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.addstr(i - offset + 9,
-                                           self.indented_startcol,
-                                           '-> ' + str(i) + '. ' + datalist[i],
-                                           curses.color_pair(2))
+                                    self.indented_startcol,
+                                    '-> ' + str(i) + '. ' + datalist[i],
+                                    curses.color_pair(2))
                     else:
                         self.addstr(i - offset + 9, self.startcol,
-                                           str(i) + '. ' + datalist[i])
+                                    str(i) + '. ' + datalist[i])
 
             elif datatype == 'djchannels':
                 for i in range(offset, min(len(datalist), offset + step)):
@@ -372,7 +372,7 @@ class Ui(object):
                 self.screen.clrtobot()
                 self.screen.timeout(-1)
                 self.addstr(8, self.startcol, '选择搜索类型:',
-                                   curses.color_pair(1))
+                            curses.color_pair(1))
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
                         self.addstr(
@@ -381,7 +381,7 @@ class Ui(object):
                             curses.color_pair(2))
                     else:
                         self.addstr(i - offset + 10, self.startcol,
-                                           str(i) + '.' + datalist[i - 1])
+                                    str(i) + '.' + datalist[i - 1])
                 self.screen.timeout(100)
 
             elif datatype == 'help':
@@ -403,9 +403,9 @@ class Ui(object):
                 self.addstr(
                     20, 6, 'NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存')
                 self.addstr(21, 10,
-                                   '按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~')
+                            '按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~')
                 self.addstr(22, self.startcol,
-                                   'Build with love to music by omi')
+                            'Build with love to music by omi')
 
         self.screen.refresh()
 
@@ -500,7 +500,7 @@ class Ui(object):
         self.screen.move(4, 1)
         self.screen.clrtobot()
         self.addstr(5, self.startcol, '请输入登录信息(支持手机登陆)',
-                           curses.color_pair(1))
+                    curses.color_pair(1))
         self.addstr(8, self.startcol, '账号:', curses.color_pair(1))
         self.addstr(9, self.startcol, '密码:', curses.color_pair(1))
         self.screen.move(8, 24)
@@ -511,7 +511,7 @@ class Ui(object):
         self.screen.timeout(-1)  # disable the screen timeout
         self.screen.clrtobot()
         self.addstr(8, self.startcol, '艾玛，登录信息好像不对呢 (O_O)#',
-                           curses.color_pair(1))
+                    curses.color_pair(1))
         self.addstr(10, self.startcol, '[1] 再试一次')
         self.addstr(11, self.startcol, '[2] 稍后再试')
         self.addstr(14, self.startcol, '请键入对应数字:', curses.color_pair(2))
@@ -540,7 +540,7 @@ class Ui(object):
         self.screen.move(4, 1)
         self.screen.clrtobot()
         self.addstr(5, self.startcol, prompt_string,
-                           curses.color_pair(1))
+                    curses.color_pair(1))
         self.screen.refresh()
         info = self.screen.getstr(10, self.startcol, 60)
         if info == '':
