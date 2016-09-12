@@ -118,5 +118,9 @@ class Storage(Singleton):
 
     def save(self):
         self.file = open(self.storage_path, 'w')
-        self.file.write(json.dumps(self.database).decode('u8'))
+        db_str = json.dumps(self.database)
+        if hasattr(db_str, 'decode'):
+            self.file.write(db_str.decode('u8'))
+        else:
+            self.file.write(db_str)
         self.file.close()
