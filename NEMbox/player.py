@@ -4,9 +4,19 @@
 # @Date:   2014-07-15 15:48:27
 # @Last Modified by:   omi
 # @Last Modified time: 2015-01-30 18:05:08
+from __future__ import unicode_literals
+
 '''
 网易云音乐 Player
 '''
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 # Let's make some noise
 
 import subprocess
@@ -16,17 +26,18 @@ import os
 import random
 import re
 
-from ui import Ui
-from storage import Storage
-from api import NetEase
-from cache import Cache
-from config import Config
-import logger
+from .ui import Ui
+from .storage import Storage
+from .api import NetEase
+from .cache import Cache
+from .config import Config
+from . import logger
 
 log = logger.getLogger(__name__)
 
 
 class Player(object):
+
     def __init__(self):
         self.config = Config()
         self.ui = Ui()
@@ -62,21 +73,22 @@ class Player(object):
                                                   stdin=subprocess.PIPE,
                                                   stdout=subprocess.PIPE,
                                                   stderr=subprocess.PIPE)
-            self.popen_handler.stdin.write('V ' + str(self.info[
-                'playing_volume']) + '\n')
+            self.popen_handler.stdin.write(b'V ' + str(self.info['playing_volume']).encode('u8') + b'\n')
             if arg:
-                self.popen_handler.stdin.write('L ' + arg + '\n')
+                self.popen_handler.stdin.write(b'L ' + arg.encode('u8') + b'\n')
             else:
                 self.next_idx()
                 onExit()
                 return
+
+            self.popen_handler.stdin.flush()
 
             self.process_first = True
             while True:
                 if self.playing_flag is False:
                     break
 
-                strout = self.popen_handler.stdout.readline()
+                strout = self.popen_handler.stdout.readline().decode('u8')
 
                 if re.match('^\@F.*$', strout):
                     process_data = strout.split(' ')
@@ -100,10 +112,12 @@ class Player(object):
                         'Song {} is not compatible with old api.'.format(sid))
                     popenArgs['mp3_url'] = new_url
 
-                    self.popen_handler.stdin.write('\nL ' + new_url + '\n')
+                    self.popen_handler.stdin.write(b'\nL ' + new_url.encode('u8') + b'\n')
+                    self.popen_handler.stdin.flush()
                     self.popen_handler.stdout.readline()
                 elif strout == '@P 0\n':
-                    self.popen_handler.stdin.write('Q\n')
+                    self.popen_handler.stdin.write(b'Q\n')
+                    self.popen_handler.stdin.flush()
                     self.popen_handler.kill()
                     break
 
@@ -259,7 +273,8 @@ class Player(object):
     def stop(self):
         if self.playing_flag and self.popen_handler:
             self.playing_flag = False
-            self.popen_handler.stdin.write('Q\n')
+            self.popen_handler.stdin.write(b'Q\n')
+            self.popen_handler.stdin.flush()
             try:
                 self.popen_handler.kill()
             except OSError as e:
@@ -270,7 +285,8 @@ class Player(object):
         if not self.playing_flag and not self.popen_handler:
             return
         self.pause_flag = True
-        self.popen_handler.stdin.write('P\n')
+        self.popen_handler.stdin.write(b'P\n')
+        self.popen_handler.stdin.flush()
 
         item = self.songs[self.info['player_list'][self.info['idx']]]
         self.ui.build_playinfo(item['song_name'],
@@ -282,7 +298,8 @@ class Player(object):
 
     def resume(self):
         self.pause_flag = False
-        self.popen_handler.stdin.write('P\n')
+        self.popen_handler.stdin.write(b'P\n')
+        self.popen_handler.stdin.flush()
 
         item = self.songs[self.info['player_list'][self.info['idx']]]
         self.ui.build_playinfo(item['song_name'], item['artist'],
@@ -409,8 +426,9 @@ class Player(object):
             self.info['playing_volume'] = 100
         if not self.playing_flag:
             return
-        self.popen_handler.stdin.write('V ' + str(self.info[
-            'playing_volume']) + '\n')
+        self.popen_handler.stdin.write(b'V ' + str(self.info[
+            'playing_volume']).encode('u8') + b'\n')
+        self.popen_handler.stdin.flush()
 
     def volume_down(self):
         self.info['playing_volume'] = self.info['playing_volume'] - 7
@@ -419,8 +437,9 @@ class Player(object):
         if not self.playing_flag:
             return
 
-        self.popen_handler.stdin.write('V ' + str(self.info[
-            'playing_volume']) + '\n')
+        self.popen_handler.stdin.write(b'V ' + str(self.info[
+            'playing_volume']).encode('u8') + b'\n')
+        self.popen_handler.stdin.flush()
 
     def update_size(self):
         try:

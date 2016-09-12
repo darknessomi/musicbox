@@ -3,11 +3,18 @@
 # osdlyrics.py --- desktop lyrics for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import super
+from future import standard_library
+standard_library.install_aliases()
 import sys
-
-import logger
-from config import Config
 from multiprocessing import Process
+
+from . import logger
+from .config import Config
 
 log = logger.getLogger(__name__)
 
@@ -24,6 +31,7 @@ except ImportError:
 if pyqt_activity:
 
     class Lyrics(QtGui.QWidget):
+
         def __init__(self):
             super(Lyrics, self).__init__()
             self.__dbusAdaptor = LyricsAdapter(self)
@@ -51,7 +59,7 @@ if pyqt_activity:
             frameGeo = self.frameGeometry()
             frameGeo.moveBottomRight(br)
             self.move(frameGeo.topLeft())
-            self.text = u"OSD Lyrics for Musicbox"
+            self.text = "OSD Lyrics for Musicbox"
             self.setWindowTitle("Lyrics")
             self.show()
 

@@ -5,6 +5,14 @@
 '''
 网易云音乐 Menu
 '''
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 
 import curses
 import locale
@@ -12,24 +20,22 @@ import threading
 import sys
 import os
 import time
-import webbrowser
 import signal
+import webbrowser
+import xml.etree.cElementTree as ET
 
-from api import NetEase
-from player import Player
-from ui import Ui
-from osdlyrics import show_lyrics_new_process
-from const import Constant
-from config import Config
-from utils import notify
-from storage import Storage
-from cache import Cache
-import logger
 
-try:
-    import xml.etree.cElementTree as ET
-except ImportError:
-    import xml.etree.ElementTree as ET
+from .api import NetEase
+from .player import Player
+from .ui import Ui
+from .osdlyrics import show_lyrics_new_process
+from .const import Constant
+from .config import Config
+from .utils import notify
+from .storage import Storage
+from .cache import Cache
+from . import logger
+
 
 log = logger.getLogger(__name__)
 
@@ -96,9 +102,8 @@ shortcut = [
 
 # yapf: enable
 class Menu(object):
+
     def __init__(self):
-        reload(sys)
-        sys.setdefaultencoding('UTF-8')
         self.config = Config()
         self.datatype = 'main'
         self.title = '网易云音乐'
@@ -156,8 +161,7 @@ class Menu(object):
             pcsignin = self.netease.daily_signin(1)
             if pcsignin != -1 and pcsignin['code'] != -2:
                 notify('PC signin success', 1)
-            tree = ET.ElementTree(ET.fromstring(str(self.netease.get_version(
-            ))))
+            tree = ET.ElementTree(ET.fromstring(self.netease.get_version()))
             root = tree.getroot()
             return root[0][4][0][0].text
         except TypeError as e:
@@ -677,8 +681,8 @@ class Menu(object):
         for i in self.storage.database['player_info']['player_list']:
             self.datalist.append(self.storage.database['songs'][i])
         self.index = self.storage.database['player_info']['idx']
-        self.offset = self.storage.database['player_info'][
-            'idx'] / self.step * self.step
+        self.offset = self.storage.database[
+            'player_info']['idx'] // self.step * self.step
         if self.resume_play:
             if self.datatype == 'fmsongs':
                 self.player.end_callback = self.fm_callback
@@ -708,7 +712,7 @@ class Menu(object):
                 self.datalist.append(self.storage.database['songs'][i])
             self.index = self.storage.database['player_info']['idx']
             self.offset = self.storage.database['player_info'][
-                'idx'] / self.step * self.step
+                'idx'] // self.step * self.step
 
     def request_api(self, func, *args):
         if self.storage.database['user']['user_id'] != '':
