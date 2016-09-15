@@ -13,6 +13,7 @@ import os
 from . import logger
 from .singleton import Singleton
 from .const import Constant
+from .utils import utf8_data_to_file
 
 log = logger.getLogger(__name__)
 
@@ -128,12 +129,12 @@ class Config(Singleton):
 
     def generate_config_file(self):
         f = open(self.config_file_path, 'w')
-        f.write(json.dumps(self.default_config, indent=2))
+        utf8_data_to_file(f, json.dumps(self.default_config, indent=2))
         f.close()
 
     def save_config_file(self):
         f = open(self.config_file_path, 'w')
-        f.write(json.dumps(self.config, indent=2))
+        utf8_data_to_file(f, json.dumps(self.config, indent=2))
         f.close()
 
     def check_version(self):

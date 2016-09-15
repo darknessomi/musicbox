@@ -15,6 +15,7 @@ import json
 
 from .const import Constant
 from .singleton import Singleton
+from .utils import utf8_data_to_file
 
 
 class Storage(Singleton):
@@ -119,8 +120,5 @@ class Storage(Singleton):
     def save(self):
         self.file = open(self.storage_path, 'w')
         db_str = json.dumps(self.database)
-        if hasattr(db_str, 'decode'):
-            self.file.write(db_str.decode('u8'))
-        else:
-            self.file.write(db_str)
+        utf8_data_to_file(self.file, db_str)
         self.file.close()
