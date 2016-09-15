@@ -14,6 +14,13 @@ import platform
 import os
 
 
+def utf8_data_to_file(f, data):
+    if hasattr(data, 'decode'):
+        f.write(data.decode('u8'))
+    else:
+        f.write(data)
+
+
 def notify_command_osx(msg, msg_type, t=None):
     command = '/usr/bin/osascript -e \'display notification "' + msg
     if msg_type == 1:
