@@ -6,7 +6,6 @@ NetEase-MusicBox
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
-<!--[![](https://img.shields.io/pypi/dm/NetEase-MusicBox.svg)](https://pypi.python.org/pypi/NetEase-MusicBox/)-->
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.python.org/pypi/NetEase-MusicBox/)
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
@@ -71,7 +70,7 @@ NetEase-MusicBox
 
 ### Mac安装
 
-	$ sudo pip install NetEase-MusicBox
+	$ (sudo) pip install NetEase-MusicBox
 
 	$ brew install mpg123
 
@@ -82,24 +81,25 @@ NetEase-MusicBox
 
 #### Ubuntu/Debian
 
-	$ sudo pip2 install NetEase-MusicBox
+	$ (sudo) pip install NetEase-MusicBox
 
-	$ sudo apt-get install mpg123
+	$ (sudo) apt-get install mpg123
 
 #### Arch Linux
 
     $ pacaur -S netease-musicbox-git
 
-#### 可选功能依赖 && 配置文件
+#### 可选功能依赖
 
 1. ``` aria2 ``` 用于缓存歌曲
 2. ``` python-keybinder ``` 用于支持全局快捷键
 3. ``` libnotify-bin ``` 用于支持消息提示
-4. ``` pyqt python-dbus dbus qt ``` 用于支持桌面歌词 (Mac 用户需要 ```brew
-   install qt --with-d-bus``` 获取支持 DBus 的 Qt)
+4. ``` pyqt python-dbus dbus qt ``` 用于支持桌面歌词 (Mac 用户需要 ```brew install qt --with-d-bus``` 获取支持 DBus 的 Qt)
 
-配置文件地址: ``` ~/.netease-musicbox ``` 可配置缓存，快捷键，消息，歌词  
-由于歌曲 API 只接受中国大陆地区访问，港澳台及海外用户请自行在```config.json```中设置代理
+#### 配置文件
+配置文件地址: ``` ~/.netease-musicbox/config.json ```
+可配置缓存，快捷键，消息，桌面歌词。
+由于歌曲 API 只接受中国大陆地区访问，港澳台及海外用户请自行设置代理：
 
 ```
 "mpg123_parameters": {
