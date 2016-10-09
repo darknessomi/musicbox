@@ -15,10 +15,12 @@ import curses
 import traceback
 import argparse
 import sys
+import time
 
 from .menu import Menu
 
 version = "0.2.3.3"
+
 
 
 def start():
@@ -35,8 +37,9 @@ def start():
 
 
 if __name__ == '__main__':
+    print('------------start debugging------------')
+    time.sleep(0.5)
     start()
-
 parser = argparse.ArgumentParser()
 parser.add_argument("-v",
                     "--version",

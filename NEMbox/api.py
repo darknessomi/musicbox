@@ -471,6 +471,16 @@ class NetEase(object):
         except requests.exceptions.RequestException as e:
             log.error(e)
             return []
+        
+    def song_comments(self, music_id, offset=0, total='fasle', limit=100):
+        action = 'http://music.163.com/api/v1/resource/comments/R_SO_4_{}/?rid=R_SO_4_{}&\
+            offset={}&total={}&limit={}'.format(music_id, music_id, offset, total, limit)
+        try:
+            comments = self.httpRequest('GET', action)
+            return comments
+        except requests.exceptions.RequestException as e:
+            log.error(e)
+            return []
 
     # song ids --> song urls ( details )
     def songs_detail(self, ids, offset=0):
@@ -547,7 +557,7 @@ class NetEase(object):
         except requests.exceptions.RequestException as e:
             log.error(e)
             return []
-
+     
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
     def djchannels(self, stype=0, offset=0, limit=50):
         action = 'http://music.163.com/discover/djradio?type={}&offset={}&limit={}'.format(  # NOQA

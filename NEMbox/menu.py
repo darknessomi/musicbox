@@ -77,6 +77,7 @@ shortcut = [
     ['[', 'Prev song ', '上一曲'],
     [']', 'Next song ', '下一曲'],
     [' ', 'Play/Pause', '播放/暂停'],
+    ['t', 'Comments  ', '歌曲评论'],
     ['?', 'Shuffle          ', '手气不错'],
     ['=', 'Volume+          ', '音量增加'],
     ['-', 'Volume-          ', '音量减少'],
@@ -269,6 +270,16 @@ class Menu(object):
                     log.error(e)
                     break
                 break
+                
+            elif key == ord('t'):
+                try:
+                    music_id = self.datalist[idx]['song_id']
+                    comments = self.netease.song_comments(music_id)
+                    notify(str(comments), 1000)
+                except Exception, e:
+                    log.error(e)
+                    break
+                self.dispatch_enter(8)
 
             # 上移
             elif key == ord('k'):
@@ -548,7 +559,7 @@ class Menu(object):
             elif key == ord('C'):
                 s = self.datalist[idx]
                 cache_thread = threading.Thread(
-                    target=self.player.cacheSong1time,
+                        target=self.player.cacheSong1time,
                     args=(s['song_id'], s['song_name'], s['artist'], s[
                         'mp3_url']))
                 cache_thread.start()
