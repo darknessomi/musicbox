@@ -213,6 +213,7 @@ class Ui(object):
         self.addstr(7, self.startcol, '享受高品质音乐，loading...',
                     curses.color_pair(1))
         self.screen.refresh()
+        
 
     # start is the timestamp of this function being called
     def build_menu(self, datatype, title, datalist, offset, index, step,
@@ -276,6 +277,21 @@ class Ui(object):
                                 datalist[i]['album_name'])[:int(self.x * 2)])
 
                 self.addstr(iter_range - offset + 8, 0, ' ' * self.x)
+                
+            # need to add comments ui    
+            elif datatype == 'comments':
+                for i in range(offset, min(len(datalist), offset + step)):
+                    if i == index:
+                        self.addstr(
+                            i - offset + 9, self.indented_startcol,
+                            '-> ' + str(i) + '. ' + datalist[i]+
+                            self.space + str(datalist[i]),
+                            curses.color_pair(2))
+                    else:
+                        self.addstr(
+                            i - offset + 9, self.startcol,
+                            str(i) + '. ' + datalist[i] +
+                            self.space + datalist[i])
 
             elif datatype == 'artists':
                 for i in range(offset, min(len(datalist), offset + step)):

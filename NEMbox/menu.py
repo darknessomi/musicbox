@@ -272,14 +272,12 @@ class Menu(object):
                 break
                 
             elif key == ord('t'):
-                try:
-                    music_id = self.datalist[idx]['song_id']
-                    comments = self.netease.song_comments(music_id)
-                    notify(str(comments), 1000)
-                except Exception, e:
-                    log.error(e)
-                    break
-                self.dispatch_enter(8)
+                self.datatype = 'comments'
+                self.title = '网易云音乐 > 评论'
+                self.datalist = ['the first', 'second']
+                self.offset = 0
+                self.index = 0
+                notify(self.datatype, 500)
 
             # 上移
             elif key == ord('k'):
