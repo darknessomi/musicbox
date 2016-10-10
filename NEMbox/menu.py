@@ -660,7 +660,7 @@ class Menu(object):
             
         elif datatype == 'songs':
             song_id = datalist[idx]['song_id']
-            comments = self.netease.song_comments(song_id, limit=10)
+            comments = self.netease.song_comments(song_id, limit=5)
             hotcomments = comments['hotComments']
             comcomments = comments['comments']
             notify(hotcomments[0]['content'], 500)

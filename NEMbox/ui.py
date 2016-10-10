@@ -280,17 +280,33 @@ class Ui(object):
                 
             # need to add comments ui    
             elif datatype == 'comments':
+                nextstep = 0
                 for i in range(offset, min(len(datalist), offset + step)):
-                    step = int(len(datalist[i])/self.y)
+                    nextstep += int(len(datalist[i-1])/self.y)
+                    if i - offset + 9 + nextstep >= self.y:
+                        for j in range(i, 10):
+                            try:
+                                self.addstr(j,self.startcol, '')
+                            except Exception, e:
+                                log.error(e)
+                        nextstep = 0
                     if i == index:
-                        self.addstr(
-                            i - offset + 9 + step, self.indented_startcol,
+                        try:
+                            self.addstr(
+                            i - offset + 9 + nextstep, self.indented_startcol,
                             '-> ' + str(i) + '. ' + datalist[i],
                             curses.color_pair(2))
+                        except Exception, e:
+                                log.error(e)
                     else:
-                        self.addstr(
-                            i - offset + 9 + step, self.startcol,
+                        try:
+                            self.addstr(
+                            i - offset + 9 + nextstep, self.startcol,
                             str(i) + '. ' + datalist[i])
+                        except Exception, e:
+                                log.error(e)
+                            
+                    
 
             elif datatype == 'artists':
                 for i in range(offset, min(len(datalist), offset + step)):
