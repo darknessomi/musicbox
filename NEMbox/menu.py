@@ -272,12 +272,27 @@ class Menu(object):
                 break
                 
             elif key == ord('t'):
+                notify(self.datatype, 500)
+                try:
+                    music_id = self.datalist[idx]['song_id']
+                    comments = self.netease.song_comments(music_id, limit=10)
+                    hotcomments = comments['hotComments']
+                    comcomment = comments['comments']
+                    notify(hotcomments[0]['content'], 500)
+                    self.datalist = []
+                    for one_comment in hotcomments:
+                        self.datalist.append('%s:%s' % (one_comment['user']['nicname'], one_comment['content']))
+                    for one_comment in comcoments:
+                        self.datalist.append(one_comment['content'])
+                        
+                except Exception, e:
+                    log.error(e)
+                    time.sleep(2)
                 self.datatype = 'comments'
                 self.title = '网易云音乐 > 评论'
-                self.datalist = ['the first', 'second']
+                self.datalist.append('---debug---')
                 self.offset = 0
                 self.index = 0
-                notify(self.datatype, 500)
 
             # 上移
             elif key == ord('k'):
@@ -642,6 +657,22 @@ class Menu(object):
             self.datalist = netease.dig_info(
                 netease.top_playlists(data), self.datatype)
             self.title += ' > ' + data
+            
+        elif datatype == 'songs':
+            song_id = datalist[idx]['song_id']
+            comments = self.netease.song_comments(song_id, limit=10)
+            hotcomments = comments['hotComments']
+            comcomments = comments['comments']
+            notify(hotcomments[0]['content'], 500)
+            self.datalist = []
+            for one_comment in hotcomments:
+                self.datalist.append('%s' % (one_comment['content']))
+            for one_comment in comcomments:
+                self.datalist.append(one_comment['content'])
+            self.datatype = 'comments'
+            self.title = '网易云音乐 > 评论'
+            self.offset = 0
+            self.index = 0
 
         # 歌曲榜单
         elif datatype == 'toplists':
@@ -675,7 +706,10 @@ class Menu(object):
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
-
+    
+    def show_comments(self):
+        self.netease.song_comments()
+                
     def show_playing_song(self):
         if self._is_playlist_empty():
             return
