@@ -685,10 +685,7 @@ class Menu(object):
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
-    
-    def show_comments(self):
-        self.netease.song_comments()
-                
+                    
     def show_playing_song(self):
         if self._is_playlist_empty():
             return
