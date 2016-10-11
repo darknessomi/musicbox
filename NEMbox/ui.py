@@ -278,35 +278,25 @@ class Ui(object):
 
                 self.addstr(iter_range - offset + 8, 0, ' ' * self.x)
                 
-            # need to add comments ui    
             elif datatype == 'comments':
-                nextstep = 0
+                # 被选中的评论在最下方显示全部字符，其余评论仅显示一行
                 for i in range(offset, min(len(datalist), offset + step)):
-                    nextstep += int(len(datalist[i-1])/self.y)
-                    if i - offset + 9 + nextstep >= self.y:
-                        for j in range(i, 10):
-                            try:
-                                self.addstr(j,self.startcol, '')
-                            except Exception, e:
-                                log.error(e)
-                        nextstep = 0
+                    maxdatalistlength = min(int(1.8 * self.startcol), len(datalist[i]))
                     if i == index:
                         try:
                             self.addstr(
-                            i - offset + 9 + nextstep, self.indented_startcol,
-                            '-> ' + str(i) + '. ' + datalist[i],
-                            curses.color_pair(2))
-                        except Exception, e:
-                                log.error(e)
-                    else:
-                        try:
+                                20, self.indented_startcol,
+                                '-> ' + str(i) + '. ' + datalist[i],
+                                curses.color_pair(2))
+                        except:
                             self.addstr(
-                            i - offset + 9 + nextstep, self.startcol,
-                            str(i) + '. ' + datalist[i])
-                        except Exception, e:
-                                log.error(e)
-                            
-                    
+                                20, self.indented_startcol,
+                                '-> ' + str(i) + '. ' + 'This comment is invalid',
+                                curses.color_pair(2))
+                    else:
+                        self.addstr(
+                            i - offset + 9, self.startcol,
+                            str(i) + '. ' + datalist[i][:maxdatalistlength])
 
             elif datatype == 'artists':
                 for i in range(offset, min(len(datalist), offset + step)):

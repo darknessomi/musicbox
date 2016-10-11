@@ -77,7 +77,6 @@ shortcut = [
     ['[', 'Prev song ', '上一曲'],
     [']', 'Next song ', '下一曲'],
     [' ', 'Play/Pause', '播放/暂停'],
-    ['t', 'Comments  ', '歌曲评论'],
     ['?', 'Shuffle          ', '手气不错'],
     ['=', 'Volume+          ', '音量增加'],
     ['-', 'Volume-          ', '音量减少'],
@@ -271,29 +270,6 @@ class Menu(object):
                     break
                 break
                 
-            elif key == ord('t'):
-                notify(self.datatype, 500)
-                try:
-                    music_id = self.datalist[idx]['song_id']
-                    comments = self.netease.song_comments(music_id, limit=10)
-                    hotcomments = comments['hotComments']
-                    comcomment = comments['comments']
-                    notify(hotcomments[0]['content'], 500)
-                    self.datalist = []
-                    for one_comment in hotcomments:
-                        self.datalist.append('%s:%s' % (one_comment['user']['nicname'], one_comment['content']))
-                    for one_comment in comcoments:
-                        self.datalist.append(one_comment['content'])
-                        
-                except Exception, e:
-                    log.error(e)
-                    time.sleep(2)
-                self.datatype = 'comments'
-                self.title = '网易云音乐 > 评论'
-                self.datalist.append('---debug---')
-                self.offset = 0
-                self.index = 0
-
             # 上移
             elif key == ord('k'):
                 # turn page if at beginning
@@ -658,19 +634,22 @@ class Menu(object):
                 netease.top_playlists(data), self.datatype)
             self.title += ' > ' + data
             
+        # 歌曲评论    
         elif datatype == 'songs':
             song_id = datalist[idx]['song_id']
-            comments = self.netease.song_comments(song_id, limit=5)
-            hotcomments = comments['hotComments']
-            comcomments = comments['comments']
-            notify(hotcomments[0]['content'], 500)
+            comments = self.netease.song_comments(song_id, limit=100)
+            try:
+                hotcomments = comments['hotComments']
+                comcomments = comments['comments']
+            except KeyError:
+                hotcomments = comcomments = []
             self.datalist = []
             for one_comment in hotcomments:
-                self.datalist.append('%s' % (one_comment['content']))
+                self.datalist.append(u'(热门评论)%s:%s' % (one_comment['user']['nickname'], one_comment['content']))
             for one_comment in comcomments:
                 self.datalist.append(one_comment['content'])
             self.datatype = 'comments'
-            self.title = '网易云音乐 > 评论'
+            self.title = '网易云音乐 > 评论:%s' % datalist[idx]['song_name']
             self.offset = 0
             self.index = 0
 
