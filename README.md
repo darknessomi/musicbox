@@ -94,7 +94,7 @@ NetEase-MusicBox
 1. ``` aria2 ``` 用于缓存歌曲
 2. ``` python-keybinder ``` 用于支持全局快捷键
 3. ``` libnotify-bin ``` 用于支持消息提示
-4. ``` pyqt python-dbus dbus qt ``` 用于支持桌面歌词 (Mac 用户需要 ```brew install qt --with-d-bus``` 获取支持 DBus 的 Qt)
+4. ``` pyqt python-dbus dbus qt ``` 用于支持桌面歌词 (Mac 用户需要 ```brew install qt --with-dbus``` 获取支持 DBus 的 Qt)
 
 #### 配置文件
 配置文件地址: ``` ~/.netease-musicbox/config.json ```
