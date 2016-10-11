@@ -635,13 +635,14 @@ class Menu(object):
             self.title += ' > ' + data
             
         # 歌曲评论    
-        elif datatype == 'songs':
+        elif datatype in ['songs', 'fmsongs']:
             song_id = datalist[idx]['song_id']
             comments = self.netease.song_comments(song_id, limit=100)
             try:
                 hotcomments = comments['hotComments']
                 comcomments = comments['comments']
             except KeyError:
+                log.error(str(comments))
                 hotcomments = comcomments = []
             self.datalist = []
             for one_comment in hotcomments:
