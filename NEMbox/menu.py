@@ -633,9 +633,9 @@ class Menu(object):
             self.datalist = netease.dig_info(
                 netease.top_playlists(data), self.datatype)
             self.title += ' > ' + data
-            
-        # 歌曲评论    
-        elif datatype == 'songs':
+
+        # 歌曲评论
+        elif datatype in ['songs', 'fmsongs']:
             song_id = datalist[idx]['song_id']
             comments = self.netease.song_comments(song_id, limit=100)
             try:
@@ -645,7 +645,9 @@ class Menu(object):
                 hotcomments = comcomments = []
             self.datalist = []
             for one_comment in hotcomments:
-                self.datalist.append(u'(热门评论)%s:%s' % (one_comment['user']['nickname'], one_comment['content']))
+                self.datalist.append(
+                    u'(热门评论)%s:%s' % (one_comment['user']['nickname'],
+                                      one_comment['content']))
             for one_comment in comcomments:
                 self.datalist.append(one_comment['content'])
             self.datatype = 'comments'
@@ -685,7 +687,7 @@ class Menu(object):
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
-                    
+
     def show_playing_song(self):
         if self._is_playlist_empty():
             return

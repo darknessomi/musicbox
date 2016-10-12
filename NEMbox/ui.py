@@ -277,11 +277,11 @@ class Ui(object):
                                 datalist[i]['album_name'])[:int(self.x * 2)])
 
                 self.addstr(iter_range - offset + 8, 0, ' ' * self.x)
-                
+
             elif datatype == 'comments':
                 # 被选中的评论在最下方显示全部字符，其余评论仅显示一行
                 for i in range(offset, min(len(datalist), offset + step)):
-                    maxdatalistlength = min(int(1.8 * self.startcol), len(datalist[i]))
+                    maxlength = min(int(1.8 * self.startcol), len(datalist[i]))
                     if i == index:
                         try:
                             self.addstr(
@@ -296,7 +296,7 @@ class Ui(object):
                     else:
                         self.addstr(
                             i - offset + 9, self.startcol,
-                            str(i) + '. ' + datalist[i][:maxdatalistlength])
+                            str(i) + '. ' + datalist[i][:maxlength])
 
             elif datatype == 'artists':
                 for i in range(offset, min(len(datalist), offset + step)):
