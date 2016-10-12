@@ -389,7 +389,8 @@ class Menu(object):
                 return_data = self.request_api(self.netease.fm_like,
                                                self.player.get_playing_id())
                 if return_data != -1:
-                    notify('Added successfully!', 0)
+                    song_name = self.player.get_playing_name()
+                    notify('Added: %s successfully!' % song_name, 0)
                 else:
                     notify('Existing song!', 0)
 

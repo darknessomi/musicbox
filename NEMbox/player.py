@@ -50,6 +50,7 @@ class Player(object):
         self.info = self.storage.database['player_info']
         self.songs = self.storage.database['songs']
         self.playing_id = -1
+        self.playing_name = ''
         self.cache = Cache()
         self.notifier = self.config.get_item('notifier')
         self.mpg123_parameters = self.config.get_item('mpg123_parameters')
@@ -179,6 +180,9 @@ class Player(object):
     def get_playing_id(self):
         return self.playing_id
 
+    def get_playing_name(self):
+        return self.playing_name
+
     def recall(self):
         if self.info['idx'] >= len(self.info[
                 'player_list']) and self.end_callback is not None:
@@ -199,6 +203,7 @@ class Player(object):
             self.ui.notify('Now playing', item['song_name'],
                            item['album_name'], item['artist'])
         self.playing_id = item['song_id']
+        self.playing_name = item['song_name']
         self.popen_recall(self.recall, item)
 
     def generate_shuffle_playing_list(self):
@@ -304,6 +309,7 @@ class Player(object):
                                item['album_name'], item['quality'],
                                time.time())
         self.playing_id = item['song_id']
+        self.playing_name = item['song_name']
 
     def _swap_song(self):
         plist = self.info['playing_list']
