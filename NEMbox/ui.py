@@ -277,6 +277,26 @@ class Ui(object):
 
                 self.addstr(iter_range - offset + 8, 0, ' ' * self.x)
 
+            elif datatype == 'comments':
+                # 被选中的评论在最下方显示全部字符，其余评论仅显示一行
+                for i in range(offset, min(len(datalist), offset + step)):
+                    maxlength = min(int(1.8 * self.startcol), len(datalist[i]))
+                    if i == index:
+                        try:
+                            self.addstr(
+                                20, self.indented_startcol,
+                                '-> ' + str(i) + '. ' + datalist[i],
+                                curses.color_pair(2))
+                        except:
+                            self.addstr(
+                                20, self.indented_startcol,
+                                '-> ' + str(i) + '. ' + 'This comment is invalid',
+                                curses.color_pair(2))
+                    else:
+                        self.addstr(
+                            i - offset + 9, self.startcol,
+                            str(i) + '. ' + datalist[i][:maxlength])
+
             elif datatype == 'artists':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
