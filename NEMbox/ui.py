@@ -213,7 +213,6 @@ class Ui(object):
         self.addstr(7, self.startcol, '享受高品质音乐，loading...',
                     curses.color_pair(1))
         self.screen.refresh()
-        
 
     # start is the timestamp of this function being called
     def build_menu(self, datatype, title, datalist, offset, index, step,

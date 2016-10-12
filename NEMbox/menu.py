@@ -269,7 +269,7 @@ class Menu(object):
                     log.error(e)
                     break
                 break
-                
+
             # 上移
             elif key == ord('k'):
                 # turn page if at beginning
@@ -548,7 +548,7 @@ class Menu(object):
             elif key == ord('C'):
                 s = self.datalist[idx]
                 cache_thread = threading.Thread(
-                        target=self.player.cacheSong1time,
+                    target=self.player.cacheSong1time,
                     args=(s['song_id'], s['song_name'], s['artist'], s[
                         'mp3_url']))
                 cache_thread.start()
