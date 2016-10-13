@@ -472,6 +472,16 @@ class NetEase(object):
             log.error(e)
             return []
 
+    def song_comments(self, music_id, offset=0, total='fasle', limit=100):
+        action = 'http://music.163.com/api/v1/resource/comments/R_SO_4_{}/?rid=R_SO_4_{}&\
+            offset={}&total={}&limit={}'.format(music_id, music_id, offset, total, limit)
+        try:
+            comments = self.httpRequest('GET', action)
+            return comments
+        except requests.exceptions.RequestException as e:
+            log.error(e)
+            return []
+
     # song ids --> song urls ( details )
     def songs_detail(self, ids, offset=0):
         tmpids = ids[offset:]

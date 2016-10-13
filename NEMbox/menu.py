@@ -40,8 +40,8 @@ from . import logger
 log = logger.getLogger(__name__)
 
 try:
-    import keybinder
-    BINDABLE = True
+    # import keybinder
+    BINDABLE = False
 except ImportError:
     BINDABLE = False
     log.warn('keybinder module not installed.')
@@ -633,6 +633,27 @@ class Menu(object):
             self.datalist = netease.dig_info(
                 netease.top_playlists(data), self.datatype)
             self.title += ' > ' + data
+
+        # 歌曲评论
+        elif datatype in ['songs', 'fmsongs']:
+            song_id = datalist[idx]['song_id']
+            comments = self.netease.song_comments(song_id, limit=100)
+            try:
+                hotcomments = comments['hotComments']
+                comcomments = comments['comments']
+            except KeyError:
+                hotcomments = comcomments = []
+            self.datalist = []
+            for one_comment in hotcomments:
+                self.datalist.append(
+                    u'(热门评论)%s:%s' % (one_comment['user']['nickname'],
+                                      one_comment['content']))
+            for one_comment in comcomments:
+                self.datalist.append(one_comment['content'])
+            self.datatype = 'comments'
+            self.title = '网易云音乐 > 评论:%s' % datalist[idx]['song_name']
+            self.offset = 0
+            self.index = 0
 
         # 歌曲榜单
         elif datatype == 'toplists':
