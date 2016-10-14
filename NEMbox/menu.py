@@ -300,8 +300,6 @@ class Menu(object):
 
             # 数字快捷键
             elif ord('0') <= key <= ord('9'):
-                if self.datatype == ('songs', 'djchannels', 'help'):
-                    continue
                 idx = key - ord('0')
                 self.ui.build_menu(self.datatype, self.title, self.datalist,
                                    self.offset, idx, self.step, self.START)
@@ -332,8 +330,7 @@ class Menu(object):
 
             # 前进
             elif key == ord('l') or key == 10:
-                if self.datatype == ('songs', 'djchannels',
-                                     'help') or len(self.datalist) <= 0:
+                if len(self.datalist) <= 0:
                     continue
                 self.START = time.time()
                 self.ui.build_loading()
@@ -501,8 +498,8 @@ class Menu(object):
 
             # 从当前列表移除
             elif key == ord('r'):
-                if (datatype == 'songs' or
-                        datatype == 'djchannels') and len(datalist) != 0:
+                if (datatype in ('songs', 'djchannels', 'fmsongs') and
+                        len(datalist) != 0):
                     self.datalist.pop(idx)
                     self.index = carousel(offset, min(
                         len(datalist), offset + step) - 1, idx)
