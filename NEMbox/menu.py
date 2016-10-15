@@ -84,9 +84,10 @@ shortcut = [
     ['p', 'Present/History  ', '当前/历史播放列表'],
     ['i', 'Music Info       ', '当前音乐信息'],
     ['Shift+p', 'Playing Mode     ', '播放模式切换'],
+    ['Shift+a', 'Enter album      ', '进入专辑'],
     ['a', 'Add              ', '添加曲目到打碟'],
     ['z', 'DJ list          ', '打碟列表（退出后清空）'],
-    ['s', 'Star             ', '添加到本地收藏'],
+    ['s', 'Star      ', '添加到本地收藏'],
     ['c', 'Collection', '本地收藏列表'],
     ['r', 'Remove    ', '删除当前条目'],
     ['Shift+j', 'Move Down ', '向下移动当前条目'],
@@ -466,6 +467,30 @@ class Menu(object):
                 self.storage.database['player_info']['playing_mode'] = (
                     self.storage.database['player_info']['playing_mode'] +
                     1) % 5
+
+            # 进入专辑
+            elif key == ord('A'):
+                if datatype == 'album':
+                    continue
+                if datatype in ['songs', 'fmsongs']:
+                    song_id = str(datalist[idx]['song_id'])
+                    album_id = str(datalist[idx]['album_id'])
+                    album_name = datalist[idx]['album_name']
+                elif self.player.playing_flag:
+                    song_id = str(self.player.playing_id)
+                    song_info = self.storage.database['songs'].get(song_id, {})
+                    album_id = song_info.get('album_id', '')
+                    album_name = song_info.get('album_name', '')
+                else:
+                    album_id = ''
+                if album_id:
+                    self.stack.append([datatype, title, datalist, offset, index])
+                    songs = self.netease.album(album_id)
+                    self.datatype = 'songs'
+                    self.datalist = self.netease.dig_info(songs, 'songs')
+                    self.title = '网易云音乐 > 专辑 > %s' % album_name
+                    self.offset = 0
+                    self.index = 0
 
             # 添加到打碟歌单
             elif key == ord('a'):
