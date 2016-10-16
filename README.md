@@ -68,7 +68,7 @@ NetEase-MusicBox
 
 
 
-### Mac安装
+### macOS安装
 
 	$ (sudo) pip install NetEase-MusicBox
 
@@ -112,7 +112,7 @@ NetEase-MusicBox
 #### 已测试的系统兼容列表
 
 <table>
-	<tr> <td>OS X</td> <td>10.11 / 10.10 / 10.9</td> </tr>
+	<tr> <td>macOS</td> <td>10.12 / 10.11 / 10.10 / 10.9</td> </tr>
 	<tr> <td>Ubuntu</td> <td>14.04</td> </tr>
 	<tr> <td>Kali</td> <td>1.1.0 / 2.0 / Rolling</td> </tr>
 	<tr> <td>CentOS</td> <td>7</td> </tr>
@@ -150,6 +150,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2016-10-16 版本 0.2.3.5    新增进入歌曲专辑功能
 
 2016-10-13 版本 0.2.3.4    新增歌曲评论
 

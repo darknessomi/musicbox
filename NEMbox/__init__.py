@@ -18,7 +18,7 @@ import sys
 
 from .menu import Menu
 
-version = "0.2.3.4"
+version = "0.2.3.5"
 
 
 def start():
