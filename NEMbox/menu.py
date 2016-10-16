@@ -470,24 +470,27 @@ class Menu(object):
                 if datatype == 'album':
                     continue
                 if datatype in ['songs', 'fmsongs']:
-                    song_id = str(datalist[idx]['song_id'])
-                    album_id = str(datalist[idx]['album_id'])
+                    song_id = datalist[idx]['song_id']
+                    album_id = datalist[idx]['album_id']
                     album_name = datalist[idx]['album_name']
                 elif self.player.playing_flag:
-                    song_id = str(self.player.playing_id)
-                    song_info = self.storage.database['songs'].get(song_id, {})
+                    song_id = self.player.playing_id
+                    song_info = self.storage.database['songs'].get(str(song_id), {})
                     album_id = song_info.get('album_id', '')
                     album_name = song_info.get('album_name', '')
                 else:
-                    album_id = ''
+                    album_id = 0
                 if album_id:
                     self.stack.append([datatype, title, datalist, offset, index])
                     songs = self.netease.album(album_id)
                     self.datatype = 'songs'
                     self.datalist = self.netease.dig_info(songs, 'songs')
                     self.title = '网易云音乐 > 专辑 > %s' % album_name
-                    self.offset = 0
-                    self.index = 0
+                    for i in range(len(self.datalist)):
+                        if self.datalist[i]['song_id'] == song_id:
+                            self.offset = i - i%step
+                            self.index = i
+                            break
 
             # 添加到打碟歌单
             elif key == ord('a'):
