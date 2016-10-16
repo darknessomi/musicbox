@@ -44,6 +44,7 @@ class Storage(Singleton):
                 song_name str
                 mp3_url str
                 album_name str
+                album_id str
                 quality str
                 lyric str
                 tlyric str

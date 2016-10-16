@@ -610,14 +610,17 @@ class NetEase(object):
 
                 if data[i]['album'] is not None:
                     album_name = data[i]['album']['name']
+                    album_id = data[i]['album']['id']
                 else:
                     album_name = '未知专辑'
+                    album_id = ''
 
                 song_info = {
                     'song_id': data[i]['id'],
                     'artist': [],
                     'song_name': data[i]['name'],
                     'album_name': album_name,
+                    'album_id': album_id,
                     'mp3_url': url,
                     'quality': quality
                 }
