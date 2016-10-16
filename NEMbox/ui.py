@@ -420,14 +420,14 @@ class Ui(object):
                         self.addstr(
                             i - offset + 9, self.indented_startcol,
                             '-> {}. \'{}{}   {}'.format(
-                                i, (datalist[i][0].upper() + '\'').ljust(11),
+                                i, (datalist[i][0] + '\'').ljust(11),
                                 datalist[i][1], datalist[i][2]),
                             curses.color_pair(2))
                     else:
                         self.addstr(
                             i - offset + 9, self.startcol,
                             '{}. \'{}{}   {}'.format(
-                                i, (datalist[i][0].upper() + '\'').ljust(11),
+                                i, (datalist[i][0] + '\'').ljust(11),
                                 datalist[i][1], datalist[i][2]))
 
                 self.addstr(
