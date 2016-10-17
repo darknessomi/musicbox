@@ -26,9 +26,11 @@ NetEase-MusicBox
 9. 本地收藏，随时加❤
 10. 播放进度及播放模式显示
 11. 现在播放及桌面歌词显示
-12. Vimer式快捷键让操作丝般顺滑
-13. 可使用数字快捷键
-14. 可使用自定义全局快捷键
+12. 歌曲评论显示
+13. 一键进入歌曲专辑
+14. Vimer式快捷键让操作丝般顺滑
+15. 可使用数字快捷键
+16. 可使用自定义全局快捷键
 
 ### 键盘快捷键
 
@@ -51,6 +53,7 @@ NetEase-MusicBox
 	<tr> <td>I</td> <td>Music Info</td> <td>当前音乐信息</td> </tr>
 	<tr> <td>⇧+P</td> <td>Playing Mode</td> <td>播放模式切换</td> </tr>
 	<tr> <td>A</td> <td>Add</td> <td>添加曲目到打碟</td> </tr>
+	<tr> <td>⇧+A</td> <td>Enter album</td> <td>进入专辑</td> </tr>
 	<tr> <td>Z</td> <td>DJ list</td> <td>打碟列表</td> </tr>
 	<tr> <td>S</td> <td>Star</td> <td>添加到收藏</td> </tr>
 	<tr> <td>C</td> <td>Collection</td> <td>收藏列表</td> </tr>
@@ -153,7 +156,7 @@ Enjoy it !
 
 2016-10-16 版本 0.2.3.5    新增进入歌曲专辑功能
 
-2016-10-13 版本 0.2.3.4    新增歌曲评论
+2016-10-13 版本 0.2.3.4    新增查看歌曲评论
 
 2016-09-26 版本 0.2.3.3    keybinder 错误修复
 
