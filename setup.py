@@ -9,9 +9,9 @@
 __   ___________________________________________
 | \  ||______   |   |______|_____||______|______
 |  \_||______   |   |______|     |______||______
-                                                
+
 ________     __________________________  _____ _     _
-|  |  ||     ||______  |  |      |_____]|     | \___/ 
+|  |  ||     ||______  |  |      |_____]|     | \___/
 |  |  ||_____|______|__|__|_____ |_____]|_____|_/   \_
 
 
@@ -19,7 +19,7 @@ ________     __________________________  _____ _     _
 |   NetEase-MusicBox               320kbps   |
 + ------------------------------------------ +
 |                                            |
-|   ++++++++++++++++++++++++++++++++++++++   | 
+|   ++++++++++++++++++++++++++++++++++++++   |
 |   ++++++++++++++++++++++++++++++++++++++   |
 |   ++++++++++++++++++++++++++++++++++++++   |
 |   ++++++++++++++++++++++++++++++++++++++   |
@@ -33,21 +33,17 @@ ________     __________________________  _____ _     _
 + ------------------------------------------ +
 
 '''
-
 from setuptools import setup, find_packages
-
 
 setup(
     name='NetEase-MusicBox',
-    version='0.2.0.8',
+    version='0.2.3.5',
     packages=find_packages(),
-
-    include_package_data=True,
-
     install_requires=[
         'requests',
         'BeautifulSoup4',
         'pycrypto',
+        'future'
     ],
 
     entry_points={
@@ -56,10 +52,10 @@ setup(
         ],
     },
 
+    license='MIT',
     author='omi',
     author_email='4399.omi@gmail.com',
     url='https://github.com/darknessomi/musicbox',
     description='A sexy command line interface musicbox',
     keywords=['music', 'netease', 'cli', 'player'],
-    zip_safe=False,
 )

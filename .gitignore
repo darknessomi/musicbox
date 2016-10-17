@@ -70,3 +70,6 @@ NEMbox/*.swp
 
 # ignore TEST files
 TEST
+
+# virtualenv
+venv
