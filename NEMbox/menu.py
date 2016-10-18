@@ -569,6 +569,13 @@ class Menu(object):
                 if datatype == 'help':
                     webbrowser.open_new_tab(
                         'https://github.com/darknessomi/musicbox')
+                else:
+                    self.index = 0
+                    self.offset = 0
+
+            elif key == ord('G'):
+                self.index = len(self.datalist) - 1
+                self.offset = self.index - self.index % step
 
             # 开始下载
             elif key == ord('C'):
