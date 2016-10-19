@@ -54,6 +54,8 @@ NetEase-MusicBox
 	<tr> <td>⇧+P</td> <td>Playing Mode</td> <td>播放模式切换</td> </tr>
 	<tr> <td>A</td> <td>Add</td> <td>添加曲目到打碟</td> </tr>
 	<tr> <td>⇧+A</td> <td>Enter album</td> <td>进入专辑</td> </tr>
+	<tr> <td>G</td> <td>To the first</td> <td>跳至首项</td> </tr>
+	<tr> <td>⇧+G</td> <td>To the end</td> <td>跳至尾项</td> </tr>
 	<tr> <td>Z</td> <td>DJ list</td> <td>打碟列表</td> </tr>
 	<tr> <td>S</td> <td>Star</td> <td>添加到收藏</td> </tr>
 	<tr> <td>C</td> <td>Collection</td> <td>收藏列表</td> </tr>
