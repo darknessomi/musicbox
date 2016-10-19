@@ -322,6 +322,18 @@ class Ui(object):
                             self.space + datalist[i][
                                 'alias'])
 
+            elif datatype == 'artist_info':
+                for i in range(offset, min(len(datalist) - 1, offset + step)):
+                    if i == index:
+                        self.addstr(
+                            i - offset + 9, self.indented_startcol,
+                            '-> ' + str(i) + '. ' + datalist[i],
+                            curses.color_pair(2))
+                    else:
+                        self.addstr(
+                            i - offset + 9, self.startcol,
+                            str(i) + '. ' + datalist[i])
+
             elif datatype == 'albums':
                 for i in range(offset, min(len(datalist), offset + step)):
                     if i == index:
