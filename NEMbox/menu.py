@@ -623,15 +623,22 @@ class Menu(object):
         elif datatype == 'artists':
             artist_name = datalist[idx]['artists_name']
             artist_id = datalist[idx]['artist_id']
-            notify(artist_name)
+
             self.datatype = 'artist_info'
             self.title += ' > ' + artist_name
-            # 用datalist最后一个参数传递artist_id给  datatype=='artist_info'
-            self.datalist = ['{}的热门歌曲'.format(artist_name), '{}的所有专辑'.format(artist_name), artist_id]
+            self.datalist = [
+                {
+                    'item': '{}的热门歌曲'.format(artist_name),
+                    'id': artist_id,
+                }, {
+                    'item': '{}的所有专辑'.format(artist_name),
+                    'id': artist_id,
+                }
+            ]
 
         elif datatype == 'artist_info':
-            self.title += ' > ' + datalist[idx]
-            artist_id = datalist[-1]
+            self.title += ' > ' + datalist[idx]['item']
+            artist_id = datalist[0]['id']
             if idx == 0:
                 self.datatype = 'songs'
                 songs = netease.artists(artist_id)
