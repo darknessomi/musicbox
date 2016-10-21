@@ -621,11 +621,33 @@ class Menu(object):
 
         # 该艺术家的热门歌曲
         elif datatype == 'artists':
+            artist_name = datalist[idx]['artists_name']
             artist_id = datalist[idx]['artist_id']
-            songs = netease.artists(artist_id)
-            self.datatype = 'songs'
-            self.datalist = netease.dig_info(songs, 'songs')
-            self.title += ' > ' + datalist[idx]['artists_name']
+
+            self.datatype = 'artist_info'
+            self.title += ' > ' + artist_name
+            self.datalist = [
+                {
+                    'item': '{}的热门歌曲'.format(artist_name),
+                    'id': artist_id,
+                }, {
+                    'item': '{}的所有专辑'.format(artist_name),
+                    'id': artist_id,
+                }
+            ]
+
+        elif datatype == 'artist_info':
+            self.title += ' > ' + datalist[idx]['item']
+            artist_id = datalist[0]['id']
+            if idx == 0:
+                self.datatype = 'songs'
+                songs = netease.artists(artist_id)
+                self.datalist = netease.dig_info(songs, 'songs')
+
+            elif idx == 1:
+                albums = netease.get_artist_album(artist_id)
+                self.datatype = 'albums'
+                self.datalist = netease.dig_info(albums, 'albums')
 
         # 该专辑包含的歌曲
         elif datatype == 'albums':
