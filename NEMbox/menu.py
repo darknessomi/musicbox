@@ -40,8 +40,8 @@ from . import logger
 log = logger.getLogger(__name__)
 
 try:
-    # import keybinder
-    BINDABLE = False
+    import keybinder
+    BINDABLE = True
 except ImportError:
     BINDABLE = False
     log.warn('keybinder module not installed.')
