@@ -588,7 +588,7 @@ class Menu(object):
 
             elif key == ord('i'):
                 if self.player.playing_id != -1:
-                    webbrowser.open_new_tab('http://music.163.com/#/song?id=' +
+                    webbrowser.open_new_tab('http://music.163.com/song?id=' +
                                             str(self.player.playing_id))
 
             self.ui.build_process_bar(
