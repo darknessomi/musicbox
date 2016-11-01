@@ -296,7 +296,7 @@ class Ui(object):
                             self.addstr(
                                 20, self.indented_startcol,
                                 '-> ' + str(i) + '. ' + 
-+                                break_str(datalist[i], self.indented_startcol,
+                                break_str(datalist[i], self.indented_startcol,maxlength),
                                 curses.color_pair(2))
                         except:
                             self.addstr(
