@@ -42,14 +42,14 @@ def escape_quote(text):
     return text.replace('\'', '\\\'').replace('\'', '\'\'')
 
 
-def break_str(s, max_len=80):
+def break_str(s, start, max_len=80):
     l = len(s)
     i, x = 0, max_len
     res = []
     while i < l:
         res.append(s[i:i + max_len])
         i += x
-    return '\n{}'.format('\t' * 5).join(res)
+    return '\n{}'.format(' ' * start).join(res)
 
 
 class Ui(object):
@@ -295,7 +295,8 @@ class Ui(object):
                         try:
                             self.addstr(
                                 20, self.indented_startcol,
-                                '-> ' + str(i) + '. ' + break_str(datalist[i], maxlength),
+                                '-> ' + str(i) + '. ' + 
++                                break_str(datalist[i], self.indented_startcol,
                                 curses.color_pair(2))
                         except:
                             self.addstr(
