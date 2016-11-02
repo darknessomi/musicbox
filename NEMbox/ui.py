@@ -42,14 +42,14 @@ def escape_quote(text):
     return text.replace('\'', '\\\'').replace('\'', '\'\'')
 
 
-def break_str(s, max_len=80):
+def break_str(s, start, max_len=80):
     l = len(s)
     i, x = 0, max_len
     res = []
     while i < l:
         res.append(s[i:i + max_len])
         i += x
-    return '\n{}'.format('\t' * 5).join(res)
+    return '\n{}'.format(' ' * start).join(res)
 
 
 class Ui(object):
@@ -295,7 +295,8 @@ class Ui(object):
                         try:
                             self.addstr(
                                 20, self.indented_startcol,
-                                '-> ' + str(i) + '. ' + break_str(datalist[i], maxlength),
+                                '-> ' + str(i) + '. ' +
+                                break_str(datalist[i], self.indented_startcol, maxlength),
                                 curses.color_pair(2))
                         except:
                             self.addstr(
@@ -321,6 +322,18 @@ class Ui(object):
                             str(i) + '. ' + datalist[i]['artists_name'] +
                             self.space + datalist[i][
                                 'alias'])
+
+            elif datatype == 'artist_info':
+                for i in range(offset, min(len(datalist), offset + step)):
+                    if i == index:
+                        self.addstr(
+                            i - offset + 9, self.indented_startcol,
+                            '-> ' + str(i) + '. ' + datalist[i]['item'],
+                            curses.color_pair(2))
+                    else:
+                        self.addstr(
+                            i - offset + 9, self.startcol,
+                            str(i) + '. ' + datalist[i]['item'])
 
             elif datatype == 'albums':
                 for i in range(offset, min(len(datalist), offset + step)):
@@ -420,14 +433,14 @@ class Ui(object):
                         self.addstr(
                             i - offset + 9, self.indented_startcol,
                             '-> {}. \'{}{}   {}'.format(
-                                i, (datalist[i][0].upper() + '\'').ljust(11),
+                                i, (datalist[i][0] + '\'').ljust(11),
                                 datalist[i][1], datalist[i][2]),
                             curses.color_pair(2))
                     else:
                         self.addstr(
                             i - offset + 9, self.startcol,
                             '{}. \'{}{}   {}'.format(
-                                i, (datalist[i][0].upper() + '\'').ljust(11),
+                                i, (datalist[i][0] + '\'').ljust(11),
                                 datalist[i][1], datalist[i][2]))
 
                 self.addstr(

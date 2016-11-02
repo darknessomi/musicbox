@@ -462,6 +462,16 @@ class NetEase(object):
             log.error(e)
             return []
 
+    def get_artist_album(self, artist_id, offset=0, limit=50):
+        action = 'http://music.163.com/api/artist/albums/{}?offset={}&limit={}'.format(
+            artist_id, offset, limit)
+        try:
+            data = self.httpRequest('GET', action)
+            return data['hotAlbums']
+        except requests.exceptions.RequestException as e:
+            log.error(e)
+            return []
+
     # album id --> song id set
     def album(self, album_id):
         action = 'http://music.163.com/api/album/{}'.format(album_id)
