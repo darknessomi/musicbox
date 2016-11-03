@@ -95,7 +95,7 @@ NetEase-MusicBox
 
 #### Arch Linux
 
-    $ pacaur -S netease-musicbox-git
+    $ pacaur -S netease-musicbox-git #or use $ yaourt musicbox
 
 #### 可选功能依赖
 
@@ -137,7 +137,7 @@ NetEase-MusicBox
 #### 已知问题及解决方案
 - [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux，尝试更改mpg123配置
 - [#404](https://github.com/darknessomi/musicbox/issues/404) 某些环境缺乏lxml，尝试利用包管理器安装lxml或者直接`pip install lxml`
-
+- #377 #405 32位Python下cookie时间戳超出了32位整数最大值，尝试使用64位版本的Python或者拷贝cookie文件
 ### 使用
 
 	$ musicbox
