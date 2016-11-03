@@ -129,23 +129,7 @@ NetEase-MusicBox
 
 #### 错误处理
 
-1. pkg_resources.DistributionNotFound: requests
-
-	$ sudo pip install requests
-
-    如果是运行 $ musicbox 出错
-
-	$ sudo pip install --upgrade setuptools
-
-2. pip: Command not found
-
-	$ sudo apt-get install python-pip
-
-3. ImportError: No module named setuptools
-
-    $ sudo easy_install pip
-
-    $ sudo apt-get install python-setuptools
+如遇到在特定终端下不能播放问题，首先检查**此终端**下mpg123能否正常使用，其次检查**其他终端**下musicbox能否正常使用，报告issue的时候请告知以上使用情况以及你终端的报错信息。
 
 ### 使用
 
