@@ -88,7 +88,7 @@ def encrypted_id(id):
     result = base64.b64encode(result)
     result = result.replace(b'/', b'_')
     result = result.replace(b'+', b'-')
-    return result.decode('u8')
+    return result.decode('utf-8')
 
 
 # 登录加密算法, 基于https://github.com/stkevintan/nw_musicbox脚本实现
@@ -106,7 +106,7 @@ def aesEncrypt(text, secKey):
     text = text + chr(pad) * pad
     encryptor = AES.new(secKey, 2, '0102030405060708')
     ciphertext = encryptor.encrypt(text)
-    ciphertext = base64.b64encode(ciphertext).decode('u8')
+    ciphertext = base64.b64encode(ciphertext).decode('utf-8')
     return ciphertext
 
 

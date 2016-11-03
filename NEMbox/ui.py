@@ -38,10 +38,6 @@ except ImportError:
     log.warn('Osdlyrics Not Available.')
 
 
-def escape_quote(text):
-    return text.replace('\'', '\\\'').replace('\'', '\'\'')
-
-
 def break_str(s, start, max_len=80):
     l = len(s)
     i, x = 0, max_len
@@ -85,12 +81,12 @@ class Ui(object):
         if len(args) == 1:
             self.screen.addstr(args[0])
         else:
-            self.screen.addstr(args[0], args[1], args[2].encode('u8'), *args[3:])
+            self.screen.addstr(args[0], args[1], args[2].encode('utf-8'), *args[3:])
 
     def notify(self, summary, song, album, artist):
         if summary != 'disable':
             body = '%s\nin %s by %s' % (song, album, artist)
-            content = escape_quote(summary + ': ' + body)
+            content = summary + ': ' + body
             notify(content)
 
     def build_playinfo(self,
@@ -295,7 +291,7 @@ class Ui(object):
                         try:
                             self.addstr(
                                 20, self.indented_startcol,
-                                '-> ' + str(i) + '. ' + 
+                                '-> ' + str(i) + '. ' +
                                 break_str(datalist[i], self.indented_startcol, maxlength),
                                 curses.color_pair(2))
                         except:
@@ -526,7 +522,7 @@ class Ui(object):
     def build_login(self):
         self.build_login_bar()
         local_account = self.get_account()
-        local_password = hashlib.md5(self.get_password().encode('u8')).hexdigest()
+        local_password = hashlib.md5(self.get_password().encode('utf-8')).hexdigest()
         login_info = self.netease.login(local_account, local_password)
         account = [local_account, local_password]
         if login_info['code'] != 200:
@@ -568,14 +564,14 @@ class Ui(object):
         curses.echo()
         account = self.screen.getstr(8, self.startcol + 6, 60)
         self.screen.timeout(100)  # restore the screen timeout
-        return account.decode('u8')
+        return account.decode('utf-8')
 
     def get_password(self):
         self.screen.timeout(-1)  # disable the screen timeout
         curses.noecho()
         password = self.screen.getstr(9, self.startcol + 6, 60)
         self.screen.timeout(100)  # restore the screen timeout
-        return password.decode('u8')
+        return password.decode('utf-8')
 
     def get_param(self, prompt_string):
         # keep playing info in line 1
