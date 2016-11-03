@@ -16,17 +16,15 @@ import os
 
 def utf8_data_to_file(f, data):
     if hasattr(data, 'decode'):
-        f.write(data.decode('u8'))
+        f.write(data.decode('utf-8'))
     else:
         f.write(data)
 
 
 def notify_command_osx(msg, msg_type, t=None):
-    command = '/usr/bin/osascript -e \'display notification "' + msg
-    if msg_type == 1:
-        command += '"sound name "/System/Library/Sounds/Ping.aiff'
-    command += '"\''
-    return command
+    command = '/usr/bin/osascript -e "display notification \\\"{}\\\" {} with title \\\"musicbox\\\""'
+    sound = 'sound name \\\"/System/Library/Sounds/Ping.aiff\\\"' if msg_type else ''
+    return command.format(msg, sound)
 
 
 def notify_command_linux(msg, t=None):
@@ -43,8 +41,9 @@ def notify(msg, msg_type=0, t=None):
         command = notify_command_osx(msg, msg_type, t)
     else:
         command = notify_command_linux(msg, t)
-    os.system(command.encode('u8'))
+    os.system(command.encode('utf-8'))
 
 
 if __name__ == "__main__":
-    notify("test", t=1000)
+    notify("I'm test 1", msg_type=1, t=1000)
+    notify("I'm test 2", msg_type=0, t=1000)

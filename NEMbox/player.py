@@ -72,9 +72,9 @@ class Player(object):
                                                   stdin=subprocess.PIPE,
                                                   stdout=subprocess.PIPE,
                                                   stderr=subprocess.PIPE)
-            self.popen_handler.stdin.write(b'V ' + str(self.info['playing_volume']).encode('u8') + b'\n')
+            self.popen_handler.stdin.write(b'V ' + str(self.info['playing_volume']).encode('utf-8') + b'\n')
             if arg:
-                self.popen_handler.stdin.write(b'L ' + arg.encode('u8') + b'\n')
+                self.popen_handler.stdin.write(b'L ' + arg.encode('utf-8') + b'\n')
             else:
                 self.next_idx()
                 onExit()
@@ -87,7 +87,7 @@ class Player(object):
                 if self.playing_flag is False:
                     break
 
-                strout = self.popen_handler.stdout.readline().decode('u8')
+                strout = self.popen_handler.stdout.readline().decode('utf-8')
 
                 if re.match('^\@F.*$', strout):
                     process_data = strout.split(' ')
@@ -111,7 +111,7 @@ class Player(object):
                         'Song {} is not compatible with old api.'.format(sid))
                     popenArgs['mp3_url'] = new_url
 
-                    self.popen_handler.stdin.write(b'\nL ' + new_url.encode('u8') + b'\n')
+                    self.popen_handler.stdin.write(b'\nL ' + new_url.encode('utf-8') + b'\n')
                     self.popen_handler.stdin.flush()
                     self.popen_handler.stdout.readline()
                 elif strout == '@P 0\n':
@@ -431,7 +431,7 @@ class Player(object):
         if not self.playing_flag:
             return
         self.popen_handler.stdin.write(b'V ' + str(self.info[
-            'playing_volume']).encode('u8') + b'\n')
+            'playing_volume']).encode('utf-8') + b'\n')
         self.popen_handler.stdin.flush()
 
     def volume_down(self):
@@ -442,7 +442,7 @@ class Player(object):
             return
 
         self.popen_handler.stdin.write(b'V ' + str(self.info[
-            'playing_volume']).encode('u8') + b'\n')
+            'playing_volume']).encode('utf-8') + b'\n')
         self.popen_handler.stdin.flush()
 
     def update_size(self):
