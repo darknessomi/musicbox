@@ -71,12 +71,15 @@ NetEase-MusicBox
 </table>
 
 
-
+### PyPi安装
+	$ pip(3) install NetEase-MusicBox
+	
+### Git clone最新版
+	$ git clone https://github.com/darknessomi/musicbox.git && cd musicbox
+	$ python(3) setup.py install
 
 ### macOS安装
-
-	$ (sudo) pip install NetEase-MusicBox
-
+	$ pip(3) install NetEase-MusicBox
 	$ brew install mpg123
 
 ### Linux安装
@@ -129,7 +132,7 @@ NetEase-MusicBox
 
 #### 错误处理
 
-如遇到在特定终端下不能播放问题，首先检查**此终端**下mpg123能否正常使用，其次检查**其他终端**下musicbox能否正常使用，报告issue的时候请告知以上使用情况以及你终端的报错信息。
+如遇到在特定终端下不能播放问题，首先检查**此终端**下mpg123能否正常使用，其次检查**其他终端**下musicbox能否正常使用，报告issue的时候请告知以上使用情况以及出问题终端的报错信息。
 
 ### 使用
 
