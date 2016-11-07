@@ -15,13 +15,13 @@ from future import standard_library
 standard_library.install_aliases()
 
 import curses
-import locale
 import threading
 import sys
 import os
 import time
 import signal
 import webbrowser
+import locale
 import xml.etree.cElementTree as ET
 
 
@@ -37,6 +37,8 @@ from .cache import Cache
 from . import logger
 
 
+locale.setlocale(locale.LC_ALL, '')
+
 log = logger.getLogger(__name__)
 
 try:
@@ -51,12 +53,9 @@ home = os.path.expanduser('~')
 if os.path.isdir(Constant.conf_dir) is False:
     os.mkdir(Constant.conf_dir)
 
-locale.setlocale(locale.LC_ALL, '')
-code = locale.getpreferredencoding()
 
-
-# carousel x in [left, right]
 def carousel(left, right, x):
+    # carousel x in [left, right]
     if x > right:
         return left
     elif x < left:
@@ -156,12 +155,12 @@ class Menu(object):
         # 检查更新 && 签到
         try:
             mobilesignin = self.netease.daily_signin(0)
-            if mobilesignin != -1 and mobilesignin['code'] != -2:
-                notify('Mobile signin success', 1)
+            if mobilesignin != -1 and mobilesignin['code'] not in (-2, 301):
+                notify('移动端签到成功', 1)
             time.sleep(0.5)
             pcsignin = self.netease.daily_signin(1)
-            if pcsignin != -1 and pcsignin['code'] != -2:
-                notify('PC signin success', 1)
+            if pcsignin != -1 and pcsignin['code'] not in (-2, 301):
+                notify('PC端签到成功', 1)
             tree = ET.ElementTree(ET.fromstring(self.netease.get_version()))
             root = tree.getroot()
             return root[0][4][0][0].text
@@ -202,17 +201,15 @@ class Menu(object):
 
     def bind_keys(self):
         if BINDABLE:
-            keybinder.bind(
-                self.config.get_item('global_play_pause'), self.play_pause)
-            keybinder.bind(self.config.get_item('global_next'), self.next_song)
-            keybinder.bind(
-                self.config.get_item('global_previous'), self.previous_song)
+            keybinder.bind(self.config.get_item('global_play_pause'), self.play_pause)  # noqa
+            keybinder.bind(self.config.get_item('global_next'), self.next_song)  # noqa
+            keybinder.bind(self.config.get_item('global_previous'), self.previous_song)  # noqa
 
     def unbind_keys(self):
         if BINDABLE:
-            keybinder.unbind(self.config.get_item('global_play_pause'))
-            keybinder.unbind(self.config.get_item('global_next'))
-            keybinder.unbind(self.config.get_item('global_previous'))
+            keybinder.unbind(self.config.get_item('global_play_pause'))  # noqa
+            keybinder.unbind(self.config.get_item('global_next'))  # noqa
+            keybinder.unbind(self.config.get_item('global_previous'))  # noqa
 
     def start(self):
         self.START = time.time() // 1
@@ -222,12 +219,9 @@ class Menu(object):
             self.player.process_location, self.player.process_length,
             self.player.playing_flag, self.player.pause_flag,
             self.storage.database['player_info']['playing_mode'])
-        self.stack.append([self.datatype, self.title, self.datalist,
-                           self.offset, self.index])
-        try:
-            self.bind_keys()
-        except KeyError as e:
-            log.warning(e)
+        self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
+
+        self.bind_keys()  # deprecated keybinder
         show_lyrics_new_process()
         while True:
             datatype = self.datatype
@@ -240,7 +234,7 @@ class Menu(object):
             self.screen.timeout(500)
             key = self.screen.getch()
             if BINDABLE:
-                keybinder.gtk.main_iteration(False)
+                keybinder.gtk.main_iteration(False)  # noqa
             self.ui.screen.refresh()
 
             # term resize
@@ -250,10 +244,7 @@ class Menu(object):
 
             # 退出
             if key == ord('q'):
-                try:
-                    self.unbind_keys()
-                except KeyError as e:
-                    log.warning(e)
+                self.unbind_keys()
                 break
 
             # 退出并清除用户信息
@@ -488,7 +479,7 @@ class Menu(object):
                     self.title = '网易云音乐 > 专辑 > %s' % album_name
                     for i in range(len(self.datalist)):
                         if self.datalist[i]['song_id'] == song_id:
-                            self.offset = i - i%step
+                            self.offset = i - i % step
                             self.index = i
                             break
 
@@ -795,14 +786,13 @@ class Menu(object):
             result = func(*args)
             if result != -1:
                 return result
-        log.debug('Re Login.')
+        notify('You need to log in')
         user_info = {}
         if self.storage.database['user']['username'] != '':
             user_info = self.netease.login(
                 self.storage.database['user']['username'],
                 self.storage.database['user']['password'])
-        if self.storage.database['user']['username'] == '' or user_info[
-                'code'] != 200:
+        if self.storage.database['user']['username'] == '' or user_info['code'] != 200:
             data = self.ui.build_login()
             # 取消登录
             if data == -1:
@@ -810,10 +800,8 @@ class Menu(object):
             user_info = data[0]
             self.storage.database['user']['username'] = data[1][0]
             self.storage.database['user']['password'] = data[1][1]
-            self.storage.database['user']['user_id'] = user_info['account'][
-                'id']
-            self.storage.database['user']['nickname'] = user_info['profile'][
-                'nickname']
+            self.storage.database['user']['user_id'] = user_info['account']['id']
+            self.storage.database['user']['nickname'] = user_info['profile']['nickname']
         self.userid = self.storage.database['user']['user_id']
         self.username = self.storage.database['user']['nickname']
         return func(*args)
@@ -868,8 +856,7 @@ class Menu(object):
 
         # 我的歌单
         elif idx == 4:
-            myplaylist = self.request_api(self.netease.user_playlist,
-                                          self.userid)
+            myplaylist = self.request_api(self.netease.user_playlist, self.userid)
             if myplaylist == -1:
                 return
             self.datatype = 'top_playlists'

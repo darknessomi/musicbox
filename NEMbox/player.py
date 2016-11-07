@@ -357,14 +357,13 @@ class Player(object):
                 playinglist_len = len(self.info['playing_list'])
                 # When you regenerate playing list
                 # you should keep previous song same.
-                try:
-                    self._swap_song()
-                except Exception as e:
-                    log.error(e)
+                self._swap_song()
+
             self.info['ridx'] += 1
             # Out of border
             if self.info['playing_mode'] == 4:
                 self.info['ridx'] %= playinglist_len
+
             if self.info['ridx'] >= playinglist_len:
                 self.info['idx'] = playlist_len
             else:
@@ -446,23 +445,18 @@ class Player(object):
         self.popen_handler.stdin.flush()
 
     def update_size(self):
-        try:
-            self.ui.update_size()
+        self.ui.update_size()
+        if self.songs and self.info['player_list']:
             item = self.songs[self.info['player_list'][self.info['idx']]]
             if self.playing_flag:
                 self.ui.build_playinfo(item['song_name'], item['artist'],
                                        item['album_name'], item['quality'],
                                        time.time())
             if self.pause_flag:
-                self.ui.build_playinfo(item['song_name'],
-                                       item['artist'],
-                                       item['album_name'],
-                                       item['quality'],
+                self.ui.build_playinfo(item['song_name'], item['artist'],
+                                       item['album_name'], item['quality'],
                                        time.time(),
                                        pause=True)
-        except Exception as e:
-            log.error(e)
-            pass
 
     def cacheSong1time(self, song_id, song_name, artist, song_url):
         def cacheExit(song_id, path):

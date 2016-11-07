@@ -17,7 +17,6 @@ import argparse
 import sys
 
 from .menu import Menu
-
 version = "0.2.3.5"
 
 
@@ -25,7 +24,7 @@ def start():
     nembox_menu = Menu()
     try:
         nembox_menu.start_fork(version)
-    except (OSError, TypeError, ValueError):
+    except (OSError, TypeError, ValueError, KeyError):
         # clean up terminal while failed
         nembox_menu.screen.keypad(1)
         curses.echo()

@@ -32,8 +32,7 @@ def getLogger(name):
     fh = logging.FileHandler(FILE_NAME)
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(logging.Formatter(
-        '%(asctime)s - %(levelname)s - %(name)s:%(lineno)s: %(message)s')
-                    )  # NOQA
+        '%(asctime)s - %(levelname)s - %(name)s:%(lineno)s: %(message)s'))  # NOQA
     log.addHandler(fh)
 
     return log
