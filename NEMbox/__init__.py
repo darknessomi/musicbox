@@ -17,7 +17,7 @@ import argparse
 import sys
 
 from .menu import Menu
-version = "0.2.3.5"
+version = "0.2.3.6"
 
 
 def start():
