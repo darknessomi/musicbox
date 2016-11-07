@@ -179,14 +179,14 @@ class NetEase(object):
         self.session.cookies = LWPCookieJar(self.storage.cookie_path)
         try:
             self.session.cookies.load()
-            self.file = open(self.storage.cookie_path, 'r')
-            cookie = self.file.read()
-            self.file.close()
-            pattern = re.compile(r'\d{4}-\d{2}-\d{2}')
-            str = pattern.findall(cookie)
-            if str:
-                if str[0] < time.strftime('%Y-%m-%d',
-                                          time.localtime(time.time())):
+            cookie = ''
+            if os.path.isfile(self.storage.cookie_path):
+                self.file = open(self.storage.cookie_path, 'r')
+                cookie = self.file.read()
+                self.file.close()
+            expire_time = re.compile(r'\d{4}-\d{2}-\d{2}').findall(cookie)
+            if expire_time:
+                if expire_time[0] < time.strftime('%Y-%m-%d', time.localtime(time.time())):
                     self.storage.database['user'] = {
                         'username': '',
                         'password': '',
@@ -209,8 +209,9 @@ class NetEase(object):
                     urlencoded=None,
                     callback=None,
                     timeout=None):
-        connection = json.loads(self.rawHttpRequest(
-            method, action, query, urlencoded, callback, timeout))
+        connection = json.loads(
+            self.rawHttpRequest(method, action, query, urlencoded, callback, timeout)
+        )
         return connection
 
     def rawHttpRequest(self,
@@ -593,8 +594,7 @@ class NetEase(object):
                 channelids[i])
             try:
                 data = self.httpRequest('GET', action)
-                channel = self.dig_info(data['program']['mainSong'],
-                                        'channels')
+                channel = self.dig_info(data['program']['mainSong'], 'channels')
                 channels.append(channel)
             except requests.exceptions.RequestException as e:
                 log.error(e)
@@ -709,5 +709,4 @@ if __name__ == '__main__':
     print(geturl_new_api(ne.songs_detail([27902910])[0]))  # MD 128k, fallback
     print(ne.songs_detail_new_api([27902910])[0]['url'])
     print(ne.songs_detail([405079776])[0]['mp3Url'])  # old api
-    print(requests.get(ne.songs_detail([405079776])[0][
-        'mp3Url']).status_code)  # 404
+    print(requests.get(ne.songs_detail([405079776])[0]['mp3Url']).status_code)  # 404

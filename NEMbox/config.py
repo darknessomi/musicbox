@@ -219,5 +219,5 @@ class Config(Singleton):
         if name not in self.config.keys():
             if name not in self.default_config.keys():
                 return None
-            return self.default_config[name]['value']
-        return self.config[name]['value']
+            return self.default_config[name].get('value')
+        return self.config[name].get('value')

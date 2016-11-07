@@ -10,10 +10,6 @@ from builtins import chr
 from future import standard_library
 standard_library.install_aliases()
 from time import time
-import locale
-
-locale.setlocale(locale.LC_ALL, '')
-code = locale.getpreferredencoding()
 
 
 class scrollstring(object):
