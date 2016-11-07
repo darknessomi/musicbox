@@ -105,7 +105,7 @@ class Player(object):
                     new_url = NetEase().songs_detail_new_api([sid])[0]['url']
                     if new_url is None:
                         log.warning(('Song {} is unavailable '
-                                     'due to copyright issue').format(sid))
+                                     'due to copyright issue.').format(sid))
                         break
                     log.warning(
                         'Song {} is not compatible with old api.'.format(sid))
@@ -446,7 +446,11 @@ class Player(object):
 
     def update_size(self):
         self.ui.update_size()
-        if self.songs and self.info['player_list']:
+        if not 0 <= self.info['idx'] < len(self.info['player_list']):
+            if self.info['player_list']:
+                log.error('Index not in range!')
+                log.debug(self.info)
+        else:
             item = self.songs[self.info['player_list'][self.info['idx']]]
             if self.playing_flag:
                 self.ui.build_playinfo(item['song_name'], item['artist'],

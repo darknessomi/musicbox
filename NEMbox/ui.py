@@ -30,12 +30,11 @@ log = logger.getLogger(__name__)
 
 try:
     import dbus
-
     dbus_activity = True
 except ImportError:
     dbus_activity = False
-    log.warn('dbus module not installed.')
-    log.warn('Osdlyrics Not Available.')
+    log.warn('Qt dbus module is not installed.')
+    log.warn('Osdlyrics is not available.')
 
 
 def break_str(s, start, max_len=80):
