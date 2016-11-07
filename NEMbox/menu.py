@@ -239,7 +239,6 @@ class Menu(object):
 
             # term resize
             if key == -1:
-                self.ui.update_size()
                 self.player.update_size()
 
             # 退出
@@ -379,9 +378,9 @@ class Menu(object):
                                                self.player.get_playing_id())
                 if return_data != -1:
                     song_name = self.player.get_playing_name()
-                    notify('Added: %s successfully!' % song_name, 0)
+                    notify('%s added successfully!' % song_name, 0)
                 else:
-                    notify('Existing song!', 0)
+                    notify('Adding song failed!', 0)
 
             # 删除FM
             elif key == ord('.'):
@@ -410,14 +409,13 @@ class Menu(object):
             elif key == ord(' '):
                 # If not open a new playing list, just play and pause.
                 try:
-                    if self.datalist[idx]['song_id'] == self.player.playing_id:
-                        self.player.play_and_pause(self.storage.database[
-                            'player_info']['idx'])
+                    if isinstance(self.datalist[idx], dict) and self.datalist[idx]['song_id'] == self.player.playing_id:
+                        self.player.play_and_pause(self.storage.database['player_info']['idx'])
                         time.sleep(0.1)
                         continue
                 except (TypeError, KeyError) as e:
                     log.error(e)
-                    pass
+
                 # If change to a new playing list. Add playing list and play.
                 if datatype == 'songs':
                     self.resume_play = False
@@ -442,8 +440,7 @@ class Menu(object):
                     self.player.play_and_pause(idx)
                     self.at_playing_list = True
                 else:
-                    self.player.play_and_pause(self.storage.database[
-                        'player_info']['idx'])
+                    self.player.play_and_pause(self.storage.database['player_info']['idx'])
                 time.sleep(0.1)
 
             # 加载当前播放列表
