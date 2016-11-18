@@ -26,7 +26,7 @@ class Config(Singleton):
         self._init = True
         self.config_file_path = Constant.config_path
         self.default_config = {
-            'version': 6,
+            'version': 7,
             'cache': {
                 'value': False,
                 'default': False,
@@ -109,6 +109,11 @@ class Config(Singleton):
                 'default': True,
                 'describe': 'Desktop lyrics OnTopHint.'
             },
+            'curses_transparency': {
+                'value': False,
+                'default': False,
+                'describe': 'Set true to make curses transparency.'
+            }
         }
         self.config = {}
         if not os.path.isfile(self.config_file_path):
@@ -211,6 +216,13 @@ class Config(Singleton):
                     'value': True,
                     'default': True,
                     'describe': 'Desktop lyrics OnTopHint.'
+                }
+            elif self.config['version'] == 6:
+                self.config['version'] = 7
+                self.config['curses_transparency'] = {
+                    'value': False,
+                    'default': False,
+                    'describe': 'Set true to make curses transparency.'
                 }
             self.check_version()
             return False
