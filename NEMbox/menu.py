@@ -164,7 +164,7 @@ class Menu(object):
             tree = ET.ElementTree(ET.fromstring(self.netease.get_version()))
             root = tree.getroot()
             return root[0][4][0][0].text
-        except TypeError as e:
+        except (ET.ParseError, TypeError) as e:
             log.error(e)
             return 0
 
