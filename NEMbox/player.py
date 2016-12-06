@@ -14,6 +14,7 @@ from __future__ import absolute_import
 from builtins import range
 from builtins import str
 from future import standard_library
+
 standard_library.install_aliases()
 # Let's make some noise
 
@@ -35,11 +36,11 @@ log = logger.getLogger(__name__)
 
 
 class Player(object):
-
     def __init__(self):
         self.config = Config()
         self.ui = Ui()
-        self.popen_handler = None
+        self.mpg123_handler = None
+        self.buffer_handler = None
         # flag stop, prevent thread start
         self.playing_flag = False
         self.pause_flag = False
@@ -65,29 +66,51 @@ class Player(object):
         that would give to subprocess.Popen.
         '''
 
-        def runInThread(onExit, arg):
+        # Force new url
+        if not re.match("^http://m\d{1,2}\.music\.126\.net/\d{14}/*", popenArgs['mp3_url']):
+            sid = popenArgs['song_id']
+            popenArgs['mp3_url'] = NetEase().songs_detail_new_api([sid])[0]['url']
+            log.debug("Force use new api for song %s, url:%s" % (popenArgs['song_id'], popenArgs['mp3_url']))
+            self.songs[str(popenArgs['song_id'])]['mp3_url'] = popenArgs['mp3_url']
+
+        def buffer_music(url):
+            if self.buffer_handler:
+                try:
+                    self.mpg123_handler.kill()
+                except OSError as e:
+                    pass
+            para = ['musicbox_backend', "-u", url]
+            self.buffer_handler = subprocess.Popen(para)
+
+        def runInThread(onExit, arg, cached):
             para = ['mpg123', '-R']
             para[1:1] = self.mpg123_parameters
-            self.popen_handler = subprocess.Popen(para,
-                                                  stdin=subprocess.PIPE,
-                                                  stdout=subprocess.PIPE,
-                                                  stderr=subprocess.PIPE)
-            self.popen_handler.stdin.write(b'V ' + str(self.info['playing_volume']).encode('utf-8') + b'\n')
+            if not cached:
+                buffer_music(arg)
+            time.sleep(0.1)
+            self.mpg123_handler = subprocess.Popen(para,
+                                                   stdin=subprocess.PIPE,
+                                                   stdout=subprocess.PIPE,
+                                                   stderr=subprocess.PIPE)
+            self.mpg123_handler.stdin.write(b'V ' + str(self.info['playing_volume']).encode('utf-8') + b'\n')
             if arg:
-                self.popen_handler.stdin.write(b'L ' + arg.encode('utf-8') + b'\n')
+                if cached:
+                    self.mpg123_handler.stdin.write(b'L ' + arg.encode('utf-8') + b'\n')
+                else:
+                    self.mpg123_handler.stdin.write(b'L /tmp/music_box.pipe\n')
             else:
                 self.next_idx()
                 onExit()
                 return
 
-            self.popen_handler.stdin.flush()
+            self.mpg123_handler.stdin.flush()
 
             self.process_first = True
             while True:
                 if self.playing_flag is False:
                     break
 
-                strout = self.popen_handler.stdout.readline().decode('utf-8')
+                strout = self.mpg123_handler.stdout.readline().decode('utf-8')
 
                 if re.match('^\@F.*$', strout):
                     process_data = strout.split(' ')
@@ -100,24 +123,14 @@ class Player(object):
                         self.process_location = self.process_length - process_location  # NOQA
                     continue
                 elif strout[:2] == '@E':
-                    # get a alternative url from new api
-                    sid = popenArgs['song_id']
-                    new_url = NetEase().songs_detail_new_api([sid])[0]['url']
-                    if new_url is None:
-                        log.warning(('Song {} is unavailable '
-                                     'due to copyright issue.').format(sid))
-                        break
-                    log.warning(
-                        'Song {} is not compatible with old api.'.format(sid))
-                    popenArgs['mp3_url'] = new_url
-
-                    self.popen_handler.stdin.write(b'\nL ' + new_url.encode('utf-8') + b'\n')
-                    self.popen_handler.stdin.flush()
-                    self.popen_handler.stdout.readline()
+                    self.mpg123_handler.stdin.write(b'Q\n')
+                    self.mpg123_handler.stdin.flush()
+                    self.mpg123_handler.kill()
+                    break
                 elif strout == '@P 0\n':
-                    self.popen_handler.stdin.write(b'Q\n')
-                    self.popen_handler.stdin.flush()
-                    self.popen_handler.kill()
+                    self.mpg123_handler.stdin.write(b'Q\n')
+                    self.mpg123_handler.stdin.flush()
+                    self.mpg123_handler.kill()
                     break
 
             if self.playing_flag:
@@ -160,10 +173,10 @@ class Player(object):
 
         if 'cache' in popenArgs.keys() and os.path.isfile(popenArgs['cache']):
             thread = threading.Thread(target=runInThread,
-                                      args=(onExit, popenArgs['cache']))
+                                      args=(onExit, popenArgs['cache'], True))
         else:
             thread = threading.Thread(target=runInThread,
-                                      args=(onExit, popenArgs['mp3_url']))
+                                      args=(onExit, popenArgs['mp3_url'], False))
             cache_thread = threading.Thread(
                 target=cacheSong,
                 args=(popenArgs['song_id'], popenArgs['song_name'], popenArgs[
@@ -185,11 +198,11 @@ class Player(object):
 
     def recall(self):
         if self.info['idx'] >= len(self.info[
-                'player_list']) and self.end_callback is not None:
+                                       'player_list']) and self.end_callback is not None:
             log.debug('Callback')
             self.end_callback()
         if self.info['idx'] < 0 or self.info['idx'] >= len(self.info[
-                'player_list']):
+                                                               'player_list']):
             self.info['idx'] = 0
             self.stop()
             return
@@ -227,7 +240,7 @@ class Player(object):
             else:
                 database_song = self.songs[str(song['song_id'])]
                 if (database_song['song_name'] != song['song_name'] or
-                        database_song['quality'] != song['quality']):
+                            database_song['quality'] != song['quality']):
                     self.songs[str(song['song_id'])] = song
 
     def append_songs(self, datalist):
@@ -245,7 +258,7 @@ class Player(object):
                             'cache']
                     self.songs[str(song['song_id'])] = song
         if len(datalist) > 0 and self.info['playing_mode'] == 3 or self.info[
-                'playing_mode'] == 4:
+            'playing_mode'] == 4:
             self.generate_shuffle_playing_list()
 
     def play_and_pause(self, idx):
@@ -274,22 +287,22 @@ class Player(object):
         self.recall()
 
     def stop(self):
-        if self.playing_flag and self.popen_handler:
+        if self.playing_flag and self.mpg123_handler:
             self.playing_flag = False
-            self.popen_handler.stdin.write(b'Q\n')
-            self.popen_handler.stdin.flush()
+            self.mpg123_handler.stdin.write(b'Q\n')
+            self.mpg123_handler.stdin.flush()
             try:
-                self.popen_handler.kill()
+                self.mpg123_handler.kill()
             except OSError as e:
                 log.error(e)
                 return
 
     def pause(self):
-        if not self.playing_flag and not self.popen_handler:
+        if not self.playing_flag and not self.mpg123_handler:
             return
         self.pause_flag = True
-        self.popen_handler.stdin.write(b'P\n')
-        self.popen_handler.stdin.flush()
+        self.mpg123_handler.stdin.write(b'P\n')
+        self.mpg123_handler.stdin.flush()
 
         item = self.songs[self.info['player_list'][self.info['idx']]]
         self.ui.build_playinfo(item['song_name'],
@@ -301,8 +314,8 @@ class Player(object):
 
     def resume(self):
         self.pause_flag = False
-        self.popen_handler.stdin.write(b'P\n')
-        self.popen_handler.stdin.flush()
+        self.mpg123_handler.stdin.write(b'P\n')
+        self.mpg123_handler.stdin.flush()
 
         item = self.songs[self.info['player_list'][self.info['idx']]]
         self.ui.build_playinfo(item['song_name'], item['artist'],
@@ -429,9 +442,9 @@ class Player(object):
             self.info['playing_volume'] = 100
         if not self.playing_flag:
             return
-        self.popen_handler.stdin.write(b'V ' + str(self.info[
-            'playing_volume']).encode('utf-8') + b'\n')
-        self.popen_handler.stdin.flush()
+        self.mpg123_handler.stdin.write(b'V ' + str(self.info[
+                                                        'playing_volume']).encode('utf-8') + b'\n')
+        self.mpg123_handler.stdin.flush()
 
     def volume_down(self):
         self.info['playing_volume'] = self.info['playing_volume'] - 7
@@ -440,9 +453,9 @@ class Player(object):
         if not self.playing_flag:
             return
 
-        self.popen_handler.stdin.write(b'V ' + str(self.info[
-            'playing_volume']).encode('utf-8') + b'\n')
-        self.popen_handler.stdin.flush()
+        self.mpg123_handler.stdin.write(b'V ' + str(self.info[
+                                                        'playing_volume']).encode('utf-8') + b'\n')
+        self.mpg123_handler.stdin.flush()
 
     def update_size(self):
         self.ui.update_size()

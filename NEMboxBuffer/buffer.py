@@ -27,10 +27,15 @@ class Buffer:
         self.buffer_size = 128 * 1024
         self.queue = queue.Queue()
         self.music = None
+        self.exit = False
 
     def buffer(self, url):
         def download():
-            request = urllib.request.urlopen(url)
+            try:
+                request = urllib.request.urlopen(url)
+            except Exception:
+                self.exit = True
+                exit(1)
             with open(self.tmp_file, "wb") as f:
                 try:
                     while True:
@@ -51,17 +56,34 @@ class Buffer:
             os.mkfifo(self.tmp_pipe)
             pipe_file = open(self.tmp_pipe, "wb")
             while True:
-                data = self.queue.get()
-                pipe_file.write(data)
+                try:
+                    data = self.queue.get(timeout=0.1)
+                    pipe_file.write(data)
+                except queue.Empty:
+                    pass
+                except:
+                    break
+                finally:
+                    if self.exit:
+                        break
 
         download_thread = threading.Thread(target=download)
         download_thread.start()
-        cache()
+        cache_thread = threading.Thread(target=cache)
+        cache_thread.start()
         download_thread.join()
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-u", "--url")
     args = parser.parse_args()
-    Buffer().buffer(args.url)
+    if args.url:
+        try:
+            Buffer().buffer(args.url)
+        except Exception:
+            pass
+
+
+if __name__ == '__main__':
+    main()

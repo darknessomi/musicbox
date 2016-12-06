@@ -48,8 +48,9 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'musicbox = NEMbox:start'
-        ],
+            'musicbox = NEMbox:start',
+            'musicbox_backend = NEMboxBuffer.buffer:main'
+        ]
     },
 
     license='MIT',
