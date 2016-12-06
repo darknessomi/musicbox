@@ -290,6 +290,8 @@ class Player(object):
             except OSError as e:
                 log.error(e)
                 return
+            except:
+                return
 
     def pause(self):
         if not self.playing_flag and not self.mpg123_handler:
