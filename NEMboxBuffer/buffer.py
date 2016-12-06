@@ -28,6 +28,7 @@ class Buffer:
         self.queue = queue.Queue()
         self.music = None
         self.exit = False
+        self.finish = False
 
     def buffer(self, url):
         def download():
@@ -46,22 +47,26 @@ class Buffer:
                         f.write(data)
                 except:
                     pass
+                self.finish = True
 
         def cache():
             try:
                 os.unlink(self.tmp_pipe)
-                os.unlink(self.tmp_file)
             except:
                 pass
             os.mkfifo(self.tmp_pipe)
             pipe_file = open(self.tmp_pipe, "wb")
             while True:
                 if self.exit:
+                    os.close(pipe_file)
                     break
                 try:
                     data = self.queue.get(timeout=0.1)
                     pipe_file.write(data)
                 except queue.Empty:
+                    if self.finish:
+                        os.close(pipe_file)
+                        break
                     continue
                 except:
                     break

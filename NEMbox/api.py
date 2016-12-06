@@ -602,6 +602,19 @@ class NetEase(object):
 
         return channels
 
+    def update_url(self, id, url):
+        if not re.match("^http://m\d{1,2}\.music\.126\.net/\d{14}/*", url):
+            url = self.songs_detail_new_api([id])[0]['url']
+            log.debug("Force use new api for song %s, url:%s" % (id, url))
+            return url
+        else:
+            expired_time = re.search("^http://m\d{1,2}\.music\.126\.net/(\d{14})/*", url).group(1)
+            expired_time = time.mktime(time.strptime(expired_time,"%Y%m%d%H%M%S"))
+            if time.time()>expired_time-300:
+                url = self.songs_detail_new_api([id])[0]['url']
+                log.debug("Update url for song %s, url:%s" % (id, url))
+            return url
+
     # 获取版本
     def get_version(self):
         action = 'https://pypi.python.org/pypi?:action=doap&name=NetEase-MusicBox'  # NOQA

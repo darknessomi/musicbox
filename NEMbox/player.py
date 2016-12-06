@@ -69,7 +69,6 @@ class Player(object):
         # Force new url
         def buffer_music(url):
             para = ['musicbox_backend', "-u", url]
-            log.debug("BUFFER %s" % para)
             self.buffer_handler = subprocess.Popen(para)
 
         def runInThread(onExit, arg):
@@ -159,6 +158,7 @@ class Player(object):
             thread = threading.Thread(target=runInThread,
                                       args=(onExit, popenArgs['cache']))
         else:
+            popenArgs['mp3_url']=NetEase().update_url(popenArgs['song_id'], popenArgs['mp3_url'])
             try:
                 os.unlink("/tmp/music_box.pipe")
             except:
@@ -209,10 +209,6 @@ class Player(object):
                            item['album_name'], item['artist'])
         self.playing_id = item['song_id']
         self.playing_name = item['song_name']
-        #if not re.match("^http://m\d{1,2}\.music\.126\.net/\d{14}/*", item['mp3_url']):
-        sid = item['song_id']
-        item['mp3_url'] = NetEase().songs_detail_new_api([sid])[0]['url']
-        log.debug("Force use new api for song %s, url:%s" % (item['song_id'], item['mp3_url']))
 
         self.popen_recall(self.recall, item)
 
