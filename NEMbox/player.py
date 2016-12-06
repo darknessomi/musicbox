@@ -67,37 +67,21 @@ class Player(object):
         '''
 
         # Force new url
-        if not re.match("^http://m\d{1,2}\.music\.126\.net/\d{14}/*", popenArgs['mp3_url']):
-            sid = popenArgs['song_id']
-            popenArgs['mp3_url'] = NetEase().songs_detail_new_api([sid])[0]['url']
-            log.debug("Force use new api for song %s, url:%s" % (popenArgs['song_id'], popenArgs['mp3_url']))
-            self.songs[str(popenArgs['song_id'])]['mp3_url'] = popenArgs['mp3_url']
-
         def buffer_music(url):
-            if self.buffer_handler:
-                try:
-                    self.mpg123_handler.kill()
-                except OSError as e:
-                    pass
             para = ['musicbox_backend', "-u", url]
+            log.debug("BUFFER %s" % para)
             self.buffer_handler = subprocess.Popen(para)
 
-        def runInThread(onExit, arg, cached):
+        def runInThread(onExit, arg):
             para = ['mpg123', '-R']
             para[1:1] = self.mpg123_parameters
-            if not cached:
-                buffer_music(arg)
-            time.sleep(0.1)
             self.mpg123_handler = subprocess.Popen(para,
                                                    stdin=subprocess.PIPE,
                                                    stdout=subprocess.PIPE,
                                                    stderr=subprocess.PIPE)
             self.mpg123_handler.stdin.write(b'V ' + str(self.info['playing_volume']).encode('utf-8') + b'\n')
             if arg:
-                if cached:
-                    self.mpg123_handler.stdin.write(b'L ' + arg.encode('utf-8') + b'\n')
-                else:
-                    self.mpg123_handler.stdin.write(b'L /tmp/music_box.pipe\n')
+                self.mpg123_handler.stdin.write(b'L ' + arg.encode('utf-8') + b'\n')
             else:
                 self.next_idx()
                 onExit()
@@ -173,10 +157,18 @@ class Player(object):
 
         if 'cache' in popenArgs.keys() and os.path.isfile(popenArgs['cache']):
             thread = threading.Thread(target=runInThread,
-                                      args=(onExit, popenArgs['cache'], True))
+                                      args=(onExit, popenArgs['cache']))
         else:
+            try:
+                os.unlink("/tmp/music_box.pipe")
+            except:
+                pass
+            buffer_music(popenArgs['mp3_url'])
+            while not os.path.exists("/tmp/music_box.pipe"):
+                #log.debug("Wait 0.1.")
+                time.sleep(0.1)
             thread = threading.Thread(target=runInThread,
-                                      args=(onExit, popenArgs['mp3_url'], False))
+                                      args=(onExit, "/tmp/music_box.pipe"))
             cache_thread = threading.Thread(
                 target=cacheSong,
                 args=(popenArgs['song_id'], popenArgs['song_name'], popenArgs[
@@ -217,6 +209,11 @@ class Player(object):
                            item['album_name'], item['artist'])
         self.playing_id = item['song_id']
         self.playing_name = item['song_name']
+        #if not re.match("^http://m\d{1,2}\.music\.126\.net/\d{14}/*", item['mp3_url']):
+        sid = item['song_id']
+        item['mp3_url'] = NetEase().songs_detail_new_api([sid])[0]['url']
+        log.debug("Force use new api for song %s, url:%s" % (item['song_id'], item['mp3_url']))
+
         self.popen_recall(self.recall, item)
 
     def generate_shuffle_playing_list(self):
@@ -293,6 +290,7 @@ class Player(object):
             self.mpg123_handler.stdin.flush()
             try:
                 self.mpg123_handler.kill()
+                self.buffer_handler.kill()
             except OSError as e:
                 log.error(e)
                 return

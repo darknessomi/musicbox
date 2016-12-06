@@ -56,22 +56,22 @@ class Buffer:
             os.mkfifo(self.tmp_pipe)
             pipe_file = open(self.tmp_pipe, "wb")
             while True:
+                if self.exit:
+                    break
                 try:
                     data = self.queue.get(timeout=0.1)
                     pipe_file.write(data)
                 except queue.Empty:
-                    pass
+                    continue
                 except:
                     break
-                finally:
-                    if self.exit:
-                        break
 
-        download_thread = threading.Thread(target=download)
-        download_thread.start()
-        cache_thread = threading.Thread(target=cache)
+        download_thread = threading.Thread(target=download, daemon=True)
+        cache_thread = threading.Thread(target=cache, daemon=True)
         cache_thread.start()
+        download_thread.start()
         download_thread.join()
+        cache_thread.join()
 
 
 def main():
