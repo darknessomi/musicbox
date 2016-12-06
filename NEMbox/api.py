@@ -603,7 +603,7 @@ class NetEase(object):
         return channels
 
     def update_url(self, id, url):
-        if not re.match("^http://m\d{1,2}\.music\.126\.net/\d{14}/*", url):
+        if not url or not re.match("^http://m\d{1,2}\.music\.126\.net/\d{14}/*", url):
             url = self.songs_detail_new_api([id])[0]['url']
             log.debug("Force use new api for song %s, url:%s" % (id, url))
             return url

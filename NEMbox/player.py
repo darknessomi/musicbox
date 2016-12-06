@@ -68,8 +68,9 @@ class Player(object):
 
         # Force new url
         def buffer_music(url):
-            para = ['musicbox_backend', "-u", url]
-            self.buffer_handler = subprocess.Popen(para)
+            if url:
+                para = ['musicbox_backend', "-u", url]
+                self.buffer_handler = subprocess.Popen(para)
 
         def runInThread(onExit, arg):
             para = ['mpg123', '-R']
@@ -158,14 +159,18 @@ class Player(object):
             thread = threading.Thread(target=runInThread,
                                       args=(onExit, popenArgs['cache']))
         else:
-            popenArgs['mp3_url']=NetEase().update_url(popenArgs['song_id'], popenArgs['mp3_url'])
+            popenArgs['mp3_url'] = NetEase().update_url(popenArgs['song_id'], popenArgs['mp3_url'])
+            if not popenArgs['mp3_url']:
+                self.next_idx()
+                onExit()
+                return
             try:
                 os.unlink("/tmp/music_box.pipe")
             except:
                 pass
             buffer_music(popenArgs['mp3_url'])
             while not os.path.exists("/tmp/music_box.pipe"):
-                #log.debug("Wait 0.1.")
+                # log.debug("Wait 0.1.")
                 time.sleep(0.1)
             thread = threading.Thread(target=runInThread,
                                       args=(onExit, "/tmp/music_box.pipe"))
