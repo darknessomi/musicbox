@@ -569,6 +569,8 @@ class Menu(object):
             elif key == ord('C'):
                 if datatype == "songs":
                     s = self.datalist[idx]
+                    self.player.new_player_list('songs', self.title,
+                                                self.datalist, idx)
                     cache_thread = threading.Thread(
                         target=self.player.cacheSong1time,
                         args=(s['song_id'], s['song_name'], s['artist'],
