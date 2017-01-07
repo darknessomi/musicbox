@@ -470,3 +470,29 @@ class Player(object):
         self.cache.enable = True
         self.cache.add(song_id, song_name, artist, song_url, cacheExit)
         self.cache.start_download()
+
+    def cachePlaylist1time(self, playlist_id):
+        def cacheExit(song_id, path):
+            self.songs[str(song_id)]['cache'] = path
+            self.cache.enable = len(self.cache.downloading) > 0
+            current = total_songs - len(self.cache.downloading)
+            log.info("Caching playlist %d/%d" % (current, total_songs))
+
+        try:
+            api = NetEase()
+            pld = api.playlist_detail(playlist_id)
+            total_songs = len(pld)
+            for x in pld:
+                song_id = x['id']
+                song_name = x['name']
+                _ = list()
+                for y in x['artists']:
+                    _.append(y['name'])
+                artist = ", ".join(_)
+                url = x['mp3Url']
+                self.cache.add(song_id, song_name, artist, url, cacheExit)
+            self.cache.enable = True
+            self.info['idx'] = 0
+            self.cache.start_download()
+        except Exception as e:
+            log.exception(e)

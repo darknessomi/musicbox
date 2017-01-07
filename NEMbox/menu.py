@@ -577,6 +577,19 @@ class Menu(object):
                               s['mp3_url']))
                     cache_thread.start()
 
+                elif datatype == "top_playlists":
+                    playlist_id = datalist[idx]['playlist_id']
+                    songs = self.netease.playlist_detail(playlist_id)
+                    _datalist = self.netease.dig_info(songs, 'songs')
+                    _title = self.title + ' > ' + datalist[idx][
+                        'playlists_name']
+                    self.player.new_player_list('songs', _title,
+                                                _datalist, idx)
+                    cache_thread = threading.Thread(
+                        target=self.player.cachePlaylist1time,
+                        args=(playlist_id, ))
+                    cache_thread.start()
+
             elif key == ord('i'):
                 if self.player.playing_id != -1:
                     webbrowser.open_new_tab('http://music.163.com/song?id=' +
