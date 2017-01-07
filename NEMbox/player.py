@@ -476,7 +476,7 @@ class Player(object):
             self.songs[str(song_id)]['cache'] = path
             self.cache.enable = len(self.cache.downloading) > 0
             current = total_songs - len(self.cache.downloading)
-            log.info("Caching playlist %d/%d" % (current, total_songs))
+            log.info("Cached playlist (%d/%d)" % (current, total_songs))
 
         try:
             api = NetEase()
