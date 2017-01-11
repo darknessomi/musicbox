@@ -530,7 +530,7 @@ class Menu(object):
                 start_time = time.time()
                 timing_time = self.ui.build_timing()
                 if timing_time.isdigit():
-                    timing_time = int(timing_time)
+                    timing_time = int(timing_time) * 60
                     timing_flag = True
                     notify('The musicbox will quit in {} minutes'.format(timing_time))
                 else:
