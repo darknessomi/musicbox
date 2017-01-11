@@ -565,6 +565,18 @@ class Ui(object):
         self.screen.timeout(100)  # restore the screen timeout
         return x
 
+    def build_timing(self):
+        self.screen.move(6, 1)
+        self.screen.clrtobot()
+        self.screen.timeout(-1)
+        self.addstr(8, self.startcol, '输入定时时间(min):',
+                    curses.color_pair(1))
+        self.screen.timeout(-1)  # disable the screen timeout
+        curses.echo()
+        timing_time = self.screen.getstr(8, self.startcol + 19, 60)
+        self.screen.timeout(100)  # restore the screen timeout
+        return timing_time
+
     def get_account(self):
         self.screen.timeout(-1)  # disable the screen timeout
         curses.echo()

@@ -12,6 +12,7 @@ from __future__ import absolute_import
 from builtins import range
 from builtins import str
 from future import standard_library
+import time
 standard_library.install_aliases()
 
 import curses
@@ -223,6 +224,7 @@ class Menu(object):
 
         self.bind_keys()  # deprecated keybinder
         show_lyrics_new_process()
+        timing_flag = False
         while True:
             datatype = self.datatype
             title = self.title
@@ -240,6 +242,10 @@ class Menu(object):
             # term resize
             if key == -1:
                 self.player.update_size()
+
+            if timing_flag:
+                if time.time() - start_time > timing_time:
+                    key = ord('q')
 
             # 退出
             if key == ord('q'):
@@ -519,6 +525,16 @@ class Menu(object):
                     self.datalist.pop(idx)
                     self.index = carousel(offset, min(
                         len(datalist), offset + step) - 1, idx)
+
+            elif key == ord('t'):
+                start_time = time.time()
+                timing_time = self.ui.build_timing()
+                if timing_time.isdigit():
+                    timing_time = int(timing_time)
+                    timing_flag = True
+                    notify('The musicbox will quit in {} minutes'.format(timing_time))
+                else:
+                    notify('The input should be digit')
 
             # 当前项目下移
             elif key == ord('J'):
