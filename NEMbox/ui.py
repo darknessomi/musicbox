@@ -571,6 +571,8 @@ class Ui(object):
         self.screen.timeout(-1)
         self.addstr(8, self.startcol, '输入定时时间(min):',
                     curses.color_pair(1))
+        self.addstr(11, self.startcol, 'ps:定时时间为整数，输入0代表取消定时退出',
+                    curses.color_pair(1))
         self.screen.timeout(-1)  # disable the screen timeout
         curses.echo()
         timing_time = self.screen.getstr(8, self.startcol + 19, 60)
