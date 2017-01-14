@@ -28,9 +28,10 @@ NetEase-MusicBox
 11. 现在播放及桌面歌词显示
 12. 歌曲评论显示
 13. 一键进入歌曲专辑
-14. Vimer式快捷键让操作丝般顺滑
-15. 可使用数字快捷键
-16. 可使用自定义全局快捷键
+14. 定时退出
+15. Vimer式快捷键让操作丝般顺滑
+16. 可使用数字快捷键
+17. 可使用自定义全局快捷键
 
 ### 键盘快捷键
 
@@ -67,6 +68,7 @@ NetEase-MusicBox
 	<tr> <td>.</td> <td>Trash FM</td> <td>删除 FM</td> </tr>
 	<tr> <td>/</td> <td>Next FM</td> <td>下一FM</td> </tr>
 	<tr> <td>Q</td> <td>Quit</td> <td>退出</td> </tr>
+	<tr> <td>T</td> <td>Timing Exit</td> <td>定时退出</td> </tr>
 	<tr> <td>W</td> <td>Quit&Clear</td> <td>退出并清除用户信息</td> </tr>
 </table>
 
