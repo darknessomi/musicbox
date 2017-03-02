@@ -256,7 +256,7 @@ class NetEase(object):
             if cookie.name == '__csrf':
                 csrf = cookie.value
         if csrf == '':
-            return False
+            return {'code': 501}
         action += csrf
         text = {
             'username': username,
