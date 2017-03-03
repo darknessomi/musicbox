@@ -37,7 +37,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='NetEase-MusicBox',
-    version='0.2.3.8',
+    version='0.2.3.9',
     packages=find_packages(),
     install_requires=[
         'requests',
