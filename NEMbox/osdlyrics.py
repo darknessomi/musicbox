@@ -55,9 +55,12 @@ if pyqt_activity:
             self.resize(600, 60)
             scn = QtGui.QApplication.desktop().screenNumber(
                 QtGui.QApplication.desktop().cursor().pos())
+            bl = QtGui.QApplication.desktop().screenGeometry(scn).bottomLeft()
             br = QtGui.QApplication.desktop().screenGeometry(scn).bottomRight()
+            bc = (bl+br)/2
             frameGeo = self.frameGeometry()
-            frameGeo.moveBottomRight(br)
+            frameGeo.moveCenter(bc)
+            frameGeo.moveBottom(bc.y())
             self.move(frameGeo.topLeft())
             self.text = "OSD Lyrics for Musicbox"
             self.setWindowTitle("Lyrics")
@@ -107,7 +110,7 @@ if pyqt_activity:
 
         @QtCore.pyqtSlot(str)
         def refresh_lyrics(self, text):
-            self.parent().text = text
+            self.parent().text = text.replace('||', '\n')
             self.parent().repaint()
 
     def show_lyrics():
