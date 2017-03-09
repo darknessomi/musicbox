@@ -598,8 +598,11 @@ class Ui(object):
     def update_size(self):
         # get terminal size
         size = terminalsize.get_terminal_size()
-        self.x = max(size[0], 10)
-        self.y = max(size[1], 25)
+        x = max(size[0], 10)
+        y = max(size[1], 25)
+        if (x, y) == (self.x, self.y): # no need to resize
+            return
+        self.x, self.y = x, y
 
         # update intendations
         curses.resizeterm(self.y, self.x)
