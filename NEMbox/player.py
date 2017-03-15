@@ -115,13 +115,19 @@ class Player(object):
                         'Song {} is not compatible with old api.'.format(sid))
                     popenArgs['mp3_url'] = new_url
 
-                    self.popen_handler.stdin.write(b'\nL ' + new_url.encode('utf-8') + b'\n')
-                    self.popen_handler.stdin.flush()
-                    self.popen_handler.stdout.readline()
+                    try:
+                        self.popen_handler.stdin.write(b'\nL ' + new_url.encode('utf-8') + b'\n')
+                        self.popen_handler.stdin.flush()
+                        self.popen_handler.stdout.readline()
+                    except IOError as e:
+                        log.error(e)
                 elif strout == '@P 0\n':
-                    self.popen_handler.stdin.write(b'Q\n')
-                    self.popen_handler.stdin.flush()
-                    self.popen_handler.kill()
+                    try:
+                        self.popen_handler.stdin.write(b'Q\n')
+                        self.popen_handler.stdin.flush()
+                        self.popen_handler.kill()
+                    except IOError as e:
+                        log.error(e)
                     break
 
             if self.playing_flag:
@@ -280,20 +286,23 @@ class Player(object):
     def stop(self):
         if self.playing_flag and self.popen_handler:
             self.playing_flag = False
-            self.popen_handler.stdin.write(b'Q\n')
-            self.popen_handler.stdin.flush()
             try:
+                self.popen_handler.stdin.write(b'Q\n')
+                self.popen_handler.stdin.flush()
                 self.popen_handler.kill()
-            except OSError as e:
+            except IOError as e:
                 log.error(e)
-                return
 
     def pause(self):
         if not self.playing_flag and not self.popen_handler:
             return
         self.pause_flag = True
-        self.popen_handler.stdin.write(b'P\n')
-        self.popen_handler.stdin.flush()
+        try:
+            self.popen_handler.stdin.write(b'P\n')
+            self.popen_handler.stdin.flush()
+        except IOError as e:
+            log.error(e)
+            return
 
         item = self.songs[self.info['player_list'][self.info['idx']]]
         self.ui.build_playinfo(item['song_name'],
@@ -305,8 +314,12 @@ class Player(object):
 
     def resume(self):
         self.pause_flag = False
-        self.popen_handler.stdin.write(b'P\n')
-        self.popen_handler.stdin.flush()
+        try:
+            self.popen_handler.stdin.write(b'P\n')
+            self.popen_handler.stdin.flush()
+        except IOError as e:
+            log.error(e)
+            return
 
         item = self.songs[self.info['player_list'][self.info['idx']]]
         self.ui.build_playinfo(item['song_name'], item['artist'],
@@ -433,9 +446,13 @@ class Player(object):
             self.info['playing_volume'] = 100
         if not self.playing_flag:
             return
-        self.popen_handler.stdin.write(b'V ' + str(self.info[
-            'playing_volume']).encode('utf-8') + b'\n')
-        self.popen_handler.stdin.flush()
+
+        try:
+            self.popen_handler.stdin.write(b'V ' + str(self.info[
+                'playing_volume']).encode('utf-8') + b'\n')
+            self.popen_handler.stdin.flush()
+        except IOError as e:
+            log.error(e)
 
     def volume_down(self):
         self.info['playing_volume'] = self.info['playing_volume'] - 7
@@ -444,9 +461,12 @@ class Player(object):
         if not self.playing_flag:
             return
 
-        self.popen_handler.stdin.write(b'V ' + str(self.info[
-            'playing_volume']).encode('utf-8') + b'\n')
-        self.popen_handler.stdin.flush()
+        try:
+            self.popen_handler.stdin.write(b'V ' + str(self.info[
+                'playing_volume']).encode('utf-8') + b'\n')
+            self.popen_handler.stdin.flush()
+        except IOError as e:
+            log.error(e)
 
     def update_size(self):
         self.ui.update_size()
