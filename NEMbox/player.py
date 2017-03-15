@@ -68,19 +68,23 @@ class Player(object):
         def runInThread(onExit, arg):
             para = ['mpg123', '-R']
             para[1:1] = self.mpg123_parameters
-            self.popen_handler = subprocess.Popen(para,
-                                                  stdin=subprocess.PIPE,
-                                                  stdout=subprocess.PIPE,
-                                                  stderr=subprocess.PIPE)
-            self.popen_handler.stdin.write(b'V ' + str(self.info['playing_volume']).encode('utf-8') + b'\n')
-            if arg:
-                self.popen_handler.stdin.write(b'L ' + arg.encode('utf-8') + b'\n')
-            else:
-                self.next_idx()
-                onExit()
-                return
+            try:
+                self.popen_handler = subprocess.Popen(para,
+                                                      stdin=subprocess.PIPE,
+                                                      stdout=subprocess.PIPE,
+                                                      stderr=subprocess.PIPE)
+                self.popen_handler.stdin.write(b'V ' + str(self.info['playing_volume']).encode('utf-8') + b'\n')
+                if arg:
+                    self.popen_handler.stdin.write(b'L ' + arg.encode('utf-8') + b'\n')
+                else:
+                    self.next_idx()
+                    onExit()
+                    return
 
-            self.popen_handler.stdin.flush()
+                self.popen_handler.stdin.flush()
+            except IOError as e:
+                log.error('stdin write error')
+                log.error(e)
 
             self.process_first = True
             while True:
