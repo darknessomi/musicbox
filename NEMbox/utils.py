@@ -9,10 +9,12 @@ from __future__ import division
 from __future__ import absolute_import
 from builtins import str
 from future import standard_library
+from . import logger
 standard_library.install_aliases()
 import platform
-import os
+import subprocess
 
+log = logger.getLogger(__name__)
 
 def utf8_data_to_file(f, data):
     if hasattr(data, 'decode'):
@@ -22,16 +24,19 @@ def utf8_data_to_file(f, data):
 
 
 def notify_command_osx(msg, msg_type, t=None):
-    command = '/usr/bin/osascript -e "display notification \\\"{}\\\" {} with title \\\"musicbox\\\""'
-    sound = 'sound name \\\"/System/Library/Sounds/Ping.aiff\\\"' if msg_type else ''
-    return command.format(msg, sound)
+    command = ['/usr/bin/osascript', '-e']
+    tpl = "display notification \"{}\" {} with title \"musicbox\""
+    sound = 'sound name \"/System/Library/Sounds/Ping.aiff\"' if msg_type else ''
+    command.append(tpl.format(msg, sound).encode('UTF-8'))
+    return command
 
 
 def notify_command_linux(msg, t=None):
-    command = '/usr/bin/notify-send "' + msg + '"'
+    command = ['/usr/bin/notify-send']
+    command.append(msg.encode('UTF-8'))
     if t:
-        command += ' -t ' + str(t)
-    command += ' -h int:transient:1'
+        command.extend(['-t', str(t)])
+    command.extend(['-h', 'int:transient:1'])
     return command
 
 
@@ -41,8 +46,10 @@ def notify(msg, msg_type=0, t=None):
         command = notify_command_osx(msg, msg_type, t)
     else:
         command = notify_command_linux(msg, t)
-    os.system(command.encode('utf-8'))
-
+    try:
+        subprocess.call(command)
+    except OSError as e:
+        log.warning('Sending notification error.')
 
 if __name__ == "__main__":
     notify("I'm test 1", msg_type=1, t=1000)
