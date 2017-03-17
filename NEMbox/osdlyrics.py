@@ -52,7 +52,8 @@ if pyqt_activity:
             else:
                 self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
             self.setMinimumSize(600, 50)
-            self.resize(600, 60)
+            osdlyrics_size = config.get_item("osdlyrics_size")
+            self.resize(osdlyrics_size[0], osdlyrics_size[1])
             scn = QtGui.QApplication.desktop().screenNumber(
                 QtGui.QApplication.desktop().cursor().pos())
             bl = QtGui.QApplication.desktop().screenGeometry(scn).bottomLeft()
