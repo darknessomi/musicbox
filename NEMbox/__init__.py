@@ -34,8 +34,10 @@ def start():
 
 
 if __name__ == '__main__':
+    # print('------------start debugging------------')
+    # time.sleep(0.5)
     start()
-
+    
 parser = argparse.ArgumentParser()
 parser.add_argument("-v",
                     "--version",

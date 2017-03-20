@@ -225,6 +225,7 @@ class Ui(object):
         self.addstr(7, self.startcol, '享受高品质音乐，loading...',
                     curses.color_pair(1))
         self.screen.refresh()
+        
 
     # start is the timestamp of this function being called
     def build_menu(self, datatype, title, datalist, offset, index, step,
@@ -288,6 +289,26 @@ class Ui(object):
                                 datalist[i]['album_name'])[:int(self.x * 2)])
 
                 self.addstr(iter_range - offset + 8, 0, ' ' * self.x)
+                
+            elif datatype == 'comments':
+                # 被选中的评论在最下方显示全部字符，其余评论仅显示一行
+                for i in range(offset, min(len(datalist), offset + step)):
+                    maxdatalistlength = min(int(1.8 * self.startcol), len(datalist[i]))
+                    if i == index:
+                        try:
+                            self.addstr(
+                                20, self.indented_startcol,
+                                '-> ' + str(i) + '. ' + datalist[i],
+                                curses.color_pair(2))
+                        except:
+                            self.addstr(
+                                20, self.indented_startcol,
+                                '-> ' + str(i) + '. ' + 'This comment is invalid',
+                                curses.color_pair(2))
+                    else:
+                        self.addstr(
+                            i - offset + 9, self.startcol,
+                            str(i) + '. ' + datalist[i][:maxdatalistlength])
 
             elif datatype == 'comments':
                 # 被选中的评论在最下方显示全部字符，其余评论仅显示一行

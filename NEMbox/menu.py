@@ -266,7 +266,7 @@ class Menu(object):
                     log.error(e)
                     break
                 break
-
+                
             # 上移
             elif key == ord('k'):
                 # turn page if at beginning
@@ -590,7 +590,7 @@ class Menu(object):
             elif key == ord('C'):
                 s = self.datalist[idx]
                 cache_thread = threading.Thread(
-                    target=self.player.cacheSong1time,
+                        target=self.player.cacheSong1time,
                     args=(s['song_id'], s['song_name'], s['artist'], s[
                         'mp3_url']))
                 cache_thread.start()
@@ -697,6 +697,26 @@ class Menu(object):
             self.datalist = netease.dig_info(
                 netease.top_playlists(data), self.datatype)
             self.title += ' > ' + data
+            
+        # 歌曲评论    
+        elif datatype in ['songs', 'fmsongs']:
+            song_id = datalist[idx]['song_id']
+            comments = self.netease.song_comments(song_id, limit=100)
+            try:
+                hotcomments = comments['hotComments']
+                comcomments = comments['comments']
+            except KeyError:
+                log.error(str(comments))
+                hotcomments = comcomments = []
+            self.datalist = []
+            for one_comment in hotcomments:
+                self.datalist.append(u'(热门评论)%s:%s' % (one_comment['user']['nickname'], one_comment['content']))
+            for one_comment in comcomments:
+                self.datalist.append(one_comment['content'])
+            self.datatype = 'comments'
+            self.title = '网易云音乐 > 评论:%s' % datalist[idx]['song_name']
+            self.offset = 0
+            self.index = 0
 
         # 歌曲评论
         elif datatype in ['songs', 'fmsongs']:
@@ -751,7 +771,7 @@ class Menu(object):
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
-
+                    
     def show_playing_song(self):
         if self._is_playlist_empty():
             return
