@@ -98,16 +98,14 @@ if pyqt_activity:
             path = QtGui.QPainterPath()
             pen.setWidth(4)
             rect_width = event.rect().width()
-            text_row0 = self.text.split('\n')[0]
-            text_width = metrics.width(text_row0)
-            point_x = abs((text_width - rect_width) / 2)
+            text_row0 = QtCore.QString(self.text.split('\n')[0]).simplified()
+            point_x = abs((metrics.width(text_row0) - rect_width) / 2)
             if len(self.text.split('\n')) > 1:
                 point_y = abs((event.rect().height() - metrics.height() * 2) / 3 + metrics.ascent())
                 path.addText(point_x + 2, point_y + 2, font, text_row0)
 
-                text_row1 = self.text.split('\n')[1]
-                text_width = metrics.width(text_row1)
-                point_x = abs((text_width - rect_width) / 2)
+                text_row1 = QtCore.QString(self.text.split('\n')[1]).simplified()
+                point_x = abs((metrics.width(text_row1) - rect_width) / 2)
                 point_y = abs((event.rect().height() - metrics.height() * 2) / 3 * 2
                               + metrics.height() + metrics.ascent())
                 path.addText(point_x + 2, point_y + 2, font, text_row1)
