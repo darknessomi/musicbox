@@ -602,6 +602,7 @@ class Ui(object):
                     curses.color_pair(1))
         self.screen.refresh()
         info = self.screen.getstr(10, self.startcol, 60)
+        info = info.decode('utf8')
         if info == '':
             return '/return'
         elif info.strip() is '':
