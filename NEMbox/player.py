@@ -75,6 +75,7 @@ class Player(object):
                                                       stderr=subprocess.PIPE)
                 self.popen_handler.stdin.write(b'V ' + str(self.info['playing_volume']).encode('utf-8') + b'\n')
                 if arg:
+                    log.debug("now playing with url:" + arg)
                     self.popen_handler.stdin.write(b'L ' + arg.encode('utf-8') + b'\n')
                 else:
                     self.next_idx()
@@ -116,11 +117,21 @@ class Player(object):
                     popenArgs['mp3_url'] = new_url
 
                     try:
+                        log.debug("now playing with new url:" + new_url)
                         self.popen_handler.stdin.write(b'\nL ' + new_url.encode('utf-8') + b'\n')
                         self.popen_handler.stdin.flush()
                         self.popen_handler.stdout.readline()
                     except IOError as e:
+                        log.error('we quit when ioerror occor')
                         log.error(e)
+                        # 如果io错误发生了，我们终止线程退出然后播放下一首
+                        try:
+                            self.popen_handler.stdin.write(b'Q\n')
+                            self.popen_handler.stdin.flush()
+                            self.popen_handler.kill()
+                        except IOError as e1:
+                            log.error(e1)
+                        break
                 elif strout == '@P 0\n':
                     try:
                         self.popen_handler.stdin.write(b'Q\n')
@@ -129,7 +140,17 @@ class Player(object):
                     except IOError as e:
                         log.error(e)
                     break
-
+                else:
+                    #有遇到播放玩后没有退出，mpg123一直在发送空消息的情况，此处直接终止处理
+                    if len(strout) == 0:
+                        log.error('mpg123 error, halt, endless loop and high cpu use, then we kill it')
+                        try:
+                            self.popen_handler.stdin.write(b'Q\n')
+                            self.popen_handler.stdin.flush()
+                            self.popen_handler.kill()
+                        except IOError as e:
+                            log.error(e)
+                        break
             if self.playing_flag:
                 self.next_idx()
                 onExit()
