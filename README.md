@@ -122,7 +122,7 @@ NetEase-MusicBox
 #### 已测试的系统兼容列表
 
 <table>
-	<tr> <td>macOS</td> <td>10.12 / 10.11 / 10.10 / 10.9</td> </tr>
+	<tr> <td>macOS</td> <td>10.12 / 10.11</td> </tr>
 	<tr> <td>Ubuntu</td> <td>14.04</td> </tr>
 	<tr> <td>Kali</td> <td>1.1.0 / 2.0 / Rolling</td> </tr>
 	<tr> <td>CentOS</td> <td>7</td> </tr>
@@ -150,6 +150,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2017-06-03 版本 0.2.4.1    修正mpg123状态异常导致的cpu占用，增加歌词双行显示功能
 
 2017-03-17 版本 0.2.4.0    修复通知可能造成的崩溃
 
@@ -179,7 +181,7 @@ Enjoy it !
 
 2016-05-07 版本 0.2.2.8    解决通知在Gnome桌面持续驻留（#303）的问题
 
-[更多>>](Change Log.md)
+[更多>>](https://github.com/darknessomi/musicbox/blob/master/ChangeLog.md)
 
 ### The MIT License (MIT)
 
