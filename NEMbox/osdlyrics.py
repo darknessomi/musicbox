@@ -46,7 +46,7 @@ if pyqt_activity:
             self.setAttribute(QtCore.Qt.WA_X11DoNotAcceptFocus)
             self.setFocusPolicy(QtCore.Qt.NoFocus)
             if config.get_item("osdlyrics_on_top"):
-                self.setWindowFlags(QtCore.Qt.FramelessWindowHint |
+                self.setWindowFlags(QtCore.Qt.CustomizeWindowHint|QtCore.Qt.FramelessWindowHint |
                                     QtCore.Qt.WindowStaysOnTopHint |
                                     QtCore.Qt.X11BypassWindowManagerHint)
             else:
