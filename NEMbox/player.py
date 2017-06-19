@@ -23,6 +23,7 @@ import time
 import os
 import random
 import re
+import platform
 
 from .ui import Ui
 from .storage import Storage
@@ -148,7 +149,7 @@ class Player(object):
                     break
                 else:
                     #有遇到播放玩后没有退出，mpg123一直在发送空消息的情况，此处直接终止处理
-                    if len(strout) == 0:
+                    if len(strout) == 0 and platform.system() == 'Darwin':
                         log.error('mpg123 error, halt, endless loop and high cpu use, then we kill it')
                         try:
                             self.popen_handler.stdin.write(b'Q\n')
