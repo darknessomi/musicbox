@@ -123,14 +123,20 @@ class Player(object):
                         self.popen_handler.stdout.readline()
                     except IOError as e:
                         log.error('we quit when ioerror occor')
-                        log.error(e)
+                        try:
+                            log.error(e)
+                        except Exception as e:
+                            pass
                         # 如果io错误发生了，我们终止线程退出然后播放下一首
                         try:
                             self.popen_handler.stdin.write(b'Q\n')
                             self.popen_handler.stdin.flush()
                             self.popen_handler.kill()
                         except IOError as e1:
-                            log.error(e1)
+                            try:
+                                log.error(e1)
+                            except Exception as e2:
+                                pass
                         break
                 elif strout == '@P 0\n':
                     try:
@@ -149,7 +155,10 @@ class Player(object):
                             self.popen_handler.stdin.flush()
                             self.popen_handler.kill()
                         except IOError as e:
-                            log.error(e)
+                            try:
+                                log.error(e)
+                            except Exception as e1:
+                                pass
                         break
             if self.playing_flag:
                 self.next_idx()
