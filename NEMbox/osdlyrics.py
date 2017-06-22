@@ -89,12 +89,34 @@ if pyqt_activity:
             osdlyrics_color = config.get_item("osdlyrics_color")
             osdlyrics_font = config.get_item("osdlyrics_font")
             font = QtGui.QFont(osdlyrics_font[0], osdlyrics_font[1])
-            pen = QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1],
-                               osdlyrics_color[2])
-            qp.setFont(font)
-            qp.setPen(pen)
-            qp.drawText(event.rect(), QtCore.Qt.AlignCenter |
-                        QtCore.Qt.TextWordWrap, self.text)
+            color = QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1],
+                                 osdlyrics_color[2])
+            opp_color = QtGui.QColor(255-color.red(), 255-color.green(), 255-color.blue())
+            metrics = QtGui.QFontMetrics(font)
+            qp.setRenderHint(QtGui.QPainter.Antialiasing)
+            pen = QtGui.QPen(opp_color)
+            path = QtGui.QPainterPath()
+            pen.setWidth(4)
+            rect_width = event.rect().width()
+            text_row0 = QtCore.QString(self.text.split('\n')[0]).simplified()
+            point_x = abs((metrics.width(text_row0) - rect_width) / 2)
+            if len(self.text.split('\n')) > 1:
+                point_y = abs((event.rect().height() - metrics.height() * 2) / 3 + metrics.ascent())
+                path.addText(point_x + 2, point_y + 2, font, text_row0)
+
+                text_row1 = QtCore.QString(self.text.split('\n')[1]).simplified()
+                point_x = abs((metrics.width(text_row1) - rect_width) / 2)
+                point_y = abs((event.rect().height() - metrics.height() * 2) / 3 * 2
+                              + metrics.height() + metrics.ascent())
+                path.addText(point_x + 2, point_y + 2, font, text_row1)
+
+            else:
+                point_y = abs((event.rect().height() - metrics.height()) / 2 + metrics.ascent())
+                path.addText(point_x + 2, point_y + 2, font, text_row0)
+
+            qp.strokePath(path, pen)
+            qp.drawPath(path)
+            qp.fillPath(path, QtGui.QBrush(color))
 
     class LyricsAdapter(QtDBus.QDBusAbstractAdaptor):
         QtCore.Q_CLASSINFO("D-Bus Interface", "local.musicbox.Lyrics")
