@@ -23,6 +23,7 @@ import time
 import os
 import random
 import re
+import platform
 
 from .ui import Ui
 from .storage import Storage
@@ -88,6 +89,7 @@ class Player(object):
                 log.error(e)
 
             self.process_first = True
+            endless_loop_cnt = 0
             while True:
                 if self.playing_flag is False:
                     break
@@ -123,14 +125,20 @@ class Player(object):
                         self.popen_handler.stdout.readline()
                     except IOError as e:
                         log.error('we quit when ioerror occor')
-                        log.error(e)
+                        try:
+                            log.error(e)
+                        except Exception as e:
+                            pass
                         # 如果io错误发生了，我们终止线程退出然后播放下一首
                         try:
                             self.popen_handler.stdin.write(b'Q\n')
                             self.popen_handler.stdin.flush()
                             self.popen_handler.kill()
                         except IOError as e1:
-                            log.error(e1)
+                            try:
+                                log.error(e1)
+                            except Exception as e2:
+                                pass
                         break
                 elif strout == '@P 0\n':
                     try:
@@ -143,14 +151,19 @@ class Player(object):
                 else:
                     #有遇到播放玩后没有退出，mpg123一直在发送空消息的情况，此处直接终止处理
                     if len(strout) == 0:
-                        log.error('mpg123 error, halt, endless loop and high cpu use, then we kill it')
-                        try:
-                            self.popen_handler.stdin.write(b'Q\n')
-                            self.popen_handler.stdin.flush()
-                            self.popen_handler.kill()
-                        except IOError as e:
-                            log.error(e)
-                        break
+                        endless_loop_cnt += 1
+                        if platform.system() == 'Darwin' or endless_loop_cnt > 100:
+                            log.error('mpg123 error, halt, endless loop and high cpu use, then we kill it')
+                            try:
+                                self.popen_handler.stdin.write(b'Q\n')
+                                self.popen_handler.stdin.flush()
+                                self.popen_handler.kill()
+                            except IOError as e:
+                                try:
+                                    log.error(e)
+                                except Exception as e1:
+                                    pass
+                            break
             if self.playing_flag:
                 self.next_idx()
                 onExit()
