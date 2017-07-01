@@ -32,6 +32,7 @@ NetEase-MusicBox
 15. Vimer式快捷键让操作丝般顺滑
 16. 可使用数字快捷键
 17. 可使用自定义全局快捷键
+18. 可使用 socket 控制
 
 ### 键盘快捷键
 
@@ -72,6 +73,61 @@ NetEase-MusicBox
 	<tr> <td>W</td> <td>Quit&Clear</td> <td>退出并清除用户信息</td> </tr>
 </table>
 
+### Socket 控制
+默认4000端口
+
+在 `NEMbox/menu.py` 可以修改 
+    
+直接发送信息见下表即可
+
+<table>
+	<tr> <td>j</td> <td>Down</td> <td>下移</td> </tr>
+	<tr> <td>k</td> <td>Up</td> <td>上移</td> </tr>
+	<tr> <td>h</td> <td>Back</td> <td>后退</td> </tr>
+	<tr> <td>l</td> <td>Forword</td> <td>前进</td> </tr>
+	<tr> <td>u</td> <td>Prev page</td> <td>上一页</td> </tr>
+	<tr> <td>d</td> <td>Next page</td> <td>下一页</td> </tr>
+	<tr> <td>f</td> <td>Search</td> <td>快速搜索</td> </tr>
+	<tr> <td>[</td> <td>Prev song</td> <td>上一曲</td> </tr>
+	<tr> <td>]</td> <td>Next song</td> <td>下一曲</td> </tr>
+	<tr> <td>=</td> <td>Volume +</td> <td>音量增加</td> </tr>
+	<tr> <td>-</td> <td>Volume -</td> <td>音量减少</td> </tr>
+	<tr> <td> (空格)</td> <td>Play/Pause</td> <td>播放/暂停</td> </tr>
+    <tr> <td>?</td> <td>Shuffle</td> <td>手气不错</td> </tr>
+	<tr> <td>m</td> <td>Menu</td> <td>主菜单</td> </tr>
+	<tr> <td>p</td> <td>Present/History</td> <td>当前/历史播放列表</td> </tr>
+	<tr> <td>i</td> <td>Music Info</td> <td>当前音乐信息</td> </tr>
+	<tr> <td>P</td> <td>Playing Mode</td> <td>播放模式切换</td> </tr>
+	<tr> <td>a</td> <td>Add</td> <td>添加曲目到打碟</td> </tr>
+	<tr> <td>A</td> <td>Enter album</td> <td>进入专辑</td> </tr>
+	<tr> <td>g</td> <td>To the first</td> <td>跳至首项</td> </tr>
+	<tr> <td>G</td> <td>To the end</td> <td>跳至尾项</td> </tr>
+	<tr> <td>z</td> <td>DJ list</td> <td>打碟列表</td> </tr>
+	<tr> <td>s</td> <td>Star</td> <td>添加到收藏</td> </tr>
+	<tr> <td>c</td> <td>Collection</td> <td>收藏列表</td> </tr>
+	<tr> <td>r</td> <td>Remove</td> <td>删除当前条目</td> </tr>
+	<tr> <td>J</td> <td>Move Down</td> <td>向下移动当前项目</td> </tr>
+	<tr> <td>K</td> <td>Move Up</td> <td>向上移动当前项目</td> </tr>
+	<tr> <td>C</td> <td>Cache</td> <td>缓存歌曲到本地</td> </tr>
+	<tr> <td>,</td> <td>Like</td> <td>喜爱</td> </tr>
+	<tr> <td>.</td> <td>Trash FM</td> <td>删除 FM</td> </tr>
+	<tr> <td>/</td> <td>Next FM</td> <td>下一FM</td> </tr>
+	<tr> <td>q</td> <td>Quit</td> <td>退出</td> </tr>
+	<tr> <td>t</td> <td>Timing Exit</td> <td>定时退出</td> </tr>
+	<tr> <td>w</td> <td>Quit&Clear</td> <td>退出并清除用户信息</td> </tr>
+</table>
+
+发送源码示例
+
+```python
+import socket
+port = 4000
+host = 'localhost'
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((host,port))
+s.sendall(b']')
+s.close()
+```
 
 ### PyPi安装
 	$ pip(3) install NetEase-MusicBox
