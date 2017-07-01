@@ -15,6 +15,9 @@ from future import standard_library
 import time
 standard_library.install_aliases()
 
+import time
+import threading
+import socket
 import curses
 import threading
 import sys
@@ -110,6 +113,8 @@ class Menu(object):
         self.title = '网易云音乐'
         self.datalist = ['排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单', '主播电台', '每日推荐',
                          '私人FM', '搜索', '帮助']
+        self.sk = socket.socket()
+        self.key = ''
         self.offset = 0
         self.index = 0
         self.storage = Storage()
@@ -212,6 +217,26 @@ class Menu(object):
             keybinder.unbind(self.config.get_item('global_next'))  # noqa
             keybinder.unbind(self.config.get_item('global_previous'))  # noqa
 
+    def catch_socket(self):
+        cli, addr = self.sk.accept()
+        self.key = ord(cli.recv(1024).decode())
+        cli.close()
+
+    def catch_keybroad(self):
+        self.key = self.screen.getch()
+
+    def get_key(self):
+        t_s = threading.Thread(target = self.catch_socket)
+        t_k = threading.Thread(target = self.catch_keybroad)
+        t_s.setDaemon(True)
+        t_k.setDaemon(True)
+        t_s.start()
+        t_k.start()
+        while True:
+            time.sleep(0.05)
+            if self.key != -1:
+                break
+
     def start(self):
         self.START = time.time() // 1
         self.ui.build_menu(self.datatype, self.title, self.datalist,
@@ -221,11 +246,17 @@ class Menu(object):
             self.player.playing_flag, self.player.pause_flag,
             self.storage.database['player_info']['playing_mode'])
         self.stack.append([self.datatype, self.title, self.datalist, self.offset, self.index])
-
         self.bind_keys()  # deprecated keybinder
         show_lyrics_new_process()
         timing_flag = False
+        self.sk.bind(('', 4000))
+        self.sk.listen(10)
         while True:
+            self.key = -1
+            t = threading.Thread(target = self.get_key)
+            t.start()
+            t.join()
+            key = self.key
             datatype = self.datatype
             title = self.title
             datalist = self.datalist
@@ -234,7 +265,6 @@ class Menu(object):
             step = self.step
             stack = self.stack
             self.screen.timeout(500)
-            key = self.screen.getch()
             if BINDABLE:
                 keybinder.gtk.main_iteration(False)  # noqa
             self.ui.screen.refresh()
