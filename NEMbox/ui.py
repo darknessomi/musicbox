@@ -93,7 +93,7 @@ class Ui(object):
 
     def notify(self, summary, song, album, artist):
         if summary != 'disable':
-            body = '%s\nin %s by %s' % (song, album, artist)
+            body = '%s\n专辑 %s 歌手 %s' % (song, album, artist)
             content = summary + ': ' + body
             notify(content)
 

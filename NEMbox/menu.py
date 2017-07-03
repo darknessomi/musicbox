@@ -710,7 +710,7 @@ class Menu(object):
             self.datalist = []
             for one_comment in hotcomments:
                 self.datalist.append(
-                    u'(热门评论)%s:%s' % (one_comment['user']['nickname'],
+                    u'(热评 %s👍 )%s:%s' % (one_comment['likedCount'], one_comment['user']['nickname'],
                                       one_comment['content']))
             for one_comment in comcomments:
                 self.datalist.append(one_comment['content'])
