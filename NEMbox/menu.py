@@ -297,7 +297,7 @@ class Menu(object):
 
             # 数字快捷键
             elif ord('0') <= key <= ord('9'):
-                idx = key - ord('0')
+                idx = self.index + key - ord('0')
                 self.ui.build_menu(self.datatype, self.title, self.datalist,
                                    self.offset, idx, self.step, self.START)
                 self.ui.build_loading()
