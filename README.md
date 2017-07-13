@@ -91,7 +91,7 @@ NetEase-MusicBox
 
 #### Ubuntu/Debian
 
-	$ (sudo) pip install NetEase-MusicBox
+	$ (sudo) pip install NetEase-MusicBox (如果使用Python3应使用pip3代替pip)
 
 	$ (sudo) apt-get install mpg123
 
@@ -129,6 +129,7 @@ NetEase-MusicBox
 	<tr> <td>openSUSE</td> <td>13.2</td> </tr>
 	<tr> <td>Fedora</td> <td>22</td> </tr>
 	<tr> <td>Arch</td> <td>Rolling</td> </tr>
+	<tr> <td>Deepin</td> <td>15.4</td> </tr>
 </table>
 
 
