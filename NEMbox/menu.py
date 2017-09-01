@@ -457,7 +457,7 @@ class Menu(object):
             elif key == ord('P'):
                 self.storage.database['player_info']['playing_mode'] = (
                     self.storage.database['player_info']['playing_mode'] +
-                    1) % 5
+                    1) % 6
 
             # 进入专辑
             elif key == ord('A'):

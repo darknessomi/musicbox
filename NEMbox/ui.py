@@ -188,6 +188,8 @@ class Ui(object):
             process = '随机播放 ' + process
         elif playing_mode == 4:
             process = '随机循环 ' + process
+        elif playing_mode == 5:
+            process = '倒序循环 ' + process
         else:
             pass
         self.addstr(3, self.startcol - 2, process, curses.color_pair(1))
