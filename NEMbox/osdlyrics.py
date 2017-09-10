@@ -24,12 +24,16 @@ try:
     from PyQt4 import QtGui, QtCore, QtDBus
     QWidget = QtGui.QWidget
     QApplication = QtGui.QApplication
+    def delta(e):
+        return e.delta()
     pyqt_activity = True
 except ImportError:
     try:
         from PyQt5 import QtGui, QtCore, QtDBus, QtWidgets
         QWidget = QtWidgets.QWidget
         QApplication = QtWidgets.QApplication
+        def delta(e):
+            return e.angleDelta().y()
         pyqt_activity = True
     except ImportError:
         pyqt_activity = False
@@ -85,7 +89,7 @@ if pyqt_activity:
                 self.move(newpos)
 
         def wheelEvent(self, event):
-            self.resize(self.width() + event.delta(), self.height())
+            self.resize(self.width() + delta(event), self.height())
 
         def paintEvent(self, event):
             qp = QtGui.QPainter()
