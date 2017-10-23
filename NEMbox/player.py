@@ -244,7 +244,7 @@ class Player(object):
                                item['album_name'], item['quality'],
                                time.time())
         if self.notifier:
-            self.ui.notify('Now playing', item['song_name'],
+            self.ui.notify('正在播放', item['song_name'],
                            item['album_name'], item['artist'])
         self.playing_id = item['song_id']
         self.playing_name = item['song_name']
