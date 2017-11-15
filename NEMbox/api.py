@@ -548,7 +548,7 @@ class NetEase(object):
             music_id)
         try:
             data = self.httpRequest('GET', action)
-            if 'lrc' in data and data['lrc']['lyric'] is not None:
+            if 'lrc' in data and data['lrc'].get('lyric') is not None:
                 lyric_info = data['lrc']['lyric']
             else:
                 lyric_info = '未找到歌词'
@@ -620,7 +620,7 @@ class NetEase(object):
             for i in range(0, len(data)):
                 url, quality = geturl(data[i])
 
-                if data[i]['album'] is not None:
+                if data[i].get('album') is not None:
                     album_name = data[i]['album']['name']
                     album_id = data[i]['album']['id']
                 else:
