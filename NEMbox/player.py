@@ -94,7 +94,11 @@ class Player(object):
                 if self.playing_flag is False:
                     break
 
-                strout = self.popen_handler.stdout.readline().decode('utf-8')
+                try:
+                    strout = self.popen_handler.stdout.readline().decode('utf-8')
+                except UnicodeDecodeError as e:
+                    log.error('stdout utf8 decode error:' + strout)
+                    continue
 
                 if re.match('^\@F.*$', strout):
                     process_data = strout.split(' ')
