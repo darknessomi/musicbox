@@ -131,20 +131,20 @@ def uniq(arr):
 # 获取高音质mp3 url
 def geturl(song):
     quality = Config().get_item('music_quality')
-    if song['hMusic'] and quality <= 0:
-        music = song['hMusic']
+    if song['h'] and quality <= 0:
+        music = song['h']
         quality = 'HD'
-    elif song['mMusic'] and quality <= 1:
-        music = song['mMusic']
+    elif song['m'] and quality <= 1:
+        music = song['m']
         quality = 'MD'
-    elif song['lMusic'] and quality <= 2:
-        music = song['lMusic']
+    elif song['l'] and quality <= 2:
+        music = song['l']
         quality = 'LD'
     else:
         return song['mp3Url'], ''
 
-    quality = quality + ' {0}k'.format(music['bitrate'] // 1000)
-    song_id = str(music['dfsId'])
+    quality = quality + ' {0}k'.format(music['br'] // 1000)
+    song_id = str(music['fid'])
     enc_id = encrypted_id(song_id)
     url = 'http://m%s.music.126.net/%s/%s.mp3' % (random.randrange(1, 3),
                                                   enc_id, song_id)
@@ -417,11 +417,24 @@ class NetEase(object):
 
     # 歌单详情
     def playlist_detail(self, playlist_id):
-        action = 'http://music.163.com/api/playlist/detail?id={}'.format(
-            playlist_id)
         try:
-            data = self.httpRequest('GET', action)
-            return data['result']['tracks']
+            action = 'http://music.163.com/weapi/v3/playlist/detail?csrf_token='  # NOQA
+            self.session.cookies.load()
+            csrf = ''
+            for cookie in self.session.cookies:
+                if cookie.name == '__csrf':
+                    csrf = cookie.value
+            if csrf == '':
+                return False
+            action += csrf
+            req = {'id': playlist_id, 'offset': 0, 'total': True, 'limit': 1000, 'n': 1000, 'csrf_token': csrf}
+            page = self.session.post(action,
+                                     data=encrypted_request(req),
+                                     headers=self.header,
+                                     timeout=default_timeout)
+            results = json.loads(page.text)
+            return results['playlist']['tracks']
+
         except requests.exceptions.RequestException as e:
             log.error(e)
             return []
@@ -620,9 +633,12 @@ class NetEase(object):
             for i in range(0, len(data)):
                 url, quality = geturl(data[i])
 
-                if data[i]['album'] is not None:
-                    album_name = data[i]['album']['name']
-                    album_id = data[i]['album']['id']
+                if 'pc' in data[i]:
+                    album_name = data[i]['pc']['alb']
+                    album_id = ''
+                elif data[i]['al'] is not None:
+                    album_name = data[i]['al']['name']
+                    album_id = data[i]['al']['id']
                 else:
                     album_name = '未知专辑'
                     album_id = ''
@@ -636,15 +652,16 @@ class NetEase(object):
                     'mp3_url': url,
                     'quality': quality
                 }
-                if 'artist' in data[i]:
-                    song_info['artist'] = data[i]['artist']
-                elif 'artists' in data[i]:
-                    for j in range(0, len(data[i]['artists'])):
-                        song_info['artist'].append(data[i]['artists'][j][
-                            'name'])
-                    song_info['artist'] = ', '.join(song_info['artist'])
+
+                if 'pc' in data[i]:
+                    song_info['artist'] = data[i]['pc']['ar']
                 else:
-                    song_info['artist'] = '未知艺术家'
+                    for j in range(0, len(data[i]['ar'])):
+                        if data[i]['ar'][j]['name'] is None:
+                            song_info['artist'].append('未知艺术家')
+                        else:
+                            song_info['artist'].append(data[i]['ar'][j]['name'])
+                    song_info['artist'] = ', '.join(song_info['artist'])
 
                 temp.append(song_info)
 

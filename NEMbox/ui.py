@@ -117,6 +117,9 @@ class Ui(object):
             self.addstr(1, self.indented_startcol,
                         '♫  ♪ ♫  ♪ ' + quality, curses.color_pair(3))
 
+        if album_name is None:
+            album_name='未知专辑'
+
         self.addstr(
             1, min(self.indented_startcol + 18, self.x - 1),
             song_name + self.space + artist + '  < ' + album_name + ' >',
