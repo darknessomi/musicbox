@@ -452,12 +452,12 @@ class NetEase(object):
         for cookie in self.session.cookies:
             if cookie.name == '__csrf':
                 csrf = cookie.value
-        data = {'id': playlist_id, 'total': 'true', 'csrf_token': csrf}
+        data = {'id': playlist_id, 'total': 'true', 'csrf_token': csrf, 'limit': 1000, 'n': 1000, 'offset': 0}
         connection = self.session.post(action,
                                        data=encrypted_request(data),
                                        headers=self.header, )
         result = json.loads(connection.text)
-        
+        # log.debug(result['playlist']['tracks'])
         return result['playlist']['tracks']
 
     # 热门歌手 http://music.163.com/#/discover/artist/
