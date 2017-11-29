@@ -130,6 +130,14 @@ def uniq(arr):
 
 # 获取高音质mp3 url
 def geturl(song):
+    try:
+        return geturl_v1(song)
+    except KeyError as e:
+        return geturl_v3(song)
+
+
+# 老的获取歌曲url方法
+def geturl_v1(song):
     quality = Config().get_item('music_quality')
     if song['hMusic'] and quality <= 0:
         music = song['hMusic']
@@ -150,6 +158,27 @@ def geturl(song):
                                                   enc_id, song_id)
     return url, quality
 
+# 新的获取歌曲url方法
+def geturl_v3(song):
+    quality = Config().get_item('music_quality')
+    if song['h'] and quality <= 0:
+        music = song['h']
+        quality = 'HD'
+    elif song['m'] and quality <= 1:
+        music = song['m']
+        quality = 'MD'
+    elif song['l'] and quality <= 2:
+        music = song['l']
+        quality = 'LD'
+    else:
+        return song['mp3Url'], ''
+
+    quality = quality + ' {0}k'.format(music['br'] // 1000)
+    song_id = str(music['fid'])
+    enc_id = encrypted_id(song_id)
+    url = 'http://m%s.music.126.net/%s/%s.mp3' % (random.randrange(1, 3),
+                                                  enc_id, song_id)
+    return url, quality    
 
 def geturl_new_api(song):
     br_to_quality = {128000: 'MD 128k', 320000: 'HD 320k'}
@@ -415,16 +444,21 @@ class NetEase(object):
     def playlist_class_detail(self):
         pass
 
-    # 歌单详情
+    # 歌单详情， 使用新版本v3接口，借鉴自https://github.com/Binaryify/NeteaseCloudMusicApi/commit/a1239a838c97367e86e2ec3cdce5557f1aa47bc1
     def playlist_detail(self, playlist_id):
-        action = 'http://music.163.com/api/playlist/detail?id={}'.format(
-            playlist_id)
-        try:
-            data = self.httpRequest('GET', action)
-            return data['result']['tracks']
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+        action = 'http://music.163.com/weapi/v3/playlist/detail'
+        self.session.cookies.load()
+        csrf = ''
+        for cookie in self.session.cookies:
+            if cookie.name == '__csrf':
+                csrf = cookie.value
+        data = {'id': playlist_id, 'total': 'true', 'csrf_token': csrf, 'limit': 1000, 'n': 1000, 'offset': 0}
+        connection = self.session.post(action,
+                                       data=encrypted_request(data),
+                                       headers=self.header, )
+        result = json.loads(connection.text)
+        # log.debug(result['playlist']['tracks'])
+        return result['playlist']['tracks']
 
     # 热门歌手 http://music.163.com/#/discover/artist/
     def top_artists(self, offset=0, limit=100):
@@ -620,13 +654,22 @@ class NetEase(object):
             for i in range(0, len(data)):
                 url, quality = geturl(data[i])
 
-                if data[i]['album'] is not None:
-                    album_name = data[i]['album']['name']
-                    album_id = data[i]['album']['id']
+                # 对新老接口进行处理
+                if 'al' in data[i]:
+                    if data[i]['al'] is not None:
+                        album_name = data[i]['al']['name']
+                        album_id = data[i]['al']['id']
+                    else:
+                        album_name = '未知专辑'
+                        album_id = ''
                 else:
-                    album_name = '未知专辑'
-                    album_id = ''
-
+                    if data[i]['album'] is not None:
+                        album_name = data[i]['album']['name']
+                        album_id = data[i]['album']['id']
+                    else:
+                        album_name = '未知专辑'
+                        album_id = ''
+                
                 song_info = {
                     'song_id': data[i]['id'],
                     'artist': [],
@@ -636,8 +679,17 @@ class NetEase(object):
                     'mp3_url': url,
                     'quality': quality
                 }
+                # 对新老接口进行处理
                 if 'artist' in data[i]:
                     song_info['artist'] = data[i]['artist']
+                elif 'ar' in data[i]:
+                    if len(data[i]['ar']) == 1:
+                        song_info['artist'] = data[i]['ar'][0]['name']
+                    else:
+                        for j in range(0, len(data[i]['ar'])):
+                            song_info['artist'].append(data[i]['ar'][j][
+                            'name'])
+                        song_info['artist'] = ', '.join(song_info['artist'])
                 elif 'artists' in data[i]:
                     for j in range(0, len(data[i]['artists'])):
                         song_info['artist'].append(data[i]['artists'][j][
