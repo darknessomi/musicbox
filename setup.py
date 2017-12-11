@@ -43,7 +43,8 @@ setup(
         'requests',
         'BeautifulSoup4',
         'pycrypto',
-        'future'
+        'future',
+        'lxml'
     ],
 
     entry_points={
