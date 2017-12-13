@@ -129,6 +129,7 @@ class Menu(object):
         self.username = self.storage.database['user']['nickname']
         self.resume_play = True
         self.at_playing_list = False
+        self.enter_flag = True
         signal.signal(signal.SIGWINCH, self.change_term)
         signal.signal(signal.SIGINT, self.send_kill)
         self.START = time.time()
@@ -327,13 +328,15 @@ class Menu(object):
 
             # 前进
             elif key == ord('l') or key == 10:
+                self.enter_flag = True
                 if len(self.datalist) <= 0:
                     continue
                 self.START = time.time()
                 self.ui.build_loading()
                 self.dispatch_enter(idx)
-                self.index = 0
-                self.offset = 0
+                if self.enter_flag is True:
+                    self.index = 0
+                    self.offset = 0
 
             # 回退
             elif key == ord('h'):
@@ -751,6 +754,16 @@ class Menu(object):
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
+
+        else:
+            stack = self.stack
+            up = stack.pop()
+            self.datatype = up[0]
+            self.title = up[1]
+            self.datalist = up[2]
+            self.offset = up[3]
+            self.index = idx
+            self.enter_flag = False
 
     def show_playing_song(self):
         if self._is_playlist_empty():
