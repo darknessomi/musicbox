@@ -217,12 +217,12 @@ class Ui(object):
                         self.now_lyric = line
                     else:
                         self.now_lyric = line
-                        for tline in song['tlyric']:
+                        for tindex, tline in enumerate(song['tlyric']):
                             if key in tline and self.config.get_item(
                                     'translation'):
                                 self.now_lyric = tline + ' || ' + self.now_lyric  # NOQA
-                                if not (self.post_lyric == ''):
-                                    self.post_lyric = tline + ' || ' + self.post_lyric
+                                if not (self.post_lyric == '') and tindex < len(song['tlyric']) -1:
+                                    self.post_lyric = song['tlyric'][tindex+1] + ' || ' + self.post_lyric
                                 #此处已经拿到，直接break即可
                                 break
                     #此处已经拿到，直接break即可
