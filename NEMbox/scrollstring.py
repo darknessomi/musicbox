@@ -55,4 +55,4 @@ def truelen(string):
     >>> truelen('')
     0
     """
-    return len(string) - sum(1 for c in string if c > chr(127)) / 3
+    return len(string) + sum(1 for c in string if c > chr(127))
