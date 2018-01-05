@@ -69,11 +69,14 @@ class Ui(object):
             curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)
             curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
             curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        
+        self.config = Config()
         # term resize handling
         size = terminalsize.get_terminal_size()
         self.x = max(size[0], 10)
         self.y = max(size[1], 25)
-        self.startcol = int(float(self.x) / 5)
+        self.margin = self.config.get_item('left_margin_ratio')
+        self.startcol = int(float(self.x) / self.margin)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
         self.lyric = ''
@@ -82,7 +85,6 @@ class Ui(object):
         self.now_lyric_index = 0
         self.tlyric = ''
         self.storage = Storage()
-        self.config = Config()
         self.newversion = False
 
     def addstr(self, *args):
@@ -657,7 +659,8 @@ class Ui(object):
 
         # update intendations
         curses.resizeterm(self.y, self.x)
-        self.startcol = int(float(self.x) / 5)
+        self.margin = self.config.get_item('left_margin_ratio')
+        self.startcol = int(float(self.x) / self.margin)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
         self.screen.clear()
