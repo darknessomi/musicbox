@@ -400,6 +400,8 @@ class Player(object):
             self._inc_idx()
         elif self.info['playing_mode'] == 1:
             self.info['idx'] = (self.info['idx'] + 1) % playlist_len
+        elif self.info['playing_mode'] == 5:
+            self.info['idx'] = (self.info['idx'] - 1) % playlist_len
         elif self.info['playing_mode'] == 2:
             self.info['idx'] = self.info['idx']
         elif self.info['playing_mode'] == 3 or self.info['playing_mode'] == 4:
@@ -444,6 +446,8 @@ class Player(object):
             self.info['idx'] = (self.info['idx'] - 1) % playlist_len
         elif self.info['playing_mode'] == 2:
             self.info['idx'] = self.info['idx']
+        elif self.info['playing_mode'] == 5:
+            self.info['idx'] = (self.info['idx'] + 1) % playlist_len
         elif self.info['playing_mode'] == 3 or self.info['playing_mode'] == 4:
             if self._need_to_shuffle():
                 self.generate_shuffle_playing_list()
