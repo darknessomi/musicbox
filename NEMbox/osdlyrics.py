@@ -22,15 +22,27 @@ config = Config()
 
 try:
     from PyQt4 import QtGui, QtCore, QtDBus
+    QWidget = QtGui.QWidget
+    QApplication = QtGui.QApplication
+    def delta(e):
+        return e.delta()
     pyqt_activity = True
 except ImportError:
-    pyqt_activity = False
-    log.warn("PyQt4 module not installed.")
-    log.warn("Osdlyrics Not Available.")
+    try:
+        from PyQt5 import QtGui, QtCore, QtDBus, QtWidgets
+        QWidget = QtWidgets.QWidget
+        QApplication = QtWidgets.QApplication
+        def delta(e):
+            return e.angleDelta().y()
+        pyqt_activity = True
+    except ImportError:
+        pyqt_activity = False
+        log.warn("Neither PyQt4 nor PyQt5 module installed.")
+        log.warn("Osdlyrics Not Available.")
 
 if pyqt_activity:
 
-    class Lyrics(QtGui.QWidget):
+    class Lyrics(QWidget):
 
         def __init__(self):
             super(Lyrics, self).__init__()
@@ -54,10 +66,10 @@ if pyqt_activity:
             self.setMinimumSize(600, 50)
             osdlyrics_size = config.get_item("osdlyrics_size")
             self.resize(osdlyrics_size[0], osdlyrics_size[1])
-            scn = QtGui.QApplication.desktop().screenNumber(
-                QtGui.QApplication.desktop().cursor().pos())
-            bl = QtGui.QApplication.desktop().screenGeometry(scn).bottomLeft()
-            br = QtGui.QApplication.desktop().screenGeometry(scn).bottomRight()
+            scn = QApplication.desktop().screenNumber(
+                QApplication.desktop().cursor().pos())
+            bl = QApplication.desktop().screenGeometry(scn).bottomLeft()
+            br = QApplication.desktop().screenGeometry(scn).bottomRight()
             bc = (bl+br)/2
             frameGeo = self.frameGeometry()
             frameGeo.moveCenter(bc)
@@ -77,7 +89,7 @@ if pyqt_activity:
                 self.move(newpos)
 
         def wheelEvent(self, event):
-            self.resize(self.width() + event.delta(), self.height())
+            self.resize(self.width() + delta(event), self.height())
 
         def paintEvent(self, event):
             qp = QtGui.QPainter()
@@ -116,7 +128,7 @@ if pyqt_activity:
 
     def show_lyrics():
 
-        app = QtGui.QApplication(sys.argv)
+        app = QApplication(sys.argv)
         lyrics = Lyrics()
         QtDBus.QDBusConnection.sessionBus().registerService('org.musicbox.Bus')
         QtDBus.QDBusConnection.sessionBus().registerObject('/', lyrics)
