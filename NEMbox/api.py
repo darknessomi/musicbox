@@ -28,10 +28,13 @@ import random
 import base64
 import binascii
 
-from Crypto.Cipher import AES
 from http.cookiejar import LWPCookieJar
 from bs4 import BeautifulSoup
 import requests
+from cryptography.hazmat.primitives.ciphers import (
+    Cipher, algorithms, modes
+)
+from cryptography.hazmat.backends import default_backend
 
 from .config import Config
 from .storage import Storage
@@ -96,18 +99,24 @@ def encrypted_id(id):
 def encrypted_request(text):
     text = json.dumps(text)
     secKey = createSecretKey(16)
-    encText = aesEncrypt(aesEncrypt(text, nonce), secKey)
+    encText = aes_encrypt(aes_encrypt(text, nonce), secKey)
     encSecKey = rsaEncrypt(secKey, pubKey, modulus)
     data = {'params': encText, 'encSecKey': encSecKey}
     return data
 
 
-def aesEncrypt(text, secKey):
+def aes_encrypt(text, sec_key):
+    backend = default_backend()
     pad = 16 - len(text) % 16
     text = text + chr(pad) * pad
-    encryptor = AES.new(secKey, 2, '0102030405060708')
-    ciphertext = encryptor.encrypt(text)
-    ciphertext = base64.b64encode(ciphertext).decode('utf-8')
+    cipher = Cipher(
+        algorithms.AES(sec_key.encode('utf-8')),
+        modes.CBC(b'0102030405060708'),
+        backend=backend
+    )
+    encryptor = cipher.encryptor()
+    ciphertext = encryptor.update(text.encode('utf-8')) + encryptor.finalize()
+    ciphertext = base64.b64encode(ciphertext)
     return ciphertext
 
 
@@ -178,7 +187,7 @@ def geturl_v3(song):
     enc_id = encrypted_id(song_id)
     url = 'http://m%s.music.126.net/%s/%s.mp3' % (random.randrange(1, 3),
                                                   enc_id, song_id)
-    return url, quality    
+    return url, quality
 
 def geturl_new_api(song):
     br_to_quality = {128000: 'MD 128k', 320000: 'HD 320k'}
@@ -669,7 +678,7 @@ class NetEase(object):
                     else:
                         album_name = '未知专辑'
                         album_id = ''
-                
+
                 song_info = {
                     'song_id': data[i]['id'],
                     'artist': [],
