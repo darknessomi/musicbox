@@ -171,7 +171,7 @@ def geturl_v3(song):
         music = song['l']
         quality = 'LD'
     else:
-        return song['mp3Url'], ''
+        return song.get('mp3Url', ''), ''
 
     quality = quality + ' {0}k'.format(music['br'] // 1000)
     song_id = str(music['fid'])
@@ -653,6 +653,8 @@ class NetEase(object):
         if dig_type == 'songs' or dig_type == 'fmsongs':
             for i in range(0, len(data)):
                 url, quality = geturl(data[i])
+                if not url:
+                    continue
 
                 # 对新老接口进行处理
                 if 'al' in data[i]:
