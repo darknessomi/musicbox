@@ -25,7 +25,7 @@ def utf8_data_to_file(f, data):
 
 def notify_command_osx(msg, msg_type, t=None):
     command = ['/usr/bin/osascript', '-e']
-    tpl = "display notification \"{}\" {} with title \"musicbox\""
+    tpl = "display notification \"{}\" {} with title \"MusicBox\""
     sound = 'sound name \"/System/Library/Sounds/Ping.aiff\"' if msg_type else ''
     command.append(tpl.format(msg, sound).encode('UTF-8'))
     return command
