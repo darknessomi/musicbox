@@ -622,7 +622,7 @@ class Menu(object):
         index = self.index
         self.stack.append([datatype, title, datalist, offset, index])
 
-        if idx > len(self.datalist):
+        if idx >= len(self.datalist):
             return False
 
         if datatype == 'main':
