@@ -555,8 +555,8 @@ class NetEase(object):
         for cookie in self.session.cookies:
             if cookie.name == '__csrf':
                 csrf = cookie.value
-        if csrf == '':
-            notify('You Need Login', 1)
+        # if csrf == '':
+        #     notify('You Need Login', 1)
         action += csrf
         data = {'ids': music_ids, 'br': bit_rate, 'csrf_token': csrf}
         connection = self.session.post(action,
