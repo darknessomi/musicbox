@@ -84,7 +84,7 @@ def encrypted_id(id):
     magic_len = len(magic)
     for i, sid in enumerate(song_id):
         song_id[i] = sid ^ magic[i % magic_len]
-    m = hashlib.md5(song_id)
+    m = hashlib.sha512(song_id)
     result = m.digest()
     result = base64.b64encode(result)
     result = result.replace(b'/', b'_')

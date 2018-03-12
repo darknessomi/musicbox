@@ -564,7 +564,7 @@ class Ui(object):
     def build_login(self):
         self.build_login_bar()
         local_account = self.get_account()
-        local_password = hashlib.md5(self.get_password().encode('utf-8')).hexdigest()
+        local_password = hashlib.sha512(self.get_password().encode('utf-8')).hexdigest()
         login_info = self.netease.login(local_account, local_password)
         account = [local_account, local_password]
         if login_info['code'] != 200:
