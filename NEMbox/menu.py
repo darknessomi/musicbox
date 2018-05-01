@@ -20,10 +20,10 @@ import threading
 import sys
 import os
 import time
+import json
 import signal
 import webbrowser
 import locale
-import xml.etree.cElementTree as ET
 
 
 from .api import NetEase
@@ -163,10 +163,9 @@ class Menu(object):
             pcsignin = self.netease.daily_signin(1)
             if pcsignin != -1 and pcsignin['code'] not in (-2, 301):
                 notify('PC端签到成功', 1)
-            tree = ET.ElementTree(ET.fromstring(self.netease.get_version()))
-            root = tree.getroot()
-            return root[0][4][0][0].text
-        except (ET.ParseError, TypeError) as e:
+            data = json.loads(self.netease.get_version())
+            return data['info']['version']
+        except (ValueError, TypeError) as e:
             log.error(e)
             return 0
 
