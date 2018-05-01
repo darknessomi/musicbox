@@ -640,7 +640,7 @@ class NetEase(object):
 
     # 获取版本
     def get_version(self):
-        action = 'https://pypi.python.org/pypi?:action=doap&name=NetEase-MusicBox'  # NOQA
+        action = 'https://pypi.org/pypi/NetEase-MusicBox/json'  # JSON API
         try:
             data = requests.get(action)
             return data.content
