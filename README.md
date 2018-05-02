@@ -133,14 +133,18 @@ NetEase-MusicBox
 
 
 #### 错误处理
+当某些歌曲不能播放时，总时长为 00:01 时，请检查是否为版权问题导致。
 
 如遇到在特定终端下不能播放问题，首先检查**此终端**下mpg123能否正常使用，其次检查**其他终端**下musicbox能否正常使用，报告issue的时候请告知以上使用情况以及出问题终端的报错信息。
+
+同时，您可以通过```tail -f ~/.netease-musicbox/musicbox.log```自行查看日志。
 
 #### 已知问题及解决方案
 - [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。
 - [#404](https://github.com/darknessomi/musicbox/issues/404) 某些环境缺乏lxml。尝试利用包管理器安装lxml或者直接`pip install lxml`。
 - [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
 - [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
+- [#536](https://github.com/darknessomi/musicbox/issues/536) 从浏览器登录之后把cookie copy到配置文件中，并且设置username和userid之后就能达到登录效果。
 
 ### 使用
 
@@ -150,6 +154,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2017-11-28 版本 0.2.4.2    更新获取歌曲列表的 api
 
 2017-06-03 版本 0.2.4.1    修正mpg123状态异常导致的cpu占用，增加歌词双行显示功能
 

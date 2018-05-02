@@ -20,10 +20,10 @@ import threading
 import sys
 import os
 import time
+import json
 import signal
 import webbrowser
 import locale
-import xml.etree.cElementTree as ET
 
 
 from .api import NetEase
@@ -129,6 +129,7 @@ class Menu(object):
         self.username = self.storage.database['user']['nickname']
         self.resume_play = True
         self.at_playing_list = False
+        self.enter_flag = True
         signal.signal(signal.SIGWINCH, self.change_term)
         signal.signal(signal.SIGINT, self.send_kill)
         self.START = time.time()
@@ -162,10 +163,9 @@ class Menu(object):
             pcsignin = self.netease.daily_signin(1)
             if pcsignin != -1 and pcsignin['code'] not in (-2, 301):
                 notify('PC端签到成功', 1)
-            tree = ET.ElementTree(ET.fromstring(self.netease.get_version()))
-            root = tree.getroot()
-            return root[0][4][0][0].text
-        except (ET.ParseError, TypeError) as e:
+            data = json.loads(self.netease.get_version())
+            return data['info']['version']
+        except (ValueError, TypeError) as e:
             log.error(e)
             return 0
 
@@ -327,13 +327,15 @@ class Menu(object):
 
             # 前进
             elif key == ord('l') or key == 10:
+                self.enter_flag = True
                 if len(self.datalist) <= 0:
                     continue
                 self.START = time.time()
                 self.ui.build_loading()
                 self.dispatch_enter(idx)
-                self.index = 0
-                self.offset = 0
+                if self.enter_flag is True:
+                    self.index = 0
+                    self.offset = 0
 
             # 回退
             elif key == ord('h'):
@@ -622,7 +624,7 @@ class Menu(object):
         index = self.index
         self.stack.append([datatype, title, datalist, offset, index])
 
-        if idx > len(self.datalist):
+        if idx >= len(self.datalist):
             return False
 
         if datatype == 'main':
@@ -751,6 +753,16 @@ class Menu(object):
                 self.datatype = 'albums'
                 self.datalist = ui.build_search('albums')
                 self.title = '专辑搜索列表'
+
+        else:
+            stack = self.stack
+            up = stack.pop()
+            self.datatype = up[0]
+            self.title = up[1]
+            self.datalist = up[2]
+            self.offset = up[3]
+            self.index = idx
+            self.enter_flag = False
 
     def show_playing_song(self):
         if self._is_playlist_empty():
