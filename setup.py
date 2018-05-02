@@ -42,7 +42,7 @@ setup(
     install_requires=[
         'requests',
         'BeautifulSoup4',
-        'pycrypto',
+        'cryptography==2.1.4',
         'future',
         'lxml'
     ],
