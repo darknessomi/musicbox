@@ -5,26 +5,21 @@
 '''
 网易云音乐 Menu
 '''
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from builtins import range
-from builtins import str
-from future import standard_library
-import time
-standard_library.install_aliases()
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 
+import time
 import curses
 import threading
 import sys
 import os
-import time
 import json
 import signal
 import webbrowser
 import locale
 
+from future.builtins import range, str
 
 from .api import NetEase
 from .player import Player
@@ -681,7 +676,7 @@ class Menu(object):
             songs = netease.playlist_detail(playlist_id)
             self.datatype = 'songs'
             self.datalist = netease.dig_info(songs, 'songs')
-            self.title += ' > ' + datalist[idx]['playlists_name']
+            self.title += ' > ' + datalist[idx]['playlist_name']
 
         # 分类精选
         elif datatype == 'playlist_classes':
@@ -696,8 +691,7 @@ class Menu(object):
             # 子类别
             data = self.datalist[idx]
             self.datatype = 'top_playlists'
-            self.datalist = netease.dig_info(
-                netease.top_playlists(data), self.datatype)
+            self.datalist = netease.dig_info(netease.top_playlists(data), self.datatype)
             self.title += ' > ' + data
 
         # 歌曲评论
@@ -713,7 +707,7 @@ class Menu(object):
             for one_comment in hotcomments:
                 self.datalist.append(
                     u'(热评 %s❤️ ️)%s:%s' % (one_comment['likedCount'], one_comment['user']['nickname'],
-                                      one_comment['content']))
+                                           one_comment['content']))
             for one_comment in comcomments:
                 self.datalist.append(one_comment['content'])
             self.datatype = 'comments'
@@ -870,17 +864,15 @@ class Menu(object):
 
         # 精选歌单
         elif idx == 3:
-            self.datalist = [
-                {
-                    'title': '全站置顶',
-                    'datatype': 'top_playlists',
-                    'callback': netease.top_playlists
-                }, {
-                    'title': '分类精选',
-                    'datatype': 'playlist_classes',
-                    'callback': netease.playlist_classes
-                }
-            ]
+            self.datalist = [{
+                'title': '全站置顶',
+                'datatype': 'top_playlists',
+                'callback': netease.top_playlists
+            }, {
+                'title': '分类精选',
+                'datatype': 'playlist_classes',
+                'callback': netease.playlist_classes
+            }]
             self.title += ' > 精选歌单'
             self.datatype = 'playlists'
 

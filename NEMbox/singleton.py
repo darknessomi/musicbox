@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 class Singleton(object):
     """Singleton Class
     This is a class to make some class being a Singleton class.
