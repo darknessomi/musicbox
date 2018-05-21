@@ -2,16 +2,14 @@
 # -*- coding: utf-8 -*-
 # osdlyrics.py --- desktop lyrics for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from builtins import super
-from future import standard_library
-standard_library.install_aliases()
 import sys
 from multiprocessing import Process
+
+from future.builtins import super
 
 from . import logger
 from .config import Config
@@ -58,7 +56,7 @@ if pyqt_activity:
                 QtGui.QApplication.desktop().cursor().pos())
             bl = QtGui.QApplication.desktop().screenGeometry(scn).bottomLeft()
             br = QtGui.QApplication.desktop().screenGeometry(scn).bottomRight()
-            bc = (bl+br)/2
+            bc = (bl + br) / 2
             frameGeo = self.frameGeometry()
             frameGeo.moveCenter(bc)
             frameGeo.moveBottom(bc.y())

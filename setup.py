@@ -37,14 +37,13 @@ from setuptools import setup, find_packages
 
 setup(
     name='NetEase-MusicBox',
-    version='0.2.4.2',
+    version='0.2.4.3',
     packages=find_packages(),
     install_requires=[
         'requests',
         'BeautifulSoup4',
-        'pycrypto',
-        'future',
-        'lxml'
+        'pycryptodomex',
+        'future'
     ],
 
     entry_points={
