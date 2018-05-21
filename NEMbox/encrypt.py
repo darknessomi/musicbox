@@ -9,7 +9,7 @@ import hashlib
 import json
 import os
 
-from Crypto.Cipher import AES
+from Cryptodome.Cipher import AES
 from future.builtins import (int, pow)
 
 __all__ = ['encrypted_id', 'encrypted_request']

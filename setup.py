@@ -42,7 +42,7 @@ setup(
     install_requires=[
         'requests',
         'BeautifulSoup4',
-        'pycryptodome',
+        'pycryptodomex',
         'future'
     ],
 
