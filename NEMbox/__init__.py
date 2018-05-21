@@ -15,7 +15,7 @@ from future.builtins import str
 
 from .menu import Menu
 
-version = '0.2.4.2'
+version = '0.2.4.3'
 
 
 def start():

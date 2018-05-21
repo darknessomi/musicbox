@@ -14,7 +14,6 @@ import curses
 import threading
 import sys
 import os
-import json
 import signal
 import webbrowser
 import locale
@@ -158,9 +157,9 @@ class Menu(object):
             pcsignin = self.netease.daily_signin(1)
             if pcsignin != -1 and pcsignin['code'] not in (-2, 301):
                 notify('PC端签到成功', 1)
-            data = json.loads(self.netease.get_version())
+            data = self.netease.get_version()
             return data['info']['version']
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError, KeyError) as e:
             log.error(e)
             return 0
 

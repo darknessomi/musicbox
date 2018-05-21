@@ -652,11 +652,10 @@ class NetEase(object):
     def get_version(self):
         action = 'https://pypi.org/pypi/NetEase-MusicBox/json'  # JSON API
         try:
-            data = requests.get(action)
-            return data.content
+            return requests.get(action).json()
         except requests.exceptions.RequestException as e:
             log.error(e)
-            return ''
+            return {}
 
     def dig_info(self, data, dig_type):
         if dig_type == 'songs' or dig_type == 'fmsongs':

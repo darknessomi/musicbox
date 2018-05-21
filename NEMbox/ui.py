@@ -577,7 +577,7 @@ class Ui(object):
         curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
-        self.addstr(5, self.startcol, '请输入登录信息(支持手机登陆)',
+        self.addstr(5, self.startcol, '请输入登录信息(支持手机登录)',
                     curses.color_pair(1))
         self.addstr(8, self.startcol, '账号:', curses.color_pair(1))
         self.addstr(9, self.startcol, '密码:', curses.color_pair(1))
