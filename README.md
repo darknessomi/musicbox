@@ -122,7 +122,7 @@ NetEase-MusicBox
 #### 已测试的系统兼容列表
 
 <table>
-	<tr> <td>macOS</td> <td>10.12 / 10.11</td> </tr>
+	<tr> <td>macOS</td> <td>10.13 / 10.12 / 10.11</td> </tr>
 	<tr> <td>Ubuntu</td> <td>14.04</td> </tr>
 	<tr> <td>Kali</td> <td>1.1.0 / 2.0 / Rolling</td> </tr>
 	<tr> <td>CentOS</td> <td>7</td> </tr>
@@ -153,6 +153,8 @@ NetEase-MusicBox
 Enjoy it !
 
 ### 更新日志
+
+2018-05-21 版本 0.2.4.3    更新依赖，错误修复
 
 2017-11-28 版本 0.2.4.2    更新获取歌曲列表的 api
 
