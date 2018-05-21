@@ -10,7 +10,7 @@ import json
 import os
 
 from Crypto.Cipher import AES
-from future.builtins import (chr, int, pow)
+from future.builtins import (int, pow)
 
 __all__ = ['encrypted_id', 'encrypted_request']
 
@@ -19,8 +19,8 @@ MODULUS = ('00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7'
            '104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932'
            '575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b'
            '3ece0462db0a22b8e7')
-NONCE = '0CoJUm6Qyw8W8jud'
 PUBKEY = '010001'
+NONCE = b'0CoJUm6Qyw8W8jud'
 
 
 # 歌曲加密算法, 基于https://github.com/yanunon/NeteaseCloudMusic
@@ -32,29 +32,26 @@ def encrypted_id(id):
         song_id[i] = sid ^ magic[i % magic_len]
     m = hashlib.md5(song_id)
     result = m.digest()
-    result = base64.b64encode(result)
-    result = result.replace(b'/', b'_')
-    result = result.replace(b'+', b'-')
+    result = base64.b64encode(result).replace(b'/', b'_').replace(b'+', b'-')
     return result.decode('utf-8')
 
 
 # 登录加密算法, 基于https://github.com/stkevintan/nw_musicbox
 def encrypted_request(text):
-    text = json.dumps(text)
-    secKey = create_key(16)
-    encText = aes(aes(text, NONCE), secKey)
-    encSecKey = rsa(secKey, PUBKEY, MODULUS)
-    data = {'params': encText, 'encSecKey': encSecKey}
-    return data
+    # type: (str) -> dict
+    data = json.dumps(text).encode('utf-8')
+    secret = create_key(16)
+    params = aes(aes(data, NONCE), secret)
+    encseckey = rsa(secret, PUBKEY, MODULUS)
+    return {'params': params, 'encSecKey': encseckey}
 
 
 def aes(text, key):
     pad = 16 - len(text) % 16
-    text = text + chr(pad) * pad
-    encryptor = AES.new(key, 2, '0102030405060708')
+    text = text + bytearray([pad] * pad)
+    encryptor = AES.new(key, 2, b'0102030405060708')
     ciphertext = encryptor.encrypt(text)
-    ciphertext = base64.b64encode(ciphertext).decode('utf-8')
-    return ciphertext
+    return base64.b64encode(ciphertext)
 
 
 def rsa(text, pubkey, modulus):

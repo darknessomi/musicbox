@@ -1,4 +1,4 @@
 requests
 BeautifulSoup4
-pycrypto
+pycryptodome
 future
