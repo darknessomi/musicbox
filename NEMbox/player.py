@@ -7,15 +7,10 @@
 '''
 网易云音乐 Player
 '''
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from builtins import range
-from builtins import str
-from future import standard_library
-standard_library.install_aliases()
 # Let's make some noise
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 
 import subprocess
 import threading
@@ -24,6 +19,8 @@ import os
 import random
 import re
 import platform
+
+from future.builtins import range, str
 
 from .ui import Ui
 from .storage import Storage
@@ -149,7 +146,7 @@ class Player(object):
                         log.error(e)
                     break
                 else:
-                    #有遇到播放玩后没有退出，mpg123一直在发送空消息的情况，此处直接终止处理
+                    # 有播放后没有退出，mpg123一直在发送空消息的情况，此处直接终止处理
                     if len(strout) == 0:
                         endless_loop_cnt += 1
                         if platform.system() == 'Darwin' or endless_loop_cnt > 100:
@@ -159,11 +156,9 @@ class Player(object):
                                 self.popen_handler.stdin.flush()
                                 self.popen_handler.kill()
                             except IOError as e:
-                                try:
-                                    log.error(e)
-                                except Exception as e1:
-                                    pass
+                                log.error(e)
                             break
+
             if self.playing_flag:
                 self.next_idx()
                 onExit()

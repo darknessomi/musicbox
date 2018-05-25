@@ -5,18 +5,15 @@
 '''
 网易云音乐 Ui
 '''
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
-from builtins import range
-from builtins import str
-from builtins import int
-from future import standard_library
-standard_library.install_aliases()
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
+
 import hashlib
 import re
 import curses
+
+from future.builtins import range, str, int
 
 from .api import NetEase
 from .scrollstring import truelen, scrollstring
@@ -38,10 +35,10 @@ except ImportError:
 
 
 def break_str(s, start, max_len=80):
-    l = len(s)
+    length = len(s)
     i, x = 0, max_len
     res = []
-    while i < l:
+    while i < length:
         res.append(s[i:i + max_len])
         i += x
     return '\n{}'.format(' ' * start).join(res)
@@ -209,7 +206,7 @@ class Ui(object):
                     # 计算下一句歌词，判断刷新时的歌词和上一次是否相同来进行index计算
                     if not (self.now_lyric == re.sub('\[.*?\]', '', line)):
                         self.now_lyric_index = self.now_lyric_index + 1
-                    if index < len(song['lyric']) - 1 :
+                    if index < len(song['lyric']) - 1:
                         self.post_lyric = song['lyric'][index + 1]
                     else:
                         self.post_lyric = ''
@@ -221,11 +218,11 @@ class Ui(object):
                             if key in tline and self.config.get_item(
                                     'translation'):
                                 self.now_lyric = tline + ' || ' + self.now_lyric  # NOQA
-                                if not (self.post_lyric == '') and tindex < len(song['tlyric']) -1:
-                                    self.post_lyric = song['tlyric'][tindex+1] + ' || ' + self.post_lyric
-                                #此处已经拿到，直接break即可
+                                if not (self.post_lyric == '') and tindex < len(song['tlyric']) - 1:
+                                    self.post_lyric = song['tlyric'][tindex + 1] + ' || ' + self.post_lyric
+                                # 此处已经拿到，直接break即可
                                 break
-                    #此处已经拿到，直接break即可
+                    # 此处已经拿到，直接break即可
                     break
                 index += 1
         self.now_lyric = re.sub('\[.*?\]', '', self.now_lyric)
@@ -233,7 +230,7 @@ class Ui(object):
         if dbus_activity and self.config.get_item('osdlyrics'):
             try:
                 bus = dbus.SessionBus().get_object('org.musicbox.Bus', '/')
-                #TODO 环境问题，没有试过桌面歌词，此处需要了解的人加个刷界面操作
+                # TODO 环境问题，没有试过桌面歌词，此处需要了解的人加个刷界面操作
                 if self.now_lyric == '暂无歌词 ~>_<~ \n':
                     bus.refresh_lyrics(self.now_playing,
                                        dbus_interface='local.musicbox.Lyrics')
@@ -243,7 +240,7 @@ class Ui(object):
             except Exception as e:
                 log.error(e)
                 pass
-        #根据索引计算双行歌词的显示，其中当前歌词颜色为红色，下一句歌词颜色为白色；
+        # 根据索引计算双行歌词的显示，其中当前歌词颜色为红色，下一句歌词颜色为白色；
         # 当前歌词从下一句歌词刷新颜色变换，所以当前歌词和下一句歌词位置会交替
         if self.now_lyric_index % 2 == 0:
             self.addstr(4, self.startcol - 2, str(self.now_lyric),
@@ -404,13 +401,13 @@ class Ui(object):
                     if i == index:
                         self.addstr(
                             i - offset + 9, self.indented_startcol, '-> ' +
-                            str(i) + '. ' + datalist[i]['playlists_name'] +
+                            str(i) + '. ' + datalist[i]['playlist_name'] +
                             self.space + datalist[i]['creator_name'],
                             curses.color_pair(2))
                     else:
                         self.addstr(
                             i - offset + 9, self.startcol,
-                            str(i) + '. ' + datalist[i]['playlists_name'] +
+                            str(i) + '. ' + datalist[i]['playlist_name'] +
                             self.space + datalist[i][
                                 'creator_name'])
 
@@ -580,7 +577,7 @@ class Ui(object):
         curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
-        self.addstr(5, self.startcol, '请输入登录信息(支持手机登陆)',
+        self.addstr(5, self.startcol, '请输入登录信息(支持手机登录)',
                     curses.color_pair(1))
         self.addstr(8, self.startcol, '账号:', curses.color_pair(1))
         self.addstr(9, self.startcol, '密码:', curses.color_pair(1))
@@ -651,7 +648,7 @@ class Ui(object):
         size = terminalsize.get_terminal_size()
         x = max(size[0], 10)
         y = max(size[1], 25)
-        if (x, y) == (self.x, self.y): # no need to resize
+        if (x, y) == (self.x, self.y):  # no need to resize
             return
         self.x, self.y = x, y
 

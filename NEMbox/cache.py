@@ -4,18 +4,15 @@
 '''
 Class to cache songs into local storage.
 '''
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from builtins import str
-from future import standard_library
-standard_library.install_aliases()
-
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 import threading
 import subprocess
 import os
 import signal
+
+from future.builtins import str
 
 from .const import Constant
 from .config import Config
@@ -27,7 +24,6 @@ log = logger.getLogger(__name__)
 
 
 class Cache(Singleton):
-
     def __init__(self):
         if hasattr(self, '_init'):
             return
@@ -99,8 +95,7 @@ class Cache(Singleton):
                                                stderr=subprocess.PIPE)
                 self.aria2c.wait()
             except OSError as e:
-                log.warning(
-                    '{}.\tAria2c is unavailable, fall back to wget'.format(e))
+                log.warning('{}.\tAria2c is unavailable, fall back to wget'.format(e))
 
                 self._mkdir(output_path)
                 para = ['wget', '-O', full_path, new_url]

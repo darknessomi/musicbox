@@ -1,23 +1,21 @@
 #!/usr/bin/env python
-# encoding: UTF-8
+# -*- coding: utf-8 -*-
 '''
 网易云音乐 Entry
 '''
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
-from builtins import str
-from future import standard_library
-standard_library.install_aliases()
-
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 import curses
 import traceback
 import argparse
 import sys
 
+from future.builtins import str
+
 from .menu import Menu
-version = "0.2.4.2"
+
+version = '0.2.4.3'
 
 
 def start():
