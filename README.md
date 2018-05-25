@@ -2,16 +2,16 @@ NetEase-MusicBox
 =================
 
 
-#### [感谢](https://github.com/darknessomi/musicbox/graphs/contributors)为 MusicBox 的开发付出过努力的每一个人！
+#### 感谢为 MusicBox 的开发付出过努力的[每一个人](https://github.com/darknessomi/musicbox/graphs/contributors)！
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
-[![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.python.org/pypi/NetEase-MusicBox/)
+[![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 [![platform](https://img.shields.io/badge/python-3.5-green.svg)]()
 
-[![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)](https://pypi.python.org/pypi/NetEase-MusicBox/)
+[![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)](https://pypi.org/project/NetEase-MusicBox/)
 
 ### 功能特性
 
@@ -73,7 +73,7 @@ NetEase-MusicBox
 </table>
 
 
-### PyPi安装
+### PyPi安装（推荐）
 	$ pip(3) install NetEase-MusicBox
 
 ### Git clone最新版
@@ -87,7 +87,7 @@ NetEase-MusicBox
 ### Linux安装
 
 #### Fedora
-首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`。
+首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`（通过此方法安装可能仍然需要`pip install NetEase-MusicBox`更新到最新版）。
 
 #### Ubuntu/Debian
 
@@ -97,16 +97,21 @@ NetEase-MusicBox
 
 #### Arch Linux
 
-    $ pacaur -S netease-musicbox-git #or use $ yaourt musicbox
+    $ pacaur -S netease-musicbox-git # or $ yaourt musicbox
 
-#### 可选功能依赖
+### 依赖
+
+#### 必选
+1. `mpg123` 用于播放歌曲
+
+#### 可选
 
 1. ``` aria2 ``` 用于缓存歌曲
 2. ``` python-keybinder ``` 用于支持全局快捷键
 3. ``` libnotify-bin ``` 用于支持消息提示
 4. ``` pyqt python-dbus dbus qt ``` 用于支持桌面歌词 (Mac 用户需要 ```brew install qt --with-dbus``` 获取支持 DBus 的 Qt)
 
-#### 配置文件
+### 配置文件
 配置文件地址: ``` ~/.netease-musicbox/config.json ```
 可配置缓存，快捷键，消息，桌面歌词。
 由于歌曲 API 只接受中国大陆地区访问，港澳台及海外用户请自行设置代理：
@@ -119,7 +124,7 @@ NetEase-MusicBox
 }
 ```
 
-#### 已测试的系统兼容列表
+### 已测试的系统兼容列表
 
 <table>
 	<tr> <td>macOS</td> <td>10.13 / 10.12 / 10.11</td> </tr>
@@ -132,23 +137,21 @@ NetEase-MusicBox
 </table>
 
 
-#### 错误处理
+### 错误处理
 当某些歌曲不能播放时，总时长为 00:01 时，请检查是否为版权问题导致。
 
 如遇到在特定终端下不能播放问题，首先检查**此终端**下mpg123能否正常使用，其次检查**其他终端**下musicbox能否正常使用，报告issue的时候请告知以上使用情况以及出问题终端的报错信息。
 
 同时，您可以通过```tail -f ~/.netease-musicbox/musicbox.log```自行查看日志。
 
-#### 已知问题及解决方案
+### 已知问题及解决方案
 - [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。
 - [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
 - [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
-- [#536](https://github.com/darknessomi/musicbox/issues/536) 从浏览器登录之后把cookie copy到配置文件中，并且设置username和userid之后就能达到登录效果。
 
 ### 使用
 
 	$ musicbox
-
 
 Enjoy it !
 
