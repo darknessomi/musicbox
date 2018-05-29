@@ -15,11 +15,11 @@ import curses
 
 from future.builtins import range, str, int
 
-from .api import NetEase
 from .scrollstring import truelen, scrollstring
 from .storage import Storage
 from .config import Config
 from .utils import notify
+from .api import NetEase
 from . import logger
 from . import terminalsize
 
@@ -52,7 +52,6 @@ class Ui(object):
         # charactor break buffer
         curses.cbreak()
         self.screen.keypad(1)
-        self.netease = NetEase()
 
         curses.start_color()
         if Config().get_item('curses_transparency'):
@@ -81,6 +80,7 @@ class Ui(object):
         self.storage = Storage()
         self.config = Config()
         self.newversion = False
+        self.api = NetEase()
 
     def addstr(self, *args):
         if len(args) == 1:
@@ -121,11 +121,13 @@ class Ui(object):
 
         self.screen.refresh()
 
-    def build_process_bar(self, now_playing, total_length, playing_flag,
+    def build_process_bar(self, song, now_playing, total_length, playing_flag,
                           pause_flag, playing_mode):
-        if (self.storage.database['player_info']['idx'] >=
-                len(self.storage.database['player_info']['player_list'])):
+        if not song or not playing_flag:
             return
+        name, artist = song['song_name'], song['artist']
+        lyrics, tlyrics = song.get('lyric', []), song.get('tlyric', [])
+
         curses.noecho()
         self.screen.move(3, 1)
         self.screen.clrtoeol()
@@ -133,8 +135,6 @@ class Ui(object):
         self.screen.clrtoeol()
         self.screen.move(5, 1)
         self.screen.clrtoeol()
-        if not playing_flag:
-            return
         if total_length <= 0:
             total_length = 1
         if now_playing > total_length or now_playing <= 0:
@@ -174,7 +174,7 @@ class Ui(object):
             total_second = str(total_second)
         else:
             total_second = '0' + str(total_second)
-        process += '(' + now_minute + ':' + now_second + '/' + total_minute + ':' + total_second + ')'  # NOQA
+        process += '(' + now_minute + ':' + now_second + '/' + total_minute + ':' + total_second + ')'
         if playing_mode == 0:
             process = '顺序播放 ' + process
         elif playing_mode == 1:
@@ -188,38 +188,33 @@ class Ui(object):
         else:
             pass
         self.addstr(3, self.startcol - 2, process, curses.color_pair(1))
-        song = self.storage.database['songs'][
-            self.storage.database['player_info']['player_list'][
-                self.storage.database['player_info']['idx']]]
-        if 'lyric' not in song.keys() or len(song['lyric']) <= 0:
+        if not lyrics:
             self.now_lyric = '暂无歌词 ~>_<~ \n'
             self.post_lyric = ''
             if dbus_activity and self.config.get_item('osdlyrics'):
-                self.now_playing = song['song_name'] + ' - ' + song[
-                    'artist'] + '\n'
+                self.now_playing = '{} - {}\n'.format(name, artist)
 
         else:
             key = now_minute + ':' + now_second
             index = 0
-            for line in song['lyric']:
+            for line in lyrics:
                 if key in line:
                     # 计算下一句歌词，判断刷新时的歌词和上一次是否相同来进行index计算
                     if not (self.now_lyric == re.sub('\[.*?\]', '', line)):
                         self.now_lyric_index = self.now_lyric_index + 1
-                    if index < len(song['lyric']) - 1:
-                        self.post_lyric = song['lyric'][index + 1]
+                    if index < len(lyrics) - 1:
+                        self.post_lyric = lyrics[index + 1]
                     else:
                         self.post_lyric = ''
-                    if 'tlyric' not in song.keys() or len(song['tlyric']) <= 0:
+                    if not tlyrics:
                         self.now_lyric = line
                     else:
                         self.now_lyric = line
-                        for tindex, tline in enumerate(song['tlyric']):
-                            if key in tline and self.config.get_item(
-                                    'translation'):
-                                self.now_lyric = tline + ' || ' + self.now_lyric  # NOQA
-                                if not (self.post_lyric == '') and tindex < len(song['tlyric']) - 1:
-                                    self.post_lyric = song['tlyric'][tindex + 1] + ' || ' + self.post_lyric
+                        for tindex, tline in enumerate(tlyrics):
+                            if key in tline and self.config.get_item('translation'):
+                                self.now_lyric = tline + ' || ' + self.now_lyric
+                                if not (self.post_lyric == '') and tindex < len(tlyrics) - 1:
+                                    self.post_lyric = tlyrics[tindex + 1] + ' || ' + self.post_lyric
                                 # 此处已经拿到，直接break即可
                                 break
                     # 此处已经拿到，直接break即可
@@ -333,7 +328,7 @@ class Ui(object):
                                 '-> ' + str(i) + '. ' +
                                 break_str(datalist[i], self.indented_startcol, maxlength),
                                 curses.color_pair(2))
-                        except:
+                        except Exception:
                             self.addstr(
                                 20, self.indented_startcol,
                                 '-> ' + str(i) + '. ' + 'This comment is invalid',
@@ -489,7 +484,7 @@ class Ui(object):
 
     def build_search(self, stype):
         self.screen.timeout(-1)
-        netease = self.netease
+        netease = self.api
         if stype == 'songs':
             song_name = self.get_param('搜索歌曲：')
             if song_name == '/return':
@@ -562,7 +557,7 @@ class Ui(object):
         self.build_login_bar()
         local_account = self.get_account()
         local_password = hashlib.md5(self.get_password().encode('utf-8')).hexdigest()
-        login_info = self.netease.login(local_account, local_password)
+        login_info = self.api.login(local_account, local_password)
         account = [local_account, local_password]
         if login_info['code'] != 200:
             x = self.build_login_error()

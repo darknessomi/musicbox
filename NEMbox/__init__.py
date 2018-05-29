@@ -36,9 +36,8 @@ def start():
     nembox_menu = Menu()
     try:
         nembox_menu.start_fork(version)
-    except (OSError, TypeError, ValueError, KeyError):
+    except (OSError, TypeError, ValueError, KeyError, IndexError):
         # clean up terminal while failed
-        nembox_menu.screen.keypad(1)
         curses.echo()
         curses.nocbreak()
         curses.endwin()

@@ -107,8 +107,7 @@ NetEase-MusicBox
 #### 可选
 
 1. ``` aria2 ``` 用于缓存歌曲
-2. ``` python-keybinder ``` 用于支持全局快捷键
-3. ``` libnotify-bin ``` 用于支持消息提示
+2. ``` libnotify-bin ``` 用于支持消息提示（Linux平台）
 4. ``` pyqt python-dbus dbus qt ``` 用于支持桌面歌词 (Mac 用户需要 ```brew install qt --with-dbus``` 获取支持 DBus 的 Qt)
 
 ### 配置文件

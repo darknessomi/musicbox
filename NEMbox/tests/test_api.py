@@ -9,6 +9,6 @@ from NEMbox.api import NetEase
 
 class TestApi(unittest.TestCase):
     def test_api(self):
-        ne = NetEase()
-        self.assertIsInstance(ne.songs_detail_new_api([27902910])[0]['url'], str)
-        self.assertIsNone(ne.songs_detail([405079776])[0]['mp3Url'])  # old api
+        api = NetEase()
+        self.assertIsInstance(api.songs_detail_new_api([27902910])[0]['url'], str)
+        self.assertIsNone(api.songs_detail([405079776])[0]['mp3Url'])  # old api

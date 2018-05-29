@@ -10,7 +10,7 @@ import json
 import os
 
 from Cryptodome.Cipher import AES
-from future.builtins import (int, pow)
+from future.builtins import int, pow
 
 __all__ = ['encrypted_id', 'encrypted_request']
 
