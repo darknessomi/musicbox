@@ -88,7 +88,7 @@ class Cache(Singleton):
                 para = ['aria2c', '--auto-file-renaming=false',
                         '--allow-overwrite=true', '-d', output_path, '-o',
                         output_file, new_url]
-                para[1:1] = self.aria2c_parameters
+                para.extend(self.aria2c_parameters)
                 self.aria2c = subprocess.Popen(para,
                                                stdin=subprocess.PIPE,
                                                stdout=subprocess.PIPE,

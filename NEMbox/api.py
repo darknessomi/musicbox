@@ -205,7 +205,7 @@ class NetEase(object):
             'Host': 'music.163.com',
             'Referer': 'http://music.163.com/search/',
             'User-Agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36'  # NOQA
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36'
         }
         self.cookies = {'appver': '1.5.2'}
         self.session = requests.Session()
@@ -317,7 +317,7 @@ class NetEase(object):
 
     # 用户歌单
     def user_playlist(self, uid, offset=0, limit=100):
-        action = 'http://music.163.com/api/user/playlist/?offset={}&limit={}&uid={}'.format(  # NOQA
+        action = 'http://music.163.com/api/user/playlist/?offset={}&limit={}&uid={}'.format(
             offset, limit, uid)
         try:
             data = self.request('GET', action)
@@ -329,7 +329,7 @@ class NetEase(object):
     # 每日推荐歌单
     def recommend_playlist(self):
         try:
-            action = 'http://music.163.com/weapi/v1/discovery/recommend/songs?csrf_token='  # NOQA
+            action = 'http://music.163.com/weapi/v1/discovery/recommend/songs?csrf_token='
             self.session.cookies.load()
             csrf = ''
             for cookie in self.session.cookies:
@@ -408,7 +408,7 @@ class NetEase(object):
 
     # 新碟上架 http://music.163.com/#/discover/album/
     def new_albums(self, offset=0, limit=50):
-        action = 'http://music.163.com/api/album/new?area=ALL&offset={}&total=true&limit={}'.format(  # NOQA
+        action = 'http://music.163.com/api/album/new?area=ALL&offset={}&total=true&limit={}'.format(
             offset, limit)
         try:
             data = self.request('GET', action)
@@ -419,9 +419,9 @@ class NetEase(object):
 
     # 歌单（网友精选碟） hot||new http://music.163.com/#/discover/playlist/
     def top_playlists(self, category='全部', order='hot', offset=0, limit=50):
-        action = 'http://music.163.com/api/playlist/list?cat={}&order={}&offset={}&total={}&limit={}'.format(  # NOQA
+        action = 'http://music.163.com/api/playlist/list?cat={}&order={}&offset={}&total={}&limit={}'.format(
             category, order, offset, 'true' if offset else 'false',
-            limit)  # NOQA
+            limit)
         try:
             data = self.request('GET', action)
             return data['playlists']
@@ -472,7 +472,7 @@ class NetEase(object):
 
     # 热门歌手 http://music.163.com/#/discover/artist/
     def top_artists(self, offset=0, limit=100):
-        action = 'http://music.163.com/api/artist/top?offset={}&total=false&limit={}'.format(  # NOQA
+        action = 'http://music.163.com/api/artist/top?offset={}&total=false&limit={}'.format(
             offset, limit)
         try:
             data = self.request('GET', action)
@@ -544,7 +544,7 @@ class NetEase(object):
         tmpids = ids[offset:]
         tmpids = tmpids[0:100]
         tmpids = list(map(str, tmpids))
-        action = 'http://music.163.com/api/song/detail?ids=[{}]'.format(  # NOQA
+        action = 'http://music.163.com/api/song/detail?ids=[{}]'.format(
             ','.join(tmpids))
         try:
             data = self.request('GET', action)
@@ -592,9 +592,9 @@ class NetEase(object):
         try:
             data = self.request('GET', action)
             if 'lrc' in data and data['lrc']['lyric'] is not None:
-                lyric_info = data['lrc']['lyric']
+                lyric_info = data['lrc']['lyric'].split('\n')
             else:
-                lyric_info = '未找到歌词'
+                lyric_info = []
             return lyric_info
         except requests.exceptions.RequestException as e:
             log.error(e)
@@ -606,9 +606,9 @@ class NetEase(object):
         try:
             data = self.request('GET', action)
             if 'tlyric' in data and data['tlyric'].get('lyric') is not None:
-                lyric_info = data['tlyric']['lyric'][1:]
+                lyric_info = data['tlyric']['lyric'][1:].split('\n')
             else:
-                lyric_info = '未找到歌词翻译'
+                lyric_info = []
             return lyric_info
         except requests.exceptions.RequestException as e:
             log.error(e)
@@ -616,7 +616,7 @@ class NetEase(object):
 
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
     def djchannels(self, stype=0, offset=0, limit=50):
-        action = 'http://music.163.com/discover/djradio?type={}&offset={}&limit={}'.format(  # NOQA
+        action = 'http://music.163.com/discover/djradio?type={}&offset={}&limit={}'.format(
             stype, offset, limit)
         try:
             connection = requests.get(action,

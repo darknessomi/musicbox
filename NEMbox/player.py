@@ -47,13 +47,29 @@ class Player(object):
         self.storage = Storage()
         self.info = self.storage.database['player_info']
         self.songs = self.storage.database['songs']
-        self.playing_id = -1
-        self.playing_name = ''
         self.cache = Cache()
         self.notifier = self.config.get_item('notifier')
         self.mpg123_parameters = self.config.get_item('mpg123_parameters')
         self.end_callback = None
         self.playing_song_changed_callback = None
+        self.api = NetEase()
+
+    @property
+    def current_song(self):
+        if not self.songs:
+            return {}
+        return self.songs[self.info['player_list'][self.info['idx']]]
+
+    @property
+    def playing_id(self):
+        return self.current_song['song_id']
+
+    @property
+    def playing_name(self):
+        return self.current_song['song_name']
+
+    def is_empty(self):
+        return len(self.info['player_list']) == 0
 
     def popen_recall(self, onExit, popenArgs):
         '''
@@ -101,12 +117,12 @@ class Player(object):
                         self.process_first = False
                         self.process_location = 0
                     else:
-                        self.process_location = self.process_length - process_location  # NOQA
+                        self.process_location = self.process_length - process_location
                     continue
                 elif strout[:2] == '@E':
                     # get a alternative url from new api
                     sid = popenArgs['song_id']
-                    new_url = NetEase().songs_detail_new_api([sid])[0]['url']
+                    new_url = self.api.songs_detail_new_api([sid])[0]['url']
                     if new_url is None:
                         log.warning(('Song {} is unavailable '
                                      'due to copyright issue.').format(sid))
@@ -165,30 +181,16 @@ class Player(object):
             return
 
         def getLyric():
-            if 'lyric' not in self.songs[str(self.playing_id)].keys():
-                self.songs[str(self.playing_id)]['lyric'] = []
             if len(self.songs[str(self.playing_id)]['lyric']) > 0:
                 return
-            netease = NetEase()
-            lyric = netease.song_lyric(self.playing_id)
-            if lyric == [] or lyric == '未找到歌词':
-                return
-            lyric = lyric.split('\n')
+            lyric = self.api.song_lyric(self.playing_id)
             self.songs[str(self.playing_id)]['lyric'] = lyric
-            return
 
         def gettLyric():
-            if 'tlyric' not in self.songs[str(self.playing_id)].keys():
-                self.songs[str(self.playing_id)]['tlyric'] = []
             if len(self.songs[str(self.playing_id)]['tlyric']) > 0:
                 return
-            netease = NetEase()
-            tlyric = netease.song_tlyric(self.playing_id)
-            if tlyric == [] or tlyric == '未找到歌词翻译':
-                return
-            tlyric = tlyric.split('\n')
+            tlyric = self.api.song_tlyric(self.playing_id)
             self.songs[str(self.playing_id)]['tlyric'] = tlyric
-            return
 
         def cacheSong(song_id, song_name, artist, song_url):
             def cacheExit(song_id, path):
@@ -216,12 +218,6 @@ class Player(object):
         # returns immediately after the thread starts
         return thread
 
-    def get_playing_id(self):
-        return self.playing_id
-
-    def get_playing_name(self):
-        return self.playing_name
-
     def recall(self):
         if self.info['idx'] >= len(self.info[
                 'player_list']) and self.end_callback is not None:
@@ -234,15 +230,13 @@ class Player(object):
             return
         self.playing_flag = True
         self.pause_flag = False
-        item = self.songs[self.info['player_list'][self.info['idx']]]
+        item = self.current_song
         self.ui.build_playinfo(item['song_name'], item['artist'],
                                item['album_name'], item['quality'],
                                time.time())
         if self.notifier:
             self.ui.notify('正在播放', item['song_name'],
                            item['album_name'], item['artist'])
-        self.playing_id = item['song_id']
-        self.playing_name = item['song_name']
         self.popen_recall(self.recall, item)
 
     def generate_shuffle_playing_list(self):
@@ -333,7 +327,7 @@ class Player(object):
             log.error(e)
             return
 
-        item = self.songs[self.info['player_list'][self.info['idx']]]
+        item = self.current_song
         self.ui.build_playinfo(item['song_name'],
                                item['artist'],
                                item['album_name'],
@@ -350,12 +344,10 @@ class Player(object):
             log.error(e)
             return
 
-        item = self.songs[self.info['player_list'][self.info['idx']]]
+        item = self.current_song
         self.ui.build_playinfo(item['song_name'], item['artist'],
                                item['album_name'], item['quality'],
                                time.time())
-        self.playing_id = item['song_id']
-        self.playing_name = item['song_name']
 
     def _swap_song(self):
         plist = self.info['playing_list']
@@ -504,7 +496,7 @@ class Player(object):
                 log.error('Index not in range!')
                 log.debug(self.info)
         else:
-            item = self.songs[self.info['player_list'][self.info['idx']]]
+            item = self.current_song
             if self.playing_flag:
                 self.ui.build_playinfo(item['song_name'], item['artist'],
                                        item['album_name'], item['quality'],
