@@ -8,108 +8,91 @@
 from __future__ import (
     print_function, unicode_literals, division, absolute_import
 )
-import re
-import os
+
 import json
-import time
-import random
 from collections import OrderedDict
 from http.cookiejar import LWPCookieJar
 
-from bs4 import BeautifulSoup
-from future.builtins import (map, open, range, str)
 import requests
+import requests_cache
 
 from .config import Config
 from .storage import Storage
-from .encrypt import encrypted_id, encrypted_request
-from .utils import uniq
+from .encrypt import encrypted_request
 from . import logger
+
+requests_cache.install_cache('musicbox', backend='memory', expire_after=3600)
 
 log = logger.getLogger(__name__)
 
 # 歌曲榜单地址
-top_list_all = {
-    0: ['云音乐新歌榜', '/discover/toplist?id=3779629'],
-    1: ['云音乐热歌榜', '/discover/toplist?id=3778678'],
-    2: ['网易原创歌曲榜', '/discover/toplist?id=2884035'],
-    3: ['云音乐飙升榜', '/discover/toplist?id=19723756'],
-    4: ['云音乐电音榜', '/discover/toplist?id=10520166'],
-    5: ['UK排行榜周榜', '/discover/toplist?id=180106'],
-    6: ['美国Billboard周榜', '/discover/toplist?id=60198'],
-    7: ['KTV嗨榜', '/discover/toplist?id=21845217'],
-    8: ['iTunes榜', '/discover/toplist?id=11641012'],
-    9: ['Hit FM Top榜', '/discover/toplist?id=120001'],
-    10: ['日本Oricon周榜', '/discover/toplist?id=60131'],
-    11: ['韩国Melon排行榜周榜', '/discover/toplist?id=3733003'],
-    12: ['韩国Mnet排行榜周榜', '/discover/toplist?id=60255'],
-    13: ['韩国Melon原声周榜', '/discover/toplist?id=46772709'],
-    14: ['中国TOP排行榜(港台榜)', '/discover/toplist?id=112504'],
-    15: ['中国TOP排行榜(内地榜)', '/discover/toplist?id=64016'],
-    16: ['香港电台中文歌曲龙虎榜', '/discover/toplist?id=10169002'],
-    17: ['华语金曲榜', '/discover/toplist?id=4395559'],
-    18: ['中国嘻哈榜', '/discover/toplist?id=1899724'],
-    19: ['法国 NRJ EuroHot 30周榜', '/discover/toplist?id=27135204'],
-    20: ['台湾Hito排行榜', '/discover/toplist?id=112463'],
-    21: ['Beatport全球电子舞曲榜', '/discover/toplist?id=3812895']
+TOP_LIST_ALL = {
+    0: ['云音乐新歌榜', '3779629'],
+    1: ['云音乐热歌榜', '3778678'],
+    2: ['网易原创歌曲榜', '2884035'],
+    3: ['云音乐飙升榜', '19723756'],
+    4: ['云音乐电音榜', '10520166'],
+    5: ['UK排行榜周榜', '180106'],
+    6: ['美国Billboard周榜', '60198'],
+    7: ['KTV嗨榜', '21845217'],
+    8: ['iTunes榜', '11641012'],
+    9: ['Hit FM Top榜', '120001'],
+    10: ['日本Oricon周榜', '60131'],
+    11: ['韩国Melon排行榜周榜', '3733003'],
+    12: ['韩国Mnet排行榜周榜', '60255'],
+    13: ['韩国Melon原声周榜', '46772709'],
+    14: ['中国TOP排行榜(港台榜)', '112504'],
+    15: ['中国TOP排行榜(内地榜)', '64016'],
+    16: ['香港电台中文歌曲龙虎榜', '10169002'],
+    17: ['华语金曲榜', '4395559'],
+    18: ['中国嘻哈榜', '1899724'],
+    19: ['法国 NRJ EuroHot 30周榜', '27135204'],
+    20: ['台湾Hito排行榜', '112463'],
+    21: ['Beatport全球电子舞曲榜', '3812895'],
+    22: ['云音乐ACG音乐榜', '71385702'],
+    23: ['云音乐嘻哈榜', '991319590']
 }
 
-default_timeout = 10
+
+PLAYLIST_CLASSES = OrderedDict([
+    ('语种', ['华语', '欧美', '日语', '韩语', '粤语', '小语种']),
+    ('风格', ['流行', '摇滚', '民谣', '电子', '舞曲', '说唱', '轻音乐', '爵士', '乡村', 'R&B/Soul', '古典', '民族', '英伦', '金属', '朋克', '蓝调', '雷鬼', '世界音乐', '拉丁', '另类/独立', 'New Age', '古风', '后摇', 'Bossa Nova']),
+    ('场景', ['清晨', '夜晚', '学习', '工作', '午休', '下午茶', '地铁', '驾车', '运动', '旅行', '散步', '酒吧']),
+    ('情感', ['怀旧', '清新', '浪漫', '性感', '伤感', '治愈', '放松', '孤独', '感动', '兴奋', '快乐', '安静', '思念']),
+    ('主题', ['影视原声', 'ACG', '儿童', '校园', '游戏', '70后', '80后', '90后', '网络歌曲', 'KTV', '经典', '翻唱', '吉他', '钢琴', '器乐', '榜单', '00后'])
+])
+
+DEFAULT_TIMEOUT = 10
+
+BASE_URL = 'http://music.163.com'
 
 
 class Parse(object):
 
     @classmethod
-    def _song_v1(cls, song):
-        # 老的获取歌曲url方法
-        quality = Config().get_item('music_quality')
-        if song['hMusic'] and quality <= 0:
-            music = song['hMusic']
-            quality = 'HD'
-        elif song['mMusic'] and quality <= 1:
-            music = song['mMusic']
-            quality = 'MD'
-        elif song['lMusic'] and quality <= 2:
-            music = song['lMusic']
-            quality = 'LD'
-        else:
-            return song['mp3Url'], ''
-
-        quality = quality + ' {0}k'.format(music['bitrate'] // 1000)
-        song_id = str(music['dfsId'])
-        enc_id = encrypted_id(song_id)
-        url = 'http://m{}.music.126.net/{}/{}.mp3'.format(random.randrange(1, 3), enc_id, song_id)
-        return url, quality
-
-    @classmethod
-    def _song_v3(cls, song):
-        # 新的获取歌曲url方法
-        quality = Config().get_item('music_quality')
-        if song['h'] and quality <= 0:
-            music = song['h']
-            quality = 'HD'
-        elif song['m'] and quality <= 1:
-            music = song['m']
-            quality = 'MD'
-        elif song['l'] and quality <= 2:
-            music = song['l']
-            quality = 'LD'
-        else:
-            return song.get('mp3Url', ''), ''
-
-        quality = quality + ' {0}k'.format(music['br'] // 1000)
-        song_id = str(music['fid'])
-        enc_id = encrypted_id(song_id)
-        url = 'http://m{}.music.126.net/{}/{}.mp3'.format(random.randrange(1, 3), enc_id, song_id)
+    def _song_url_by_id(cls, sid):
+        # 128k
+        url = 'http://music.163.com/song/media/outer/url?id={}.mp3'.format(sid)
+        quality = 'LD 128k'
         return url, quality
 
     @classmethod
     def song_url(cls, song):
-        # 获取高音质mp3 url
-        try:
-            return cls._song_v1(song)
-        except KeyError as e:
-            return cls._song_v3(song)
+        if 'url' in song:
+            # songs_url resp
+            url = song['url']
+            if url is None:
+                return Parse._song_url_by_id(song['id'])
+            br = song['br']
+            quality_map = {
+                320000: 'HD 320k',
+                192000: 'MD 192k',
+                128000: 'LD 128k',
+            }
+            return url, quality_map[br]
+        else:
+            # songs_detail resp
+            return Parse._song_url_by_id(song['id'])
 
     @classmethod
     def song_album(cls, song):
@@ -181,16 +164,12 @@ class Parse(object):
         } for album in albums]
 
     @classmethod
-    def top_playlists(cls, playlists):
+    def playlists(cls, playlists):
         return [{
             'playlist_id': pl['id'],
             'playlist_name': pl['name'],
             'creator_name': pl['creator']['nickname']
         } for pl in playlists]
-
-    @classmethod
-    def playlist_classes(cls, playlist_html):
-        pass
 
 
 class NetEase(object):
@@ -203,454 +182,321 @@ class NetEase(object):
             'Connection': 'keep-alive',
             'Content-Type': 'application/x-www-form-urlencoded',
             'Host': 'music.163.com',
-            'Referer': 'http://music.163.com/search/',
-            'User-Agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36'
+            'Referer': 'http://music.163.com',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
         }
-        self.cookies = {'appver': '1.5.2'}
-        self.session = requests.Session()
+
         self.storage = Storage()
-        self.session.cookies = LWPCookieJar(self.storage.cookie_path)
-        try:
-            self.session.cookies.load()
-            cookie = ''
-            if os.path.isfile(self.storage.cookie_path):
-                self.file = open(self.storage.cookie_path, 'r')
-                cookie = self.file.read()
-                self.file.close()
-            expire_time = re.compile(r'\d{4}-\d{2}-\d{2}').findall(cookie)
-            if expire_time:
-                if expire_time[0] < time.strftime('%Y-%m-%d', time.localtime(time.time())):
-                    self.storage.database['user'] = {
-                        'username': '',
-                        'password': '',
-                        'user_id': '',
-                        'nickname': '',
-                    }
-                    self.storage.save()
-                    os.remove(self.storage.cookie_path)
-        except IOError as e:
-            log.error(e)
-            self.session.cookies.save()
+        cookie_jar = LWPCookieJar(self.storage.cookie_path)
+        cookie_jar.load()
+        self.session = requests.Session()
+        self.session.cookies = cookie_jar
+        for cookie in cookie_jar:
+            if cookie.is_expired():
+                cookie_jar.clear()
+                self.storage.database['user'] = {
+                    'username': '',
+                    'password': '',
+                    'user_id': '',
+                    'nickname': '',
+                }
+                self.storage.save()
+                break
 
-    def return_toplists(self):
-        return [l[0] for l in top_list_all.values()]
+    @property
+    def toplists(self):
+        return [l[0] for l in TOP_LIST_ALL.values()]
 
-    def request(self, method, action, query=None, urlencoded=None, callback=None, timeout=None):
-        connection = json.loads(
-            self._raw_request(method, action, query, urlencoded, callback, timeout)
-        )
-        return connection
+    def logout(self):
+        self.session.cookies.clear()
+        self.storage.database['user'] = {
+            'username': '',
+            'password': '',
+            'user_id': '',
+            'nickname': '',
+        }
+        self.session.cookies.save()
+        self.storage.save()
 
-    def _raw_request(self,
-                     method,
-                     action,
-                     query=None,
-                     urlencoded=None,
-                     callback=None,
-                     timeout=None):
+    def _raw_request(self, method, endpoint, data=None):
         if method == 'GET':
-            url = action if query is None else action + '?' + query
-            connection = self.session.get(
-                url, headers=self.header, timeout=default_timeout
+            resp = self.session.get(
+                endpoint, params=data, headers=self.header, timeout=DEFAULT_TIMEOUT
             )
-
         elif method == 'POST':
-            connection = self.session.post(
-                action, data=query, headers=self.header, timeout=default_timeout
+            resp = self.session.post(
+                endpoint, data=data, headers=self.header, timeout=DEFAULT_TIMEOUT
             )
+        return resp
 
-        elif method == 'Login_POST':
-            connection = self.session.post(
-                action, data=query, headers=self.header, timeout=default_timeout
-            )
-            self.session.cookies.save()
+    def request(self, method, path, params={}, default={'code': -1}):
+        endpoint = '{}{}'.format(BASE_URL, path)
+        csrf_token = ''
+        for cookie in self.session.cookies:
+            if cookie.name == '__csrf':
+                csrf_token = cookie.value
+                break
+        params.update({'csrf_token': csrf_token})
+        data = default
 
-        connection.encoding = 'UTF-8'
-        return connection.text
+        params = encrypted_request(params)
+        try:
+            resp = self._raw_request(method, endpoint, params)
+            data = resp.json()
+        except requests.exceptions.RequestException as e:
+            log.error(e)
+        except ValueError as e:
+            log.error('Path: {}, response: {}'.format(path, resp.text[:200]))
+        finally:
+            return data
 
-    # 登录
     def login(self, username, password):
-        pattern = re.compile(r'^0\d{2,3}\d{7,8}$|^1[34578]\d{9}$')
-        if pattern.match(username):
-            return self.phone_login(username, password)
-
-        action = 'https://music.163.com/weapi/login?csrf_token='
         self.session.cookies.load()
-        text = {
-            'username': username,
-            'password': password,
-            'rememberLogin': 'true'
-        }
-        data = encrypted_request(text)
-        try:
-            return self.request('Login_POST', action, data)
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return {'code': 501}
-
-    # 手机登录
-    def phone_login(self, username, password):
-        action = 'https://music.163.com/weapi/login/cellphone'
-        text = {
-            'phone': username,
-            'password': password,
-            'rememberLogin': 'true'
-        }
-        data = encrypted_request(text)
-        try:
-            return self.request('Login_POST', action, data)
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return {'code': 501}
+        if username.isdigit():
+            path = '/weapi/login/cellphone'
+            params = dict(
+                phone=username,
+                password=password,
+                rememberLogin='true',
+            )
+        else:
+            # magic token for login
+            # see https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/router/login.js#L15
+            client_token = '1_jVUMqWEPke0/1/Vu56xCmJpo5vP1grjn_SOVVDzOc78w8OKLVZ2JH7IfkjSXqgfmh'
+            path = '/weapi/login'
+            params = dict(
+                username=username,
+                password=password,
+                rememberLogin='true',
+                clientToken=client_token
+            )
+        data = self.request('POST', path, params)
+        self.session.cookies.save()
+        return data
 
     # 每日签到
-    def daily_signin(self, type):
-        action = 'http://music.163.com/weapi/point/dailyTask'
-        text = {'type': type}
-        data = encrypted_request(text)
-        try:
-            return self.request('POST', action, data)
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return -1
+    def daily_task(self, is_mobile=True):
+        path = '/point/dailyTask'
+        params = dict(type=0 if is_mobile else 1)
+        return self.request('POST', path, params)
 
     # 用户歌单
-    def user_playlist(self, uid, offset=0, limit=100):
-        action = 'http://music.163.com/api/user/playlist/?offset={}&limit={}&uid={}'.format(
-            offset, limit, uid)
-        try:
-            data = self.request('GET', action)
-            return data['playlist']
-        except (requests.exceptions.RequestException, KeyError) as e:
-            log.error(e)
-            return -1
+    def user_playlist(self, uid, offset=0, limit=50):
+        path = '/weapi/user/playlist'
+        params = dict(
+            uid=uid,
+            offset=offset,
+            limit=limit,
+            csrf_token=''
+        )
+        return self.request('POST', path, params).get('playlist', [])
 
     # 每日推荐歌单
-    def recommend_playlist(self):
-        try:
-            action = 'http://music.163.com/weapi/v1/discovery/recommend/songs?csrf_token='
-            self.session.cookies.load()
-            csrf = ''
-            for cookie in self.session.cookies:
-                if cookie.name == '__csrf':
-                    csrf = cookie.value
-            if csrf == '':
-                return False
-            action += csrf
-            req = {'offset': 0, 'total': True, 'limit': 20, 'csrf_token': csrf}
-            page = self.session.post(action,
-                                     data=encrypted_request(req),
-                                     headers=self.header,
-                                     timeout=default_timeout)
-            results = json.loads(page.text)['recommend']
-            song_ids = []
-            for result in results:
-                song_ids.append(result['id'])
-            data = map(self.song_detail, song_ids)
-            return [d[0] for d in data]
-        except (requests.exceptions.RequestException, ValueError) as e:
-            log.error(e)
-            return False
+    def recommend_resource(self):
+        path = '/weapi/v1/discovery/recommend/resource'
+        return self.request('POST', path).get('recommend', [])
 
     # 私人FM
     def personal_fm(self):
-        action = 'http://music.163.com/api/radio/get'
-        try:
-            data = self.request('GET', action)
-            return data['data']
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return -1
+        path = '/weapi/v1/radio/get'
+        return self.request('POST', path).get('data', [])
 
     # like
     def fm_like(self, songid, like=True, time=25, alg='itembased'):
-        action = 'http://music.163.com/api/radio/like?alg={}&trackId={}&like={}&time={}'.format(
-            alg, songid, 'true' if like else 'false', time
+        path = '/weapi/radio/like'
+        params = dict(
+            alg=alg,
+            trackId=songid,
+            like='true' if like else 'false',
+            time=time
         )
-
-        try:
-            data = self.request('GET', action)
-            if data['code'] == 200:
-                return data
-            else:
-                return -1
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return -1
+        return self.request('POST', path, params)['code'] == 200
 
     # FM trash
     def fm_trash(self, songid, time=25, alg='RT'):
-        action = 'http://music.163.com/api/radio/trash/add?alg={}&songId={}&time={}'.format(
-            alg, songid, time
+        path = '/weapi/radio/trash/add'
+        params = dict(
+            songId=songid,
+            alg=alg,
+            time=time,
         )
-        try:
-            data = self.request('GET', action)
-            if data['code'] == 200:
-                return data
-            else:
-                return -1
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return -1
+        return self.request('POST', path, params)['code'] == 200
 
     # 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002) *(type)*
-    def search(self, s, stype=1, offset=0, total='true', limit=60):
-        action = 'http://music.163.com/api/search/get'
-        data = {
-            's': s,
+    def search(self, keywords, stype=1, offset=0, total='true', limit=30):
+        path = '/weapi/search/get'
+        params = {
+            's': keywords,
             'type': stype,
             'offset': offset,
             'total': total,
             'limit': limit
         }
-        return self.request('POST', action, data)
+        return self.request('POST', path, params).get('result', {})
 
-    # 新碟上架 http://music.163.com/#/discover/album/
+    # 新碟上架
     def new_albums(self, offset=0, limit=50):
-        action = 'http://music.163.com/api/album/new?area=ALL&offset={}&total=true&limit={}'.format(
-            offset, limit)
-        try:
-            data = self.request('GET', action)
-            return data['albums']
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+        path = '/weapi/album/new'
+        params = dict(
+            area='ALL',
+            offset=offset,
+            total=True,
+            limit=limit,
+        )
+        return self.request('POST', path, params).get('albums', [])
 
     # 歌单（网友精选碟） hot||new http://music.163.com/#/discover/playlist/
     def top_playlists(self, category='全部', order='hot', offset=0, limit=50):
-        action = 'http://music.163.com/api/playlist/list?cat={}&order={}&offset={}&total={}&limit={}'.format(
-            category, order, offset, 'true' if offset else 'false',
-            limit)
-        try:
-            data = self.request('GET', action)
-            return data['playlists']
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+        path = '/weapi/playlist/list'
+        params = dict(
+            cat=category,
+            order=order,
+            offset=offset,
+            total='true',
+            limit=limit
+        )
+        return self.request('POST', path, params).get('playlists', [])
 
-    # 分类歌单
-    def playlist_classes(self):
-        action = 'http://music.163.com/discover/playlist/'
-        try:
-            data = self._raw_request('GET', action)
-            soup = BeautifulSoup(data, 'html.parser')
-            dls = soup.select('dl.f-cb')
-            self.playlist_class_dict = OrderedDict()
+    def playlist_catelogs(self):
+        path = '/weapi/playlist/catalogue'
+        return self.request('POST', path)
 
-            for dl in dls:
-                title = dl.dt.text
-                sub = [item.text for item in dl.select('a')]
-                self.playlist_class_dict[title] = sub
-
-            return self.playlist_class_dict
-
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
-
-    # 分类歌单中某一个分类的详情
-    def playlist_class_detail(self):
-        pass
-
-    # 歌单详情， 使用新版本v3接口，借鉴自https://github.com/Binaryify/NeteaseCloudMusicApi/commit/a1239a838c97367e86e2ec3cdce5557f1aa47bc1
+    # 歌单详情
     def playlist_detail(self, playlist_id):
-        action = 'http://music.163.com/weapi/v3/playlist/detail'
-        self.session.cookies.load()
-        csrf = ''
-        for cookie in self.session.cookies:
-            if cookie.name == '__csrf':
-                csrf = cookie.value
-        data = {'id': playlist_id, 'total': 'true',
-                'csrf_token': csrf, 'limit': 1000, 'n': 1000, 'offset': 0}
-        connection = self.session.post(action,
-                                       data=encrypted_request(data),
-                                       headers=self.header, )
-        result = json.loads(connection.text)
-        # log.debug(result['playlist']['tracks'])
-        return result['playlist']['tracks']
+        path = '/weapi/v3/playlist/detail'
+        params = dict(
+            id=playlist_id,
+            total='true',
+            limit=1000,
+            n=1000,
+            offest=0
+        )
+        return self.request('POST', path, params).get('playlist', {}).get('tracks', [])
 
     # 热门歌手 http://music.163.com/#/discover/artist/
     def top_artists(self, offset=0, limit=100):
-        action = 'http://music.163.com/api/artist/top?offset={}&total=false&limit={}'.format(
-            offset, limit)
-        try:
-            data = self.request('GET', action)
-            return data['artists']
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+        path = '/weapi/artist/top'
+        params = dict(
+            offset=offset,
+            total=True,
+            limit=limit
+        )
+        return self.request('POST', path, params).get('artists', [])
 
     # 热门单曲 http://music.163.com/discover/toplist?id=
     def top_songlist(self, idx=0, offset=0, limit=100):
-        action = 'http://music.163.com' + top_list_all[idx][1]
-        try:
-            connection = requests.get(action,
-                                      headers=self.header,
-                                      timeout=default_timeout)
-            connection.encoding = 'UTF-8'
-            songids = re.findall(r'/song\?id=(\d+)', connection.text)
-            if songids == []:
-                return []
-            # 去重
-            songids = uniq(songids)
-            return self.songs_detail(songids)
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+        playlist_id = TOP_LIST_ALL[idx][1]
+        return self.playlist_detail(playlist_id)
 
     # 歌手单曲
     def artists(self, artist_id):
-        action = 'http://music.163.com/api/artist/{}'.format(artist_id)
-        try:
-            data = self.request('GET', action)
-            return data['hotSongs']
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+        path = '/weapi/v1/artist/{}'.format(artist_id)
+        return self.request('POST', path).get('hotSongs', [])
 
     def get_artist_album(self, artist_id, offset=0, limit=50):
-        action = 'http://music.163.com/api/artist/albums/{}?offset={}&limit={}'.format(
-            artist_id, offset, limit)
-        try:
-            data = self.request('GET', action)
-            return data['hotAlbums']
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+        path = '/weapi/artist/albums/{}'.format(artist_id)
+        params = dict(
+            offset=offset,
+            total=True,
+            limit=limit
+        )
+        return self.request('POST', path, params).get('hotAlbums', [])
 
     # album id --> song id set
     def album(self, album_id):
-        action = 'http://music.163.com/api/album/{}'.format(album_id)
-        try:
-            data = self.request('GET', action)
-            return data['album']['songs']
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+        path = '/weapi/v1/album/{}'.format(album_id)
+        return self.request('POST', path).get('songs', [])
 
     def song_comments(self, music_id, offset=0, total='false', limit=100):
-        action = 'http://music.163.com/api/v1/resource/comments/R_SO_4_{}/?rid=R_SO_4_{}&\
-            offset={}&total={}&limit={}'.format(music_id, music_id, offset, total, limit)
-        try:
-            comments = self.request('GET', action)
-            return comments
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+        path = '/weapi/v1/resource/comments/R_SO_4_{}/'.format(music_id)
+        params = dict(
+            rid=music_id,
+            offset=offset,
+            total=total,
+            limit=limit
+        )
+        return self.request('POST', path, params)
 
     # song ids --> song urls ( details )
-    def songs_detail(self, ids, offset=0):
-        tmpids = ids[offset:]
-        tmpids = tmpids[0:100]
-        tmpids = list(map(str, tmpids))
-        action = 'http://music.163.com/api/song/detail?ids=[{}]'.format(
-            ','.join(tmpids))
-        try:
-            data = self.request('GET', action)
+    def songs_detail(self, ids):
+        path = '/weapi/v3/song/detail'
+        params = dict(
+            c=json.dumps([{'id': _id} for _id in ids]),
+            ids=json.dumps(ids),
+        )
+        return self.request('POST', path, params).get('songs', [])
 
-            # the order of data['songs'] is no longer the same as tmpids,
-            # so just make the order back
-            data['songs'].sort(key=lambda song: tmpids.index(str(song['id'])))
+    def songs_url(self, ids):
+        quality = Config().get('music_quality')
+        rate_map = {
+            0: 320000,
+            1: 192000,
+            2: 128000
+        }
 
-            return data['songs']
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
-
-    def songs_detail_new_api(self, music_ids, bit_rate=320000):
-        action = 'http://music.163.com/weapi/song/enhance/player/url?csrf_token='
-        self.session.cookies.load()
-        csrf = ''
-        for cookie in self.session.cookies:
-            if cookie.name == '__csrf':
-                csrf = cookie.value
-
-        action += csrf
-        data = {'ids': music_ids, 'br': bit_rate, 'csrf_token': csrf}
-        connection = self.session.post(action,
-                                       data=encrypted_request(data),
-                                       headers=self.header, )
-        result = json.loads(connection.text)
-        return result['data']
-
-    # song id --> song url ( details )
-    def song_detail(self, music_id):
-        action = 'http://music.163.com/api/song/detail/?id={}&ids=[{}]'.format(
-            music_id, music_id)
-        try:
-            data = self.request('GET', action)
-            return data['songs']
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+        path = '/weapi/song/enhance/player/url'
+        params = dict(
+            ids=ids,
+            br=rate_map[quality]
+        )
+        return self.request('POST', path, params).get('data', [])
 
     # lyric http://music.163.com/api/song/lyric?os=osx&id= &lv=-1&kv=-1&tv=-1
     def song_lyric(self, music_id):
-        action = 'http://music.163.com/api/song/lyric?os=osx&id={}&lv=-1&kv=-1&tv=-1'.format(
-            music_id)
-        try:
-            data = self.request('GET', action)
-            if 'lrc' in data and data['lrc']['lyric'] is not None:
-                lyric_info = data['lrc']['lyric'].split('\n')
-            else:
-                lyric_info = []
-            return lyric_info
-        except requests.exceptions.RequestException as e:
-            log.error(e)
+        path = '/weapi/song/lyric'
+        params = dict(
+            os='osx',
+            id=music_id,
+            lv=-1,
+            kv=-1,
+            tv=-1
+        )
+        lyric = self.request('POST', path, params).get('lrc', {}).get('lyric', [])
+        if not lyric:
             return []
+        else:
+            return lyric.split('\n')
 
     def song_tlyric(self, music_id):
-        action = 'http://music.163.com/api/song/lyric?os=osx&id={}&lv=-1&kv=-1&tv=-1'.format(
-            music_id)
-        try:
-            data = self.request('GET', action)
-            if 'tlyric' in data and data['tlyric'].get('lyric') is not None:
-                lyric_info = data['tlyric']['lyric'][1:].split('\n')
-            else:
-                lyric_info = []
-            return lyric_info
-        except requests.exceptions.RequestException as e:
-            log.error(e)
+        path = '/weapi/song/lyric'
+        params = dict(
+            os='osx',
+            id=music_id,
+            lv=-1,
+            kv=-1,
+            tv=-1
+        )
+        lyric = self.request('POST', path, params).get('tlyric', {}).get('lyric', [])
+        if not lyric:
             return []
+        else:
+            return lyric.split('\n')
 
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
-    def djchannels(self, stype=0, offset=0, limit=50):
-        action = 'http://music.163.com/discover/djradio?type={}&offset={}&limit={}'.format(
-            stype, offset, limit)
-        try:
-            connection = requests.get(action,
-                                      headers=self.header,
-                                      timeout=default_timeout)
-            connection.encoding = 'UTF-8'
-            channelids = re.findall(r'/program\?id=(\d+)', connection.text)
-            channelids = uniq(channelids)
-            return self.channel_detail(channelids)
-        except requests.exceptions.RequestException as e:
-            log.error(e)
-            return []
+    def djchannels(self, offset=0, limit=50):
+        path = '/weapi/djradio/recommend/v1'
+        params = dict(
+            limit=limit,
+            offset=offset
+        )
+        channels = self.request('POST', path, params).get('djRadios', [])
+        return [c['id'] for c in channels]
 
     # DJchannel ( id, channel_name ) ids --> song urls ( details )
     # 将 channels 整理为 songs 类型
     def channel_detail(self, channelids, offset=0):
+        path = '/weapi/djradio/get'
         channels = []
-        for i in range(0, len(channelids)):
-            action = 'http://music.163.com/api/dj/program/detail?id={}'.format(
-                channelids[i])
-            try:
-                data = self.request('GET', action)
-                channel = self.dig_info(
-                    data['program']['mainSong'], 'channels')
-                channels.append(channel)
-            except requests.exceptions.RequestException as e:
-                log.error(e)
-                continue
-
+        for cid in channelids:
+            params = dict(id=cid)
+            data = self.request('POST', path, params).get('program', {}).get('mainSong', {})
+            if data:
+                channels.append(self.dig_info(data, 'channels'))
         return channels
 
     # 获取版本
     def get_version(self):
-        action = 'https://pypi.org/pypi/NetEase-MusicBox/json'  # JSON API
+        action = 'https://pypi.org/pypi/NetEase-MusicBox/json'
         try:
             return requests.get(action).json()
         except requests.exceptions.RequestException as e:
@@ -666,8 +512,8 @@ class NetEase(object):
         elif dig_type == 'albums':
             return Parse.albums(data)
 
-        elif dig_type == 'top_playlists':
-            return Parse.top_playlists(data)
+        elif dig_type == 'playlists' or dig_type == 'top_playlists':
+            return Parse.playlists(data)
 
         elif dig_type == 'channels':
             url, quality = Parse.song_url(data)
@@ -681,7 +527,9 @@ class NetEase(object):
             }
 
         elif dig_type == 'playlist_classes':
-            return list(self.playlist_class_dict.keys())
+            return list(PLAYLIST_CLASSES.keys())
 
         elif dig_type == 'playlist_class_detail':
-            return self.playlist_class_dict[data]
+            return PLAYLIST_CLASSES[data]
+        else:
+            raise ValueError('Invalid dig type')

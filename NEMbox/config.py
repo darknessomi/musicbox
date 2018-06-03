@@ -119,17 +119,14 @@ class Config(Singleton):
         self.config = {}
         if not os.path.isfile(self.config_file_path):
             self.generate_config_file()
-        try:
-            f = open(self.config_file_path, 'r')
-        except IOError:
-            log.debug('Read config file error.')
-            return
-        try:
-            self.config = json.loads(f.read())
-        except ValueError:
-            log.debug('Load config json data failed.')
-            return
-        f.close()
+
+        with open(self.config_file_path, 'r') as f:
+            try:
+                self.config = json.load(f)
+            except ValueError:
+                log.debug('Load config json data failed.')
+                return
+
         if not self.check_version():
             self.save_config_file()
 
@@ -235,9 +232,7 @@ class Config(Singleton):
             self.check_version()
             return False
 
-    def get_item(self, name):
+    def get(self, name):
         if name not in self.config.keys():
-            if name not in self.default_config.keys():
-                return None
-            return self.default_config[name].get('value')
-        return self.config[name].get('value')
+            return self.default_config[name]['value']
+        return self.config[name]['value']
