@@ -1,14 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from hashlib import md5
 import unittest
 
-from future.builtins import str
-from NEMbox.api import NetEase
+from NEMbox.api import NetEase, Parse
 
 
 class TestApi(unittest.TestCase):
     def test_api(self):
         api = NetEase()
-        self.assertIsInstance(api.songs_detail_new_api([27902910])[0]['url'], str)
-        self.assertIsNone(api.songs_detail([405079776])[0]['mp3Url'])  # old api
+        ids = [347230, 496619464, 405998841, 28012031]
+        print(api.songs_url(ids))
+        print(api.songs_detail(ids))
+        print(Parse.song_url(api.songs_detail(ids)[0]))
+        # user = api.login('example@163.com', md5(b'').hexdigest())
+        # user_id = user['account']['id']
+        # print(user)
+        # api.logout()
+        # print(api.user_playlist(3765346))
+        # print(api.song_comments(347230))
+        # print(api.search('海阔天空')['result']['songs'])
+        # print(api.top_songlist()[0])
+        # print(Parse.song_url(api.top_songlist()[0]))
+        # print(api.djchannels())
+        # print(api.search('测', 1000))
+        # print(api.album(38721188))
+        print(api.playlist_catelogs())
