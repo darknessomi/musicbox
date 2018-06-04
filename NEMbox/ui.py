@@ -121,7 +121,6 @@ class Ui(object):
                           playing_flag,
                           playing_mode):
 
-        # log.error('called {} {}'.format(now_playing, playing_flag))
         if not song or not playing_flag:
             return
         name, artist = song['song_name'], song['artist']
@@ -237,7 +236,10 @@ class Ui(object):
                     curses.color_pair(1))
         self.screen.refresh()
 
-    # start is the timestamp of this function being called
+    def build_submenu(self, data):
+        pass
+
+    # start is the called timestamp of this function
     def build_menu(self, datatype, title, datalist, offset, index, step,
                    start):
         # keep playing info in line 1
@@ -401,12 +403,12 @@ class Ui(object):
                 if i == index:
                     self.addstr(
                         i - offset + 8, self.indented_startcol,
-                        '-> ' + str(i) + '. ' + datalist[i]['song_name'],
+                        '-> ' + str(i) + '. ' + datalist[i]['name'],
                         curses.color_pair(2))
                 else:
                     self.addstr(
                         i - offset + 8, self.startcol,
-                        str(i) + '. ' + datalist[i]['song_name'])
+                        str(i) + '. ' + datalist[i]['name'])
 
         elif datatype == 'search':
             self.screen.move(6, 1)

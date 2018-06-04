@@ -53,7 +53,6 @@ setup(
     license=about['__license__'],
     packages=find_packages(),
     install_requires=[
-        'requests',
         'requests-cache',
         'pycryptodomex',
         'future',

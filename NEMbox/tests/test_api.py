@@ -25,4 +25,12 @@ class TestApi(unittest.TestCase):
         # print(api.djchannels())
         # print(api.search('测', 1000))
         # print(api.album(38721188))
-        print(api.playlist_catelogs())
+        # print(api.djchannels()[:5])
+        # print(api.channel_detail([348289113]))
+        # print(api.djprograms(243, True, limit=5))
+        # print(api.request('POST', '/weapi/djradio/hot/v1', params=dict(
+        #     category='旅途|城市',
+        #     limit=5,
+        #     offset=0
+        # )))
+        print(api.recommend_resource()[0])
