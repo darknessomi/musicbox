@@ -21,7 +21,7 @@ from .storage import Storage
 from .encrypt import encrypted_request
 from . import logger
 
-requests_cache.install_cache('musicbox', backend='memory', expire_after=3600)
+requests_cache.install_cache('nemcache', expire_after=3600)
 
 log = logger.getLogger(__name__)
 
@@ -104,13 +104,15 @@ class Parse(object):
             else:
                 album_name = '未知专辑'
                 album_id = ''
-        else:
+        elif 'album' in song:
             if song['album'] is not None:
                 album_name = song['album']['name']
                 album_id = song['album']['id']
             else:
                 album_name = '未知专辑'
                 album_id = ''
+        else:
+            raise ValueError
         return album_name, album_id
 
     @classmethod
@@ -323,15 +325,15 @@ class NetEase(object):
         return self.request('POST', path, params)['code'] == 200
 
     # 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002) *(type)*
-    def search(self, keywords, stype=1, offset=0, total='true', limit=30):
+    def search(self, keywords, stype=1, offset=0, total='true', limit=50):
         path = '/weapi/search/get'
-        params = {
-            's': keywords,
-            'type': stype,
-            'offset': offset,
-            'total': total,
-            'limit': limit
-        }
+        params = dict(
+            s=keywords,
+            type=stype,
+            offset=offset,
+            total=total,
+            limit=limit
+        )
         return self.request('POST', path, params).get('result', {})
 
     # 新碟上架
@@ -474,25 +476,24 @@ class NetEase(object):
 
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
     def djchannels(self, offset=0, limit=50):
-        path = '/weapi/djradio/recommend/v1'
+        path = '/weapi/djradio/hot/v1'
         params = dict(
             limit=limit,
             offset=offset
         )
         channels = self.request('POST', path, params).get('djRadios', [])
-        return [c['id'] for c in channels]
-
-    # DJchannel ( id, channel_name ) ids --> song urls ( details )
-    # 将 channels 整理为 songs 类型
-    def channel_detail(self, channelids, offset=0):
-        path = '/weapi/djradio/get'
-        channels = []
-        for cid in channelids:
-            params = dict(id=cid)
-            data = self.request('POST', path, params).get('program', {}).get('mainSong', {})
-            if data:
-                channels.append(self.dig_info(data, 'channels'))
         return channels
+
+    def djprograms(self, radio_id, asc=False, offset=0, limit=50):
+        path = '/weapi/dj/program/byradio'
+        params = dict(
+            asc=asc,
+            radioId=radio_id,
+            offset=offset,
+            limit=limit
+        )
+        programs = self.request('POST', path, params).get('programs', [])
+        return [p['mainSong'] for p in programs]
 
     # 获取版本
     def get_version(self):
@@ -514,17 +515,6 @@ class NetEase(object):
 
         elif dig_type == 'playlists' or dig_type == 'top_playlists':
             return Parse.playlists(data)
-
-        elif dig_type == 'channels':
-            url, quality = Parse.song_url(data)
-            return {
-                'song_id': data['id'],
-                'song_name': data['name'],
-                'artist': data['artists'][0]['name'],
-                'album_name': '主播电台',
-                'mp3_url': url,
-                'quality': quality
-            }
 
         elif dig_type == 'playlist_classes':
             return list(PLAYLIST_CLASSES.keys())

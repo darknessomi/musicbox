@@ -109,3 +109,4 @@ venv3/
 .vscode/
 
 setup.cfg
+nemcache.sqlite

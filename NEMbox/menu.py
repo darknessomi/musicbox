@@ -235,19 +235,16 @@ class Menu(object):
             self.player.resume()
         else:
             self.player.pause()
-        time.sleep(0.1)
 
     def next_song(self):
         if self.player.is_empty:
             return
         self.player.next()
-        time.sleep(0.5)
 
     def previous_song(self):
         if self.player.is_empty:
             return
         self.player.prev()
-        time.sleep(0.5)
 
     def start(self):
         self.menu_starts = time.time()
@@ -352,8 +349,6 @@ class Menu(object):
                 self.menu_starts = time.time()
                 self.ui.build_loading()
                 self.dispatch_enter(idx)
-                log.error(self.datalist)
-                log.error(self.datatype)
                 if self.enter_flag is True:
                     self.index = 0
                     self.offset = 0
@@ -398,7 +393,6 @@ class Menu(object):
                 if len(self.player.info['player_list']) == 0:
                     continue
                 self.player.shuffle()
-                time.sleep(0.1)
 
             # 喜爱
             elif key == ord(','):
@@ -420,7 +414,6 @@ class Menu(object):
                         self.api.fm_trash, self.player.playing_id)
                     if return_data:
                         notify('Deleted successfully!', 0)
-                    time.sleep(0.1)
 
             # 下一FM
             elif key == ord('/'):
@@ -429,12 +422,9 @@ class Menu(object):
                         continue
                     if self.player.end_callback:
                         self.player.end_callback()
-                    time.sleep(0.1)
 
             # 播放、暂停
             elif key == ord(' '):
-                log.error([idx, self.player.info['idx']])
-                # log.error(self.datalist)
                 if not self.datalist:
                     continue
 
@@ -455,7 +445,7 @@ class Menu(object):
                     self.player.play_or_pause(idx)
                     self.at_playing_list = True
                 elif datatype == 'fmsongs':
-                    self.player.info['playing_mode'] = 0
+                    self.player.change_mode(0)
                     self.player.new_player_list('fmsongs', self.title,
                                                 self.datalist, -1)
                     self.player.end_callback = self.fm_callback
@@ -463,7 +453,6 @@ class Menu(object):
                     self.at_playing_list = True
                 else:
                     self.player.play_or_pause(self.player.info['idx'])
-                time.sleep(0.1)
 
             # 加载当前播放列表
             elif key == ord('p'):
@@ -471,7 +460,7 @@ class Menu(object):
 
             # 播放模式切换
             elif key == ord('P'):
-                self.player.info['playing_mode'] = (self.player.info['playing_mode'] + 1) % 5
+                self.player.change_mode()
 
             # 进入专辑
             elif key == ord('A'):
@@ -636,8 +625,6 @@ class Menu(object):
         index = self.index
         self.stack.append([datatype, title, datalist, offset, index])
 
-        log.error(idx)
-        log.error(self.datalist)
         if idx >= len(self.datalist):
             return False
 
@@ -673,6 +660,13 @@ class Menu(object):
                 albums = netease.get_artist_album(artist_id)
                 self.datatype = 'albums'
                 self.datalist = netease.dig_info(albums, 'albums')
+
+        elif datatype == 'djchannels':
+            radio_id = datalist[idx]['id']
+            programs = netease.djprograms(radio_id)
+            self.title += ' > ' + datalist[idx]['name']
+            self.datatype = 'songs'
+            self.datalist = netease.dig_info(programs, 'songs')
 
         # 该专辑包含的歌曲
         elif datatype == 'albums':
@@ -793,6 +787,8 @@ class Menu(object):
                 self.datalist.append(self.player.songs[i])
             self.index = self.player.info['idx']
             self.offset = self.index // self.step * self.step
+            if not self.player.playing_flag:
+                self.player.play_or_pause(self.index)
 
     def request_api(self, func, *args):
         result = func(*args)
@@ -804,14 +800,16 @@ class Menu(object):
         return func(*args)
 
     def get_new_fm(self):
-        myplaylist = []
-        for count in range(0, 1):
-            data = self.request_api(self.api.personal_fm)
-            if not data:
-                break
-            myplaylist += data
-            time.sleep(0.2)
-        return self.api.dig_info(myplaylist, 'fmsongs')
+        data = self.request_api(self.api.personal_fm)
+        if not data:
+            return []
+        return self.api.dig_info(data, 'fmsongs')
+
+    def enter_without_api(self, idx):
+        pass
+
+    def enter_with_api(self, idx):
+        pass
 
     def choice_channel(self, idx):
         # 排行榜
@@ -852,8 +850,6 @@ class Menu(object):
         # 我的歌单
         elif idx == 4:
             myplaylist = self.request_api(self.api.user_playlist, self.userid)
-            if not myplaylist:
-                return
             self.datatype = 'top_playlists'
             self.datalist = netease.dig_info(myplaylist, self.datatype)
             self.title += ' > ' + self.username + ' 的歌单'
@@ -866,11 +862,9 @@ class Menu(object):
 
         # 每日推荐
         elif idx == 6:
-            self.datatype = 'songs'
-            self.title += ' > 每日推荐'
             myplaylist = self.request_api(self.api.recommend_resource)
-            if not myplaylist:
-                return
+            self.datatype = 'top_playlists'
+            self.title += ' > 每日推荐'
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
 
         # 私人FM
