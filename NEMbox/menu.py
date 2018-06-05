@@ -158,7 +158,7 @@ class Menu(object):
             x = self.ui.build_login_error()
             if x != ord('1'):
                 return False
-            return self.build_login()
+            return self.login()
 
     def search(self, category):
         self.ui.screen.timeout(-1)

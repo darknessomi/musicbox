@@ -133,6 +133,20 @@ class Player(object):
     def is_index_valid(self):
         return 0 <= self.index < len(self.list)
 
+    def notify_playing(self):
+        if not self.current_song:
+            return
+
+        if not self.config_notifier:
+            return
+
+        song = self.current_song
+        notify('正在播放: {}\n{}-{}'.format(song['song_name'], song['artist'], song['album_name']))
+
+    def notify_copyright_issue(self):
+        log.warning('Song {} is unavailable due to copyright issue.'.format(self.playing_id))
+        notify('版权限制，无法播放此歌曲')
+
     def change_mode(self, step=1):
         self.info['playing_mode'] = (self.info['playing_mode'] + step) % 5
 
@@ -223,8 +237,7 @@ class Player(object):
             elif strout[:2] == '@E':
                 # error, stop song and move to next
                 self.playing_flag = True
-                notify('版权限制，无法播放此歌曲')
-                log.warning('Song {} is unavailable due to copyright issue.'.format(self.playing_id))
+                self.notify_copyright_issue()
                 break
             elif strout == '@P 0':
                 # end, moving to next
@@ -300,14 +313,13 @@ class Player(object):
                 self.end_callback()
             return
 
+        if not self.current_song:
+            return
+
         self.playing_flag = True
-        item = self.current_song
         self.build_playinfo()
-
-        if self.config_notifier:
-            notify('正在播放: {}\n{}-{}'.format(item['song_name'], item['artist'], item['album_name']))
-
-        self.start_playing(lambda: 0, item)
+        self.notify_playing()
+        self.start_playing(lambda: 0, self.current_song)
 
     def shuffle_order(self):
         self.order.clear()
