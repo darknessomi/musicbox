@@ -115,13 +115,11 @@ NetEase-MusicBox
 可配置缓存，快捷键，消息，桌面歌词。
 由于歌曲 API 只接受中国大陆地区访问，港澳台及海外用户请自行设置代理：
 
+```bash
+export http_proxy=http://ip:port
+curl ip.cn
 ```
-"mpg123_parameters": {
-    "default": [],
-    "describe": "The additional parameters when mpg123 start.",
-    "value": ["-p", "http://ip:port"]
-}
-```
+显示IP属于中国大陆地区即可。
 
 ### 已测试的系统兼容列表
 
@@ -156,9 +154,11 @@ Enjoy it !
 
 ### 更新日志
 
+2018-06-05 版本 0.2.5.0    全部迁移到新版api，大量错误修复
+
 2018-05-21 版本 0.2.4.3    更新依赖，错误修复
 
-2017-11-28 版本 0.2.4.2    更新获取歌曲列表的 api
+2017-11-28 版本 0.2.4.2    更新获取歌曲列表的api
 
 2017-06-03 版本 0.2.4.1    修正mpg123状态异常导致的cpu占用，增加歌词双行显示功能
 
