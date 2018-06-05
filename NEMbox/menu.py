@@ -638,15 +638,13 @@ class Menu(object):
 
             self.datatype = 'artist_info'
             self.title += ' > ' + artist_name
-            self.datalist = [
-                {
-                    'item': '{}的热门歌曲'.format(artist_name),
-                    'id': artist_id,
-                }, {
-                    'item': '{}的所有专辑'.format(artist_name),
-                    'id': artist_id,
-                }
-            ]
+            self.datalist = [{
+                'item': '{}的热门歌曲'.format(artist_name),
+                'id': artist_id,
+            }, {
+                'item': '{}的所有专辑'.format(artist_name),
+                'id': artist_id,
+            }]
 
         elif datatype == 'artist_info':
             self.title += ' > ' + datalist[idx]['item']
@@ -805,40 +803,29 @@ class Menu(object):
             return []
         return self.api.dig_info(data, 'fmsongs')
 
-    def enter_without_api(self, idx):
-        pass
-
-    def enter_with_api(self, idx):
-        pass
-
     def choice_channel(self, idx):
-        # 排行榜
-        netease = self.api
+        self.offset = 0
+        self.index = 0
+
         if idx == 0:
-            self.datalist = netease.toplists
+            self.datalist = self.api.toplists
             self.title += ' > 排行榜'
             self.datatype = 'toplists'
-
-        # 艺术家
         elif idx == 1:
-            artists = netease.top_artists()
-            self.datalist = netease.dig_info(artists, 'artists')
+            artists = self.api.top_artists()
+            self.datalist = self.api.dig_info(artists, 'artists')
             self.title += ' > 艺术家'
             self.datatype = 'artists'
-
-        # 新碟上架
         elif idx == 2:
-            albums = netease.new_albums()
-            self.datalist = netease.dig_info(albums, 'albums')
+            albums = self.api.new_albums()
+            self.datalist = self.api.dig_info(albums, 'albums')
             self.title += ' > 新碟上架'
             self.datatype = 'albums'
-
-        # 精选歌单
         elif idx == 3:
             self.datalist = [{
                 'title': '全站置顶',
                 'datatype': 'top_playlists',
-                'callback': netease.top_playlists
+                'callback': self.api.top_playlists
             }, {
                 'title': '分类精选',
                 'datatype': 'playlist_classes',
@@ -846,44 +833,29 @@ class Menu(object):
             }]
             self.title += ' > 精选歌单'
             self.datatype = 'playlists'
-
-        # 我的歌单
         elif idx == 4:
             myplaylist = self.request_api(self.api.user_playlist, self.userid)
             self.datatype = 'top_playlists'
-            self.datalist = netease.dig_info(myplaylist, self.datatype)
+            self.datalist = self.api.dig_info(myplaylist, self.datatype)
             self.title += ' > ' + self.username + ' 的歌单'
-
-        # 主播电台
         elif idx == 5:
             self.datatype = 'djchannels'
             self.title += ' > 主播电台'
-            self.datalist = netease.djchannels()
-
-        # 每日推荐
+            self.datalist = self.api.djchannels()
         elif idx == 6:
             myplaylist = self.request_api(self.api.recommend_resource)
             self.datatype = 'top_playlists'
             self.title += ' > 每日推荐'
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
-
-        # 私人FM
         elif idx == 7:
             self.datatype = 'fmsongs'
             self.title += ' > 私人FM'
             self.datalist = self.get_new_fm()
-
-        # 搜索
         elif idx == 8:
             self.datatype = 'search'
             self.title += ' > 搜索'
             self.datalist = ['歌曲', '艺术家', '专辑', '网易精选集']
-
-        # 帮助
         elif idx == 9:
             self.datatype = 'help'
             self.title += ' > 帮助'
             self.datalist = shortcut
-
-        self.offset = 0
-        self.index = 0

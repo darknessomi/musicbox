@@ -505,6 +505,8 @@ class NetEase(object):
             return {}
 
     def dig_info(self, data, dig_type):
+        if not data:
+            return []
         if dig_type == 'songs' or dig_type == 'fmsongs':
             return Parse.songs(data)
         elif dig_type == 'artists':
