@@ -22,7 +22,7 @@ class Config(Singleton):
         self._init = True
         self.config_file_path = Constant.config_path
         self.default_config = {
-            'version': 8,
+            'version': 9,
             'cache': {
                 'value': False,
                 'default': False,
@@ -114,6 +114,11 @@ class Config(Singleton):
                 'value': False,
                 'default': False,
                 'describe': 'Set true to make curses transparency.'
+            },
+            'left_margin_ratio': {
+                'value': 5,
+                'default': 5,
+                'describe': 'Controls the ratio between width and left margin.'
             }
         }
         self.config = {}
@@ -228,6 +233,13 @@ class Config(Singleton):
                     'value': [600, 60],
                     'default': [600, 60],
                     'describe': 'Desktop lyrics area size.'
+                }
+            elif self.config['version'] == 8:
+                self.config['version'] = 9
+                self.config['left_margin_ratio'] = {
+                    'value': 5,
+                    'default': 5,
+                    'describe': 'Controls the ratio between width and left margin.'
                 }
             self.check_version()
             return False
