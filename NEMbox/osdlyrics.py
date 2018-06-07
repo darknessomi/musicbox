@@ -47,21 +47,21 @@ if pyqt_activity:
             self.initUI()
 
         def initUI(self):
-            self.setStyleSheet("background:" + config.get_item(
+            self.setStyleSheet("background:" + config.get(
                 "osdlyrics_background"))
-            if config.get_item("osdlyrics_transparent"):
+            if config.get("osdlyrics_transparent"):
                 self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
             self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
             self.setAttribute(QtCore.Qt.WA_X11DoNotAcceptFocus)
             self.setFocusPolicy(QtCore.Qt.NoFocus)
-            if config.get_item("osdlyrics_on_top"):
+            if config.get("osdlyrics_on_top"):
                 self.setWindowFlags(QtCore.Qt.FramelessWindowHint |
                                     QtCore.Qt.WindowStaysOnTopHint |
                                     QtCore.Qt.X11BypassWindowManagerHint)
             else:
                 self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
             self.setMinimumSize(600, 50)
-            osdlyrics_size = config.get_item("osdlyrics_size")
+            osdlyrics_size = config.get("osdlyrics_size")
             self.resize(osdlyrics_size[0], osdlyrics_size[1])
             scn = QApplication.desktop().screenNumber(
                 QApplication.desktop().cursor().pos())
@@ -95,8 +95,8 @@ if pyqt_activity:
             qp.end()
 
         def drawText(self, event, qp):
-            osdlyrics_color = config.get_item("osdlyrics_color")
-            osdlyrics_font = config.get_item("osdlyrics_font")
+            osdlyrics_color = config.get("osdlyrics_color")
+            osdlyrics_font = config.get("osdlyrics_font")
             font = QtGui.QFont(osdlyrics_font[0], osdlyrics_font[1])
             pen = QtGui.QColor(osdlyrics_color[0], osdlyrics_color[1],
                                osdlyrics_color[2])
@@ -133,7 +133,7 @@ if pyqt_activity:
 
 
 def show_lyrics_new_process():
-    if pyqt_activity and config.get_item("osdlyrics"):
+    if pyqt_activity and config.get("osdlyrics"):
         p = Process(target=show_lyrics)
         p.daemon = True
         p.start()
