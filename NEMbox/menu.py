@@ -25,7 +25,6 @@ from .api import NetEase
 from .player import Player
 from .ui import Ui
 from .osdlyrics import show_lyrics_new_process
-from .const import Constant
 from .config import Config
 from .utils import notify
 from .storage import Storage
@@ -36,10 +35,6 @@ from . import logger
 locale.setlocale(locale.LC_ALL, '')
 
 log = logger.getLogger(__name__)
-
-home = os.path.expanduser('~')
-if os.path.isdir(Constant.conf_dir) is False:
-    os.mkdir(Constant.conf_dir)
 
 
 def carousel(left, right, x):
@@ -208,12 +203,11 @@ class Menu(object):
         # 检查更新 && 签到
         try:
             mobile = self.api.daily_task(is_mobile=True)
-            time.sleep(0.5)
             pc = self.api.daily_task(is_mobile=False)
 
-            if mobile['code'] not in (-1, -2, 301):
+            if mobile['code'] == 200:
                 notify('移动端签到成功', 1)
-            if pc['code'] not in (-1, -2, 301):
+            if pc['code'] == 200:
                 notify('PC端签到成功', 1)
 
             data = self.api.get_version()

@@ -33,4 +33,5 @@ class TestApi(unittest.TestCase):
         #     limit=5,
         #     offset=0
         # )))
-        print(api.recommend_resource()[0])
+        # print(api.recommend_resource()[0])
+        print(api.songs_url([561307346]))

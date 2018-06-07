@@ -232,8 +232,7 @@ class Player(object):
                 # playing, update progress
                 out = strout.split(' ')
                 self.process_location = int(float(out[3]))
-                if not self.process_length:
-                    self.process_length = int(float(out[3]) + float(out[4]))
+                self.process_length = int(float(out[3]) + float(out[4]))
             elif strout[:2] == '@E':
                 # error, stop song and move to next
                 self.playing_flag = True
@@ -242,6 +241,7 @@ class Player(object):
             elif strout == '@P 0':
                 # end, moving to next
                 self.playing_flag = True
+                break
             elif strout == '':
                 endless_loop_cnt += 1
                 # 有播放后没有退出，mpg123一直在发送空消息的情况，此处直接终止处理

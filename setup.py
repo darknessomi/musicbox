@@ -59,7 +59,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'musicbox = NEMbox:start'
+            'musicbox = NEMbox.__main__:start'
         ],
     },
     keywords=['music', 'netease', 'cli', 'player'],

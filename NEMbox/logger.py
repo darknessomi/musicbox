@@ -5,7 +5,6 @@
 from __future__ import (
     print_function, unicode_literals, division, absolute_import
 )
-import os
 import logging
 
 from future.builtins import open
@@ -13,8 +12,7 @@ from future.builtins import open
 from . import const
 
 FILE_NAME = const.Constant.log_path
-if os.path.isdir(const.Constant.conf_dir) is False:
-    os.mkdir(const.Constant.conf_dir)
+
 
 with open(FILE_NAME, 'a+') as f:
     f.write('#' * 80)
