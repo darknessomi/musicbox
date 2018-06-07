@@ -24,10 +24,12 @@ log = logger.getLogger(__name__)
 
 
 class Cache(Singleton):
+
     def __init__(self):
         if hasattr(self, '_init'):
             return
         self._init = True
+
         self.const = Constant()
         self.config = Config()
         self.download_lock = threading.Lock()
@@ -51,12 +53,6 @@ class Cache(Singleton):
 
         _kill(self.aria2c)
         _kill(self.wget)
-
-    def _mkdir(self, name):
-        try:
-            os.mkdir(name)
-        except OSError:
-            pass
 
     def start_download(self):
         check = self.download_lock.acquire(False)
@@ -97,7 +93,6 @@ class Cache(Singleton):
             except OSError as e:
                 log.warning('{}.\tAria2c is unavailable, fall back to wget'.format(e))
 
-                self._mkdir(output_path)
                 para = ['wget', '-O', full_path, new_url]
                 self.wget = subprocess.Popen(para,
                                              stdin=subprocess.PIPE,

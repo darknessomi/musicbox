@@ -84,12 +84,13 @@ class Parse(object):
             if url is None:
                 return Parse._song_url_by_id(song['id'])
             br = song['br']
-            quality_map = {
-                320000: 'HD 320k',
-                192000: 'MD 192k',
-                128000: 'LD 128k',
-            }
-            return url, quality_map[br]
+            if br >= 320000:
+                quality = 'HD'
+            elif br >= 192000:
+                quality = 'MD'
+            else:
+                quality = 'LD'
+            return url, '{} {}k'.format(quality, br // 1000)
         else:
             # songs_detail resp
             return Parse._song_url_by_id(song['id'])
@@ -278,7 +279,7 @@ class NetEase(object):
 
     # 每日签到
     def daily_task(self, is_mobile=True):
-        path = '/point/dailyTask'
+        path = '/weapi/point/dailyTask'
         params = dict(type=0 if is_mobile else 1)
         return self.request('POST', path, params)
 
@@ -508,6 +509,10 @@ class NetEase(object):
         if not data:
             return []
         if dig_type == 'songs' or dig_type == 'fmsongs':
+            urls = self.songs_url([s['id'] for s in data])
+            for s, u in zip(data, urls):
+                s['url'] = u['url']
+                s['br'] = u['br']
             return Parse.songs(data)
         elif dig_type == 'artists':
             return Parse.artists(data)

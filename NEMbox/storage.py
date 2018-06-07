@@ -59,6 +59,7 @@ class Storage(Singleton):
         if hasattr(self, '_init'):
             return
         self._init = True
+
         self.database = {
             'user': {
                 'username': '',
@@ -107,7 +108,7 @@ class Storage(Singleton):
                     else:
                         self.database[k] = v
         except (OSError, KeyError, ValueError) as e:
-            self.__init__()
+            pass
         self.save()
 
     def save(self):

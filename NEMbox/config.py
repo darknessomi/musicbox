@@ -6,12 +6,9 @@ import json
 import os
 from future.builtins import open
 
-from . import logger
 from .singleton import Singleton
 from .const import Constant
 from .utils import utf8_data_to_file
-
-log = logger.getLogger(__name__)
 
 
 class Config(Singleton):
@@ -20,7 +17,8 @@ class Config(Singleton):
         if hasattr(self, '_init'):
             return
         self._init = True
-        self.config_file_path = Constant.config_path
+
+        self.path = Constant.config_path
         self.default_config = {
             'version': 8,
             'cache': {
@@ -117,120 +115,22 @@ class Config(Singleton):
             }
         }
         self.config = {}
-        if not os.path.isfile(self.config_file_path):
+        if not os.path.isfile(self.path):
             self.generate_config_file()
 
-        with open(self.config_file_path, 'r') as f:
+        with open(self.path, 'r') as f:
             try:
                 self.config = json.load(f)
             except ValueError:
-                log.debug('Load config json data failed.')
-                return
-
-        if not self.check_version():
-            self.save_config_file()
+                self.generate_config_file()
 
     def generate_config_file(self):
-        f = open(self.config_file_path, 'w')
-        utf8_data_to_file(f, json.dumps(self.default_config, indent=2))
-        f.close()
+        with open(self.path, 'w') as f:
+            utf8_data_to_file(f, json.dumps(self.default_config, indent=2))
 
     def save_config_file(self):
-        f = open(self.config_file_path, 'w')
-        utf8_data_to_file(f, json.dumps(self.config, indent=2))
-        f.close()
-
-    def check_version(self):
-        if self.config['version'] == self.default_config['version']:
-            return True
-        else:
-            # Should do some update. Like
-            # if self.database['version'] == 2 : self.database.['version'] = 3
-            # update database form version 1 to version 2
-            if self.config['version'] == 1:
-                self.config['version'] = 2
-                self.config['global_play_pause'] = {
-                    'value': '<ctrl><alt>p',
-                    'default': '<ctrl><alt>p',
-                    'describe': 'Global keybind for play/pause.'
-                                'Uses gtk notation for keybinds.'
-                }
-                self.config['global_next'] = {
-                    'value': '<ctrl><alt>j',
-                    'default': '<ctrl><alt>j',
-                    'describe': 'Global keybind for next song.'
-                                'Uses gtk notation for keybinds.'
-                }
-                self.config['global_previous'] = {
-                    'value': '<ctrl><alt>k',
-                    'default': '<ctrl><alt>k',
-                    'describe': 'Global keybind for previous song.'
-                                'Uses gtk notation for keybinds.'
-                }
-            elif self.config['version'] == 2:
-                self.config['version'] = 3
-                self.config['notifier'] = {
-                    'value': True,
-                    'default': True,
-                    'describe': 'Notifier when switching songs.'
-                }
-            elif self.config['version'] == 3:
-                self.config['version'] = 4
-                self.config['translation'] = {
-                    'value': True,
-                    'default': True,
-                    'describe': 'Foreign language lyrics translation.'
-                }
-            elif self.config['version'] == 4:
-                self.config['version'] = 5
-                self.config['osdlyrics'] = {
-                    'value': False,
-                    'default': False,
-                    'describe': 'Desktop lyrics for musicbox.'
-                }
-                self.config['osdlyrics_color'] = {
-                    'value': [225, 248, 113],
-                    'default': [225, 248, 113],
-                    'describe': 'Desktop lyrics RGB Color.'
-                }
-                self.config['osdlyrics_font'] = {
-                    'value': ['Decorative', 16],
-                    'default': ['Decorative', 16],
-                    'describe': 'Desktop lyrics font-family and font-size.'
-                }
-                self.config['osdlyrics_background'] = {
-                    'value': 'rgba(100, 100, 100, 120)',
-                    'default': 'rgba(100, 100, 100, 120)',
-                    'describe': 'Desktop lyrics background color.'
-                }
-                self.config['osdlyrics_transparent'] = {
-                    'value': False,
-                    'default': False,
-                    'describe': 'Desktop lyrics transparent bg.'
-                }
-            elif self.config['version'] == 5:
-                self.config['version'] = 6
-                self.config['osdlyrics_on_top'] = {
-                    'value': True,
-                    'default': True,
-                    'describe': 'Desktop lyrics OnTopHint.'
-                }
-            elif self.config['version'] == 6:
-                self.config['version'] = 7
-                self.config['curses_transparency'] = {
-                    'value': False,
-                    'default': False,
-                    'describe': 'Set true to make curses transparency.'
-                }
-            elif self.config['version'] == 7:
-                self.config['version'] = 8
-                self.config['osdlyrics_size'] = {
-                    'value': [600, 60],
-                    'default': [600, 60],
-                    'describe': 'Desktop lyrics area size.'
-                }
-            self.check_version()
-            return False
+        with open(self.path, 'w') as f:
+            utf8_data_to_file(f, json.dumps(self.config, indent=2))
 
     def get(self, name):
         if name not in self.config.keys():
