@@ -33,30 +33,34 @@ ________     __________________________  _____ _     _
 + ------------------------------------------ +
 
 '''
+import os
+
 from setuptools import setup, find_packages
 
+here = os.path.abspath(os.path.dirname(__file__))
+about = {}  # type: dict
+
+with open(os.path.join(here, 'NEMbox', '__version__.py'), 'r') as f:
+    exec(f.read(), about)
+
 setup(
-    name='NetEase-MusicBox',
-    version='0.2.4.2',
+    name=about['__title__'],
+    version=about['__version__'],
+    author=about['__author__'],
+    author_email=about['__author_email__'],
+    url=about['__url__'],
+    description=about['__description__'],
+    license=about['__license__'],
     packages=find_packages(),
     install_requires=[
-        'requests',
-        'BeautifulSoup4',
-        'pycrypto',
+        'requests-cache',
+        'pycryptodomex',
         'future',
-        'lxml'
     ],
-
     entry_points={
         'console_scripts': [
-            'musicbox = NEMbox:start'
+            'musicbox = NEMbox.__main__:start'
         ],
     },
-
-    license='MIT',
-    author='omi',
-    author_email='4399.omi@gmail.com',
-    url='https://github.com/darknessomi/musicbox',
-    description='A sexy command line interface musicbox',
     keywords=['music', 'netease', 'cli', 'player'],
 )
