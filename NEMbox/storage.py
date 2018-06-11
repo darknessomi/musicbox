@@ -84,12 +84,12 @@ class Storage(Singleton):
         self.cookie_path = Constant.cookie_path
 
     def login(self, username, password, userid, nickname):
-        self.database.update(dict(
+        self.database['user'] = dict(
             username=username,
             password=password,
             user_id=userid,
             nickname=nickname
-        ))
+        )
 
     def logout(self):
         self.database['user'] = {
