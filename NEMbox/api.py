@@ -510,9 +510,19 @@ class NetEase(object):
             return []
         if dig_type == 'songs' or dig_type == 'fmsongs':
             urls = self.songs_url([s['id'] for s in data])
-            for s, u in zip(data, urls):
-                s['url'] = u['url']
-                s['br'] = u['br']
+            # api 返回的 urls 的 id 顺序和 data 的 id 顺序不一致
+            # 为了获取到对应 id 的 url，对返回的 urls 做一个 id2index 的缓存
+            # 同时保证 data 的 id 顺序不变
+            url_id_index = {}
+            for index, url in enumerate(urls):
+                url_id_index[url['id']] = index
+            for s in data:
+                url_index = url_id_index.get(s['id'])
+                if url_index is None:
+                    log.error("can't get song url, id: %s", s['id'])
+                    continue
+                s['url'] = urls[url_index]['url']
+                s['br'] = urls[url_index]['br']
             return Parse.songs(data)
         elif dig_type == 'artists':
             return Parse.artists(data)
