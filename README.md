@@ -97,7 +97,16 @@ NetEase-MusicBox
 
 #### Arch Linux
 
-    $ pacaur -S netease-musicbox-git # or $ yaourt musicbox
+如果希望从源内安装的话，需要将 [Arch Linux CN](https://github.com/archlinuxcn/repo/blob/master/README.md) 源添加到 `/etc/pacman.conf`并安装 `archlinuxcn-keyring`后更新安装。
+
+```
+$ pacman -Sy netease-musicbox  # 或者安装 netease-musicbox-git
+```
+也可以使用 AUR Helper 从 AUR 进行安装
+
+```
+$ yay netease-musicbox
+```
 
 ### 依赖
 
