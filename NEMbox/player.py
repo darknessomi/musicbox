@@ -221,7 +221,6 @@ class Player(object):
         self.popen_handler.stdin.flush()
 
         endless_loop_cnt = 0
-        log.debug(url)
         while True:
             if not self.popen_handler:
                 break
@@ -283,7 +282,7 @@ class Player(object):
         on_exit is a callable object, and args is a lists/tuple of args
         that would give to subprocess.Popen.
         '''
-
+        log.debug("%s,%s,%s" % (args['song_id'], args['song_name'], args['mp3_url']))
         if 'cache' in args.keys() and os.path.isfile(args['cache']):
             thread = threading.Thread(target=self.run_mpg123,
                                       args=(on_exit, args['cache']))
@@ -329,7 +328,7 @@ class Player(object):
     def new_player_list(self, type, title, datalist, offset):
         self.info['player_list_type'] = type
         self.info['player_list_title'] = title
-        self.info['idx'] = offset
+        # self.info['idx'] = offset
         self.info['player_list'] = []
         self.info['playing_order'] = []
         self.info['random_index'] = 0

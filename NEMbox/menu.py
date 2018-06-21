@@ -428,20 +428,20 @@ class Menu(object):
                 # If change to a new playing list. Add playing list and play.
                 if datatype == 'songs':
                     self.player.new_player_list('songs', self.title,
-                                                self.datalist, idx)
+                                                self.datalist, -1)
                     self.player.end_callback = None
                     self.player.play_or_pause(idx)
                     self.at_playing_list = True
                 elif datatype == 'djchannels':
                     self.player.new_player_list('djchannels', self.title,
-                                                self.datalist, idx)
+                                                self.datalist, -1)
                     self.player.end_callback = None
                     self.player.play_or_pause(idx)
                     self.at_playing_list = True
                 elif datatype == 'fmsongs':
                     self.player.change_mode(0)
                     self.player.new_player_list('fmsongs', self.title,
-                                                self.datalist, idx)
+                                                self.datalist, -1)
                     self.player.end_callback = self.fm_callback
                     self.player.play_or_pause(idx)
                     self.at_playing_list = True
