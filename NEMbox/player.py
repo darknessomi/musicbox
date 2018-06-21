@@ -221,6 +221,7 @@ class Player(object):
         self.popen_handler.stdin.flush()
 
         endless_loop_cnt = 0
+        log.debug(url)
         while True:
             if not self.popen_handler:
                 break
@@ -323,7 +324,7 @@ class Player(object):
         self.order.clear()
         self.order.extend(list(range(0, len(self.list))))
         random.shuffle(self.order)
-        self.info['ridx'] = 0
+        self.info['random_index'] = 0
 
     def new_player_list(self, type, title, datalist, offset):
         self.info['player_list_type'] = type
@@ -331,7 +332,7 @@ class Player(object):
         self.info['idx'] = offset
         self.info['player_list'] = []
         self.info['playing_order'] = []
-        self.info['ridx'] = 0
+        self.info['random_index'] = 0
         self.add_songs(datalist)
 
     def append_songs(self, datalist):
@@ -341,8 +342,8 @@ class Player(object):
         if self.is_empty:
             return
 
-        # if same playlists && idx --> same song :: pause/resume it
-        if self.info['idx'] == idx:
+        # if same "list index" and "playing index" --> same song :: pause/resume it
+        if self.index == idx:
             if not self.popen_handler:
                 self.replay()
             else:
@@ -350,27 +351,16 @@ class Player(object):
         else:
             self.info['idx'] = idx
             self.stop()
-            # start new play
             self.replay()
 
     def _swap_song(self):
-        plist = self.info['playing_order']
-        now_songs = plist.index(self.info['idx'])
-        plist[0], plist[now_songs] = plist[now_songs], plist[0]
-
-    def _inc_idx(self):
-        if self.info['idx'] < len(self.info['player_list']):
-            self.info['idx'] += 1
-
-    def _dec_idx(self):
-        if self.info['idx'] >= 0:
-            self.info['idx'] -= 1
+        now_songs = self.order.index(self.index)
+        self.order[0], self.order[now_songs] = self.order[now_songs], self.order[0]
 
     def _need_to_shuffle(self):
-        playing_list = self.info['playing_order']
-        ridx = self.info['ridx']
-        idx = self.info['idx']
-        if ridx >= len(playing_list) or playing_list[ridx] != idx:
+        playing_order = self.order
+        random_index = self.info['random_index']
+        if random_index >= len(playing_order) or playing_order[random_index] != self.index:
             return True
         else:
             return False
@@ -378,36 +368,40 @@ class Player(object):
     def next_idx(self):
         if not self.is_index_valid:
             return self.stop()
-        playlist_len = len(self.info['player_list'])
-        playinglist_len = len(self.info['playing_order'])
+        playlist_len = len(self.list)
 
-        # Playing mode. 0 is ordered. 1 is orderde loop.
-        # 2 is single song loop. 3 is single random. 4 is random loop
-        if self.info['playing_mode'] == 0:
-            self._inc_idx()
-        elif self.info['playing_mode'] == 1:
-            self.info['idx'] = (self.info['idx'] + 1) % playlist_len
-        elif self.info['playing_mode'] == 2:
+        if self.mode == Player.MODE_ORDERED:
+            # make sure self.index will not over
+            if self.info['idx'] < playlist_len:
+                self.info['idx'] += 1
+
+        elif self.mode == Player.MODE_ORDERED_LOOP:
+            self.info['idx'] = (self.index + 1) % playlist_len
+
+        elif self.mode == Player.MODE_SINGLE_LOOP:
             self.info['idx'] = self.info['idx']
-        elif self.info['playing_mode'] == 3 or self.info['playing_mode'] == 4:
+
+        else:
+            playing_order_len = len(self.order)
             if self._need_to_shuffle():
                 self.shuffle_order()
-                playinglist_len = len(self.info['playing_order'])
                 # When you regenerate playing list
                 # you should keep previous song same.
                 self._swap_song()
+                playing_order_len = len(self.order)
 
-            self.info['ridx'] += 1
+            self.info['random_index'] += 1
+
             # Out of border
-            if self.info['playing_mode'] == 4:
-                self.info['ridx'] %= playinglist_len
+            if self.mode == Player.MODE_RANDOM_LOOP:
+                self.info['random_index'] %= playing_order_len
 
-            if self.info['ridx'] >= playinglist_len:
+            # Random but not loop, out of border, stop playing.
+            if self.info['random_index'] >= playing_order_len:
                 self.info['idx'] = playlist_len
             else:
-                self.info['idx'] = self.info['playing_order'][self.info['ridx']]
-        else:
-            self.info['idx'] += 1
+                self.info['idx'] = self.order[self.info['random_index']]
+
         if self.playing_song_changed_callback is not None:
             self.playing_song_changed_callback()
 
@@ -420,29 +414,32 @@ class Player(object):
         if not self.is_index_valid:
             self.stop()
             return
-        playlist_len = len(self.info['player_list'])
-        playinglist_len = len(self.info['playing_order'])
-        # Playing mode. 0 is ordered. 1 is orderde loop.
-        # 2 is single song loop. 3 is single random. 4 is random loop
-        if self.info['playing_mode'] == 0:
-            self._dec_idx()
-        elif self.info['playing_mode'] == 1:
+        playlist_len = len(self.list)
+
+        if self.mode == Player.MODE_ORDERED:
+            if self.info['idx'] > 0:
+                self.info['idx'] -= 1
+
+        elif self.mode == Player.MODE_ORDERED_LOOP:
             self.info['idx'] = (self.info['idx'] - 1) % playlist_len
-        elif self.info['playing_mode'] == 2:
+
+        elif self.mode == Player.MODE_SINGLE_LOOP:
             self.info['idx'] = self.info['idx']
-        elif self.info['playing_mode'] == 3 or self.info['playing_mode'] == 4:
+
+        else:
+            playing_order_len = len(self.order)
             if self._need_to_shuffle():
                 self.shuffle_order()
-                playinglist_len = len(self.info['playing_order'])
-            self.info['ridx'] -= 1
-            if self.info['ridx'] < 0:
-                if self.info['playing_mode'] == 3:
-                    self.info['ridx'] = 0
+                playing_order_len = len(self.order)
+
+            self.info['random_index'] -= 1
+            if self.info['random_index'] < 0:
+                if self.mode == Player.MODE_RANDOM:
+                    self.info['random_index'] = 0
                 else:
-                    self.info['ridx'] %= playinglist_len
-            self.info['idx'] = self.info['playing_order'][self.info['ridx']]
-        else:
-            self.info['idx'] -= 1
+                    self.info['random_index'] %= playing_order_len
+            self.info['idx'] = self.order[self.info['random_index']]
+
         if self.playing_song_changed_callback is not None:
             self.playing_song_changed_callback()
 
@@ -453,9 +450,9 @@ class Player(object):
 
     def shuffle(self):
         self.stop()
-        self.info['playing_mode'] = 3
+        self.info['playing_mode'] = Player.MODE_RANDOM
         self.shuffle_order()
-        self.info['idx'] = self.info['playing_order'][self.info['ridx']]
+        self.info['idx'] = self.info['playing_order'][self.info['random_index']]
         self.replay()
 
     def volume_up(self):
