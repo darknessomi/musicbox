@@ -247,10 +247,10 @@ class Player(object):
                     log.warning('mpg123 error, halt, endless loop and high cpu use, then we kill it')
                     break
 
-        self.stop()
         if self.playing_flag:
-            self.next_idx()
-            self.replay()
+            self.next()
+        else:
+            self.stop()
 
     def download_lyric(self, is_transalted=False):
         key = 'lyric' if not is_transalted else 'tlyric'

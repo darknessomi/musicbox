@@ -79,30 +79,32 @@ class Cache(Singleton):
             full_path = os.path.join(output_path, output_file)
 
             new_url = NetEase().songs_url([song_id])[0]['url']
-            log.info('Old:{}. New:{}'.format(url, new_url))
-            try:
-                para = ['aria2c', '--auto-file-renaming=false',
-                        '--allow-overwrite=true', '-d', output_path, '-o',
-                        output_file, new_url]
-                para.extend(self.aria2c_parameters)
-                self.aria2c = subprocess.Popen(para,
-                                               stdin=subprocess.PIPE,
-                                               stdout=subprocess.PIPE,
-                                               stderr=subprocess.PIPE)
-                self.aria2c.wait()
-            except OSError as e:
-                log.warning('{}.\tAria2c is unavailable, fall back to wget'.format(e))
+            if new_url:
+                log.info('Old:{}. New:{}'.format(url, new_url))
+                try:
+                    para = ['aria2c', '--auto-file-renaming=false',
+                            '--allow-overwrite=true', '-d', output_path, '-o',
+                            output_file, new_url]
+                    para.extend(self.aria2c_parameters)
+                    log.debug(para)
+                    self.aria2c = subprocess.Popen(para,
+                                                   stdin=subprocess.PIPE,
+                                                   stdout=subprocess.PIPE,
+                                                   stderr=subprocess.PIPE)
+                    self.aria2c.wait()
+                except OSError as e:
+                    log.warning('{}.\tAria2c is unavailable, fall back to wget'.format(e))
 
-                para = ['wget', '-O', full_path, new_url]
-                self.wget = subprocess.Popen(para,
-                                             stdin=subprocess.PIPE,
-                                             stdout=subprocess.PIPE,
-                                             stderr=subprocess.PIPE)
-                self.wget.wait()
+                    para = ['wget', '-O', full_path, new_url]
+                    self.wget = subprocess.Popen(para,
+                                                 stdin=subprocess.PIPE,
+                                                 stdout=subprocess.PIPE,
+                                                 stderr=subprocess.PIPE)
+                    self.wget.wait()
 
-            if self._is_cache_successful():
-                log.debug(str(song_id) + ' Cache OK')
-                onExit(song_id, full_path)
+                if self._is_cache_successful():
+                    log.debug(str(song_id) + ' Cache OK')
+                    onExit(song_id, full_path)
         self.download_lock.release()
 
     def add(self, song_id, song_name, artist, url, onExit):
