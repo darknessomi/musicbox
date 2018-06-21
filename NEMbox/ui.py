@@ -51,6 +51,7 @@ class Ui(object):
         self.screen.timeout(100)  # the screen refresh every 100ms
         # charactor break buffer
         curses.cbreak()
+        curses.curs_set(False)
         self.screen.keypad(1)
 
         curses.start_color()
@@ -244,6 +245,7 @@ class Ui(object):
                    start):
         # keep playing info in line 1
         curses.noecho()
+        curses.curs_set(False)
         self.screen.move(7, 1)
         self.screen.clrtobot()
         self.addstr(7, self.startcol, title, curses.color_pair(1))
@@ -460,6 +462,7 @@ class Ui(object):
 
     def build_login_bar(self):
         curses.noecho()
+        curses.curs_set(True)
         self.screen.move(4, 1)
         self.screen.clrtobot()
         self.addstr(5, self.startcol, '请输入登录信息(支持手机登录)',
@@ -470,6 +473,7 @@ class Ui(object):
         self.screen.refresh()
 
     def build_login_error(self):
+        curses.curs_set(True)
         self.screen.move(4, 1)
         self.screen.timeout(-1)  # disable the screen timeout
         self.screen.clrtobot()
@@ -484,6 +488,7 @@ class Ui(object):
         return x
 
     def build_timing(self):
+        curses.curs_set(True)
         self.screen.move(6, 1)
         self.screen.clrtobot()
         self.screen.timeout(-1)
