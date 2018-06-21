@@ -110,3 +110,6 @@ venv3/
 
 setup.cfg
 nemcache.sqlite
+
+#Jetbrains
+.idea

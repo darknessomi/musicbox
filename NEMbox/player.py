@@ -18,7 +18,6 @@ import time
 import os
 import random
 
-
 from future.builtins import str
 
 from .ui import Ui
@@ -34,7 +33,6 @@ log = logger.getLogger(__name__)
 
 
 class Player(object):
-
     MODE_ORDERED = 0
     MODE_ORDERED_LOOP = 1
     MODE_SINGLE_LOOP = 2
@@ -323,7 +321,7 @@ class Player(object):
 
     def shuffle_order(self):
         self.order.clear()
-        self.order.extend(self.list)
+        self.order.extend(list(range(0, len(self.list))))
         random.shuffle(self.order)
         self.info['ridx'] = 0
 
