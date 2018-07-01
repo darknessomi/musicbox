@@ -320,7 +320,7 @@ class Player(object):
         self.start_playing(lambda: 0, self.current_song)
 
     def shuffle_order(self):
-        self.order.clear()
+        del self.order[:]
         self.order.extend(list(range(0, len(self.list))))
         random.shuffle(self.order)
         self.info['random_index'] = 0
