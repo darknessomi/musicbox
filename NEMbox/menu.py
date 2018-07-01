@@ -30,6 +30,8 @@ from .utils import notify
 from .storage import Storage
 from .cache import Cache
 from . import logger
+from .fifo import FIFO
+from .const import Constant
 
 
 locale.setlocale(locale.LC_ALL, '')
@@ -115,6 +117,7 @@ class Menu(object):
         self.countdown_start = time.time()
         self.countdown = -1
         self.is_in_countdown = False
+        self.fifo = FIFO(Constant.fifo_path)
 
     @property
     def user(self):
@@ -241,6 +244,7 @@ class Menu(object):
         self.player.prev()
 
     def start(self):
+        self.fifo.start()
         self.menu_starts = time.time()
         self.ui.build_menu(self.datatype, self.title, self.datalist,
                            self.offset, self.index, self.step, self.menu_starts)
@@ -259,6 +263,7 @@ class Menu(object):
             self.screen.timeout(500)
             key = self.screen.getch()
             self.ui.screen.refresh()
+            fifo = self.fifo.retrieve()
 
             # term resize
             if key == -1:
@@ -370,8 +375,14 @@ class Menu(object):
             elif key == ord(']'):
                 self.next_song()
 
+            elif fifo == "next":
+                self.next_song()
+
             # 播放上一曲
             elif key == ord('['):
+                self.previous_song()
+
+            elif fifo == "prev":
                 self.previous_song()
 
             # 增加音量
