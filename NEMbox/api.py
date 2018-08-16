@@ -18,7 +18,7 @@ import requests_cache
 
 from .config import Config
 from .storage import Storage
-from .encrypt import encrypted_request
+from .encrypt import encrypted_request, get_base_cookie
 from . import logger
 
 requests_cache.install_cache('nemcache', expire_after=3600)
@@ -247,6 +247,7 @@ class NetEase(object):
     def request(self, method, path, params={}, default={'code': -1}):
         endpoint = '{}{}'.format(BASE_URL, path)
         csrf_token = ''
+        requests.utils.add_dict_to_cookiejar(self.session.cookies, get_base_cookie())
         for cookie in self.session.cookies:
             if cookie.name == '__csrf':
                 csrf_token = cookie.value
