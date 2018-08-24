@@ -327,6 +327,7 @@ class Ui(object):
                     # 将详细显示作为一个区域，使用build_detail_bar绘制
                     self.build_detail_bar('-> {}. {}'.format(str(i), datalist[i]))
                 else:
+                    # 修复评论中含有换行符时，产生的错位问题
                     self.addstr(
                         i - offset + 9, self.startcol,
                         str(i) + '. ' + datalist[i].split('\n')[0][:maxlength])
