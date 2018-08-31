@@ -89,15 +89,20 @@ NetEase-MusicBox
 #### Fedora
 首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`（通过此方法安装可能仍然需要`pip install NetEase-MusicBox`更新到最新版）。
 
+
 #### Ubuntu/Debian
 
-	$ (sudo) pip install NetEase-MusicBox
+    $ (sudo) pip install NetEase-MusicBox
 
-	$ (sudo) apt-get install mpg123
+    $ (sudo) apt-get install mpg123
 
 #### Arch Linux
 
     $ pacaur -S netease-musicbox-git # or $ yaourt musicbox
+#### Centos/Red Hat
+    $ (sudo) pip(3) install NetEase-MusicBox
+    $ (sudo) wget http://mirror.centos.org/centos/7/os/x86_64/Packages/mpg123-1.25.6-1.el7.x86_64.rpm
+    $ (sudo) yum install mpg123-1.25.6-1.el7.x86_64.rpm
 
 ### 依赖
 
@@ -135,11 +140,13 @@ curl ip.cn
 
 
 ### 错误处理
+
 当某些歌曲不能播放时，总时长为 00:01 时，请检查是否为版权问题导致。
 
 如遇到在特定终端下不能播放问题，首先检查**此终端**下mpg123能否正常使用，其次检查**其他终端**下musicbox能否正常使用，报告issue的时候请告知以上使用情况以及出问题终端的报错信息。
 
 同时，您可以通过```tail -f ~/.netease-musicbox/musicbox.log```自行查看日志。
+mpg123 最新的版本可能会报找不到声音硬件的错误，测试了1.25.6版本可以正常使用。
 
 ### 已知问题及解决方案
 - [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。

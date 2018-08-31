@@ -85,8 +85,10 @@ class Ui(object):
         if len(args) == 1:
             self.screen.addstr(args[0])
         else:
-            self.screen.addstr(args[0], args[1], args[2].encode('utf-8'), *args[3:])
-
+            try:
+                self.screen.addstr(args[0], args[1], args[2].encode('utf-8'), *args[3:])
+            except Exception as e:
+                log.error(e)
     def build_playinfo(self,
                        song_name,
                        artist,
