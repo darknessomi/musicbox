@@ -307,6 +307,12 @@ class NetEase(object):
         )
         return self.request('POST', path, params).get('playlist', [])
 
+    # 每日推荐歌曲
+    def recommend_resource(self):
+        path = '/weapi/v1/discovery/recommend/songs'
+        params = {'offset':0, 'total':True, 'limit':20}
+        return self.request('POST', path, params).get('recommend', [])
+
     # 每日推荐歌单
     def recommend_resource(self):
         path = '/weapi/v1/discovery/recommend/resource'

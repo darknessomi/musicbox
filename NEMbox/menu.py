@@ -678,7 +678,10 @@ class Menu(object):
         # 全站置顶歌单包含的歌曲
         elif datatype == 'top_playlists':
             playlist_id = datalist[idx]['playlist_id']
-            songs = netease.playlist_detail(playlist_id)
+            if playlist_id == 0:
+                songs = netease.recommend_songs()
+            else:
+                songs = netease.playlist_detail(playlist_id)
             self.datatype = 'songs'
             self.datalist = netease.dig_info(songs, 'songs')
             self.title += ' > ' + datalist[idx]['playlist_name']
@@ -841,6 +844,10 @@ class Menu(object):
             self.datatype = 'top_playlists'
             self.title += ' > 每日推荐'
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
+            self.datalist = [{'playlist_id':0,
+                              'playlist_name':u'每日推荐歌曲',
+                              'creator_name':u'云音乐'}] + self.datalist
+
         elif idx == 7:
             self.datatype = 'fmsongs'
             self.title += ' > 私人FM'
