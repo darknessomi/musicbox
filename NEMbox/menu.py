@@ -591,9 +591,13 @@ class Menu(object):
                 cache_thread.start()
 
             elif key == ord('i'):
-                if self.player.playing_id != -1:
+                song_id = self.datalist[idx].get('song_id', -1)
+                if not song_id:
+                    song_id = self.player.playing_id
+
+                if song_id != -1:
                     webbrowser.open_new_tab(
-                        'http://music.163.com/song?id={}'.format(self.player.playing_id)
+                        'http://music.163.com/song?id={}'.format(song_id)
                     )
 
             self.ui.build_process_bar(
