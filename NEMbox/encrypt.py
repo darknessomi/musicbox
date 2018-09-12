@@ -8,6 +8,8 @@ import binascii
 import hashlib
 import json
 import os
+import random
+import time
 
 from Cryptodome.Cipher import AES
 from future.builtins import int, pow
@@ -63,3 +65,29 @@ def rsa(text, pubkey, modulus):
 
 def create_key(size):
     return binascii.hexlify(os.urandom(size))[:16]
+
+def random_string(pattern, length):
+    rand = ''
+    while len(rand) <= length:
+        rand = rand + random.choice(pattern)
+    return rand
+
+def create_jsessionid():
+    rand = random_string('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKMNOPQRSTUVWXYZ\\/+',176)
+    ts = int(time.time() * 1000)
+    return "%s:%d"% (rand, ts)
+
+def create_nuid():
+    return random_string('0123456789abcdefghijklmnopqrstuvwxyz',32)
+
+# https://github.com/Binaryify/NeteaseCloudMusicApi/../util/init.js
+def get_base_cookie():
+    nuid = create_nuid()
+    ts = int(time.time() * 1000)
+    nnid = "%s,%d"% (nuid, ts)
+    c={}
+    c['JSESSIONID-WYYY'] =  create_jsessionid()
+    c['_ntes_nuid'] =  nuid
+    c['_ntes_nnid'] = nnid
+    c['_iuqxldmzr_'] =  '32'
+    return c
