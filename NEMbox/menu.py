@@ -90,7 +90,7 @@ class Menu(object):
         self.title = '网易云音乐'
         self.datalist = [
             '排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单',
-            '主播电台', '每日推荐', '私人FM', '搜索', '帮助'
+            '主播电台', '每日推荐歌曲', '每日推荐歌单', '私人FM', '搜索', '帮助'
         ]
         self.offset = 0
         self.index = 0
@@ -837,19 +837,26 @@ class Menu(object):
             self.title += ' > 主播电台'
             self.datalist = self.api.djchannels()
         elif idx == 6:
-            myplaylist = self.request_api(self.api.recommend_resource)
-            self.datatype = 'top_playlists'
-            self.title += ' > 每日推荐'
+            self.datatype = 'songs'
+            self.title += ' > 每日推荐歌曲'
+            myplaylist = self.request_api(self.api.recommend_playlist)
+            if myplaylist == -1:
+                return
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
         elif idx == 7:
+            myplaylist = self.request_api(self.api.recommend_resource)
+            self.datatype = 'top_playlists'
+            self.title += ' > 每日推荐歌单'
+            self.datalist = self.api.dig_info(myplaylist, self.datatype)
+        elif idx == 8:
             self.datatype = 'fmsongs'
             self.title += ' > 私人FM'
             self.datalist = self.get_new_fm()
-        elif idx == 8:
+        elif idx == 9:
             self.datatype = 'search'
             self.title += ' > 搜索'
             self.datalist = ['歌曲', '艺术家', '专辑', '网易精选集']
-        elif idx == 9:
+        elif idx == 10:
             self.datatype = 'help'
             self.title += ' > 帮助'
             self.datalist = shortcut

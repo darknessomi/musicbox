@@ -12,3 +12,4 @@ class Constant(object):
     storage_path = os.path.join(conf_dir, 'database.json')
     cookie_path = os.path.join(conf_dir, 'cookie')
     log_path = os.path.join(conf_dir, 'musicbox.log')
+    cache_path = os.path.join(conf_dir, 'nemcache')

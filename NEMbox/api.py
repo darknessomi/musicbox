@@ -12,16 +12,19 @@ from __future__ import (
 import json
 from collections import OrderedDict
 from http.cookiejar import LWPCookieJar
+from http.cookiejar import Cookie
 
+import platform
 import requests
 import requests_cache
 
 from .config import Config
+from .const import Constant
 from .storage import Storage
 from .encrypt import encrypted_request
 from . import logger
 
-requests_cache.install_cache('nemcache', expire_after=3600)
+requests_cache.install_cache(Constant.cache_path, expire_after=3600)
 
 log = logger.getLogger(__name__)
 
@@ -244,7 +247,28 @@ class NetEase(object):
             )
         return resp
 
-    def request(self, method, path, params={}, default={'code': -1}):
+    # 生成Cookie对象
+    def make_cookie(self, name, value):
+        return Cookie(
+            version=0,
+            name=name,
+            value=value,
+            port=None,
+            port_specified=False,
+            domain="music.163.com",
+            domain_specified=True,
+            domain_initial_dot=False,
+            path="/",
+            path_specified=True,
+            secure=False,
+            expires=None,
+            discard=False,
+            comment=None,
+            comment_url=None,
+            rest=None
+        )
+
+    def request(self, method, path, params={}, default={'code': -1}, custom_cookies={}):
         endpoint = '{}{}'.format(BASE_URL, path)
         csrf_token = ''
         for cookie in self.session.cookies:
@@ -253,6 +277,10 @@ class NetEase(object):
                 break
         params.update({'csrf_token': csrf_token})
         data = default
+        
+        for key, value in custom_cookies.items():
+            cookie = self.make_cookie(key, value)
+            self.session.cookies.set_cookie(cookie)
 
         params = encrypted_request(params)
         try:
@@ -310,6 +338,17 @@ class NetEase(object):
     def recommend_resource(self):
         path = '/weapi/v1/discovery/recommend/resource'
         return self.request('POST', path).get('recommend', [])
+
+    # 每日推荐歌曲
+    def recommend_playlist(self, total=True, offset=0, limit=20):
+        path = '/weapi/v1/discovery/recommend/songs'  # NOQA
+        params = dict(
+            total=total,
+            offset=offset,
+            limit=limit,
+            csrf_token=''
+        )
+        return self.request('POST', path, params).get('recommend', []);
 
     # 私人FM
     def personal_fm(self):
@@ -386,7 +425,11 @@ class NetEase(object):
             n=1000,
             offest=0
         )
-        return self.request('POST', path, params).get('playlist', {}).get('tracks', [])
+        # cookie添加os字段
+        custom_cookies = dict(
+            os=platform.system()
+        )
+        return self.request('POST', path, params, {'code': -1}, custom_cookies).get('playlist', {}).get('tracks', [])
 
     # 热门歌手 http://music.163.com/#/discover/artist/
     def top_artists(self, offset=0, limit=100):
