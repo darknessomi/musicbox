@@ -15,6 +15,7 @@ from http.cookiejar import LWPCookieJar
 from http.cookiejar import Cookie
 
 import platform
+import time
 import requests
 import requests_cache
 
@@ -160,7 +161,9 @@ class Parse(object):
                 'album_name': album_name,
                 'album_id': album_id,
                 'mp3_url': url,
-                'quality': quality
+                'quality': quality,
+                'expires': song['expires'],
+                'get_time': song['get_time']
             }
             song_info_list.append(song_info)
         return song_info_list
@@ -565,6 +568,7 @@ class NetEase(object):
             return []
         if dig_type == 'songs' or dig_type == 'fmsongs':
             urls = self.songs_url([s['id'] for s in data])
+            timestamp = time.time()
             # api 返回的 urls 的 id 顺序和 data 的 id 顺序不一致
             # 为了获取到对应 id 的 url，对返回的 urls 做一个 id2index 的缓存
             # 同时保证 data 的 id 顺序不变
@@ -578,7 +582,24 @@ class NetEase(object):
                     continue
                 s['url'] = urls[url_index]['url']
                 s['br'] = urls[url_index]['br']
+                s['expires'] = urls[url_index]['expi']
+                s['get_time'] = timestamp
             return Parse.songs(data)
+
+        elif dig_type == 'refresh_urls':
+            urls_info = self.songs_url(data)
+            timestamp = time.time()
+
+            songs = []
+            for url_info in urls_info:
+                song = {}
+                song['song_id'] = url_info['id']
+                song['mp3_url'] = url_info['url']
+                song['expires'] = url_info['expi']
+                song['get_time'] = timestamp
+                songs.append(song)
+            return songs
+
         elif dig_type == 'artists':
             return Parse.artists(data)
 
