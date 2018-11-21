@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-07-15 15:48:27
-# @Last Modified by:   omi
-# @Last Modified time: 2015-01-30 18:05:08
+# @Last Modified by:   AlanAlbert
+# @Last Modified time: 2018-11-21 14:00:00
 '''
 网易云音乐 Player
 '''
@@ -45,6 +45,7 @@ class Player(object):
         self.popen_handler = None
         # flag stop, prevent thread start
         self.playing_flag = False
+        self.refrese_url_flag = False
         self.process_length = 0
         self.process_location = 0
         self.storage = Storage()
@@ -169,6 +170,19 @@ class Player(object):
             else:
                 self.songs[song_id] = song
 
+    def refresh_urls(self):
+        songs = self.api.dig_info(self.list, 'refresh_urls')
+        if songs:
+            for song in songs:
+                song_id = str(song['song_id'])
+                if song_id in self.songs:
+                    self.songs[song_id]['mp3_url'] = song['mp3_url']
+                    self.songs[song_id]['expires'] = song['expires']
+                    self.songs[song_id]['get_time'] = song['get_time']
+                else:
+                    self.songs[song_id] = song
+            self.refrese_url_flag = True
+
     def stop(self):
         if not self.popen_handler:
             return
@@ -207,7 +221,7 @@ class Player(object):
 
         self.build_playinfo()
 
-    def run_mpg123(self, on_exit, url):
+    def run_mpg123(self, on_exit, url, expires=-1, get_time=-1):
         para = ['mpg123', '-R'] + self.config_mpg123
         self.popen_handler = subprocess.Popen(
             para,
@@ -232,9 +246,13 @@ class Player(object):
                 self.process_location = int(float(out[3]))
                 self.process_length = int(float(out[3]) + float(out[4]))
             elif strout[:2] == '@E':
-                # error, stop song and move to next
                 self.playing_flag = True
-                self.notify_copyright_issue()
+                if expires >= 0 and get_time >= 0 and time.time() - expires - get_time >= 0:
+                    # 刷新URL
+                    self.refresh_urls()
+                else:
+                    # error, stop song and move to next
+                    self.notify_copyright_issue()
                 break
             elif strout == '@P 0':
                 # end, moving to next
@@ -248,7 +266,12 @@ class Player(object):
                     break
 
         if self.playing_flag:
-            self.next()
+            if self.refrese_url_flag:
+                self.stop()
+                self.replay()
+                self.refrese_url_flag = False
+            else:
+                self.next()
         else:
             self.stop()
 
@@ -282,13 +305,13 @@ class Player(object):
         on_exit is a callable object, and args is a lists/tuple of args
         that would give to subprocess.Popen.
         '''
-        log.debug("%s,%s,%s" % (args['song_id'], args['song_name'], args['mp3_url']))
+        # log.debug("%s,%s,%s" % (args['song_id'], args['song_name'], args['mp3_url']))
         if 'cache' in args.keys() and os.path.isfile(args['cache']):
             thread = threading.Thread(target=self.run_mpg123,
                                       args=(on_exit, args['cache']))
         else:
             thread = threading.Thread(target=self.run_mpg123,
-                                      args=(on_exit, args['mp3_url']))
+                                      args=(on_exit, args['mp3_url'], args['expires'], args['get_time']))
             cache_thread = threading.Thread(
                 target=self.download_song,
                 args=(args['song_id'], args['song_name'], args['artist'], args['mp3_url'])
@@ -337,12 +360,14 @@ class Player(object):
     def append_songs(self, datalist):
         self.add_songs(datalist)
 
-    def play_or_pause(self, idx):
+    # switch_flag为true表示：
+    # 在播放列表中 || 当前所在列表类型不在"songs"、"djchannels"、"fmsongs"中
+    def play_or_pause(self, idx, switch_flag):
         if self.is_empty:
             return
 
         # if same "list index" and "playing index" --> same song :: pause/resume it
-        if self.index == idx:
+        if self.index == idx and switch_flag:
             if not self.popen_handler:
                 self.replay()
             else:
