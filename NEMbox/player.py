@@ -3,7 +3,7 @@
 # @Author: omi
 # @Date:   2014-07-15 15:48:27
 # @Last Modified by:   AlanAlbert
-# @Last Modified time: 2018-11-21 11:56:26
+# @Last Modified time: 2018-11-21 14:00:00
 '''
 网易云音乐 Player
 '''
@@ -360,12 +360,14 @@ class Player(object):
     def append_songs(self, datalist):
         self.add_songs(datalist)
 
-    def play_or_pause(self, idx):
+    # switch_flag为true表示：
+    # 在播放列表中 || 当前所在列表类型不在"songs"、"djchannels"、"fmsongs"中
+    def play_or_pause(self, idx, switch_flag):
         if self.is_empty:
             return
 
         # if same "list index" and "playing index" --> same song :: pause/resume it
-        if self.index == idx:
+        if self.index == idx and switch_flag:
             if not self.popen_handler:
                 self.replay()
             else:
