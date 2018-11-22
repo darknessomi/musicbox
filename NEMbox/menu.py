@@ -430,23 +430,25 @@ class Menu(object):
                     self.player.new_player_list('songs', self.title,
                                                 self.datalist, -1)
                     self.player.end_callback = None
-                    self.player.play_or_pause(idx)
+                    self.player.play_or_pause(idx, self.at_playing_list)
                     self.at_playing_list = True
                 elif datatype == 'djchannels':
                     self.player.new_player_list('djchannels', self.title,
                                                 self.datalist, -1)
                     self.player.end_callback = None
-                    self.player.play_or_pause(idx)
+                    self.player.play_or_pause(idx, self.at_playing_list)
                     self.at_playing_list = True
                 elif datatype == 'fmsongs':
                     self.player.change_mode(0)
                     self.player.new_player_list('fmsongs', self.title,
                                                 self.datalist, -1)
                     self.player.end_callback = self.fm_callback
-                    self.player.play_or_pause(idx)
+                    self.player.play_or_pause(idx, self.at_playing_list)
                     self.at_playing_list = True
                 else:
-                    self.player.play_or_pause(self.player.info['idx'])
+                    # 所在列表类型不是歌曲
+                    isNotSongs = True
+                    self.player.play_or_pause(self.player.info['idx'], isNotSongs)
 
             # 加载当前播放列表
             elif key == ord('p'):
@@ -766,7 +768,7 @@ class Menu(object):
             self.show_playing_song()
 
     def fm_callback(self):
-        log.debug('FM CallBack.')
+        # log.debug('FM CallBack.')
         data = self.get_new_fm()
         self.player.append_songs(data)
         if self.datatype == 'fmsongs':
@@ -780,7 +782,8 @@ class Menu(object):
             self.index = self.player.info['idx']
             self.offset = self.index // self.step * self.step
             if not self.player.playing_flag:
-                self.player.play_or_pause(self.index)
+                switch_flag = False
+                self.player.play_or_pause(self.index, switch_flag)
 
     def request_api(self, func, *args):
         result = func(*args)
