@@ -159,10 +159,7 @@ class Menu(object):
         self.ui.screen.timeout(-1)
         SearchArg = namedtuple('SearchArg', ['prompt', 'api_type', 'post_process'])
         category_map = {
-            'songs': SearchArg(
-                '搜索歌曲：', 1,
-                lambda datalist: self.api.songs_url([s['id'] for s in datalist])
-            ),
+            'songs': SearchArg('搜索歌曲：', 1, lambda datalist: datalist),
             'albums': SearchArg('搜索专辑：', 10, lambda datalist: datalist),
             'artists': SearchArg('搜索艺术家：', 100, lambda datalist: datalist),
             'playlists': SearchArg('搜索网易精选集：', 1000, lambda datalist: datalist)
