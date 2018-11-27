@@ -668,14 +668,14 @@ class Menu(object):
             self.title += ' > ' + datalist[idx]['albums_name']
 
         # 精选歌单选项
-        elif datatype == 'playlists':
+        elif datatype == 'recommend_lists':
             data = self.datalist[idx]
             self.datatype = data['datatype']
             self.datalist = netease.dig_info(data['callback'](), self.datatype)
             self.title += ' > ' + data['title']
 
         # 全站置顶歌单包含的歌曲
-        elif datatype == 'top_playlists':
+        elif datatype in ['top_playlists', 'playlists']:
             playlist_id = datalist[idx]['playlist_id']
             songs = netease.playlist_detail(playlist_id)
             self.datatype = 'songs'
@@ -826,7 +826,7 @@ class Menu(object):
                 'callback': lambda: []
             }]
             self.title += ' > 精选歌单'
-            self.datatype = 'playlists'
+            self.datatype = 'recommend_lists'
         elif idx == 4:
             myplaylist = self.request_api(self.api.user_playlist, self.userid)
             self.datatype = 'top_playlists'

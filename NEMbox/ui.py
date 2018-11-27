@@ -362,7 +362,7 @@ class Ui(object):
                         self.space + datalist[i][
                             'artists_name'])
 
-        elif datatype == 'playlists':
+        elif datatype == 'recommend_lists':
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
                     self.addstr(
@@ -374,7 +374,7 @@ class Ui(object):
                         i - offset + 9, self.startcol,
                         str(i) + '. ' + datalist[i]['title'])
 
-        elif datatype == 'top_playlists':
+        elif datatype in ('top_playlists', 'playlists'):
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
                     self.addstr(
