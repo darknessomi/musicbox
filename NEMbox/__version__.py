@@ -9,7 +9,7 @@ ________     __________________________  _____ _     _
 
 '''
 __title__ = 'NetEase-MusicBox'
-__version__ = '0.2.5.3'
+__version__ = '0.2.5.4'
 __description__ = 'A sexy command line interface musicbox'
 __url__ = 'https://github.com/darknessomi/musicbox'
 __author__ = 'omi'
