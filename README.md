@@ -11,7 +11,7 @@ NetEase-MusicBox
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
 [![platform](https://img.shields.io/badge/python-3.5-green.svg)]()
 
-[![NetEase-MusicBox](http://7j1yv3.com1.z0.glb.clouddn.com/preview.gif)](https://pypi.org/project/NetEase-MusicBox/)
+[![NetEase-MusicBox](https://qfile.aobeef.cn/3abba3b8a3994ee3d5cd.gif)](https://pypi.org/project/NetEase-MusicBox/)
 
 ### 功能特性
 
@@ -160,6 +160,8 @@ mpg123 最新的版本可能会报找不到声音硬件的错误，测试了1.25
 Enjoy it !
 
 ### 更新日志
+
+2018-11-28 版本 0.2.5.4    修复多处错误
 
 2018-06-21 版本 0.2.5.3    修复多处播放错误
 
