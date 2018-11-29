@@ -33,15 +33,22 @@ except ImportError:
     log.warn('Qt dbus module is not installed.')
     log.warn('Osdlyrics is not available.')
 
-
 def break_str(s, start, max_len=80):
+    l = break_str_list(s, max_len)
+    return break_str_list2str(l, start)
+
+def break_str_list(s, max_len=80):
     length = len(s)
     i, x = 0, max_len
     res = []
     while i < length:
-        res.append(s[i:i + max_len])
+        # changed: 避免评论中有换行符时出现的错位
+        res.extend(s[i:i + max_len].split('\n'))
         i += x
-    return '\n{}'.format(' ' * start).join(res)
+    return res
+
+def break_str_list2str(l, start):
+    return '\n{}'.format(' ' * start).join(l)
 
 
 class Ui(object):
@@ -309,17 +316,23 @@ class Ui(object):
         elif datatype == 'comments':
             # 被选中的评论在最下方显示全部字符，其余评论仅显示一行
             for i in range(offset, min(len(datalist), offset + step)):
-                maxlength = min(int(1.8 * self.startcol), len(datalist[i]))
+                maxlength = int(1.8 * self.startcol)
                 if i == index:
-                    self.addstr(
-                        20, self.indented_startcol,
-                        '-> ' + str(i) + '. ' +
-                        break_str(datalist[i], self.indented_startcol, maxlength),
-                        curses.color_pair(2))
-                else:
+                    # 显示光标下的评论
                     self.addstr(
                         i - offset + 9, self.startcol,
-                        str(i) + '. ' + datalist[i][:maxlength])
+                        str(i) + '. ' + datalist[i].split('\n')[0][:maxlength],
+                        curses.color_pair(2)
+                        )
+
+                    # 修复评论溢出底部崩溃Bug
+                    # 将详细显示作为一个区域，使用build_detail_bar绘制
+                    self.build_detail_bar('-> {}. {}'.format(str(i), datalist[i]))
+                else:
+                    # 修复评论中含有换行符时，产生的错位问题
+                    self.addstr(
+                        i - offset + 9, self.startcol,
+                        str(i) + '. ' + datalist[i].split('\n')[0][:maxlength])
 
         elif datatype == 'artists':
             for i in range(offset, min(len(datalist), offset + step)):
@@ -498,6 +511,16 @@ class Ui(object):
         timing_time = self.screen.getstr(8, self.startcol + 19, 60)
         self.screen.timeout(100)  # restore the screen timeout
         return timing_time
+
+    def build_detail_bar(self, detail_str):
+        # 将详细显示作为一个区域，使用build_detail_bar绘制
+        maxlength = int(1.8 * self.startcol)
+        term_col = terminalsize.get_terminal_size()[1]
+        comment_detail_list = break_str_list(detail_str, maxlength)[:term_col - 20]
+        self.addstr(
+            20, self.indented_startcol,
+            break_str_list2str(comment_detail_list, self.indented_startcol),
+            curses.color_pair(2))
 
     def get_account(self):
         self.screen.timeout(-1)  # disable the screen timeout
