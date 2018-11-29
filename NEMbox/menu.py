@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
+
 '''
 网易云音乐 Menu
 '''
@@ -304,7 +305,7 @@ class Menu(object):
 
             # 数字快捷键
             elif ord('0') <= key <= ord('9'):
-                idx = key - ord('0')
+                idx = self.index + key - ord('0')
                 self.ui.build_menu(self.datatype, self.title, self.datalist,
                                    self.offset, idx, self.step, self.menu_starts)
                 self.ui.build_loading()
