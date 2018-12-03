@@ -67,10 +67,10 @@ if pyqt_activity:
                 QApplication.desktop().cursor().pos())
             bl = QApplication.desktop().screenGeometry(scn).bottomLeft()
             br = QApplication.desktop().screenGeometry(scn).bottomRight()
-            bc = (bl + br) / 2
+            # bc = (bl + br) / 2
             frameGeo = self.frameGeometry()
-            frameGeo.moveCenter(bc)
-            frameGeo.moveBottom(bc.y())
+            frameGeo.moveRight(br.x()-18)
+            frameGeo.moveBottom(br.y()-25)
             self.move(frameGeo.topLeft())
             self.text = "OSD Lyrics for Musicbox"
             self.setWindowTitle("Lyrics")
@@ -102,7 +102,8 @@ if pyqt_activity:
                                osdlyrics_color[2])
             qp.setFont(font)
             qp.setPen(pen)
-            qp.drawText(event.rect(), QtCore.Qt.AlignCenter |
+            qp.drawText(event.rect(), QtCore.Qt.AlignRight |
+                        QtCore.Qt.AlignBottom |
                         QtCore.Qt.TextWordWrap, self.text)
 
     class LyricsAdapter(QtDBus.QDBusAbstractAdaptor):
