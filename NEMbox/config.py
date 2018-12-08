@@ -20,7 +20,7 @@ class Config(Singleton):
 
         self.path = Constant.config_path
         self.default_config = {
-            'version': 8,
+            'version': 9,
             'cache': {
                 'value': False,
                 'default': False,
@@ -112,6 +112,11 @@ class Config(Singleton):
                 'value': False,
                 'default': False,
                 'describe': 'Set true to make curses transparency.'
+            },
+            'mouse_transparent': {
+                'value': False,
+                'default': False,
+                'describe': 'Set true to make mouse input event transparency.'
             }
         }
         self.config = {}

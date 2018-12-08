@@ -55,11 +55,15 @@ if pyqt_activity:
             self.setAttribute(QtCore.Qt.WA_X11DoNotAcceptFocus)
             self.setFocusPolicy(QtCore.Qt.NoFocus)
             if config.get("osdlyrics_on_top"):
-                self.setWindowFlags(QtCore.Qt.FramelessWindowHint |
-                                    QtCore.Qt.WindowStaysOnTopHint |
-                                    QtCore.Qt.X11BypassWindowManagerHint)
+                flags = (QtCore.Qt.FramelessWindowHint |
+                         QtCore.Qt.WindowStaysOnTopHint |
+                         QtCore.Qt.X11BypassWindowManagerHint|
+                         QtCore.Qt.WindowTransparentForInput)
             else:
-                self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+                flags = QtCore.Qt.FramelessWindowHint
+            if config.get("mouse_transparent"):
+                flags = flags | QtCore.Qt.WindowTransparentForInput
+            self.setWindowFlags(flags)
             self.setMinimumSize(600, 50)
             osdlyrics_size = config.get("osdlyrics_size")
             self.resize(osdlyrics_size[0], osdlyrics_size[1])
