@@ -1,29 +1,27 @@
-NetEase-MusicBox
-=================
+# NetEase-MusicBox
 
-
-#### 感谢为 MusicBox 的开发付出过努力的[每一个人](https://github.com/darknessomi/musicbox/graphs/contributors)！
+**感谢为 MusicBox 的开发付出过努力的[每一个人](https://github.com/darknessomi/musicbox/graphs/contributors)！**
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
-[![platform](https://img.shields.io/badge/python-2.7-green.svg)]()
-[![platform](https://img.shields.io/badge/python-3.5-green.svg)]()
+[![platform](https://img.shields.io/badge/python-2.7-green.svg)](<>)
+[![platform](https://img.shields.io/badge/python-3.5-green.svg)](<>)
 
 [![NetEase-MusicBox](https://qfile.aobeef.cn/3abba3b8a3994ee3d5cd.gif)](https://pypi.org/project/NetEase-MusicBox/)
 
 ### 功能特性
 
-1. 320kbps的高品质音乐
-2. 歌曲，艺术家，专辑检索
-3. 网易22个歌曲排行榜
-4. 网易新碟推荐
-5. 网易精选歌单
-6. 网易主播电台
-7. 私人歌单，每日推荐
-8. 随心打碟
-9. 本地收藏，随时加❤
+1.  320kbps的高品质音乐
+2.  歌曲，艺术家，专辑检索
+3.  网易22个歌曲排行榜
+4.  网易新碟推荐
+5.  网易精选歌单
+6.  网易主播电台
+7.  私人歌单，每日推荐
+8.  随心打碟
+9.  本地收藏，随时加❤
 10. 播放进度及播放模式显示
 11. 现在播放及桌面歌词显示
 12. 歌曲评论显示
@@ -72,23 +70,25 @@ NetEase-MusicBox
 	<tr> <td>W</td> <td>Quit&Clear</td> <td>退出并清除用户信息</td> </tr>
 </table>
 
-
 ### PyPi安装（推荐）
-	$ pip(3) install NetEase-MusicBox
+
+    $ pip(3) install NetEase-MusicBox
 
 ### Git clone最新版
-	$ git clone https://github.com/darknessomi/musicbox.git && cd musicbox
-	$ python(3) setup.py install
+
+    $ git clone https://github.com/darknessomi/musicbox.git && cd musicbox
+    $ python(3) setup.py install
 
 ### macOS安装
-	$ pip(3) install NetEase-MusicBox
-	$ brew install mpg123
+
+    $ pip(3) install NetEase-MusicBox
+    $ brew install mpg123
 
 ### Linux安装
 
 #### Fedora
-首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`（通过此方法安装可能仍然需要`pip install NetEase-MusicBox`更新到最新版）。
 
+首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`（通过此方法安装可能仍然需要`pip install NetEase-MusicBox`更新到最新版）。
 
 #### Ubuntu/Debian
 
@@ -99,7 +99,9 @@ NetEase-MusicBox
 #### Arch Linux
 
     $ pacaur -S netease-musicbox-git # or $ yaourt musicbox
+
 #### Centos/Red Hat
+
     $ (sudo) pip(3) install NetEase-MusicBox
     $ (sudo) wget http://mirror.centos.org/centos/7/os/x86_64/Packages/mpg123-1.25.6-1.el7.x86_64.rpm
     $ (sudo) yum install mpg123-1.25.6-1.el7.x86_64.rpm
@@ -107,16 +109,18 @@ NetEase-MusicBox
 ### 依赖
 
 #### 必选
-1. `mpg123` 用于播放歌曲
+
+1.  `mpg123` 用于播放歌曲
 
 #### 可选
 
-1. ``` aria2 ``` 用于缓存歌曲
-2. ``` libnotify-bin ``` 用于支持消息提示（Linux平台）
-4. ``` pyqt python-dbus dbus qt ``` 用于支持桌面歌词 (Mac 用户需要 ```brew install qt --with-dbus``` 获取支持 DBus 的 Qt)
+1.  `aria2` 用于缓存歌曲
+2.  `libnotify-bin` 用于支持消息提示（Linux平台）
+3.  `pyqt python-dbus dbus qt` 用于支持桌面歌词 (Mac 用户需要 `brew install qt --with-dbus` 获取支持 DBus 的 Qt)
 
 ### 配置文件
-配置文件地址: ``` ~/.netease-musicbox/config.json ```
+
+配置文件地址: `~/.netease-musicbox/config.json`
 可配置缓存，快捷键，消息，桌面歌词。
 由于歌曲 API 只接受中国大陆地区访问，港澳台及海外用户请自行设置代理：
 
@@ -124,6 +128,7 @@ NetEase-MusicBox
 export http_proxy=http://ip:port
 curl ip.cn
 ```
+
 显示IP属于中国大陆地区即可。
 
 ### 已测试的系统兼容列表
@@ -138,24 +143,24 @@ curl ip.cn
 	<tr> <td>Arch</td> <td>Rolling</td> </tr>
 </table>
 
-
 ### 错误处理
 
 当某些歌曲不能播放时，总时长为 00:01 时，请检查是否为版权问题导致。
 
 如遇到在特定终端下不能播放问题，首先检查**此终端**下mpg123能否正常使用，其次检查**其他终端**下musicbox能否正常使用，报告issue的时候请告知以上使用情况以及出问题终端的报错信息。
 
-同时，您可以通过```tail -f ~/.netease-musicbox/musicbox.log```自行查看日志。
+同时，您可以通过`tail -f ~/.netease-musicbox/musicbox.log`自行查看日志。
 mpg123 最新的版本可能会报找不到声音硬件的错误，测试了1.25.6版本可以正常使用。
 
 ### 已知问题及解决方案
-- [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。
-- [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
-- [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
+
+-   [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。
+-   [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
+-   [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
 
 ### 使用
 
-	$ musicbox
+    $ musicbox
 
 Enjoy it !
 
@@ -207,7 +212,7 @@ Enjoy it !
 
 ### The MIT License (MIT)
 
-CopyRight (c) 2015 omi  &lt;<a href="4399.omi@gmail.com">4399.omi@gmail.com</a>&gt;
+CopyRight (c) 2015 omi  &lt;<a href="4399.omi@gmail.com">4399.omi@gmail.com</a>>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

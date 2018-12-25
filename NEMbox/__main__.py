@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
 网易云音乐 Entry
-'''
-from __future__ import (
-    print_function, unicode_literals, division, absolute_import
-)
+"""
+from __future__ import print_function, unicode_literals, division, absolute_import
 import curses
 import traceback
 import argparse
@@ -19,17 +17,16 @@ from .__version__ import __version__ as version
 
 def start():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v",
-                        "--version",
-                        help="show this version and exit",
-                        action="store_true")
+    parser.add_argument(
+        "-v", "--version", help="show this version and exit", action="store_true"
+    )
     args = parser.parse_args()
     if args.version:
         latest = Menu().check_version()
         curses.endwin()
-        print('NetEase-MusicBox installed version:' + version)
+        print("NetEase-MusicBox installed version:" + version)
         if latest != version:
-            print('NetEase-MusicBox latest version:' + str(latest))
+            print("NetEase-MusicBox latest version:" + str(latest))
         sys.exit()
 
     nembox_menu = Menu()
@@ -43,5 +40,5 @@ def start():
         traceback.print_exc()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     start()
