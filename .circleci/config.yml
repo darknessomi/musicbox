@@ -1,0 +1,58 @@
+version: 2
+jobs:
+  test-3.7:
+    docker:
+      - image: circleci/python:3.7
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "requirements.txt" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run:
+          name: Install dependencies
+          command: |
+            ./create_venv.sh
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: Run tests
+          command: |
+            . venv/bin/activate
+            python -m unittest discover .
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
+  test-3.6:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.6
+  test-3.5:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.5
+  test-2.7:
+    <<: *test-template
+    docker:
+      - image: circleci/python:2.7
+
+workflows:
+  version: 2
+  test-all-supported-python-versions:
+    jobs:
+      - test-3.7
+      - test-3.6
+      - test-3.5
+      - test-2.7

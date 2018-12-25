@@ -5,7 +5,7 @@
 # @Last Modified by:   omi
 # @Last Modified time: 2015-03-30 23:36:21
 
-'''
+"""
 __   ___________________________________________
 | \  ||______   |   |______|_____||______|______
 |  \_||______   |   |______|     |______||______
@@ -32,7 +32,7 @@ ________     __________________________  _____ _     _
 |                                            |
 + ------------------------------------------ +
 
-'''
+"""
 import os
 
 from setuptools import setup, find_packages
@@ -40,27 +40,19 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 about = {}  # type: dict
 
-with open(os.path.join(here, 'NEMbox', '__version__.py'), 'r') as f:
+with open(os.path.join(here, "NEMbox", "__version__.py"), "r") as f:
     exec(f.read(), about)
 
 setup(
-    name=about['__title__'],
-    version=about['__version__'],
-    author=about['__author__'],
-    author_email=about['__author_email__'],
-    url=about['__url__'],
-    description=about['__description__'],
-    license=about['__license__'],
+    name=about["__title__"],
+    version=about["__version__"],
+    author=about["__author__"],
+    author_email=about["__author_email__"],
+    url=about["__url__"],
+    description=about["__description__"],
+    license=about["__license__"],
     packages=find_packages(),
-    install_requires=[
-        'requests-cache',
-        'pycryptodomex',
-        'future',
-    ],
-    entry_points={
-        'console_scripts': [
-            'musicbox = NEMbox.__main__:start'
-        ],
-    },
-    keywords=['music', 'netease', 'cli', 'player'],
+    install_requires=["requests-cache", "pycryptodomex", "future"],
+    entry_points={"console_scripts": ["musicbox = NEMbox.__main__:start"]},
+    keywords=["music", "netease", "cli", "player"],
 )
