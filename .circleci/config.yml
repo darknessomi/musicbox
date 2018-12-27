@@ -36,15 +36,15 @@ jobs:
           path: test-reports
           destination: test-reports
   test-3.6:
-    <<: *test-template
+    <<: *test-3.7
     docker:
       - image: circleci/python:3.6
   test-3.5:
-    <<: *test-template
+    <<: *test-3.7
     docker:
       - image: circleci/python:3.5
   test-2.7:
-    <<: *test-template
+    <<: *test-3.7
     docker:
       - image: circleci/python:2.7
 
