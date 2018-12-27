@@ -1,4 +1,5 @@
 version: 2
+
 jobs:
   test-3.7: &test-template
     docker:
@@ -19,7 +20,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            ./create_venv.sh
+            python3 -m venv venv
+            venv/bin/pip install -U pip
+            venv/bin/pip install -r requirements.txt
 
       - save_cache:
           paths:
@@ -30,29 +33,67 @@ jobs:
           name: Run tests
           command: |
             . venv/bin/activate
-            python -m unittest discover .
+            pip install codecov codacy-coverage
+            coverage run -m doctest -v ecies/utils.py
+            coverage run -m unittest discover .
+            codecov
+            python-codacy-coverage -r coverage.xml
 
-      - store_artifacts:
-          path: test-reports
-          destination: test-reports
   test-3.6:
     <<: *test-template
     docker:
       - image: circleci/python:3.6
+
   test-3.5:
     <<: *test-template
     docker:
       - image: circleci/python:3.5
+
   test-2.7:
     <<: *test-template
     docker:
       - image: circleci/python:2.7
 
+
+  deploy:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+
+      - run:
+          name: Setup env
+          command: |
+            python3 -m venv venv
+            venv/bin/pip install -U pip twine wheel
+            venv/bin/pip install -r requirements.txt
+
+      - run:
+          name: Upload to pypi
+          command: |
+            . venv/bin/activate
+            python setup.py verify
+            python setup.py sdist bdist_wheel
+            twine upload dist/* --repository-url https://test.pypi.org/legacy/
+            twine upload dist/*
+
 workflows:
   version: 2
-  test-all-supported-python-versions:
+  test-deploy:
     jobs:
       - test-3.7
       - test-3.6
       - test-3.5
       - test-2.7
+      - deploy:
+          requires:
+            - test-3.7
+            - test-3.6
+            - test-3.5
+            - test-2.7
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
