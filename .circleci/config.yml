@@ -34,10 +34,8 @@ jobs:
           command: |
             . venv/bin/activate
             pip install codecov codacy-coverage
-            coverage run -m doctest -v ecies/utils.py
             coverage run -m unittest discover .
             codecov
-            python-codacy-coverage -r coverage.xml
 
   test-3.6:
     <<: *test-template
