@@ -81,9 +81,21 @@ workflows:
   test-deploy:
     jobs:
       - test-3.7
+          filters:
+            tags:
+              only: /^v.*/
       - test-3.6
+          filters:
+            tags:
+              only: /^v.*/
       - test-3.5
+          filters:
+            tags:
+              only: /^v.*/
       - test-2.7
+          filters:
+            tags:
+              only: /^v.*/
       - deploy:
           requires:
             - test-3.7
