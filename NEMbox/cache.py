@@ -74,6 +74,7 @@ class Cache(Singleton):
             onExit = data[4]
             output_path = Constant.download_dir
             output_file = str(artist) + " - " + str(song_name) + ".mp3"
+            output_file.replace('/', ' ')
             full_path = os.path.join(output_path, output_file)
 
             new_url = NetEase().songs_url([song_id])[0]["url"]
