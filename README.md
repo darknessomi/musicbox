@@ -9,9 +9,9 @@
 [![platform](https://img.shields.io/badge/python-2.7-green.svg)](<>)
 [![platform](https://img.shields.io/badge/python-3.5-green.svg)](<>)
 
-[![NetEase-MusicBox](https://qfile.aobeef.cn/3abba3b8a3994ee3d5cd.gif)](https://pypi.org/project/NetEase-MusicBox/)
+[![NetEase-MusicBox-GIF](https://qfile.aobeef.cn/3abba3b8a3994ee3d5cd.gif)](https://pypi.org/project/NetEase-MusicBox/)
 
-### 功能特性
+## 功能特性
 
 1.  320kbps的高品质音乐
 2.  歌曲，艺术家，专辑检索
@@ -33,48 +33,60 @@
 
 ### 键盘快捷键
 
-<table>
-	<tr> <td>J</td> <td>Down</td> <td>下移</td> </tr>
-	<tr> <td>K</td> <td>Up</td> <td>上移</td> </tr>
-	<tr> <td>H</td> <td>Back</td> <td>后退</td> </tr>
-	<tr> <td>L</td> <td>Forword</td> <td>前进</td> </tr>
-	<tr> <td>U</td> <td>Prev page</td> <td>上一页</td> </tr>
-	<tr> <td>D</td> <td>Next page</td> <td>下一页</td> </tr>
-	<tr> <td>F</td> <td>Search</td> <td>快速搜索</td> </tr>
-	<tr> <td>[</td> <td>Prev song</td> <td>上一曲</td> </tr>
-	<tr> <td>]</td> <td>Next song</td> <td>下一曲</td> </tr>
-	<tr> <td>=</td> <td>Volume +</td> <td>音量增加</td> </tr>
-	<tr> <td>-</td> <td>Volume -</td> <td>音量减少</td> </tr>
-	<tr> <td>Space</td> <td>Play/Pause</td> <td>播放/暂停</td> </tr>
-    <tr> <td>?</td> <td>Shuffle</td> <td>手气不错</td> </tr>
-	<tr> <td>M</td> <td>Menu</td> <td>主菜单</td> </tr>
-	<tr> <td>P</td> <td>Present/History</td> <td>当前/历史播放列表</td> </tr>
-	<tr> <td>I</td> <td>Music Info</td> <td>当前音乐信息</td> </tr>
-	<tr> <td>⇧+P</td> <td>Playing Mode</td> <td>播放模式切换</td> </tr>
-	<tr> <td>A</td> <td>Add</td> <td>添加曲目到打碟</td> </tr>
-	<tr> <td>⇧+A</td> <td>Enter album</td> <td>进入专辑</td> </tr>
-	<tr> <td>G</td> <td>To the first</td> <td>跳至首项</td> </tr>
-	<tr> <td>⇧+G</td> <td>To the end</td> <td>跳至尾项</td> </tr>
-	<tr> <td>Z</td> <td>DJ list</td> <td>打碟列表</td> </tr>
-	<tr> <td>S</td> <td>Star</td> <td>添加到收藏</td> </tr>
-	<tr> <td>C</td> <td>Collection</td> <td>收藏列表</td> </tr>
-	<tr> <td>R</td> <td>Remove</td> <td>删除当前条目</td> </tr>
-	<tr> <td>⇧+J</td> <td>Move Down</td> <td>向下移动当前项目</td> </tr>
-	<tr> <td>⇧+K</td> <td>Move Up</td> <td>向上移动当前项目</td> </tr>
-	<tr> <td>⇧+C</td> <td>Cache</td> <td>缓存歌曲到本地</td> </tr>
-	<tr> <td>,</td> <td>Like</td> <td>喜爱</td> </tr>
-	<tr> <td>.</td> <td>Trash FM</td> <td>删除 FM</td> </tr>
-	<tr> <td>/</td> <td>Next FM</td> <td>下一FM</td> </tr>
-	<tr> <td>Q</td> <td>Quit</td> <td>退出</td> </tr>
-	<tr> <td>T</td> <td>Timing Exit</td> <td>定时退出</td> </tr>
-	<tr> <td>W</td> <td>Quit&Clear</td> <td>退出并清除用户信息</td> </tr>
-</table>
+| Key   | Effect          |           |
+| ----- | --------------- | --------- |
+| j     | Down            | 下移        |
+| k     | Up              | 上移        |
+| h     | Back            | 后退        |
+| l     | Forword         | 前进        |
+| u     | Prev page       | 上一页       |
+| d     | Next page       | 下一页       |
+| f     | Search          | 快速搜索      |
+| \[    | Prev song       | 上一曲       |
+| ]     | Next song       | 下一曲       |
+| =     | Volume +        | 音量增加      |
+| -     | Volume -        | 音量减少      |
+| Space | Play/Pause      | 播放/暂停     |
+| ?     | Shuffle         | 手气不错      |
+| m     | Menu            | 主菜单       |
+| p     | Present/History | 当前/历史播放列表 |
+| i     | Music Info      | 当前音乐信息    |
+| ⇧+p   | Playing Mode    | 播放模式切换    |
+| a     | Add             | 添加曲目到打碟   |
+| ⇧+a   | Enter album     | 进入专辑      |
+| g     | To the first    | 跳至首项      |
+| ⇧+g   | To the end      | 跳至尾项      |
+| z     | DJ list         | 打碟列表      |
+| s     | Star            | 添加到收藏     |
+| c     | Collection      | 收藏列表      |
+| r     | Remove          | 删除当前条目    |
+| ⇧+j   | Move Down       | 向下移动当前项目  |
+| ⇧+k   | Move Up         | 向上移动当前项目  |
+| ⇧+c   | Cache           | 缓存歌曲到本地   |
+| ,     | Like            | 喜爱        |
+| .     | Trash FM        | 删除 FM     |
+| /     | Next FM         | 下一FM      |
+| q     | Quit            | 退出        |
+| t     | Timing Exit     | 定时退出      |
+| w     | Quit&Clear      | 退出并清除用户信息 |
 
-### PyPi安装（推荐）
+## 安装
+
+### 必选依赖
+
+1.  `mpg123` 用于播放歌曲
+
+### 可选依赖
+
+1.  `aria2` 用于缓存歌曲
+2.  `libnotify-bin` 用于支持消息提示（Linux平台）
+3.  `pyqt python-dbus dbus qt` 用于支持桌面歌词 (Mac 用户需要 `brew install qt --with-dbus` 获取支持 DBus 的 Qt)
+
+### PyPi安装
 
     $ pip(3) install NetEase-MusicBox
 
-### Git clone最新版
+### Git clone安装master分支
 
     $ git clone https://github.com/darknessomi/musicbox.git && cd musicbox
     $ python(3) setup.py install
@@ -88,7 +100,7 @@
 
 #### Fedora
 
-首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`（通过此方法安装可能仍然需要`pip install NetEase-MusicBox`更新到最新版）。
+首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`（通过此方法安装可能仍然需要`pip install -U NetEase-MusicBox`更新到最新版）。
 
 #### Ubuntu/Debian
 
@@ -106,42 +118,31 @@
     $ (sudo) wget http://mirror.centos.org/centos/7/os/x86_64/Packages/mpg123-1.25.6-1.el7.x86_64.rpm
     $ (sudo) yum install mpg123-1.25.6-1.el7.x86_64.rpm
 
-### 依赖
-
-#### 必选
-
-1.  `mpg123` 用于播放歌曲
-
-#### 可选
-
-1.  `aria2` 用于缓存歌曲
-2.  `libnotify-bin` 用于支持消息提示（Linux平台）
-3.  `pyqt python-dbus dbus qt` 用于支持桌面歌词 (Mac 用户需要 `brew install qt --with-dbus` 获取支持 DBus 的 Qt)
-
-### 配置文件
+## 配置和错误处理
 
 配置文件地址: `~/.netease-musicbox/config.json`
 可配置缓存，快捷键，消息，桌面歌词。
-由于歌曲 API 只接受中国大陆地区访问，港澳台及海外用户请自行设置代理：
+由于歌曲 API 只接受中国大陆地区访问，非中国大陆地区用户请自行设置代理（可用polipo将socks5代理转换成http代理）：
 
 ```bash
-export http_proxy=http://ip:port
-curl ip.cn
+export http_proxy=http://IP:PORT
+export https_proxy=http://IP:PORT
+curl -L ip.cn
 ```
 
 显示IP属于中国大陆地区即可。
 
 ### 已测试的系统兼容列表
 
-<table>
-	<tr> <td>macOS</td> <td>10.13 / 10.12 / 10.11</td> </tr>
-	<tr> <td>Ubuntu</td> <td>14.04</td> </tr>
-	<tr> <td>Kali</td> <td>1.1.0 / 2.0 / Rolling</td> </tr>
-	<tr> <td>CentOS</td> <td>7</td> </tr>
-	<tr> <td>openSUSE</td> <td>13.2</td> </tr>
-	<tr> <td>Fedora</td> <td>22</td> </tr>
-	<tr> <td>Arch</td> <td>Rolling</td> </tr>
-</table>
+| OS       | Version               |
+| -------- | --------------------- |
+| macOS    | 10.13 / 10.12 / 10.11 |
+| Ubuntu   | 14.04                 |
+| Kali     | 1.1.0 / 2.0 / Rolling |
+| CentOS   | 7                     |
+| openSUSE | 13.2                  |
+| Fedora   | 22                    |
+| Arch     | Rolling               |
 
 ### 错误处理
 
@@ -158,13 +159,13 @@ mpg123 最新的版本可能会报找不到声音硬件的错误，测试了1.25
 -   [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
 -   [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
 
-### 使用
+## 使用
 
     $ musicbox
 
 Enjoy it !
 
-### 更新日志
+## 更新日志
 
 2018-11-28 版本 0.2.5.4    修复多处错误
 
@@ -210,9 +211,9 @@ Enjoy it !
 
 [更多>>](https://github.com/darknessomi/musicbox/blob/master/ChangeLog.md)
 
-### The MIT License (MIT)
+## MIT License
 
-CopyRight (c) 2015 omi  &lt;<a href="4399.omi@gmail.com">4399.omi@gmail.com</a>>
+Copyright (c) 2018 omi <mailto:4399.omi@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -221,13 +222,13 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
