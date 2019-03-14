@@ -1,5 +1,10 @@
 # NetEase-MusicBox
 
+* 本分支为https://github.com/darknessomi/musicbox 的一个修改分支，修改内容如下：
+1. 支持PyQt5，参考[该段代码](https://github.com/darknessomi/musicbox/pull/712)。
+2. 添加桌面歌词的点击穿透效果，并添加相应的配置文档。
+3. 修正版权问题错误，参考[该issue](https://github.com/darknessomi/musicbox/issues/791)
+
 **感谢为 MusicBox 的开发付出过努力的[每一个人](https://github.com/darknessomi/musicbox/graphs/contributors)！**
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
