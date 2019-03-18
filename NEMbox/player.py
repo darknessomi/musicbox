@@ -319,9 +319,12 @@ class Player(object):
                 target=self.run_mpg123, args=(on_exit, args["cache"])
             )
         else:
+            new_url = NetEase().songs_url([args["song_id"]])[0]["url"]  #使用新地址
+            if  not new_url:    #如果没有获得新地址
+                new_url = args["mp3_url"]  #使用老地址传给mpg123
             thread = threading.Thread(
                 target=self.run_mpg123,
-                args=(on_exit, args["mp3_url"], args["expires"], args["get_time"]),
+                args=(on_exit, new_url, args["expires"], args["get_time"]),
             )
             cache_thread = threading.Thread(
                 target=self.download_song,
