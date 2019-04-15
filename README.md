@@ -74,7 +74,7 @@
 
 ### 必选依赖
 
-1.  `mpg123` 用于播放歌曲
+1.  `mpg123` 用于播放歌曲，安装方法参见下面的说明
 
 ### 可选依赖
 
@@ -82,11 +82,11 @@
 2.  `libnotify-bin` 用于支持消息提示（Linux平台）
 3.  `pyqt python-dbus dbus qt` 用于支持桌面歌词 (Mac 用户需要 `brew install qt --with-dbus` 获取支持 DBus 的 Qt)
 
-### PyPi安装
+### PyPi安装（*nix系统）
 
     $ pip(3) install NetEase-MusicBox
 
-### Git clone安装master分支
+### Git clone安装master分支（*nix系统）
 
     $ git clone https://github.com/darknessomi/musicbox.git && cd musicbox
     $ python(3) setup.py install
@@ -158,6 +158,7 @@ mpg123 最新的版本可能会报找不到声音硬件的错误，测试了1.25
 -   [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。
 -   [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
 -   [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
+-   [#791](https://github.com/darknessomi/musicbox/issues/347) 版权问题，master分支已经修复
 
 ## 使用
 
