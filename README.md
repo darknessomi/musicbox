@@ -158,7 +158,7 @@ mpg123 最新的版本可能会报找不到声音硬件的错误，测试了1.25
 -   [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。
 -   [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
 -   [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
--   [#791](https://github.com/darknessomi/musicbox/issues/347) 版权问题，master分支已经修复
+-   [#791](https://github.com/darknessomi/musicbox/issues/791) 版权问题，master分支已经修复
 
 ## 使用
 
