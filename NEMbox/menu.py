@@ -24,7 +24,7 @@ from .player import Player
 from .ui import Ui
 from .osdlyrics import show_lyrics_new_process
 from .config import Config
-from .utils import notify
+from .utils import notify, SessionScreenLockDetector
 from .storage import Storage
 from .cache import Cache
 from . import logger
@@ -121,6 +121,7 @@ class Menu(object):
         self.countdown_start = time.time()
         self.countdown = -1
         self.is_in_countdown = False
+        self.sys_screen=SessionScreenLockDetector()
 
     @property
     def user(self):
@@ -249,7 +250,7 @@ class Menu(object):
         self.player.prev()
 
     def start(self):
-        self.menu_starts = time.time()
+        self.menu_starts = last_check_sys_screen = time.time()
         self.ui.build_menu(
             self.datatype,
             self.title,
@@ -630,6 +631,14 @@ class Menu(object):
                     webbrowser.open_new_tab(
                         "http://music.163.com/song?id={}".format(self.player.playing_id)
                     )
+            else:
+                # No matching input
+                if self.player.playing_flag and ( self.sys_screen is not None ) and \
+                        time.time() - last_check_sys_screen > 30 :
+                    last_check_sys_screen=time.time()
+                    if self.sys_screen.is_locked():
+                        self.player.switch()
+                        log.debug("Screen Saver Active. Pause music.")
 
             self.ui.build_process_bar(
                 self.player.current_song,
