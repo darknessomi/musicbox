@@ -230,8 +230,8 @@ class Parse(object):
                 "album_id": album_id,
                 "mp3_url": url,
                 "quality": quality,
-                "expires": song["expires"],
-                "get_time": song["get_time"],
+                "expires": song.get("expires",0),
+                "get_time": song.get("get_time",time.time()),
             }
             song_info_list.append(song_info)
         return song_info_list
