@@ -118,7 +118,11 @@ class SessionScreenLockDetector(object):
         if not self.valid:
             return False
         else:
-            return bool(self.screen_saver.GetActive())
+            try:
+                state=bool(self.screen_saver.GetActive())
+            except:
+                state=False
+            return state
 
 if __name__ == "__main__":
     notify('I\'m test ""quote', msg_type=1, t=1000)
