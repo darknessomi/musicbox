@@ -5,9 +5,9 @@
 '''
 网易云音乐 Menu
 '''
-#  from __future__ import (
-#  print_function, unicode_literals, division, absolute_import
-#  )
+# from __future__ import (
+# print_function, unicode_literals, division, absolute_import
+# )
 
 import time
 import curses as C
@@ -239,6 +239,40 @@ class Menu(object):
             return
         self.player.prev()
 
+    def space_key_event(self):
+        idx = self.index
+        datatype = self.datatype
+        if not self.datalist:
+            return
+        if idx < 0 or idx >= len(self.datalist):
+            self.player.info['idx'] = 0
+
+        # If change to a new playing list. Add playing list and play.
+        if datatype == 'songs':
+            self.player.new_player_list('songs', self.title,
+                                        self.datalist, -1)
+            self.player.end_callback = None
+            self.player.play_or_pause(idx, self.at_playing_list)
+            self.at_playing_list = True
+        elif datatype == 'djchannels':
+            self.player.new_player_list('djchannels', self.title,
+                                        self.datalist, -1)
+            self.player.end_callback = None
+            self.player.play_or_pause(idx, self.at_playing_list)
+            self.at_playing_list = True
+        elif datatype == 'fmsongs':
+            self.player.change_mode(0)
+            self.player.new_player_list('fmsongs', self.title,
+                                        self.datalist, -1)
+            self.player.end_callback = self.fm_callback
+            self.player.play_or_pause(idx, self.at_playing_list)
+            self.at_playing_list = True
+        else:
+            # 所在列表类型不是歌曲
+            isNotSongs = True
+            self.player.play_or_pause(
+                self.player.info['idx'], isNotSongs)
+
     def start(self):
         self.menu_starts = time.time()
         self.ui.build_menu(self.datatype, self.title, self.datalist,
@@ -418,37 +452,7 @@ class Menu(object):
 
             # 播放、暂停
             elif key == ord(' '):
-                if not self.datalist:
-                    continue
-
-                if idx < 0 or idx >= len(self.datalist):
-                    self.player.info['idx'] = 0
-
-                # If change to a new playing list. Add playing list and play.
-                if datatype == 'songs':
-                    self.player.new_player_list('songs', self.title,
-                                                self.datalist, -1)
-                    self.player.end_callback = None
-                    self.player.play_or_pause(idx, self.at_playing_list)
-                    self.at_playing_list = True
-                elif datatype == 'djchannels':
-                    self.player.new_player_list('djchannels', self.title,
-                                                self.datalist, -1)
-                    self.player.end_callback = None
-                    self.player.play_or_pause(idx, self.at_playing_list)
-                    self.at_playing_list = True
-                elif datatype == 'fmsongs':
-                    self.player.change_mode(0)
-                    self.player.new_player_list('fmsongs', self.title,
-                                                self.datalist, -1)
-                    self.player.end_callback = self.fm_callback
-                    self.player.play_or_pause(idx, self.at_playing_list)
-                    self.at_playing_list = True
-                else:
-                    # 所在列表类型不是歌曲
-                    isNotSongs = True
-                    self.player.play_or_pause(
-                        self.player.info['idx'], isNotSongs)
+                self.space_key_event()
 
             # 加载当前播放列表
             elif key == ord('p'):
