@@ -21,7 +21,7 @@ from .storage import Storage
 from .config import Config
 
 from . import logger
-from . import terminalsize
+from os import get_terminal_size
 
 log = logger.getLogger(__name__)
 
@@ -66,7 +66,7 @@ class Ui(object):
             curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
             curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         # term resize handling
-        size = terminalsize.get_terminal_size()
+        size = get_terminal_size()
         self.x = max(size[0], 10)
         self.y = max(size[1], 25)
         self.startcol = int(float(self.x) / 5)
@@ -89,7 +89,8 @@ class Ui(object):
                 self.screen.addstr(
                     args[0], args[1], args[2].encode('utf-8'), *args[3:])
             except Exception as e:
-                log.error(e, args)
+                #  log.error(e, args)
+                pass
 
     def build_playinfo(self,
                        song_name,
@@ -533,7 +534,7 @@ class Ui(object):
 
     def update_size(self):
         # get terminal size
-        size = terminalsize.get_terminal_size()
+        size = get_terminal_size()
         x = max(size[0], 10)
         y = max(size[1], 25)
         if (x, y) == (self.x, self.y):  # no need to resize

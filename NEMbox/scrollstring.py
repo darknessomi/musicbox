@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import (
-    print_function, unicode_literals, division, absolute_import
-)
+#  from __future__ import (
+#  print_function, unicode_literals, division, absolute_import
+#  )
 from time import time
 
-from future.builtins import int, chr
+#  from future.builtins import int, chr
 
 
 class scrollstring(object):

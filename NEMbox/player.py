@@ -244,13 +244,15 @@ class Player(object):
         while True:
             if not self.popen_handler:
                 break
-            strout = self.popen_handler.stdout.readline().decode('utf-8').strip()
+            strout = self.popen_handler.stdout.readlines(
+                500).pop().decode().strip()
             if strout[:2] == '@F':
                 # playing, update progress
                 out = strout.split(' ')
                 self.process_location = int(float(out[3]))
                 self.process_length = int(float(out[3]) + float(out[4]))
             elif strout[:2] == '@E':
+                log.warn(strout)
                 self.playing_flag = True
                 if expires >= 0 and get_time >= 0 and time.time() - expires - get_time >= 0:
                     # 刷新URL
@@ -261,6 +263,7 @@ class Player(object):
                 break
             elif strout == '@P 0':
                 # end, moving to next
+                log.warn("next")
                 self.playing_flag = True
                 break
             elif strout == '':
