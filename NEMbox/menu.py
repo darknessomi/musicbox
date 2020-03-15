@@ -19,7 +19,7 @@ import webbrowser
 import locale
 from collections import namedtuple
 
-#from future.builtins import range, str
+# from future.builtins import range, str
 
 from .api import NetEase
 from .player import Player
@@ -30,6 +30,7 @@ from .utils import notify
 from .storage import Storage
 from .cache import Cache
 from . import logger
+from .utils import parse_keylist
 
 
 locale.setlocale(locale.LC_ALL, '')
@@ -116,6 +117,7 @@ class Menu(object):
         self.countdown_start = time.time()
         self.countdown = -1
         self.is_in_countdown = False
+        self.key_list = []
 
     @property
     def user(self):
@@ -239,6 +241,38 @@ class Menu(object):
             return
         self.player.prev()
 
+    def up_key_event(self):
+        datalist = self.datalist
+        offset = self.offset
+        idx = self.index
+        step = self.step
+        if idx == offset:
+            if offset == 0:
+                return
+            self.offset -= step
+            # 移动光标到最后一列
+            self.index = offset - 1
+        else:
+            self.index = carousel(offset, min(
+                len(datalist), offset + step) - 1, idx - 1)
+        self.menu_starts = time.time()
+
+    def jump_key_event(self):
+        datalist = self.datalist
+        offset = self.offset
+        idx = self.index
+        step = self.step
+        if idx == min(len(datalist), offset + step) - 1:
+            if offset + step >= len(datalist):
+                return
+            self.offset += step
+            # 移动光标到第一列
+            self.index = offset + step
+        else:
+            self.index = carousel(offset, min(
+                len(datalist), offset + step) - 1, idx + 1)
+        self.menu_starts = time.time()
+
     def space_key_event(self):
         idx = self.index
         datatype = self.datatype
@@ -273,6 +307,76 @@ class Menu(object):
             self.player.play_or_pause(
                 self.player.info['idx'], isNotSongs)
 
+    def like_event(self):
+        return_data = self.request_api(self.api.fm_like,
+                                       self.player.playing_id)
+        if return_data:
+            song_name = self.player.playing_name
+            notify('%s added successfully!' % song_name, 0)
+        else:
+            notify('Adding song failed!', 0)
+
+    def back_page_event(self):
+        if len(self.stack) == 1:
+            return
+        self.menu_starts = time.time()
+        up = self.stack.pop()
+        self.datatype = up[0]
+        self.title = up[1]
+        self.datalist = up[2]
+        self.offset = up[3]
+        self.index = up[4]
+        self.at_playing_list = False
+
+    def enter_page_event(self):
+        idx = self.index
+        self.enter_flag = True
+        if len(self.datalist) <= 0:
+            return
+        self.menu_starts = time.time()
+        self.ui.build_loading()
+        self.dispatch_enter(idx)
+        if self.enter_flag is True:
+            self.index = 0
+            self.offset = 0
+
+    def down_page_event(self):
+        offset = self.offset
+        step = self.step
+        if offset + step >= len(datalist):
+            return
+        self.menu_starts = time.time()
+        self.offset += step
+
+        # e.g. 23 + 10 = 33 --> 30
+        self.index = (self.index + step) // step * step
+
+    def up_page_event(self):
+        offset = self.offset
+        step = self.step
+        if offset == 0:
+            return
+        self.menu_starts = time.time()
+        self.offset -= step
+
+        # e.g. 23 - 10 = 13 --> 10
+        self.index = (self.index - step) // step * step
+
+    def resize_key_event(self):
+        self.player.update_size()
+
+    def build_menu_processbar(self):
+        self.ui.build_process_bar(
+            self.player.current_song,
+            self.player.process_location, self.player.process_length,
+            self.player.playing_flag, self.player.info['playing_mode']
+        )
+        self.ui.build_menu(self.datatype, self.title, self.datalist,
+                           self.offset, self.index, self.step, self.menu_starts)
+
+    def quit_event(self):
+        sys.exit(0)
+
     def start(self):
         self.menu_starts = time.time()
         self.ui.build_menu(self.datatype, self.title, self.datalist,
@@ -282,6 +386,8 @@ class Menu(object):
         ])
 
         show_lyrics_new_process()
+        pre_key = -1
+        keylist = self.key_list
         while True:
             datatype = self.datatype
             title = self.title
@@ -292,6 +398,48 @@ class Menu(object):
             self.screen.timeout(500)
             key = self.screen.getch()
             self.ui.screen.refresh()
+            temp_pre_key = key
+            # log.warn(datatype)
+            if key*pre_key < 0 and key > pre_key:
+                temp_pre_key = key
+                keylist.append(key)
+            elif key*pre_key > 0 and key+pre_key > 0:
+                temp_pre_key = key
+                keylist.append(key)
+                log.warn(keylist)
+            elif key*pre_key < 0 and key < pre_key:
+                temp_pre_key = key
+                if keylist and (set(keylist) | {91, 93}) == {91, 93}:
+                    for key in keylist:
+                        if key == 91:
+                            self.up_key_event()
+                        else:
+                            self.jump_key_event()
+                    self.space_key_event()
+                    self.build_menu_processbar()
+                    # log.warn(keylist)
+                elif len(keylist) > 1:
+                    # 键盘映射ascii编码 91 [ 93 ] 258<KEY_DOWN> 259 <KEY_UP> 106 j 107 k
+                    # 歌单快速跳跃
+                    result = parse_keylist(keylist)
+                    # log.warn(result)
+                    if result:
+                        num, cmd = result
+                        if num == 0:
+                            num = 1
+                        for i in range(num-1):
+                            if cmd in (259, 107, 91):
+                                self.up_key_event()
+                            elif cmd in (258, 106, 93):
+                                self.jump_key_event()
+                        if cmd in (91, 93):
+                            self.space_key_event()
+                        self.build_menu_processbar()
+
+                keylist.clear()
+                pre_key = temp_pre_key
+                continue
+            pre_key = temp_pre_key
 
             # term resize
             if key == -1:
@@ -300,7 +448,6 @@ class Menu(object):
             if self.is_in_countdown:
                 if time.time() - self.countdown_start > self.countdown:
                     key = ord('q')
-
             # 退出
             if key == ord('q'):
                 break
@@ -312,34 +459,14 @@ class Menu(object):
 
             # 上移
             elif key in (ord('k'), C.KEY_UP):
-                # turn page if at beginning
-                if idx == offset:
-                    if offset == 0:
-                        continue
-                    self.offset -= step
-                    # 移动光标到最后一列
-                    self.index = offset - 1
-                else:
-                    self.index = carousel(offset, min(
-                        len(datalist), offset + step) - 1, idx - 1)
-                self.menu_starts = time.time()
+                self.up_key_event()
 
             # 下移
             elif key in (ord('j'), C.KEY_DOWN):
-                # turn page if at end
-                if idx == min(len(datalist), offset + step) - 1:
-                    if offset + step >= len(datalist):
-                        continue
-                    self.offset += step
-                    # 移动光标到第一列
-                    self.index = offset + step
-                else:
-                    self.index = carousel(offset, min(
-                        len(datalist), offset + step) - 1, idx + 1)
-                self.menu_starts = time.time()
+                self.jump_key_event()
 
             # 数字快捷键
-            elif ord('0') <= key <= ord('9'):
+            elif ord('0') <= key <= ord('9') and datatype == 'main':
                 idx = key - ord('0')
                 self.ui.build_menu(self.datatype, self.title, self.datalist,
                                    self.offset, idx, self.step, self.menu_starts)
@@ -350,49 +477,18 @@ class Menu(object):
 
             # 向上翻页
             elif key == ord('u'):
-                if offset == 0:
-                    continue
-                self.menu_starts = time.time()
-                self.offset -= step
-
-                # e.g. 23 - 10 = 13 --> 10
-                self.index = (self.index - step) // step * step
-
+                self.up_page_event()
             # 向下翻页
             elif key == ord('d'):
-                if offset + step >= len(datalist):
-                    continue
-                self.menu_starts = time.time()
-                self.offset += step
-
-                # e.g. 23 + 10 = 33 --> 30
-                self.index = (self.index + step) // step * step
+                self.down_page_event()
 
             # 前进  10 为mac return键
             elif key in (ord('l'), C.KEY_RIGHT, 10):
-                self.enter_flag = True
-                if len(self.datalist) <= 0:
-                    continue
-                self.menu_starts = time.time()
-                self.ui.build_loading()
-                self.dispatch_enter(idx)
-                if self.enter_flag is True:
-                    self.index = 0
-                    self.offset = 0
+                self.enter_page_event()
 
             # 回退
             elif key in (ord('h'), C.KEY_LEFT):
-                # if not main menu
-                if len(self.stack) == 1:
-                    continue
-                self.menu_starts = time.time()
-                up = self.stack.pop()
-                self.datatype = up[0]
-                self.title = up[1]
-                self.datalist = up[2]
-                self.offset = up[3]
-                self.index = up[4]
-                self.at_playing_list = False
+                self.back_page_event()
 
             # 搜索
             elif key == ord('f'):
@@ -400,12 +496,12 @@ class Menu(object):
                 self.dispatch_enter(8)
 
             # 播放下一曲
-            elif key == ord(']'):
-                self.next_song()
+            # elif key == ord(']'):
+                # self.next_song()
 
             # 播放上一曲
-            elif key == ord('['):
-                self.previous_song()
+            # elif key == ord('['):
+                # self.previous_song()
 
             # 增加音量
             elif key == ord('='):
@@ -583,7 +679,7 @@ class Menu(object):
             elif key == ord('g'):
                 if datatype == 'help':
                     webbrowser.open_new_tab(
-                        'https://github.com/darknessomi/musicbox')
+                        'https://github.com/wangjianyuan10/musicbox')
                 else:
                     self.index = 0
                     self.offset = 0
@@ -616,6 +712,7 @@ class Menu(object):
             )
             self.ui.build_menu(self.datatype, self.title, self.datalist,
                                self.offset, self.index, self.step, self.menu_starts)
+            # keylist.clear()
 
         self.player.stop()
         self.cache.quit()

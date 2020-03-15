@@ -246,8 +246,9 @@ class Player(object):
         if self.popen_handler.poll():
             return
         self.playing_flag = not self.playing_flag
-        self.popen_handler.stdin.write(b'P\n')
-        self.popen_handler.stdin.flush()
+        if not self.popen_handler.stdin.closed:
+            self.popen_handler.stdin.write(b'P\n')
+            self.popen_handler.stdin.flush()
 
         self.build_playinfo()
 
@@ -264,9 +265,9 @@ class Player(object):
         self.tune_volume()
         try:
             self.popen_handler.stdin.write(b'L ' + url.encode('utf-8') + b'\n')
+            self.popen_handler.stdin.flush()
         except:
             pass
-        self.popen_handler.stdin.flush()
 
         # endless_loop_cnt = 0
         strout = ' '

@@ -37,10 +37,14 @@
 
 | Key      | Effect          |                    |
 | -------- | --------------- | ------------------ |
-| j , 下键 | Down            | 下移               |
+| j,下键   | Down            | 下移               |
 | k,上键   | Up              | 上移               |
 | h,左键   | Back            | 后退               |
 | l,右键   | Forword         | 前进               |
+|num + j   | QuickJump       | 快速向后跳转n首    |
+|num + k   | QuickUp         | 快速向前跳转n首    |
+|num + \[  | Quick Prev song | 快速前n首          |
+|num + ]   | Quick Next Song | 快速后n首          |
 | u        | Prev page       | 上一页             |
 | d        | Next page       | 下一页             |
 | f        | Search          | 快速搜索           |

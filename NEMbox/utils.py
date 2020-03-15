@@ -10,6 +10,7 @@ import platform
 import subprocess
 import os
 from collections import OrderedDict
+from copy import deepcopy
 
 #from future.builtins import str
 """
@@ -17,8 +18,23 @@ from collections import OrderedDict
 """
 
 __all__ = [
-    'utf8_data_to_file', 'notify', 'uniq', 'create_dir', 'create_file'
+    'utf8_data_to_file', 'notify', 'uniq', 'create_dir', 'create_file', 'parse_keylist'
 ]
+
+
+def parse_keylist(keylist):
+    """
+    '2' '3' '4' 'j'  ----> 234 j
+    supoort keys  [  ]   j  k  <KEY_UP> <KEY_DOWN>
+    """
+    keylist = deepcopy(keylist)
+    if keylist == []:
+        return None
+    tail_cmd = keylist.pop()
+    if tail_cmd in (ord('['), ord(']'), ord('j'), ord('k'), 258, 259) and \
+            max(keylist) <= 57 and min(keylist) >= 48:
+        return (int(''.join([chr(i) for i in keylist])), tail_cmd)
+    return None
 
 
 def mkdir(path):
@@ -74,3 +90,4 @@ if __name__ == "__main__":
     notify("I'm test \"\"quote", msg_type=1, t=1000)
     notify("I'm test 1", msg_type=1, t=1000)
     notify("I'm test 2", msg_type=0, t=1000)
+    print(parse_keylist([48, 49, 55, 91]))
