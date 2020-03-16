@@ -415,22 +415,22 @@ class Menu(object):
                 self.build_menu_processbar()
                 continue
 
-            if keylist and (set(keylist) | {91, 93}) == {91, 93}:
-                # [  ] 键盘映射
-                for key in keylist:
-                    if key == 91:
-                        self.up_key_event()
-                        self.build_menu_processbar()
-                        self.ui.screen.refresh()
-                        time.sleep(0.1)  # 视觉停留效果
-                    else:
-                        self.jump_key_event()
-                        self.build_menu_processbar()
-                        self.ui.screen.refresh()
-                        time.sleep(0.1)  # 视觉停留效果
-                self.space_key_event()
-                self.build_menu_processbar()
-                continue
+            # if keylist and (set(keylist) | {91, 93}) == {91, 93}:
+                # # [  ] 键盘映射
+                # for key in keylist:
+                # if key == 91:
+                # self.up_key_event()
+                # self.build_menu_processbar()
+                # self.ui.screen.refresh()
+                # time.sleep(0.1)  # 视觉停留效果
+                # else:
+                # self.jump_key_event()
+                # self.build_menu_processbar()
+                # self.ui.screen.refresh()
+                # time.sleep(0.1)  # 视觉停留效果
+                # self.space_key_event()
+                # self.build_menu_processbar()
+                # continue
             if len(keylist) > 1:
                 # log.warn(keylist)
                 if parse_keylist(keylist):
@@ -509,12 +509,16 @@ class Menu(object):
                     self.dispatch_enter(8)
 
                 # 播放下一曲
-                # elif key == ord(']') and pre_key not in (91, 93):
+                elif key == ord(']'):
                     # self.next_song()
+                    self.jump_key_event()
 
                 # 播放上一曲
-                # elif key == ord('[') and pre_key not in (91, 93):
+                elif key == ord('['):
                     # self.previous_song()
+                    self.up_key_event()
+                elif pre_key in (ord('['), ord(']')) and key == -1 and datatype == 'songs':
+                    self.space_key_event()
 
                 # 增加音量
                 elif key == ord('='):
