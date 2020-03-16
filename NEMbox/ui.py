@@ -5,23 +5,26 @@
 '''
 网易云音乐 Ui
 '''
-# from __future__ import (
-#print_function, unicode_literals, division, absolute_import
-# )
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 
 import hashlib
 import re
 import curses
 import datetime
 
-#from future.builtins import range, str, int
+from future.builtins import range, str, int
 
 from .scrollstring import truelen, scrollstring
 from .storage import Storage
 from .config import Config
 
 from . import logger
-from os import get_terminal_size
+try:
+    from os import get_terminal_size
+except:
+    from .terminalsize import get_terminal_size
 
 log = logger.getLogger(__name__)
 

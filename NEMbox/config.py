@@ -1,7 +1,7 @@
-# encoding: UTF-8
-# from __future__ import (
-#print_function, unicode_literals, division, absolute_import
-# )
+#encoding: UTF-8
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 import json
 import os
 #from future.builtins import open

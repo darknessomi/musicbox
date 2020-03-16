@@ -8,9 +8,9 @@
 网易云音乐 Player
 '''
 # Let's make some noise
-# from __future__ import (
-#print_function, unicode_literals, division, absolute_import
-# )
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 
 import subprocess
 import threading
@@ -18,7 +18,7 @@ import time
 import os
 import random
 
-#from future.builtins import str
+from future.builtins import str
 
 from .ui import Ui
 from .storage import Storage

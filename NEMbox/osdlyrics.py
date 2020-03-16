@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # osdlyrics.py --- desktop lyrics for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
-# from __future__ import (
-#print_function, unicode_literals, division, absolute_import
-# )
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 
 import sys
 from multiprocessing import Process

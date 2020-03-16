@@ -1,0 +1,3 @@
+resize -s 20 108 > /dev/null
+musicbox
+resize -s 0  0  > /dev/null

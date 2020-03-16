@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # utils.py --- utils for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
-# from __future__ import (
-#print_function, unicode_literals, division, absolute_import
-# )
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 
 import platform
 import subprocess
@@ -12,29 +12,14 @@ import os
 from collections import OrderedDict
 from copy import deepcopy
 
-#from future.builtins import str
+from future.builtins import str
 """
 定义几个函数 写文件 通知 返回键 创建目录 创建文件
 """
 
 __all__ = [
-    'utf8_data_to_file', 'notify', 'uniq', 'create_dir', 'create_file', 'parse_keylist'
+    'utf8_data_to_file', 'notify', 'uniq', 'create_dir', 'create_file'
 ]
-
-
-def parse_keylist(keylist):
-    """
-    '2' '3' '4' 'j'  ----> 234 j
-    supoort keys  [  ]   j  k  <KEY_UP> <KEY_DOWN>
-    """
-    keylist = deepcopy(keylist)
-    if keylist == []:
-        return None
-    tail_cmd = keylist.pop()
-    if tail_cmd in (ord('['), ord(']'), ord('j'), ord('k'), 258, 259) and \
-            max(keylist) <= 57 and min(keylist) >= 48:
-        return (int(''.join([chr(i) for i in keylist])), tail_cmd)
-    return None
 
 
 def mkdir(path):

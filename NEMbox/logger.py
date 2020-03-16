@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
-# from __future__ import (
-#print_function, unicode_literals, division, absolute_import
-# )
+from __future__ import (
+    print_function, unicode_literals, division, absolute_import
+)
 import logging
 
-#from future.builtins import open
+from future.builtins import open
 
 from . import const
 
