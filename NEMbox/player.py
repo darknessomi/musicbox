@@ -207,7 +207,7 @@ class Player(object):
             # log.debug(Player.SUBPROCESS_LIST)
 
             for thread_i in range(0, len(self.MUSIC_THREADS)-1):
-                if self.MUSIC_THREADS[thread_i].isAlive:
+                if self.MUSIC_THREADS[thread_i].isAlive():
                     try:
                         stop_thread(self.MUSIC_THREADS[thread_i])
                     except:
@@ -329,6 +329,8 @@ class Player(object):
                 # log.warning(
                 # 'mpg123 error, halt, endless loop and high cpu use, then we kill it')
                 # break
+            # log.warn(self.MUSIC_THREADS)
+            # log.warn([i.isAlive() for i in self.MUSIC_THREADS])
 
         if self.playing_flag:
             if self.refrese_url_flag:
@@ -385,6 +387,9 @@ class Player(object):
             cache_thread.start()
         thread.start()
         self.MUSIC_THREADS.append(thread)
+        # log.warn(self.MUSIC_THREADS)
+        #log.warn([i.isAlive() for i in self.MUSIC_THREADS])
+        self.MUSIC_THREADS = [i for i in self.MUSIC_THREADS if i.isAlive()]
         # log.warn(self.MUSIC_THREADS)
         # log.warn(threading.enumerate())
         lyric_download_thread = threading.Thread(target=self.download_lyric)
