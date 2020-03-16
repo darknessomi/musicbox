@@ -45,6 +45,10 @@
 |num + k   | QuickUp         | 快速向前跳转n首    |
 |num + \[  | Quick Prev song | 快速前n首          |
 |num + ]   | Quick Next Song | 快速后n首          |
+|[[[[[...  | constant key [  | 连按[              |
+|]]]]]...  | constant key ]  | 连按]              |
+|num + ]   | Quick Next Song | 快速后n首          |
+|num       | Index for song  | 跳到第n首          |
 | u        | Prev page       | 上一页             |
 | d        | Next page       | 下一页             |
 | f        | Search          | 快速搜索           |
