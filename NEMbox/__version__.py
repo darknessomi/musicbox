@@ -5,10 +5,10 @@
 | | | | | | (_| | (__  | | | | | | |_| \__ \ | (__| |_) | (_) >  <
 |_| |_| |_|\__,_|\___| |_| |_| |_|\__,_|___/_|\___|_.__/ \___/_/\_\
 '''
-__title__ = 'NetEase-MusicBox'
-__version__ = '0.2.5.4'
-__description__ = 'A sexy command line interface musicbox'
-__url__ = 'https://github.com/darknessomi/musicbox'
-__author__ = 'omi'
-__author_email__ = '4399.omi@gmail.com'
+__title__ = 'macmusicbox'
+__version__ = '0.2.5.5'
+__description__ = 'A sexy command line interface musicbox for mac and linux'
+__url__ = 'https://github.com/wangjianyuan10/musicbox'
+__author__ = 'walker'
+__author_email__ = 'wangjianyuan10@163.com'
 __license__ = 'MIT'

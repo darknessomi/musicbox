@@ -29,6 +29,7 @@ ________     __________________________  _____ _     _
 + ------------------------------------------ +
 
 """
+from pprint import pprint
 import os
 
 from setuptools import setup, find_packages
@@ -41,7 +42,6 @@ with open(os.path.join(here, "NEMbox", "__version__.py"), "r") as f:
 
 with open("README.md", "r") as f:
     long_description = f.read()
-
 setup(
     name=about["__title__"],
     version=about["__version__"],
@@ -60,10 +60,9 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
-        "Natural Language :: Chinese",
+        "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",

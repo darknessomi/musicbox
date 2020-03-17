@@ -64,7 +64,8 @@ def parse_keylist(keylist):
     if keylist == []:
         return None
     tail_cmd = keylist.pop()
-    if set(keylist) | set(range(48, 58)) == set(range(48, 58)):
+    if tail_cmd in range(48, 58) and (set(keylist) | set(range(48, 58))) \
+            == set(range(48, 58)):
         return int(''.join([chr(i) for i in keylist]+[chr(tail_cmd)]))
 
     if len(keylist) == 0:
@@ -92,6 +93,18 @@ def main(data):
         group.send(i)
     group.send(-1)
     print(results)
+    x = _cmd_parser()
+    print('-----------')
+    print(x.send(None))
+    print(x.send(1))
+    print(x.send(2))
+    print(x.send(3))
+    print(x.send(3))
+    print(x.send(3))
+    try:
+        print(x.send(-1))
+    except Exception as e:
+        print(e.value)
 
 
 if __name__ == '__main__':
