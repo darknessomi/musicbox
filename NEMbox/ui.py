@@ -136,6 +136,7 @@ class Ui(object):
         lyrics, tlyrics = song.get('lyric', []), song.get('tlyric', [])
 
         curses.noecho()
+        curses.curs_set(0)
         self.screen.move(3, 1)
         self.screen.clrtoeol()
         self.screen.move(4, 1)
@@ -244,6 +245,7 @@ class Ui(object):
         self.screen.refresh()
 
     def build_loading(self):
+        curses.curs_set(0)
         self.addstr(7, self.startcol, '享受高品质音乐，💃loading...',
                     curses.color_pair(1))
         self.screen.refresh()
@@ -256,6 +258,7 @@ class Ui(object):
                    start):
         # keep playing info in line 1
         curses.noecho()
+        curses.curs_set(0)
         self.screen.move(7, 1)
         self.screen.clrtobot()
         self.addstr(7, self.startcol, title, curses.color_pair(1))
@@ -466,12 +469,14 @@ class Ui(object):
         self.screen.refresh()
 
     def build_login(self):
+        curses.curs_set(0)
         self.build_login_bar()
         account = self.get_account()
         password = hashlib.md5(self.get_password().encode('utf-8')).hexdigest()
         return account, password
 
     def build_login_bar(self):
+        curses.curs_set(0)
         curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
@@ -483,6 +488,7 @@ class Ui(object):
         self.screen.refresh()
 
     def build_login_error(self):
+        curses.curs_set(0)
         self.screen.move(4, 1)
         self.screen.timeout(-1)  # disable the screen timeout
         self.screen.clrtobot()
@@ -497,6 +503,7 @@ class Ui(object):
         return x
 
     def build_timing(self):
+        curses.curs_set(0)
         self.screen.move(6, 1)
         self.screen.clrtobot()
         self.screen.timeout(-1)
@@ -536,6 +543,7 @@ class Ui(object):
         return keyword.decode('utf-8').strip()
 
     def update_size(self):
+        curses.curs_set(0)
         # get terminal size
         size = get_terminal_size()
         x = max(size[0], 10)

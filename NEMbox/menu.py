@@ -24,7 +24,7 @@ from future.builtins import range, str
 from .api import NetEase
 from .player import Player
 from .ui import Ui
-from .osdlyrics import show_lyrics_new_process
+from .osdlyrics import show_lyrics_new_process, pyqt_activity
 from .config import Config
 from .utils import notify
 from .storage import Storage
@@ -147,7 +147,7 @@ class Menu(object):
             account, md5pass = self.ui.build_login()
 
         resp = self.api.login(account, md5pass)
-        if resp['code'] == 200:
+        if resp['code'] is 200:
             userid = resp['account']['id']
             nickname = resp['profile']['nickname']
             self.storage.login(account, md5pass, userid, nickname)
@@ -207,9 +207,9 @@ class Menu(object):
             mobile = self.api.daily_task(is_mobile=True)
             pc = self.api.daily_task(is_mobile=False)
 
-            if mobile['code'] == 200:
+            if mobile['code'] is 200:
                 notify('移动端签到成功', 1)
-            if pc['code'] == 200:
+            if pc['code'] is 200:
                 notify('PC端签到成功', 1)
 
             data = self.api.get_version()
@@ -219,7 +219,7 @@ class Menu(object):
 
     def start_fork(self, version):
         pid = os.fork()
-        if pid == 0:
+        if pid is 0:
             Menu().update_alert(version)
         else:
             Menu().start()
@@ -247,8 +247,8 @@ class Menu(object):
         offset = self.offset
         idx = self.index
         step = self.step
-        if idx == offset:
-            if offset == 0:
+        if idx is offset:
+            if offset is 0:
                 return
             self.offset -= step
             # 移动光标到最后一列
@@ -263,7 +263,7 @@ class Menu(object):
         offset = self.offset
         idx = self.index
         step = self.step
-        if idx == min(len(datalist), offset + step) - 1:
+        if idx is min(len(datalist), offset + step) - 1:
             if offset + step >= len(datalist):
                 return
             self.offset += step
@@ -283,19 +283,19 @@ class Menu(object):
             self.player.info['idx'] = 0
 
         # If change to a new playing list. Add playing list and play.
-        if datatype == 'songs':
+        if datatype is 'songs':
             self.player.new_player_list('songs', self.title,
                                         self.datalist, -1)
             self.player.end_callback = None
             self.player.play_or_pause(idx, self.at_playing_list)
             self.at_playing_list = True
-        elif datatype == 'djchannels':
+        elif datatype is 'djchannels':
             self.player.new_player_list('djchannels', self.title,
                                         self.datalist, -1)
             self.player.end_callback = None
             self.player.play_or_pause(idx, self.at_playing_list)
             self.at_playing_list = True
-        elif datatype == 'fmsongs':
+        elif datatype is 'fmsongs':
             self.player.change_mode(0)
             self.player.new_player_list('fmsongs', self.title,
                                         self.datalist, -1)
@@ -319,7 +319,7 @@ class Menu(object):
             notify('Adding song failed!', 0)
 
     def back_page_event(self):
-        if len(self.stack) == 1:
+        if len(self.stack) is 1:
             return
         self.menu_starts = time.time()
         self.datatype, self.title, self.datalist,\
@@ -345,7 +345,7 @@ class Menu(object):
         offset = self.offset
         idx = self.index
         step = self.step
-        if datatype == 'album':
+        if datatype is 'album':
             return
         if datatype in ['songs', 'fmsongs']:
             song_id = datalist[idx]['song_id']
@@ -366,7 +366,7 @@ class Menu(object):
             self.datalist = self.api.dig_info(songs, 'songs')
             self.title = '网易云音乐 > 专辑 > %s' % album_name
             for i in range(len(self.datalist)):
-                if self.datalist[i]['song_id'] == song_id:
+                if self.datalist[i]['song_id'] is song_id:
                     self.offset = i - i % step
                     self.index = i
                     return
@@ -377,15 +377,13 @@ class Menu(object):
         # 歌单快速跳跃
         result = parse_keylist(self.key_list)
         num, cmd = result
-        if num == 0:  # 0j -> 1j
+        if num is 0:  # 0j -> 1j
             num = 1
         for i in range(num):
             if cmd in (259, 107, 91):
                 self.up_key_event()
             elif cmd in (258, 106, 93):
                 self.jump_key_event()
-        if cmd in (91, 93):
-            self.space_key_event()
         self.build_menu_processbar()
 
     def digit_key_song_event(self):
@@ -426,7 +424,7 @@ class Menu(object):
     def up_page_event(self):
         offset = self.offset
         step = self.step
-        if offset == 0:
+        if offset is 0:
             return
         self.menu_starts = time.time()
         self.offset -= step
@@ -456,8 +454,8 @@ class Menu(object):
         self.stack.append([
             self.datatype, self.title, self.datalist, self.offset, self.index
         ])
-
-        show_lyrics_new_process()
+        if pyqt_activity:
+            show_lyrics_new_process()
         pre_key = -1
         keylist = self.key_list
         parser = cmd_parser(keylist)
@@ -470,7 +468,7 @@ class Menu(object):
                 self.pre_keylist = deepcopy(keylist)
 
             # log.warn(datatype)
-            if self.datatype == 'songs' and keylist and \
+            if self.datatype is 'songs' and keylist and \
                     (set(keylist) | set(range(48, 58))) == set(range(48, 58)):
                 # 歌曲数字映射
                 self.digit_key_song_event()
@@ -485,34 +483,34 @@ class Menu(object):
             else:
                 # 单键映射
                 # term resize
-                if key == -1:
+                if key is -1:
                     self.player.update_size()
                     self.build_menu_processbar()
 
                 if self.is_in_countdown:
                     if time.time() - self.countdown_start > self.countdown:
-                        key = ord('q')
-                # 退出
-                if key == ord('q'):
+                        key = 113
+                # 退出 ord('q')
+                if key is 113:
                     break
 
-                # 退出并清除用户信息
-                if key == ord('w'):
+                # 退出并清除用户信息ord('w')
+                elif key is 119:
                     self.api.logout()
                     break
 
-                # 上移
-                elif key in (ord('k'), C.KEY_UP) and not (pre_key in range(48, 58)):
+                # 上移ord('k'), C.KEY_UP   不是数字  mac触摸板支持
+                elif key in (107, 259) and not (pre_key in range(48, 58)):
                     self.up_key_event()
                     self.build_menu_processbar()
 
-                # 下移
-                elif key in (ord('j'), C.KEY_DOWN) and pre_key not in range(48, 58):
+                # 下移 ord('j') ,C.KEY_DOWN 不是数字   mac触摸板支持
+                elif key in (106, 258) and pre_key not in range(48, 58):
                     self.jump_key_event()
                     self.build_menu_processbar()
 
-                # 数字快捷键
-                elif ord('0') <= key <= ord('9') and self.datatype != 'songs':
+                # 数字快捷键ord('0') <= key <= ord('9')
+                elif 48 <= key <= 57 and self.datatype is not 'songs':
                     idx = key - ord('0')
                     self.ui.build_menu(self.datatype, self.title, self.datalist,
                                        self.offset, idx, self.step, self.menu_starts)
@@ -522,66 +520,67 @@ class Menu(object):
                     self.offset = 0
                     self.build_menu_processbar()
 
-                # 向上翻页
-                elif key == ord('u'):
+                # 向上翻页ord('u')
+                elif key is 117:
                     self.up_page_event()
                     self.build_menu_processbar()
-                # 向下翻页
-                elif key == ord('d'):
+                # 向下翻页 ord('d')
+                elif key is 100:
                     self.down_page_event()
                     self.build_menu_processbar()
 
-                # 前进  10 为mac return键
-                elif key in (ord('l'), C.KEY_RIGHT, 10):
+                # 前进 ord('l') ,C.KEY_RIGHT, ord('\n')
+                elif key in (108, 261, 10):
                     self.enter_page_event()
                     self.build_menu_processbar()
 
-                # 回退
-                elif key in (ord('h'), C.KEY_LEFT):
+                # 回退ord('h') C.KEY_LEFT
+                elif key in (104, 260):
                     self.back_page_event()
                     self.build_menu_processbar()
 
-                # 搜索
-                elif key == ord('f'):
+                # 搜索ord('f')
+                elif key is 102:
                     # 8 is the 'search' menu
                     self.dispatch_enter(8)
                     self.build_menu_processbar()
 
-                # 播放下一曲
-                elif key == ord(']'):
+                # 播放下一曲ord(']') 前次不是数字
+                elif key is 93 and pre_key not in range(48, 58):
                     # self.next_song()
                     self.jump_key_event()
                     self.build_menu_processbar()
 
-                # 播放上一曲
-                elif key == ord('['):
+                # 播放上一曲ord('[')
+                elif key is 91 and pre_key not in range(48, 58):
                     # self.previous_song()
                     self.up_key_event()
                     self.build_menu_processbar()
-                elif pre_key in (ord('['), ord(']')) and key == -1 and\
-                        self.datatype == 'songs' and sum(self.pre_keylist) % 92 != 0:
+                # 连按[ 或者 ]
+                elif pre_key in (91, 93) and key is -1 and\
+                        self.datatype is 'songs' and sum(self.pre_keylist) % 92 != 0:
                     self.space_key_event()
                     self.build_menu_processbar()
 
-                # 增加音量
-                elif key == ord('='):
+                # 增加音量ord('=')
+                elif key is 61:
                     self.player.volume_up()
                     self.build_menu_processbar()
 
-                # 减少音量
-                elif key == ord('-'):
+                # 减少音量ord('-')
+                elif key is 45:
                     self.player.volume_down()
                     self.build_menu_processbar()
 
-                # 随机播放
-                elif key == ord('?'):
-                    if len(self.player.info['player_list']) == 0:
+                # 随机播放ord('?')
+                elif key is 63:
+                    if len(self.player.info['player_list']) is 0:
                         continue
                     self.player.shuffle()
                     self.build_menu_processbar()
 
-                # 喜爱
-                elif key == ord(','):
+                # 喜爱 ord(',')
+                elif key is 44:
                     return_data = self.request_api(self.api.fm_like,
                                                    self.player.playing_id)
                     if return_data:
@@ -591,10 +590,10 @@ class Menu(object):
                         notify('Adding song failed!', 0)
                     self.build_menu_processbar()
 
-                # 删除FM
-                elif key == ord('.'):
-                    if self.datatype == 'fmsongs':
-                        if len(self.player.info['player_list']) == 0:
+                # 删除FM   ord('.')
+                elif key is 46:
+                    if self.datatype is 'fmsongs':
+                        if len(self.player.info['player_list']) is 0:
                             continue
                         self.player.next()
                         return_data = self.request_api(
@@ -603,45 +602,45 @@ class Menu(object):
                             notify('Deleted successfully!', 0)
                     self.build_menu_processbar()
 
-                # 下一FM
-                elif key == ord('/'):
-                    if self.datatype == 'fmsongs':
-                        if len(self.player.info['player_list']) == 0:
+                # 下一FM ord('/')
+                elif key is 47:
+                    if self.datatype is 'fmsongs':
+                        if len(self.player.info['player_list']) is 0:
                             continue
                         if self.player.end_callback:
                             self.player.end_callback()
                     self.build_menu_processbar()
 
-                # 播放、暂停
-                elif key == ord(' '):
+                # 播放、暂停 ord(' ')
+                elif key is 32:
                     self.space_key_event()
                     self.build_menu_processbar()
 
-                # 加载当前播放列表
-                elif key == ord('p'):
+                # 加载当前播放列表ord('p')
+                elif key is 112:
                     self.show_playing_song()
                     self.build_menu_processbar()
 
-                # 播放模式切换
-                elif key == ord('P'):
+                # 播放模式切换ord('P')
+                elif key is 80:
                     self.player.change_mode()
                     self.build_menu_processbar()
 
-                # 进入专辑
-                elif key == ord('A'):
+                # 进入专辑 ord('A')
+                elif key is 65:
                     self.album_key_event()
-                # 添加到打碟歌单
-                elif key == ord('a'):
+                # 添加到打碟歌单ord('a')
+                elif key is 97:
                     datatype = self.datatype
                     idx = self.index
-                    if datatype == 'songs' and len(self.datalist) != 0:
+                    if datatype is 'songs' and len(self.datalist) != 0:
                         self.djstack.append(self.datalist[idx])
-                    elif datatype == 'artists':
+                    elif datatype is 'artists':
                         pass
                     self.build_menu_processbar()
 
-                # 加载打碟歌单
-                elif key == ord('z'):
+                # 加载打碟歌单 ord('z')
+                elif key is 122:
                     self.stack.append(
                         [datatype, title, datalist, offset, self.index])
                     self.datatype = 'songs'
@@ -651,16 +650,16 @@ class Menu(object):
                     self.index = 0
                     self.build_menu_processbar()
 
-                # 添加到本地收藏
-                elif key == ord('s'):
-                    if (self.datatype == 'songs' or
-                            self.datatype == 'djchannels') and len(self.datalist) != 0:
+                # 添加到本地收藏ord('s')
+                elif key is 115:
+                    if (self.datatype is 'songs' or
+                            self.datatype is 'djchannels') and len(self.datalist) != 0:
                         self.collection.append(self.datalist[self.index])
                         notify('Added successfully', 0)
                     self.build_menu_processbar()
 
-                # 加载本地收藏
-                elif key == ord('c'):
+                # 加载本地收藏 ord('c')
+                elif key is 99:
                     self.stack.append(
                         [self.datatype, self.title, self.datalist, self.offset, self.index])
                     self.datatype = 'songs'
@@ -670,8 +669,8 @@ class Menu(object):
                     self.index = 0
                     self.build_menu_processbar()
 
-                # 从当前列表移除
-                elif key == ord('r'):
+                # 从当前列表移除ord('r')
+                elif key is 114:
                     if (self.datatype in ('songs', 'djchannels', 'fmsongs') and
                             len(self.datalist) != 0):
                         self.datalist.pop(self.index)
@@ -679,11 +678,12 @@ class Menu(object):
                             len(self.datalist), self.offset + self.step) - 1, self.index)
                     self.build_menu_processbar()
 
-                elif key == ord('t'):
+                # 倒计时 ord('t')
+                elif key is 116:
                     self.time_key_event()
 
-                # 当前项目下移
-                elif key == ord('J'):
+                # 当前项目下移 J
+                elif key is 74:
                     if self.datatype != 'main' and len(self.datalist) != 0 and\
                             self.index + 1 != len(self.datalist):
                         self.menu_starts = time.time()
@@ -695,8 +695,8 @@ class Menu(object):
                             self.offset = self.offset + self.step
                     self.build_menu_processbar()
 
-                # 当前项目上移
-                elif key == ord('K'):
+                # 当前项目上移 K
+                elif key is 75:
                     if self.datatype != 'main' and len(self.datalist) != 0 and self.index != 0:
                         self.menu_starts = time.time()
                         song = self.datalist.pop(self.index)
@@ -706,8 +706,8 @@ class Menu(object):
                         if self.index < self.offset:
                             self.offset = self.offset - self.step
                     self.build_menu_processbar()
-
-                elif key == ord('m'):
+                # m键
+                elif key is 109:
                     if self.datatype != 'main':
                         self.stack.append(
                             [self.datatype, self.title, self.datalist, self.offset, self.index])
@@ -717,9 +717,9 @@ class Menu(object):
                         self.offset = 0
                         self.index = 0
                     self.build_menu_processbar()
-
-                elif key == ord('g'):
-                    if self.datatype == 'help':
+                # 跳到开头 g键
+                elif key is 103:
+                    if self.datatype is 'help':
                         webbrowser.open_new_tab(
                             'https://github.com/wangjianyuan10/musicbox')
                     else:
@@ -727,13 +727,14 @@ class Menu(object):
                         self.offset = 0
                     self.build_menu_processbar()
 
-                elif key == ord('G'):
+                # 跳到末尾ord('G') 键
+                elif key is 71:
                     self.index = len(self.datalist) - 1
                     self.offset = self.index - self.index % self.step
                     self.build_menu_processbar()
 
-                # 开始下载
-                elif key == ord('C'):
+                # 开始下载 ord('C') C键值
+                elif key is 67:
                     s = self.datalist[self.index]
                     cache_thread = threading.Thread(
                         target=self.player.cache_song,
@@ -742,8 +743,8 @@ class Menu(object):
                     )
                     cache_thread.start()
                     self.build_menu_processbar()
-
-                elif key == ord('i'):
+                # 在网页打开 ord(i)
+                elif key is 105:
                     if self.player.playing_id != -1:
                         webbrowser.open_new_tab(
                             'http://music.163.com/song?id={}'.format(
@@ -773,11 +774,11 @@ class Menu(object):
         if idx >= len(self.datalist):
             return False
 
-        if datatype == 'main':
+        if datatype is 'main':
             self.choice_channel(idx)
 
         # 该艺术家的热门歌曲
-        elif datatype == 'artists':
+        elif datatype is 'artists':
             artist_name = datalist[idx]['artists_name']
             artist_id = datalist[idx]['artist_id']
 
@@ -791,20 +792,20 @@ class Menu(object):
                 'id': artist_id,
             }]
 
-        elif datatype == 'artist_info':
+        elif datatype is 'artist_info':
             self.title += ' > ' + datalist[idx]['item']
             artist_id = datalist[0]['id']
-            if idx == 0:
+            if idx is 0:
                 self.datatype = 'songs'
                 songs = netease.artists(artist_id)
                 self.datalist = netease.dig_info(songs, 'songs')
 
-            elif idx == 1:
+            elif idx is 1:
                 albums = netease.get_artist_album(artist_id)
                 self.datatype = 'albums'
                 self.datalist = netease.dig_info(albums, 'albums')
 
-        elif datatype == 'djchannels':
+        elif datatype is 'djchannels':
             radio_id = datalist[idx]['id']
             programs = netease.djprograms(radio_id)
             self.title += ' > ' + datalist[idx]['name']
@@ -812,7 +813,7 @@ class Menu(object):
             self.datalist = netease.dig_info(programs, 'songs')
 
         # 该专辑包含的歌曲
-        elif datatype == 'albums':
+        elif datatype is 'albums':
             album_id = datalist[idx]['album_id']
             songs = netease.album(album_id)
             self.datatype = 'songs'
@@ -820,7 +821,7 @@ class Menu(object):
             self.title += ' > ' + datalist[idx]['albums_name']
 
         # 精选歌单选项
-        elif datatype == 'recommend_lists':
+        elif datatype is 'recommend_lists':
             data = self.datalist[idx]
             self.datatype = data['datatype']
             self.datalist = netease.dig_info(data['callback'](), self.datatype)
@@ -835,7 +836,7 @@ class Menu(object):
             self.title += ' > ' + datalist[idx]['playlist_name']
 
         # 分类精选
-        elif datatype == 'playlist_classes':
+        elif datatype is 'playlist_classes':
             # 分类名称
             data = self.datalist[idx]
             self.datatype = 'playlist_class_detail'
@@ -843,7 +844,7 @@ class Menu(object):
             self.title += ' > ' + data
 
         # 某一分类的详情
-        elif datatype == 'playlist_class_detail':
+        elif datatype is 'playlist_class_detail':
             # 子类别
             data = self.datalist[idx]
             self.datatype = 'top_playlists'
@@ -874,14 +875,14 @@ class Menu(object):
             self.index = 0
 
         # 歌曲榜单
-        elif datatype == 'toplists':
+        elif datatype is 'toplists':
             songs = netease.top_songlist(idx)
             self.title += ' > ' + self.datalist[idx]
             self.datalist = netease.dig_info(songs, 'songs')
             self.datatype = 'songs'
 
         # 搜索菜单
-        elif datatype == 'search':
+        elif datatype is 'search':
             self.index = 0
             self.offset = 0
             SearchCategory = namedtuple('SearchCategory', ['type', 'title'])
@@ -921,7 +922,7 @@ class Menu(object):
         # log.debug('FM CallBack.')
         data = self.get_new_fm()
         self.player.append_songs(data)
-        if self.datatype == 'fmsongs':
+        if self.datatype is 'fmsongs':
             if self.player.is_empty:
                 return
             self.datatype = self.player.info['player_list_type']
@@ -954,21 +955,21 @@ class Menu(object):
         self.offset = 0
         self.index = 0
 
-        if idx == 0:
+        if idx is 0:
             self.datalist = self.api.toplists
             self.title += ' > 排行榜'
             self.datatype = 'toplists'
-        elif idx == 1:
+        elif idx is 1:
             artists = self.api.top_artists()
             self.datalist = self.api.dig_info(artists, 'artists')
             self.title += ' > 艺术家'
             self.datatype = 'artists'
-        elif idx == 2:
+        elif idx is 2:
             albums = self.api.new_albums()
             self.datalist = self.api.dig_info(albums, 'albums')
             self.title += ' > 新碟上架'
             self.datatype = 'albums'
-        elif idx == 3:
+        elif idx is 3:
             self.datalist = [{
                 'title': '全站置顶',
                 'datatype': 'top_playlists',
@@ -980,36 +981,37 @@ class Menu(object):
             }]
             self.title += ' > 精选歌单'
             self.datatype = 'recommend_lists'
-        elif idx == 4:
+        elif idx is 4:
             myplaylist = self.request_api(self.api.user_playlist, self.userid)
             self.datatype = 'top_playlists'
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
             self.title += ' > ' + self.username + ' 的歌单'
-        elif idx == 5:
+        elif idx is 5:
             self.datatype = 'djchannels'
             self.title += ' > 主播电台'
             self.datalist = self.api.djchannels()
-        elif idx == 6:
+        elif idx is 6:
             self.datatype = 'songs'
             self.title += ' > 每日推荐歌曲'
             myplaylist = self.request_api(self.api.recommend_playlist)
-            if myplaylist == -1:
+            if myplaylist is -1:
                 return
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
-        elif idx == 7:
+        elif idx is 7:
             myplaylist = self.request_api(self.api.recommend_resource)
             self.datatype = 'top_playlists'
             self.title += ' > 每日推荐歌单'
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
-        elif idx == 8:
+        elif idx is 8:
             self.datatype = 'fmsongs'
             self.title += ' > 私人FM'
             self.datalist = self.get_new_fm()
-        elif idx == 9:
+        elif idx is 9:
             self.datatype = 'search'
             self.title += ' > 搜索'
             self.datalist = ['歌曲', '艺术家', '专辑', '网易精选集']
-        elif idx == 10:
+        elif idx is 10:
             self.datatype = 'help'
             self.title += ' > 帮助'
             self.datalist = shortcut
+            # 删除FM
