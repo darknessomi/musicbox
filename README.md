@@ -1,10 +1,10 @@
-# NetEase-MusicBox-for-Mac
+# NetEase-MusicBox-Not-Only-For-Mac
 
 **感谢为 MusicBox 的开发付出过努力的[每一个人](https://github.com/darknessomi/musicbox/graphs/contributors)！**
 
-本仓库为https://github.com/darknessomi/musicbox.git的fork版本,不支持pip安装.
+本仓库为https://github.com/darknessomi/musicbox.git的fork版本.
 
-高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
+高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写,不支持python2.7。需要3.5以上
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
@@ -102,6 +102,10 @@
 ### macOS安装
 
     $ brew install mpg123
+    $ pip(3) install macmusicbox
+### ubuntu安装
+    $ apt-get install mpg123
+    $ pip(3) install macmusicbox
 
 
 ## 配置和错误处理
@@ -123,6 +127,9 @@ curl -L ip.cn
 | OS       | Version               |
 | -------- | --------------------- |
 | macOS    | 10.14 |
+| ubuntu   | 16.04                 |
+| Lubuntu  | 16.06                 |
+
 
 ### 错误处理
 
