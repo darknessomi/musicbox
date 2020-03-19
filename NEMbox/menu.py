@@ -247,7 +247,7 @@ class Menu(object):
         offset = self.offset
         idx = self.index
         step = self.step
-        if idx is offset:
+        if idx == offset:
             if offset is 0:
                 return
             self.offset -= step
@@ -263,7 +263,7 @@ class Menu(object):
         offset = self.offset
         idx = self.index
         step = self.step
-        if idx is min(len(datalist), offset + step) - 1:
+        if idx == min(len(datalist), offset + step) - 1:
             if offset + step >= len(datalist):
                 return
             self.offset += step
@@ -467,7 +467,6 @@ class Menu(object):
             if keylist:
                 self.pre_keylist = deepcopy(keylist)
 
-            # log.warn(datatype)
             if self.datatype is 'songs' and keylist and \
                     (set(keylist) | set(range(48, 58))) == set(range(48, 58)):
                 # 歌曲数字映射
@@ -477,15 +476,9 @@ class Menu(object):
                 continue
 
             if len(keylist) > 1:
-                # log.warn(keylist)
                 if parse_keylist(keylist):
                     self.num_jump_key_event()
             else:
-                # 单键映射
-                # term resize
-                if key is -1:
-                    self.player.update_size()
-                    self.build_menu_processbar()
 
                 if self.is_in_countdown:
                     if time.time() - self.countdown_start > self.countdown:
@@ -750,6 +743,11 @@ class Menu(object):
                             'http://music.163.com/song?id={}'.format(
                                 self.player.playing_id)
                         )
+                    self.build_menu_processbar()
+                # 单键映射
+                # term resize
+                elif key is -1:
+                    self.player.update_size()
                     self.build_menu_processbar()
 
                 pre_key = key
