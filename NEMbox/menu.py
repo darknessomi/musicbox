@@ -30,7 +30,7 @@ from .utils import notify
 from .storage import Storage
 from .cache import Cache
 from . import logger
-from .cmd_parser import parse_keylist, cmd_parser
+from .cmd_parser import parse_keylist, cmd_parser, erase_coroutine
 from copy import deepcopy
 
 
@@ -52,6 +52,13 @@ def carousel(left, right, x):
 shortcut = [
     ['j', 'Down      ', '下移'],
     ['k', 'Up        ', '上移'],
+    ['<UP>', 'Up        ', '上移'],
+    ['<DOWN>', 'Down      ', '上移'],
+    ['<num>+j', '<num> Up ', '上移num'],
+    ['<num>+k', '<num>Down', '下移num'],
+    ['<num><UP>', '<num> Up ', '上移num'],
+    ['<num><DOWN>', '<num>Down', '下移num'],
+    ['<touchpad>', 'Down Up    ', '上下移'],
     ['h', 'Back      ', '后退'],
     ['l', 'Forward   ', '前进'],
     ['u', 'Prev page ', '上一页'],
@@ -59,6 +66,9 @@ shortcut = [
     ['f', 'Search    ', '快速搜索'],
     ['[', 'Prev song ', '上一曲'],
     [']', 'Next song ', '下一曲'],
+    ['<num>+]', '<num> Next Song ', '下num曲'],
+    ['<num>+[', '<num> Prev song ', '上num曲'],
+    ['<num>', 'goto song num ', '跳转指定歌曲id'],
     [' ', 'Play/Pause', '播放/暂停'],
     ['?', 'Shuffle          ', '手气不错'],
     ['=', 'Volume+          ', '音量增加'],
@@ -387,11 +397,15 @@ class Menu(object):
         self.build_menu_processbar()
 
     def digit_key_song_event(self):
+        # 直接跳到指定id 歌曲
         step = self.step
         song_index = parse_keylist(self.key_list)
-        self.index = song_index
-        self.offset = self.index - self.index % step
-        self.build_menu_processbar()
+        if self.index != song_index:
+            self.index = song_index
+            self.offset = self.index - self.index % step
+            self.build_menu_processbar()
+            self.ui.screen.refresh()
+            self.space_key_event()
 
     def time_key_event(self):
         self.countdown_start = time.time()
@@ -459,7 +473,10 @@ class Menu(object):
         pre_key = -1
         keylist = self.key_list
         parser = cmd_parser(keylist)
+        erase_cmd_list = []
+        erase_coro = erase_coroutine(erase_cmd_list)
         next(parser)  # start generator
+        next(erase_coro)
         while True:
             self.screen.timeout(500)
             key = self.screen.getch()
@@ -471,8 +488,6 @@ class Menu(object):
                     (set(keylist) | set(range(48, 58))) == set(range(48, 58)):
                 # 歌曲数字映射
                 self.digit_key_song_event()
-                self.ui.screen.refresh()
-                self.space_key_event()
                 continue
 
             if len(keylist) > 1:
@@ -704,9 +719,8 @@ class Menu(object):
                     if self.datatype != 'main':
                         self.stack.append(
                             [self.datatype, self.title, self.datalist, self.offset, self.index])
-                        self.datatype = self.stack[0][0]
-                        self.title = self.stack[0][1]
-                        self.datalist = self.stack[0][2]
+                        self.datatype, self.title, self.datalist, * \
+                            _ = self.stack[0]
                         self.offset = 0
                         self.index = 0
                     self.build_menu_processbar()
@@ -744,11 +758,13 @@ class Menu(object):
                                 self.player.playing_id)
                         )
                     self.build_menu_processbar()
-                # 单键映射
                 # term resize
-                elif key is -1:
-                    self.player.update_size()
-                    self.build_menu_processbar()
+                # 刷新屏幕  按下某个键或者默认5秒刷新空白区
+                erase_coro.send(key)
+                if erase_cmd_list:
+                    self.screen.erase()
+                self.player.update_size()
+                self.build_menu_processbar()
 
                 pre_key = key
                 self.ui.screen.refresh()

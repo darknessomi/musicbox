@@ -8,9 +8,11 @@
 
 from copy import deepcopy
 from functools import wraps
+import os
 
+ERASE_SPEED = 5  # 屏幕5秒刷新一次 去除错误的显示
 
-__all__ = ['cmd_parser', 'parse_keylist', 'coroutine']
+__all__ = ['cmd_parser', 'parse_keylist', 'coroutine', 'erase_coroutine']
 
 
 def coroutine(func):
@@ -51,8 +53,25 @@ def cmd_parser(results):
     while 1:
         results.clear()
         results += yield from _cmd_parser()
-        # results.clear()
         yield results
+
+
+def _erase_coroutine():
+    keylist = []
+    while 1:
+        key = yield
+        keylist.append(key)
+        if len(set(keylist)) > 1:
+            return keylist
+        elif len(keylist) >= ERASE_SPEED*2:
+            return keylist
+
+
+def erase_coroutine(erase_cmd_list):
+    while 1:
+        erase_cmd_list.clear()
+        erase_cmd_list += yield from _erase_coroutine()
+        yield erase_cmd_list
 
 
 def parse_keylist(keylist):
