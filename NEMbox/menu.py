@@ -622,6 +622,8 @@ class Menu(object):
                         # continue
                         if self.player.end_callback:
                             self.player.end_callback()
+                        else:
+                            self.datalist.extend(self.get_new_fm())
                     self.build_menu_processbar()
                     self.index = len(self.datalist) - 1
                     self.offset = self.index - self.index % self.step
@@ -649,8 +651,12 @@ class Menu(object):
                 elif key is 97:
                     datatype = self.datatype
                     idx = self.index
-                    if datatype is 'songs' and len(self.datalist) != 0:
-                        self.djstack.append(self.datalist[idx])
+                    if datatype in ('songs', 'fmsongs') and len(self.datalist) != 0:
+                        if self.datalist[idx] not in self.djstack:
+                            self.djstack.append(self.datalist[idx])
+                            song = self.datalist[idx]
+                            notify('%s-%s成功添加到打碟歌单!' %
+                                   (song.get('song_name'), song.get('artist')), 0)
                     elif datatype is 'artists':
                         pass
                     self.build_menu_processbar()
@@ -658,7 +664,7 @@ class Menu(object):
                 # 加载打碟歌单 ord('z')
                 elif key is 122:
                     self.stack.append(
-                        [datatype, title, datalist, offset, self.index])
+                        [self.datatype, self.title, self.datalist, self.offset, self.index])
                     self.datatype = 'songs'
                     self.title = '网易云音乐 > 打碟'
                     self.datalist = self.djstack
@@ -690,6 +696,10 @@ class Menu(object):
                     if (self.datatype in ('songs', 'djchannels', 'fmsongs') and
                             len(self.datalist) != 0):
                         self.datalist.pop(self.index)
+                        log.warn(self.index)
+                        log.warn(len(self.datalist))
+                        if self.index == len(self.datalist):
+                            self.up_key_event()
                         self.index = carousel(self.offset, min(
                             len(self.datalist), self.offset + self.step) - 1, self.index)
                     self.build_menu_processbar()

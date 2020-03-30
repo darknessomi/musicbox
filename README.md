@@ -74,8 +74,9 @@
 | ⇧+k      | Move Up         | 向上移动当前项目   |
 | ⇧+c      | Cache           | 缓存歌曲到本地     |
 | ,        | Like            | 喜爱               |
-| .        | Trash FM        | 删除 FM            |
-| /        | Next FM         | 下一FM             |
+| ;        | Trash FM        | 删除 FM            |
+| .        | Next FM        | 下一首 FM            |
+| /        | More FM         | 更多  FM             |
 | q        | Quit            | 退出               |
 | t        | Timing Exit     | 定时退出           |
 | w        | Quit&Clear      | 退出并清除用户信息 |
