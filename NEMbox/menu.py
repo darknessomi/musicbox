@@ -87,8 +87,9 @@ shortcut = [
     ['Shift+k', 'Move Up   ', '向上移动当前条目'],
     [',', 'Like      ', '喜爱'],
     ['Shfit+c', 'Cache     ', '缓存歌曲到本地'],
-    ['.', 'Trash FM  ', '删除 FM'],
-    ['/', 'Next FM   ', '下一 FM'],
+    ['.', 'Next FM  ', '下一 FM'],
+    ['/', 'More FM   ', '更多 FM'],
+    [';', 'Trash FM  ', '删除 FM'],
     ['q', 'Quit      ', '退出'],
     ['w', 'Quit&Clear', '退出并清除用户信息']
 ]
@@ -129,6 +130,7 @@ class Menu(object):
         self.is_in_countdown = False
         self.key_list = []
         self.pre_keylist = []
+        self.parser = None
 
     @property
     def user(self):
@@ -473,19 +475,21 @@ class Menu(object):
             show_lyrics_new_process()
         pre_key = -1
         keylist = self.key_list
-        parser = cmd_parser(keylist)
+        self.parser = cmd_parser(keylist)
         erase_cmd_list = []
         erase_coro = erase_coroutine(erase_cmd_list)
-        next(parser)  # start generator
+        next(self.parser)  # start generator
         next(erase_coro)
         while True:
             self.screen.timeout(500)
             key = self.screen.getch()
-            parser.send(key)
+            if key is 46:  # ord('.')
+                key = 93  # ord(']')  将 . 键 映射到 ]
+            self.parser.send(key)
             if keylist:
                 self.pre_keylist = deepcopy(keylist)
 
-            if self.datatype is 'songs' and keylist and \
+            if self.datatype in ('songs', 'fmsongs') and keylist and \
                     (set(keylist) | set(range(48, 58))) == set(range(48, 58)):
                 # 歌曲数字映射
                 self.digit_key_song_event()
@@ -518,8 +522,8 @@ class Menu(object):
                     self.jump_key_event()
                     self.build_menu_processbar()
 
-                # 数字快捷键ord('0') <= key <= ord('9')
-                elif 48 <= key <= 57 and self.datatype is not 'songs':
+                # 单键数字快捷键ord('0') <= key <= ord('9')
+                elif 48 <= key <= 57 and self.datatype not in ('songs', 'fmsongs'):
                     idx = key - ord('0')
                     self.ui.build_menu(self.datatype, self.title, self.datalist,
                                        self.offset, idx, self.step, self.menu_starts)
@@ -567,7 +571,7 @@ class Menu(object):
                     self.build_menu_processbar()
                 # 连按[ 或者 ]
                 elif pre_key in (91, 93) and key is -1 and\
-                        self.datatype is 'songs' and sum(self.pre_keylist) % 92 != 0:
+                        self.datatype in ('songs', 'fmsongs') and sum(self.pre_keylist) % 92 != 0:
                     self.space_key_event()
                     self.build_menu_processbar()
 
@@ -599,8 +603,8 @@ class Menu(object):
                         notify('Adding song failed!', 0)
                     self.build_menu_processbar()
 
-                # 删除FM   ord('.')
-                elif key is 46:
+                # 删除FM   ord(';')
+                elif key is 59:
                     if self.datatype is 'fmsongs':
                         if len(self.player.info['player_list']) is 0:
                             continue
@@ -611,13 +615,16 @@ class Menu(object):
                             notify('Deleted successfully!', 0)
                     self.build_menu_processbar()
 
-                # 下一FM ord('/')
+                # 更多FM ord('/')
                 elif key is 47:
                     if self.datatype is 'fmsongs':
-                        if len(self.player.info['player_list']) is 0:
-                            continue
+                        # if len(self.player.info['player_list']) is 0:
+                        # continue
                         if self.player.end_callback:
                             self.player.end_callback()
+                    self.build_menu_processbar()
+                    self.index = len(self.datalist) - 1
+                    self.offset = self.index - self.index % self.step
                     self.build_menu_processbar()
 
                 # 播放、暂停 ord(' ')
@@ -911,6 +918,7 @@ class Menu(object):
             self.datalist = self.search(self.datatype)
         else:
             self.enter_flag = False
+        self.parser.send(-1)
 
     def show_playing_song(self):
         if self.player.is_empty:
