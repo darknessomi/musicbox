@@ -426,6 +426,7 @@ class Menu(object):
 
     def down_page_event(self):
         offset = self.offset
+        datalist = self.datalist
         step = self.step
         if offset + step >= len(datalist):
             return
@@ -550,7 +551,7 @@ class Menu(object):
                 # 搜索ord('f')
                 elif key is 102:
                     # 8 is the 'search' menu
-                    self.dispatch_enter(8)
+                    self.dispatch_enter(9)
                     self.build_menu_processbar()
 
                 # 播放下一曲ord(']') 前次不是数字
