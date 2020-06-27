@@ -343,7 +343,7 @@ class Ui(object):
                 else:
                     self.addstr(
                         i - offset + 9,
-                        self.startcol,
+                        self.startcol + 3,
                         str(i) + ". " + datalist[i].splitlines()[0][:maxlength],
                     )
 
