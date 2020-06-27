@@ -339,11 +339,12 @@ class Ui(object):
                         "-> "
                         + str(i)
                         + ". "
-                        + datalist[i].split(':', 1)[0],
+                        + datalist[i].split(':', 1)[0]
+                        + ":",
                         curses.color_pair(2),
                     )
                     self.addstr(
-                        21,
+                        22,
                         self.startcol + (len(str(i)) + 2),
                         break_str(datalist[i].split(':', 1)[1][1:], self.startcol + (len(str(i)) + 2), maxlength),
                         curses.color_pair(2),
