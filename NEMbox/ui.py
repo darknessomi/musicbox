@@ -2,14 +2,18 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
+# KenHuang:
+# 1.增加显示颜色自定义；
+# 2.调整显示格式；
 """
 网易云音乐 Ui
 """
 from __future__ import print_function, unicode_literals, division, absolute_import
-
+import os
 import hashlib
 import re
 import curses
+from curses import textpad
 import datetime
 
 from future.builtins import range, str, int
@@ -55,10 +59,10 @@ def break_str(s, start, max_len=80):
 class Ui(object):
     def __init__(self):
         self.screen = curses.initscr()
-        self.screen.timeout(100)  # the screen refresh every 100ms
-        # charactor break buffer
-        curses.cbreak()
-        self.screen.keypad(1)
+        # self.screen.timeout(100)  # the screen refresh every 100ms
+        # # charactor break buffer
+        # curses.cbreak()
+        # self.screen.keypad(1)
 
         curses.start_color()
         if Config().get("curses_transparency"):
@@ -68,14 +72,24 @@ class Ui(object):
             curses.init_pair(3, curses.COLOR_RED, -1)
             curses.init_pair(4, curses.COLOR_YELLOW, -1)
         else:
-            curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-            curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)
-            curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
-            curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+            colors = Config().get("colors")
+            if "TERM" in os.environ and os.environ["TERM"] == "xterm-256color" and colors:
+                curses.use_default_colors()
+                for i in range(1,6):
+                    color = colors["pair" + str(i)]
+                    curses.init_pair(i, color[0], color[1])
+                self.screen.bkgd(32, curses.color_pair(5))
+            else:
+                curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+                curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)
+                curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
+                curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         # term resize handling
         size = terminalsize.get_terminal_size()
         self.x = max(size[0], 10)
         self.y = max(size[1], 25)
+        self.playerX = 1 #terminalsize.get_terminal_size()[1] - 10
+        self.playerY = 0
         self.startcol = int(float(self.x) / 5)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
@@ -108,15 +122,15 @@ class Ui(object):
         self.screen.clrtoeol()
         if pause:
             self.addstr(
-                1, self.indented_startcol, "_ _ z Z Z " + quality, curses.color_pair(3)
+                self.playerX, self.indented_startcol, "_ _ z Z Z " + quality, curses.color_pair(3)
             )
         else:
             self.addstr(
-                1, self.indented_startcol, "♫  ♪ ♫  ♪ " + quality, curses.color_pair(3)
+                self.playerX, self.indented_startcol, "♫  ♪ ♫  ♪ " + quality, curses.color_pair(3)
             )
 
         self.addstr(
-            1,
+            self.playerX,
             min(self.indented_startcol + 18, self.x - 1),
             song_name + self.space + artist + "  < " + album_name + " >",
             curses.color_pair(4),
@@ -634,3 +648,5 @@ class Ui(object):
         else:
             self.space = " - "
         self.screen.refresh()
+
+
