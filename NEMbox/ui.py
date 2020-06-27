@@ -44,8 +44,9 @@ def break_substr(s, start, max_len=80):
 
 
 def break_str(s, start, max_len=80):
-    res = [s.split(':', 1)[0] + ":\n"]
-    s = s.split(':', 1)[1][1:]
+    # res = [s.split(':', 1)[0] + ":\n"]
+    # s = s.split(':', 1)[1][1:]
+    res = []
     for substr in s.splitlines():
         res.append(break_substr(substr, start, max_len=80))
     return "\n{}".format(" " * start).join(res)
@@ -338,7 +339,14 @@ class Ui(object):
                         "-> "
                         + str(i)
                         + ". "
-                        + break_str(datalist[i], self.indented_startcol, maxlength),
+                        + datalist[i].split(':', 1)[0]
+                        + ":",
+                        curses.color_pair(2),
+                    )
+                    self.addstr(
+                        22,
+                        self.startcol + (len(str(i)) + 2),
+                        break_str(datalist[i].split(':', 1)[1][1:], self.startcol + (len(str(i)) + 2), maxlength),
                         curses.color_pair(2),
                     )
                 else:
