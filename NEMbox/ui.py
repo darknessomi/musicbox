@@ -33,13 +33,20 @@ except ImportError:
     log.warn("Osdlyrics is not available.")
 
 
-def break_str(s, start, max_len=80):
+def break_substr(s, start, max_len=80):
     length = len(s)
     i, x = 0, max_len
     res = []
     while i < length:
         res.append(s[i : i + max_len])
         i += x
+    return "\n{}".format(" " * start).join(res)
+
+
+def break_str(s, start, max_len=80):
+    res = []
+    for substr in s.splitlines():
+        res.append(break_str(substr, start, max_len=80))
     return "\n{}".format(" " * start).join(res)
 
 
