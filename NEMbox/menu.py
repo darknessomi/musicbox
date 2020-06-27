@@ -753,7 +753,7 @@ class Menu(object):
             self.datalist = []
             for one_comment in hotcomments:
                 self.datalist.append(
-                    "(热评 %s❤️ ️)%s:%s"
+                    "(热评 %s❤️ ️) %s: %s"
                     % (
                         one_comment["likedCount"],
                         one_comment["user"]["nickname"],
@@ -763,7 +763,7 @@ class Menu(object):
             for one_comment in comcomments:
                 self.datalist.append(one_comment["content"])
             self.datatype = "comments"
-            self.title = "网易云音乐 > 评论:%s" % datalist[idx]["song_name"]
+            self.title = "网易云音乐 > 评论: %s" % datalist[idx]["song_name"]
             self.offset = 0
             self.index = 0
 
