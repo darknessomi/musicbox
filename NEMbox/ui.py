@@ -44,7 +44,7 @@ def break_substr(s, start, max_len=80):
 
 
 def break_str(s, start, max_len=80):
-    res = []
+    res = ['\n']
     for substr in s.splitlines():
         res.append(break_substr(substr, start, max_len=80))
     return "\n{}".format(" " * start).join(res)
@@ -343,7 +343,7 @@ class Ui(object):
                 else:
                     self.addstr(
                         i - offset + 9,
-                        self.startcol + 3,
+                        self.startcol,
                         str(i) + ". " + datalist[i].splitlines()[0][:maxlength],
                     )
 
