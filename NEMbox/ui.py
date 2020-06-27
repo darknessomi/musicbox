@@ -344,7 +344,7 @@ class Ui(object):
                     self.addstr(
                         i - offset + 9,
                         self.startcol,
-                        str(i) + ". " + datalist[i][:maxlength].replace('\n', ' ').replace('\r', ' '),
+                        str(i) + ". " + datalist[i].splitlines()[0][:maxlength],
                     )
 
         elif datatype == "artists":
