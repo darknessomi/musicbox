@@ -46,7 +46,7 @@ def break_substr(s, start, max_len=80):
 def break_str(s, start, max_len=80):
     res = []
     for substr in s.splitlines():
-        res.append(break_str(substr, start, max_len=80))
+        res.append(break_substr(substr, start, max_len=80))
     return "\n{}".format(" " * start).join(res)
 
 
