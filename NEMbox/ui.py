@@ -48,7 +48,7 @@ def break_str(s, start, max_len=80):
     # s = s.split(':', 1)[1][1:]
     res = []
     for substr in s.splitlines():
-        res.append(break_substr(substr, start, max_len=80))
+        res.append(break_substr(substr, start, max_len))
     return "\n{}".format(" " * start).join(res)
 
 
