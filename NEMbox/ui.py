@@ -123,7 +123,7 @@ class Ui(object):
                         '_ _ z Z Z ' + quality, curses.color_pair(3))
         else:
             self.addstr(1, self.indented_startcol,
-                        '♫  ♪ ♫  ♪ 👯' + quality, curses.color_pair(3))
+                        '♫  ♪ ♫  ♪ ' + quality, curses.color_pair(3))
 
         self.addstr(
             1, min(self.indented_startcol + 18, self.x - 1),
@@ -192,7 +192,7 @@ class Ui(object):
             pass
         self.addstr(3, self.startcol - 2, process, curses.color_pair(1))
         if not lyrics:
-            self.now_lyric = '暂无歌词 😌 \n'
+            self.now_lyric = '暂无歌词 ~>_<~ \n'
             self.post_lyric = ''
             if dbus_activity and self.config.get('osdlyrics'):
                 self.now_playing = '{} - {}\n'.format(name, artist)
@@ -230,7 +230,7 @@ class Ui(object):
             try:
                 bus = dbus.SessionBus().get_object('org.musicbox.Bus', '/')
                 # TODO 环境问题，没有试过桌面歌词，此处需要了解的人加个刷界面操作
-                if self.now_lyric == '暂无歌词 😟 \n':
+                if self.now_lyric == '暂无歌词 ~>_<~ \n':
                     bus.refresh_lyrics(self.now_playing,
                                        dbus_interface='local.musicbox.Lyrics')
                 else:
@@ -255,7 +255,7 @@ class Ui(object):
 
     def build_loading(self):
         curses.curs_set(0)
-        self.addstr(7, self.startcol, '享受高品质音乐，💃loading...',
+        self.addstr(7, self.startcol, '享受高品质音乐，loading...',
                     curses.color_pair(1))
         self.screen.refresh()
 
@@ -273,7 +273,7 @@ class Ui(object):
         self.addstr(7, self.startcol, title, curses.color_pair(1))
 
         if len(datalist) == 0:
-            self.addstr(8, self.startcol, '这里什么都没有  😅')
+            self.addstr(8, self.startcol, '这里什么都没有 -，-')
             return self.screen.refresh()
 
         if datatype == 'main':
