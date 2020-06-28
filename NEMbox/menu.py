@@ -169,7 +169,7 @@ class Menu(object):
         else:
             self.storage.logout()
             x = self.ui.build_login_error()
-            if x >=0 and curses.keyname(x) != keyMap["forward"]:
+            if x >=0 and curses.keyname(x).decode("utf-8") != keyMap["forward"]:
                 return False
             return self.login()
 
@@ -259,12 +259,14 @@ class Menu(object):
         if self.player.is_empty:
             return
         self.player.prev()
+
     def stop(self):
         self.quit = True
         self.player.stop()
         self.cache.quit()
         self.storage.save()
         curses.endwin()
+
     def start(self):
         self.menu_starts = time.time()
         self.ui.build_menu(
@@ -300,16 +302,16 @@ class Menu(object):
                 #         break
 
                 # 退出
-                if curses.keyname(key) == keyMap["quit"]:
+                if curses.keyname(key).decode("utf-8") == keyMap["quit"]:
                     break
 
                 # 退出并清除用户信息
-                if curses.keyname(key) == keyMap["quitClear"]:
+                if curses.keyname(key).decode("utf-8") == keyMap["quitClear"]:
                     self.api.logout()
                     break
 
                 # 上移
-                elif curses.keyname(key) == keyMap["up"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["up"]:
                     # turn page if at beginning
                     if idx == offset:
                         if offset == 0:
@@ -324,7 +326,7 @@ class Menu(object):
                     self.menu_starts = time.time()
 
                 # 下移
-                elif curses.keyname(key) == keyMap["down"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["down"]:
                     # turn page if at end
                     if idx == min(len(datalist), offset + step) - 1:
                         if offset + step >= len(datalist):
@@ -356,7 +358,7 @@ class Menu(object):
                     self.offset = 0
 
                 # 向上翻页
-                elif curses.keyname(key) == keyMap["prevPage"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["prevPage"]:
                     if offset == 0:
                         continue
                     self.menu_starts = time.time()
@@ -366,7 +368,7 @@ class Menu(object):
                     self.index = (self.index - step) // step * step
 
                 # 向下翻页
-                elif curses.keyname(key) == keyMap["nextPage"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["nextPage"]:
                     if offset + step >= len(datalist):
                         continue
                     self.menu_starts = time.time()
@@ -376,7 +378,7 @@ class Menu(object):
                     self.index = (self.index + step) // step * step
 
                 # 前进
-                elif curses.keyname(key) == keyMap["forward"] or key == 10:
+                elif curses.keyname(key).decode("utf-8") == keyMap["forward"] or key == 10:
                     self.enter_flag = True
                     if len(self.datalist) <= 0:
                         continue
@@ -388,7 +390,7 @@ class Menu(object):
                         self.offset = 0
 
                 # 回退
-                elif curses.keyname(key) == keyMap["back"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["back"]:
                     # if not main menu
                     if len(self.stack) == 1:
                         continue
@@ -402,35 +404,35 @@ class Menu(object):
                     self.at_playing_list = False
 
                 # 搜索
-                elif curses.keyname(key) == keyMap["search"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["search"]:
                     # 8 is the 'search' menu
                     # 9 is the 'search' menu
                     self.dispatch_enter(9)
 
                 # 播放下一曲
-                elif curses.keyname(key) == keyMap["nextSong"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["nextSong"]:
                     self.next_song()
 
                 # 播放上一曲
-                elif curses.keyname(key) == keyMap["prevSong"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["prevSong"]:
                     self.previous_song()
 
                 # 增加音量
-                elif curses.keyname(key) == keyMap["volume+"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["volume+"]:
                     self.player.volume_up()
 
                 # 减少音量
-                elif curses.keyname(key) == keyMap["volume-"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["volume-"]:
                     self.player.volume_down()
 
                 # 随机播放
-                elif curses.keyname(key) == keyMap["shuffle"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["shuffle"]:
                     if len(self.player.info["player_list"]) == 0:
                         continue
                     self.player.shuffle()
 
                 # 喜爱
-                elif curses.keyname(key) == keyMap["like"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["like"]:
                     return_data = self.request_api(self.api.fm_like, self.player.playing_id)
                     if return_data:
                         song_name = self.player.playing_name
@@ -439,7 +441,7 @@ class Menu(object):
                         notify("Adding song failed!", 0)
 
                 # 删除FM
-                elif curses.keyname(key) == keyMap["trashFM"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["trashFM"]:
                     if self.datatype == "fmsongs":
                         if len(self.player.info["player_list"]) == 0:
                             continue
@@ -451,7 +453,7 @@ class Menu(object):
                             notify("Deleted successfully!", 0)
 
                 # 下一FM
-                elif curses.keyname(key) == keyMap["nextFM"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["nextFM"]:
                     if self.datatype == "fmsongs":
                         if len(self.player.info["player_list"]) == 0:
                             continue
@@ -459,7 +461,7 @@ class Menu(object):
                             self.player.end_callback()
 
                 # 播放、暂停
-                elif curses.keyname(key) == keyMap["playPause"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["playPause"]:
                     if not self.datalist:
                         continue
 
@@ -493,15 +495,15 @@ class Menu(object):
                         self.player.play_or_pause(self.player.info["idx"], isNotSongs)
 
                 # 加载当前播放列表
-                elif curses.keyname(key) == keyMap["presentHistory"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["presentHistory"]:
                     self.show_playing_song()
 
                 # 播放模式切换
-                elif curses.keyname(key) == keyMap["playingMode"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["playingMode"]:
                     self.player.change_mode()
 
                 # 进入专辑
-                elif curses.keyname(key) == keyMap["enterAlbum"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["enterAlbum"]:
                     if datatype == "album":
                         continue
                     if datatype in ["songs", "fmsongs"]:
@@ -528,14 +530,14 @@ class Menu(object):
                                 break
 
                 # 添加到打碟歌单
-                elif curses.keyname(key) == keyMap["add"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["add"]:
                     if datatype == "songs" and len(datalist) != 0:
                         self.djstack.append(datalist[idx])
                     elif datatype == "artists":
                         pass
 
                 # 加载打碟歌单
-                elif curses.keyname(key) == keyMap["djList"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["djList"]:
                     self.stack.append([datatype, title, datalist, offset, self.index])
                     self.datatype = "songs"
                     self.title = "网易云音乐 > 打碟"
@@ -544,7 +546,7 @@ class Menu(object):
                     self.index = 0
 
                 # 添加到本地收藏
-                elif curses.keyname(key) == keyMap["star"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["star"]:
                     if (datatype == "songs" or datatype == "djchannels") and len(
                         datalist
                     ) != 0:
@@ -552,7 +554,7 @@ class Menu(object):
                         notify("Added successfully", 0)
 
                 # 加载本地收藏
-                elif curses.keyname(key) == keyMap["collection"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["collection"]:
                     self.stack.append([datatype, title, datalist, offset, self.index])
                     self.datatype = "songs"
                     self.title = "网易云音乐 > 本地收藏"
@@ -561,7 +563,7 @@ class Menu(object):
                     self.index = 0
 
                 # 从当前列表移除
-                elif curses.keyname(key) == keyMap["remove"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["remove"]:
                     if (
                         datatype in ("songs", "djchannels", "fmsongs")
                         and len(datalist) != 0
@@ -571,7 +573,7 @@ class Menu(object):
                             offset, min(len(datalist), offset + step) - 1, idx
                         )
 
-                elif curses.keyname(key) == keyMap["countDown"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["countDown"]:
                     self.countdown_start = time.time()
                     countdown = self.ui.build_timing()
                     if not countdown.isdigit():
@@ -591,7 +593,7 @@ class Menu(object):
                         if self.timer:
                             self.timer.cancel()
                 # 当前项目下移
-                elif curses.keyname(key) == keyMap["moveDown"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["moveDown"]:
                     if (
                         datatype != "main"
                         and len(datalist) != 0
@@ -606,7 +608,7 @@ class Menu(object):
                             self.offset = offset + step
 
                 # 当前项目上移
-                elif curses.keyname(key) == keyMap["moveUp"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["moveUp"]:
                     if datatype != "main" and len(datalist) != 0 and idx != 0:
                         self.menu_starts = time.time()
                         song = self.datalist.pop(idx)
@@ -616,7 +618,7 @@ class Menu(object):
                         if self.index < offset:
                             self.offset = offset - step
 
-                elif curses.keyname(key) == keyMap["menu"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["menu"]:
                     if datatype != "main":
                         self.stack.append([datatype, title, datalist, offset, self.index])
                         self.datatype = self.stack[0][0]
@@ -625,19 +627,19 @@ class Menu(object):
                         self.offset = 0
                         self.index = 0
 
-                elif curses.keyname(key) == keyMap["top"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["top"]:
                     if datatype == "help":
                         webbrowser.open_new_tab("https://github.com/darknessomi/musicbox")
                     else:
                         self.index = 0
                         self.offset = 0
 
-                elif curses.keyname(key) == keyMap["bottom"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["bottom"]:
                     self.index = len(self.datalist) - 1
                     self.offset = self.index - self.index % step
 
                 # 开始下载
-                elif curses.keyname(key) == keyMap["cache"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["cache"]:
                     s = self.datalist[idx]
                     cache_thread = threading.Thread(
                         target=self.player.cache_song,
@@ -645,7 +647,7 @@ class Menu(object):
                     )
                     cache_thread.start()
 
-                elif curses.keyname(key) == keyMap["musicInfo"]:
+                elif curses.keyname(key).decode("utf-8") == keyMap["musicInfo"]:
                     if self.player.playing_id != -1:
                         webbrowser.open_new_tab(
                             "http://music.163.com/song?id={}".format(self.player.playing_id)

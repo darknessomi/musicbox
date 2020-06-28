@@ -4,6 +4,7 @@ import json
 import os
 from future.builtins import open
 
+import sys
 from .singleton import Singleton
 from .const import Constant
 from .utils import utf8_data_to_file
@@ -52,19 +53,19 @@ class Config(Singleton):
                 "value": "<ctrl><alt>p",
                 "default": "<ctrl><alt>p",
                 "describe": "Global keybind for play/pause."
-                "Uses gtk notation for keybinds.",
+                            "Uses gtk notation for keybinds.",
             },
             "global_next": {
                 "value": "<ctrl><alt>j",
                 "default": "<ctrl><alt>j",
                 "describe": "Global keybind for next song."
-                "Uses gtk notation for keybinds.",
+                            "Uses gtk notation for keybinds.",
             },
             "global_previous": {
                 "value": "<ctrl><alt>k",
                 "default": "<ctrl><alt>k",
                 "describe": "Global keybind for previous song."
-                "Uses gtk notation for keybinds.",
+                            "Uses gtk notation for keybinds.",
             },
             "notifier": {
                 "value": True,
@@ -118,61 +119,60 @@ class Config(Singleton):
             },
             "colors": {
                 "value": {
-                    "pair1":[22,148],
-                    "pair2":[231,24],
-                    "pair3":[231,9],
-                    "pair4":[231,14],
-                    "pair5":[231, 237]
+                    "pair1": [22, 148],
+                    "pair2": [231, 24],
+                    "pair3": [231, 9],
+                    "pair4": [231, 14],
+                    "pair5": [231, 237]
                 },
                 "default":{
-                    "pair1":[22,148],
-                    "pair2":[231,24],
-                    "pair3":[231,9],
-                    "pair4":[231,14],
-                    "pair5":[231, 237]
+                    "pair1": [22, 148],
+                    "pair2": [231, 24],
+                    "pair3": [231, 9],
+                    "pair4": [231, 14],
+                    "pair5": [231, 237]
                 },
                 "describe": "xterm-256color theme.",
             },
-            "keymap":{
+            "keymap": {
                 "value": {
-                    "down":"j",
-                    "up":"k",
-                    "back":"h",
-                    "forward":"l",
-                    "prevPage":"^B",
-                    "nextPage":"^F",
-                    "search":"/",
-                    "prevSong":"p",
-                    "nextSong":"n",
-                    "playPause":" ",
-                    "shuffle":"?",
-                    "volume+":"+",
-                    "volume-":"-",
-                    "menu":"m",
-                    "presentHistory":"h",
-                    "musicInfo":"i",
-                    "playingMode":"P",
-                    "enterAlbum":"A",
-                    "add":"a",
-                    "djList":"z",
-                    "star":"s",
-                    "collection":"c",
-                    "remove":"r",
-                    "moveDown":"J",
-                    "moveUp":"K",
-                    "like":",",
-                    "cache":"C",
-                    "trashFM":".",
-                    "nextFM":"f",
-                    "quit":"q",
-                    "quitClear":"w",
-                    "help":"y",
-                    "top":"g",
-                    "bottom":"G",
-                    "countDown":"t"
-
+                    "down": "j",
+                    "up": "k",
+                    "back": "h",
+                    "forward": "l",
+                    "prevPage": "u",
+                    "nextPage": "d",
+                    "search": "/",
+                    "prevSong": "p",
+                    "nextSong": "n",
+                    "playPause": " ",
+                    "shuffle": "?",
+                    "volume+": "+",
+                    "volume-": "-",
+                    "menu": "m",
+                    "presentHistory": "h",
+                    "musicInfo": "i",
+                    "playingMode": "P",
+                    "enterAlbum": "A",
+                    "add": "a",
+                    "djList": "z",
+                    "star": "s",
+                    "collection": "c",
+                    "remove": "r",
+                    "moveDown": "J",
+                    "moveUp": "K",
+                    "like": ",",
+                    "cache": "C",
+                    "trashFM": ".",
+                    "nextFM": "f",
+                    "quit": "q",
+                    "quitClear": "w",
+                    "help": "y",
+                    "top": "g",
+                    "bottom": "G",
+                    "countDown": "t"
                 },
-                "describe": "Keys and function."
+                "describe": "Keys and function.",
             }
         }
         self.config = {}
