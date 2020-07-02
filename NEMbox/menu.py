@@ -503,8 +503,16 @@ class Menu(object):
         next(self.parser)  # start generator
         next(erase_coro)
         while True:
+            datatype = self.datatype
+            title = self.title
+            datalist = self.datalist
+            offset = self.offset
+            idx = self.index
+            step = self.step
             self.screen.timeout(500)
             key = self.screen.getch()
+            if key == -1:
+                self.player.update_size()
             if key == ord(','):
                 key = ord(']') # 将 . 键 映射到 ]
             self.parser.send(key)
@@ -527,10 +535,11 @@ class Menu(object):
 
                 # 退出
                 if C.keyname(key).decode('utf-8') == keyMap['quit']:
+                    print(key)
                     break
 
                 # 退出并清除用户信息
-                if C.keyname(key).decode('utf-8') == keyMap['quitClear']:
+                elif C.keyname(key).decode('utf-8') == keyMap['quitClear']:
                     self.api.logout()
                     break
 
