@@ -6,6 +6,7 @@ import json
 import os
 #from future.builtins import open
 
+import sys
 from .singleton import Singleton
 from .const import Constant
 from .utils import utf8_data_to_file
@@ -112,6 +113,63 @@ class Config(Singleton):
                 'value': False,
                 'default': False,
                 'describe': 'Set true to make curses transparency.'
+            },
+            'colors': {
+                'value': {
+                    'pair1': [22, 148],
+                    'pair2': [231, 24],
+                    'pair3': [231, 9],
+                    'pair4': [231, 14],
+                    'pair5': [231, 237]
+                },
+                'default':{
+                    'pair1': [22, 148],
+                    'pair2': [231, 24],
+                    'pair3': [231, 9],
+                    'pair4': [231, 14],
+                    'pair5': [231, 237]
+                },
+                'describe': 'xterm-256color theme.',
+            },
+            'keymap': {
+                'value': {
+                    'down': 'j',
+                    'up': 'k',
+                    'back': 'h',
+                    'forward': 'l',
+                    'prevPage': 'u',
+                    'nextPage': 'd',
+                    'search': '/',
+                    'prevSong': '[',
+                    'nextSong': ']',
+                    'playPause': ' ',
+                    'shuffle': '?',
+                    'volume+': '+',
+                    'volume-': '-',
+                    'menu': 'm',
+                    'presentHistory': 'p',
+                    'musicInfo': 'i',
+                    'playingMode': 'P',
+                    'enterAlbum': 'A',
+                    'add': 'a',
+                    'djList': 'z',
+                    'star': 's',
+                    'collection': 'c',
+                    'remove': 'r',
+                    'moveDown': 'J',
+                    'moveUp': 'K',
+                    'like': ',',
+                    'cache': 'C',
+                    'trashFM': '.',
+                    'nextFM': 'f',
+                    'quit': 'q',
+                    'quitClear': 'w',
+                    'help': 'y',
+                    'top': 'g',
+                    'bottom': 'G',
+                    'countDown': 't'
+                },
+                'describe': 'Keys and function.',
             }
         }
         self.config = {}
