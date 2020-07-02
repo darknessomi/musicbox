@@ -1,8 +1,10 @@
-# NetEase-MusicBox
+# NetEase-MusicBox-Not-Only-For-Mac
 
 **感谢为 MusicBox 的开发付出过努力的[每一个人](https://github.com/darknessomi/musicbox/graphs/contributors)！**
 
-高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
+本仓库为https://github.com/darknessomi/musicbox.git的fork版本.
+
+高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写,不支持python2.7。需要3.5以上
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
@@ -33,42 +35,51 @@
 
 ### 键盘快捷键
 
-| Key   | Effect          |           |
-| ----- | --------------- | --------- |
-| j     | Down            | 下移        |
-| k     | Up              | 上移        |
-| h     | Back            | 后退        |
-| l     | Forword         | 前进        |
-| u     | Prev page       | 上一页       |
-| d     | Next page       | 下一页       |
-| f     | Search          | 快速搜索      |
-| \[    | Prev song       | 上一曲       |
-| ]     | Next song       | 下一曲       |
-| =     | Volume +        | 音量增加      |
-| -     | Volume -        | 音量减少      |
-| Space | Play/Pause      | 播放/暂停     |
-| ?     | Shuffle         | 手气不错      |
-| m     | Menu            | 主菜单       |
-| p     | Present/History | 当前/历史播放列表 |
-| i     | Music Info      | 当前音乐信息    |
-| ⇧+p   | Playing Mode    | 播放模式切换    |
-| a     | Add             | 添加曲目到打碟   |
-| ⇧+a   | Enter album     | 进入专辑      |
-| g     | To the first    | 跳至首项      |
-| ⇧+g   | To the end      | 跳至尾项      |
-| z     | DJ list         | 打碟列表      |
-| s     | Star            | 添加到收藏     |
-| c     | Collection      | 收藏列表      |
-| r     | Remove          | 删除当前条目    |
-| ⇧+j   | Move Down       | 向下移动当前项目  |
-| ⇧+k   | Move Up         | 向上移动当前项目  |
-| ⇧+c   | Cache           | 缓存歌曲到本地   |
-| ,     | Like            | 喜爱        |
-| .     | Trash FM        | 删除 FM     |
-| /     | Next FM         | 下一FM      |
-| q     | Quit            | 退出        |
-| t     | Timing Exit     | 定时退出      |
-| w     | Quit&Clear      | 退出并清除用户信息 |
+| Key      | Effect          |                    |
+| -------- | --------------- | ------------------ |
+| j,下键,触摸板   | Down            | 下移               |
+| k,上键,触摸板   | Up              | 上移               |
+| h,左键   | Back            | 后退               |
+| l,右键   | Forword         | 前进               |
+|num + j   | QuickJump       | 快速向后跳转n首    |
+|num + k   | QuickUp         | 快速向前跳转n首    |
+|num + \[  | Quick Prev song | 快速前n首          |
+|num + ]   | Quick Next Song | 快速后n首          |
+|[[[[[...  | constant key [  | 连按[              |
+|]]]]]...  | constant key ]  | 连按]              |
+|num + ]   | Quick Next Song | 快速后n首          |
+|num       | Index for song  | 跳到第n首          |
+| u        | Prev page       | 上一页             |
+| d        | Next page       | 下一页             |
+| f        | Search          | 快速搜索           |
+| \[       | Prev song       | 上一曲             |
+| ]        | Next song       | 下一曲             |
+| =        | Volume +        | 音量增加           |
+| -        | Volume -        | 音量减少           |
+| Space    | Play/Pause      | 播放/暂停          |
+| ?        | Shuffle         | 手气不错           |
+| m        | Menu            | 主菜单             |
+| p        | Present/History | 当前/历史播放列表  |
+| i        | Music Info      | 当前音乐信息       |
+| ⇧+p      | Playing Mode    | 播放模式切换       |
+| a        | Add             | 添加曲目到打碟     |
+| ⇧+a      | Enter album     | 进入专辑           |
+| g        | To the first    | 跳至首项           |
+| ⇧+g      | To the end      | 跳至尾项           |
+| z        | DJ list         | 打碟列表           |
+| s        | Star            | 添加到收藏         |
+| c        | Collection      | 收藏列表           |
+| r        | Remove          | 删除当前条目       |
+| ⇧+j      | Move Down       | 向下移动当前项目   |
+| ⇧+k      | Move Up         | 向上移动当前项目   |
+| ⇧+c      | Cache           | 缓存歌曲到本地     |
+| ,        | Like            | 喜爱               |
+| ;        | Trash FM        | 删除 FM            |
+| .        | Next FM        | 下一首 FM            |
+| /        | More FM         | 更多  FM             |
+| q        | Quit            | 退出               |
+| t        | Timing Exit     | 定时退出           |
+| w        | Quit&Clear      | 退出并清除用户信息 |
 
 ## 安装
 
@@ -82,41 +93,21 @@
 2.  `libnotify-bin` 用于支持消息提示（Linux平台）
 3.  `pyqt python-dbus dbus qt` 用于支持桌面歌词 (Mac 用户需要 `brew install qt --with-dbus` 获取支持 DBus 的 Qt)
 
-### PyPi安装（*nix系统）
+    
 
-    $ pip(3) install NetEase-MusicBox
+#### Git clone安装master分支（*nix系统）
 
-### Git clone安装master分支（*nix系统）
-
-    $ git clone https://github.com/darknessomi/musicbox.git && cd musicbox
+    $ git clone https://github.com/wangjianyuan10/musicbox.git && cd musicbox
     $ python(3) setup.py install
 
 ### macOS安装
 
-    $ pip(3) install NetEase-MusicBox
     $ brew install mpg123
+    $ pip(3) install macmusicbox
+### ubuntu安装
+    $ apt-get install mpg123
+    $ pip(3) install macmusicbox
 
-### Linux安装
-
-#### Fedora
-
-首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`（通过此方法安装可能仍然需要`pip install -U NetEase-MusicBox`更新到最新版）。
-
-#### Ubuntu/Debian
-
-    $ (sudo) pip install NetEase-MusicBox
-
-    $ (sudo) apt-get install mpg123
-
-#### Arch Linux
-
-    $ pacaur -S netease-musicbox-git # or $ yaourt musicbox
-
-#### Centos/Red Hat
-
-    $ (sudo) pip(3) install NetEase-MusicBox
-    $ (sudo) wget http://mirror.centos.org/centos/7/os/x86_64/Packages/mpg123-1.25.6-1.el7.x86_64.rpm
-    $ (sudo) yum install mpg123-1.25.6-1.el7.x86_64.rpm
 
 ## 配置和错误处理
 
@@ -136,13 +127,10 @@ curl -L ip.cn
 
 | OS       | Version               |
 | -------- | --------------------- |
-| macOS    | 10.13 / 10.12 / 10.11 |
-| Ubuntu   | 14.04                 |
-| Kali     | 1.1.0 / 2.0 / Rolling |
-| CentOS   | 7                     |
-| openSUSE | 13.2                  |
-| Fedora   | 22                    |
-| Arch     | Rolling               |
+| macOS    | 10.14 |
+| ubuntu   | 16.04                 |
+| Lubuntu  | 16.06                 |
+
 
 ### 错误处理
 
