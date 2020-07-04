@@ -589,12 +589,10 @@ class Menu(object):
                 # 上移
                 elif C.keyname(key).decode('utf-8') == keyMap['up']:
                     self.up_key_event()
-                    self.build_menu_processbar()
 
                 # 下移
                 elif C.keyname(key).decode('utf-8') == keyMap['down']:
                     self.down_key_event()
-                    self.build_menu_processbar()
 
                 # 数字快捷键
 #                elif ord('0') <= key <= ord('9') and self.datatype not in ('songs', 'fmsongs'):
@@ -612,69 +610,57 @@ class Menu(object):
 #                    self.dispatch_enter(idx)
 #                    self.index = 0
 #                    self.offset = 0
-#                    self.build_menu_processbar()
 
                 # 向上翻页
                 elif C.keyname(key).decode('utf-8') == keyMap['prevPage']:
                     self.up_page_event()
-                    self.build_menu_processbar()
 
                 # 向下翻页
                 elif C.keyname(key).decode('utf-8') == keyMap['nextPage']:
                     self.down_page_event()
-                    self.build_menu_processbar()
 
                 # 前进
                 elif C.keyname(key).decode('utf-8') == keyMap['forward'] or key == 10:
                     self.enter_page_event()
-                    self.build_menu_processbar()
 
                 # 回退
                 elif C.keyname(key).decode('utf-8') == keyMap['back']:
                     self.back_page_event()
-                    self.build_menu_processbar()
 
                 # 搜索
                 elif C.keyname(key).decode('utf-8') == keyMap['search']:
                     # 9 == the 'search' menu
                     self.dispatch_enter(9)
-                    self.build_menu_processbar()
 
                 # 播放下一曲
                 elif C.keyname(key).decode('utf-8') == keyMap['nextSong']\
                         and pre_key not in range(ord('0'), ord('9')):
                     self.next_key_event()
                     # self.down_key_event()
-                    self.build_menu_processbar()
 
                 # 播放上一曲
                 elif C.keyname(key).decode('utf-8') == keyMap['prevSong']\
                         and pre_key not in range(ord('0'), ord('9')):
                     self.prev_key_event()
                     # self.up_key_event()
-                    self.build_menu_processbar()
                 # 连按[ 或者 ]
 #                elif pre_key in (ord(keyMap['prevSong']), ord(keyMap['nextSong'])) and key == -1 and\
 #                        self.datatype in ('songs', 'fmsongs') and sum(self.pre_keylist) % 92 != 0:
 #                    self.space_key_event()
-#                    self.build_menu_processbar()
 
                 # 增加音量
                 elif C.keyname(key).decode('utf-8') == keyMap['volume+']:
                     self.player.volume_up()
-                    self.build_menu_processbar()
 
                 # 减少音量
                 elif C.keyname(key).decode('utf-8') == keyMap['volume-']:
                     self.player.volume_down()
-                    self.build_menu_processbar()
 
                 # 随机播放
                 elif C.keyname(key).decode('utf-8') == keyMap['shuffle']:
                     if len(self.player.info['player_list']) == 0:
                         continue
                     self.player.shuffle()
-                    self.build_menu_processbar()
 
                 # 喜爱
                 elif C.keyname(key).decode('utf-8') == keyMap['like']:
@@ -685,7 +671,6 @@ class Menu(object):
                         notify('%s added successfully!' % song_name, 0)
                     else:
                         notify('Adding song failed!', 0)
-                    self.build_menu_processbar()
 
                 # 删除FM
                 elif C.keyname(key).decode('utf-8') == keyMap['trashFM']:
@@ -698,7 +683,6 @@ class Menu(object):
                         )
                         if return_data:
                             notify('Deleted successfully!', 0)
-                    self.build_menu_processbar()
 
                 # 更多FM
                 elif C.keyname(key).decode('utf-8') == keyMap['nextFM']:
@@ -712,22 +696,18 @@ class Menu(object):
                     self.build_menu_processbar()
                     self.index = len(self.datalist) - 1
                     self.offset = self.index - self.index % self.step
-                    self.build_menu_processbar()
 
                 # 播放、暂停
                 elif C.keyname(key).decode('utf-8') == keyMap['playPause']:
                     self.space_key_event()
-                    self.build_menu_processbar()
 
                 # 加载当前播放列表
                 elif C.keyname(key).decode('utf-8') == keyMap['presentHistory']:
                     self.show_playing_song()
-                    self.build_menu_processbar()
 
                 # 播放模式切换
                 elif C.keyname(key).decode('utf-8') == keyMap['playingMode']:
                     self.player.change_mode()
-                    self.build_menu_processbar()
 
                 # 进入专辑
                 elif C.keyname(key).decode('utf-8') == keyMap['enterAlbum']:
@@ -762,7 +742,6 @@ class Menu(object):
                         self.djstack.append(datalist[idx])
                     elif datatype == 'artists':
                         pass
-                    self.build_menu_processbar()
 
                 # 加载打碟歌单
                 elif C.keyname(key).decode('utf-8') == keyMap['djList']:
@@ -773,7 +752,6 @@ class Menu(object):
                     self.datalist = self.djstack
                     self.offset = 0
                     self.index = 0
-                    self.build_menu_processbar()
 
                 # 添加到本地收藏
                 elif C.keyname(key).decode('utf-8') == keyMap['star']:
@@ -781,7 +759,6 @@ class Menu(object):
                             self.datatype == 'djchannels') and len(self.datalist) != 0:
                         self.collection.append(self.datalist[self.index])
                         notify('Added successfully', 0)
-                    self.build_menu_processbar()
 
                 # 加载本地收藏
                 elif C.keyname(key).decode("utf-8") == keyMap["collection"]:
@@ -792,7 +769,6 @@ class Menu(object):
                     self.datalist = self.collection
                     self.offset = 0
                     self.index = 0
-                    self.build_menu_processbar()
 
                 # 从当前列表移除
                 elif C.keyname(key).decode('utf-8') == keyMap['remove']:
@@ -807,7 +783,6 @@ class Menu(object):
                             self.up_key_event()
                         self.index = carousel(self.offset, min(
                             len(self.datalist), self.offset + self.step) - 1, self.index)
-                    self.build_menu_processbar()
 
                 # 倒计时
                 elif C.keyname(key).decode('utf-8') == keyMap['countDown']:
@@ -827,7 +802,6 @@ class Menu(object):
                         # 翻页
                         if self.index >= self.offset + self.step:
                             self.offset = self.offset + self.step
-                    self.build_menu_processbar()
 
                 # 当前项目上移
                 elif C.keyname(key).decode('utf-8') == keyMap['moveUp']:
@@ -839,7 +813,6 @@ class Menu(object):
                         # 翻页
                         if self.index < self.offset:
                             self.offset = self.offset - self.step
-                    self.build_menu_processbar()
 
                 # 菜单
                 elif C.keyname(key).decode('utf-8') == keyMap['menu']:
@@ -850,7 +823,6 @@ class Menu(object):
                             _ = self.stack[0]
                         self.offset = 0
                         self.index = 0
-                    self.build_menu_processbar()
                 # 跳到开头 g键
                 elif C.keyname(key).decode('utf-8') == keyMap['top']:
                     if self.datatype == 'help':
@@ -859,13 +831,11 @@ class Menu(object):
                     else:
                         self.index = 0
                         self.offset = 0
-                    self.build_menu_processbar()
 
                 # 跳到末尾ord('G') 键
                 elif C.keyname(key).decode('utf-8') == keyMap['bottom']:
                     self.index = len(self.datalist) - 1
                     self.offset = self.index - self.index % self.step
-                    self.build_menu_processbar()
 
                 # 开始下载
                 elif C.keyname(key).decode('utf-8') == keyMap['cache']:
@@ -876,7 +846,6 @@ class Menu(object):
                               s['artist'], s['mp3_url'])
                     )
                     cache_thread.start()
-                    self.build_menu_processbar()
                 # 在网页打开 ord(i)
                 elif C.keyname(key).decode('utf-8') == keyMap['musicInfo']:
                     if self.player.playing_id != -1:
@@ -884,18 +853,17 @@ class Menu(object):
                             'http://music.163.com/song?id={}'.format(
                                 self.player.playing_id)
                         )
-                    self.build_menu_processbar()
                 # term resize
                 # 刷新屏幕  按下某个键或者默认5秒刷新空白区
                 erase_coro.send(key)
                 if erase_cmd_list:
                     self.screen.erase()
                 self.player.update_size()
-                self.build_menu_processbar()
 
                 pre_key = key
                 self.ui.screen.refresh()
                 # keylist.clear()
+        self.build_menu_processbar()
         self.stop()
 
 
