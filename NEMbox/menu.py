@@ -409,14 +409,6 @@ class Menu(object):
         # 歌单快速跳跃
         result = parse_keylist(self.key_list)
         num, cmd = result
-
-#        origin_stdout = sys.stdout
-#        with open('/home/tonyfettes/function_call.log', 'a') as f:
-#            sys.stdout = f
-#            print('Call num_jump_key_event.')
-#            print(num)
-#            print(cmd)
-#            sys.stdout = origin_stdout
         if num == 0:  # 0j -> 1j
             num = 1
         for _ in range(num):
