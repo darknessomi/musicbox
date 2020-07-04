@@ -20,7 +20,6 @@ import curses as C
 import threading
 import sys
 from threading import Timer
-import time
 import os
 import signal
 import webbrowser
@@ -179,7 +178,7 @@ class Menu(object):
         else:
             self.storage.logout()
             x = self.ui.build_login_error()
-            if x >= 0 and C.keyname(x).decode("utf-8") != keyMap["forward"]:
+            if x >= 0 and C.keyname(x).decode('utf-8') != keyMap['forward']:
                 return False
             return self.login()
 
@@ -449,9 +448,13 @@ class Menu(object):
                 'The musicbox will exit in {} minutes'.format(countdown))
             self.countdown = countdown * 60
             self.is_in_countdown = True
+            self.timer = Timer(self.countdown, self.stop, ())
+            self.timer.start()
         else:
             notify('The timing exit has been canceled')
             self.is_in_countdown = False
+            if self.timer:
+                self.timer.cancel()
         self.build_menu_processbar()
 
     def down_page_event(self):
@@ -522,7 +525,7 @@ class Menu(object):
         erase_coro = erase_coroutine(erase_cmd_list)
         next(self.parser)  # start generator
         next(erase_coro)
-        while True:
+        while not self.quit:
             datatype = self.datatype
             title = self.title
             datalist = self.datalist
