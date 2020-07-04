@@ -26,6 +26,7 @@ import signal
 import webbrowser
 import locale
 from collections import namedtuple
+from copy import deepcopy
 
 from future.builtins import range, str
 
@@ -39,7 +40,6 @@ from .storage import Storage
 from .cache import Cache
 from . import logger
 from .cmd_parser import parse_keylist, cmd_parser, erase_coroutine
-from copy import deepcopy
 
 
 locale.setlocale(locale.LC_ALL, '')
@@ -175,7 +175,7 @@ class Menu(object):
         else:
             self.storage.logout()
             x = self.ui.build_login_error()
-            if x >=0 and C.keyname(x).decode("utf-8") != keyMap["forward"]:
+            if x >= 0 and C.keyname(x).decode("utf-8") != keyMap["forward"]:
                 return False
             return self.login()
 
@@ -244,14 +244,6 @@ class Menu(object):
         else:
             Menu().start()
 
-    def play_pause(self):
-        if self.player.is_empty:
-            return
-        if not self.player.playing_flag:
-            self.player.resume()
-        else:
-            self.player.pause()
-
     def next_song(self):
         if self.player.is_empty:
             return
@@ -261,6 +253,22 @@ class Menu(object):
         if self.player.is_empty:
             return
         self.player.prev()
+
+    def prev_key_event(self):
+        origin_stdout = sys.stdout
+        with open('/home/tonyfettes/function_call.log', 'a') as f:
+            sys.stdout = f
+            print('Call prev_key_event.')
+            sys.stdout = origin_stdout
+        self.player.prev_idx()
+
+    def next_key_event(self):
+        origin_stdout = sys.stdout
+        with open('/home/tonyfettes/function_call.log', 'a') as f:
+            sys.stdout = f
+            print('Call next_key_event.')
+            sys.stdout = origin_stdout
+        self.player.next_idx()
 
     def up_key_event(self):
         datalist = self.datalist
@@ -278,7 +286,7 @@ class Menu(object):
                 len(datalist), offset + step) - 1, idx - 1)
         self.menu_starts = time.time()
 
-    def jump_key_event(self):
+    def down_key_event(self):
         datalist = self.datalist
         offset = self.offset
         idx = self.index
@@ -324,9 +332,9 @@ class Menu(object):
             self.at_playing_list = True
         else:
             # 所在列表类型不是歌曲
-            isNotSongs = True
+            is_not_songs = True
             self.player.play_or_pause(
-                self.player.info['idx'], isNotSongs)
+                self.player.info['idx'], is_not_songs)
         self.build_menu_processbar()
 
     def like_event(self):
@@ -397,13 +405,21 @@ class Menu(object):
         # 歌单快速跳跃
         result = parse_keylist(self.key_list)
         num, cmd = result
+
+#        origin_stdout = sys.stdout
+#        with open('/home/tonyfettes/function_call.log', 'a') as f:
+#            sys.stdout = f
+#            print('Call num_jump_key_event.')
+#            print(num)
+#            print(cmd)
+#            sys.stdout = origin_stdout
         if num == 0:  # 0j -> 1j
             num = 1
-        for i in range(num):
-            if cmd in (259, 107, 91):
+        for _ in range(num):
+            if cmd in (259, 107):
                 self.up_key_event()
-            elif cmd in (258, 106, 93):
-                self.jump_key_event()
+            elif cmd in (258, 106):
+                self.down_key_event()
         self.build_menu_processbar()
 
     def digit_key_song_event(self):
@@ -511,31 +527,58 @@ class Menu(object):
             step = self.step
             self.screen.timeout(500)
             key = self.screen.getch()
-            if key == -1:
-                self.player.update_size()
-            if key == ord(','):
-                key = ord(']') # 将 . 键 映射到 ]
             self.parser.send(key)
             if keylist:
                 self.pre_keylist = deepcopy(keylist)
 
+            # 如果 keylist 全都是数字
             if self.datatype in ('songs', 'fmsongs') and keylist and \
                     (set(keylist) | set(range(48, 58))) == set(range(48, 58)):
                 # 歌曲数字映射
                 self.digit_key_song_event()
                 continue
 
+            # 如果 keylist 只有 [ ]
+            if len(keylist) > 0 and (set(keylist) | {91, 93}) == {91, 93}:
+                self.player.stop()
+                self.player.replay()
+
+            # 如果是 数字+ [ ] j k
             if len(keylist) > 1:
+#                if parse_keylist(keylist):
+#                    num, cmd = parse_keylist(keylist)
+#                    origin_stdout = sys.stdout
+#                    with open('/home/tonyfettes/parse_keylist_ret.log', 'w') as f:
+#                        sys.stdout = f
+#                        print(num)
+#                        print(cmd)
+#                        sys.stdout = origin_stdout
                 if parse_keylist(keylist):
                     self.num_jump_key_event()
             else:
                 # if self.is_in_countdown:
                 #     if time.time() - self.countdown_start > self.countdown:
                 #         break
+#                origin_stdout = sys.stdout
+#                with open('/home/tonyfettes/key_pressed.log', 'w') as f:
+#                    sys.stdout = f
+#                    print(key)
+#                with open('/home/tonyfettes/pre_key.log', 'w') as f:
+#                    sys.stdout = f
+#                    print(pre_key)
+#                with open('/home/tonyfettes/keymap.log', 'w') as f:
+#                    sys.stdout = f
+#                    print(keyMap['prevSong'])
+#                    print(keyMap['nextSong'])
+#                with open('/home/tonyfettes/pre_keylist.log', 'w') as f:
+#                    sys.stdout = f
+#                    print(self.pre_keylist)
+#                    sys.stdout = origin_stdout
+                if key == -1:
+                    self.player.update_size()
 
                 # 退出
-                if C.keyname(key).decode('utf-8') == keyMap['quit']:
-                    print(key)
+                elif C.keyname(key).decode('utf-8') == keyMap['quit']:
                     break
 
                 # 退出并清除用户信息
@@ -550,26 +593,26 @@ class Menu(object):
 
                 # 下移
                 elif C.keyname(key).decode('utf-8') == keyMap['down']:
-                    self.jump_key_event()
+                    self.down_key_event()
                     self.build_menu_processbar()
 
                 # 数字快捷键
-                elif ord('0') <= key <= ord('9') and self.datatype not in ('songs', 'fmsongs'):
-                    idx = key - ord('0')
-                    self.ui.build_menu(
-                        self.datatype,
-                        self.title,
-                        self.datalist,
-                        self.offset,
-                        idx,
-                        self.step,
-                        self.menu_starts,
-                    )
-                    self.ui.build_loading()
-                    self.dispatch_enter(idx)
-                    self.index = 0
-                    self.offset = 0
-                    self.build_menu_processbar()
+#                elif ord('0') <= key <= ord('9') and self.datatype not in ('songs', 'fmsongs'):
+#                    idx = key - ord('0')
+#                    self.ui.build_menu(
+#                        self.datatype,
+#                        self.title,
+#                        self.datalist,
+#                        self.offset,
+#                        idx,
+#                        self.step,
+#                        self.menu_starts,
+#                    )
+#                    self.ui.build_loading()
+#                    self.dispatch_enter(idx)
+#                    self.index = 0
+#                    self.offset = 0
+#                    self.build_menu_processbar()
 
                 # 向上翻页
                 elif C.keyname(key).decode('utf-8') == keyMap['prevPage']:
@@ -598,21 +641,23 @@ class Menu(object):
                     self.build_menu_processbar()
 
                 # 播放下一曲
-                elif C.keyname(key).decode('utf-8') == keyMap['nextSong']:
-                    # self.next_song()
-                    self.jump_key_event()
+                elif C.keyname(key).decode('utf-8') == keyMap['nextSong']\
+                        and pre_key not in range(ord('0'), ord('9')):
+                    self.next_key_event()
+                    # self.down_key_event()
                     self.build_menu_processbar()
 
                 # 播放上一曲
-                elif C.keyname(key).decode('utf-8') == keyMap['prevSong']:
-                    # self.previous_song()
-                    self.up_key_event()
+                elif C.keyname(key).decode('utf-8') == keyMap['prevSong']\
+                        and pre_key not in range(ord('0'), ord('9')):
+                    self.prev_key_event()
+                    # self.up_key_event()
                     self.build_menu_processbar()
                 # 连按[ 或者 ]
-                elif pre_key in (ord(keyMap['prevSong']), ord(keyMap['nextSong'])) and key == -1 and\
-                        self.datatype in ('songs', 'fmsongs') and sum(self.pre_keylist) % 92 != 0:
-                    self.space_key_event()
-                    self.build_menu_processbar()
+#                elif pre_key in (ord(keyMap['prevSong']), ord(keyMap['nextSong'])) and key == -1 and\
+#                        self.datatype in ('songs', 'fmsongs') and sum(self.pre_keylist) % 92 != 0:
+#                    self.space_key_event()
+#                    self.build_menu_processbar()
 
                 # 增加音量
                 elif C.keyname(key).decode('utf-8') == keyMap['volume+']:

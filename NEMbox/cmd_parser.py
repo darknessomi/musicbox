@@ -82,6 +82,11 @@ def parse_keylist(keylist):
     keylist = deepcopy(keylist)
     if keylist == []:
         return None
+    if (set(keylist) | {91, 93}) == {91, 93}:
+        delta_key = keylist.count(93) - keylist.count(91)
+        if delta_key < 0:
+            return (-delta_key, 91)
+        return (delta_key, 93)
     tail_cmd = keylist.pop()
     if tail_cmd in range(48, 58) and (set(keylist) | set(range(48, 58))) \
             == set(range(48, 58)):
