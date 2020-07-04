@@ -483,18 +483,18 @@ class Ui(object):
                         i - offset + 9, self.indented_startcol,
                         '-> {}. \'{}{}   {}'.format(
                             i, (datalist[i][0] + '\'').ljust(11),
-                            datalist[i][1], datalist[i][2]),
+                            datalist[i][1].ljust(16), datalist[i][2]),
                         curses.color_pair(2))
                 else:
                     self.addstr(
                         i - offset + 9, self.startcol,
                         '{}. \'{}{}   {}'.format(
                             i, (datalist[i][0] + '\'').ljust(11),
-                            datalist[i][1], datalist[i][2]))
+                            datalist[i][1].ljust(16), datalist[i][2]))
 
             self.addstr(
-                20, 6, 'NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存')
-            self.addstr(21, 10,
+                20, self.startcol, 'NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存')
+            self.addstr(21, self.startcol,
                         '按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~')
             self.addstr(22, self.startcol,
                         'Build with love to music by omi')
