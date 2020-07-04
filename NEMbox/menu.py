@@ -542,360 +542,301 @@ class Menu(object):
             if len(keylist) > 0 and (set(keylist) | {91, 93}) == {91, 93}:
                 self.player.stop()
                 self.player.replay()
+                continue
 
             # 如果是 数字+ [ ] j k
             if len(keylist) > 1:
-#                if parse_keylist(keylist):
-#                    num, cmd = parse_keylist(keylist)
-#                    origin_stdout = sys.stdout
-#                    with open('/home/tonyfettes/parse_keylist_ret.log', 'w') as f:
-#                        sys.stdout = f
-#                        print(num)
-#                        print(cmd)
-#                        sys.stdout = origin_stdout
                 if parse_keylist(keylist):
                     self.num_jump_key_event()
-            else:
-                # if self.is_in_countdown:
-                #     if time.time() - self.countdown_start > self.countdown:
-                #         break
-#                origin_stdout = sys.stdout
-#                with open('/home/tonyfettes/key_pressed.log', 'w') as f:
-#                    sys.stdout = f
-#                    print(key)
-#                with open('/home/tonyfettes/pre_key.log', 'w') as f:
-#                    sys.stdout = f
-#                    print(pre_key)
-#                with open('/home/tonyfettes/keymap.log', 'w') as f:
-#                    sys.stdout = f
-#                    print(keyMap['prevSong'])
-#                    print(keyMap['nextSong'])
-#                with open('/home/tonyfettes/pre_keylist.log', 'w') as f:
-#                    sys.stdout = f
-#                    print(self.pre_keylist)
-#                    sys.stdout = origin_stdout
-                if key == -1:
-                    self.player.update_size()
+                    continue
+            # if self.is_in_countdown:
+            #     if time.time() - self.countdown_start > self.countdown:
+            #         break
+            if key == -1:
+                self.player.update_size()
 
-                # 退出
-                elif C.keyname(key).decode('utf-8') == keyMap['quit']:
-                    break
+            # 退出
+            elif C.keyname(key).decode('utf-8') == keyMap['quit']:
+                break
 
-                # 退出并清除用户信息
-                elif C.keyname(key).decode('utf-8') == keyMap['quitClear']:
-                    self.api.logout()
-                    break
+            # 退出并清除用户信息
+            elif C.keyname(key).decode('utf-8') == keyMap['quitClear']:
+                self.api.logout()
+                break
 
-                # 上移
-                elif C.keyname(key).decode('utf-8') == keyMap['up']:
-                    self.up_key_event()
-                    self.build_menu_processbar()
+            # 上移
+            elif C.keyname(key).decode('utf-8') == keyMap['up']:
+                self.up_key_event()
 
-                # 下移
-                elif C.keyname(key).decode('utf-8') == keyMap['down']:
-                    self.down_key_event()
-                    self.build_menu_processbar()
+            # 下移
+            elif C.keyname(key).decode('utf-8') == keyMap['down']:
+                self.down_key_event()
 
-                # 数字快捷键
-#                elif ord('0') <= key <= ord('9') and self.datatype not in ('songs', 'fmsongs'):
-#                    idx = key - ord('0')
-#                    self.ui.build_menu(
-#                        self.datatype,
-#                        self.title,
-#                        self.datalist,
-#                        self.offset,
-#                        idx,
-#                        self.step,
-#                        self.menu_starts,
-#                    )
-#                    self.ui.build_loading()
-#                    self.dispatch_enter(idx)
-#                    self.index = 0
-#                    self.offset = 0
-#                    self.build_menu_processbar()
+            # 数字快捷键
+#            elif ord('0') <= key <= ord('9') and self.datatype not in ('songs', 'fmsongs'):
+#                idx = key - ord('0')
+#                self.ui.build_menu(
+#                    self.datatype,
+#                    self.title,
+#                    self.datalist,
+#                    self.offset,
+#                    idx,
+#                    self.step,
+#                    self.menu_starts,
+#                )
+#                self.ui.build_loading()
+#                self.dispatch_enter(idx)
+#                self.index = 0
+#                self.offset = 0
 
-                # 向上翻页
-                elif C.keyname(key).decode('utf-8') == keyMap['prevPage']:
-                    self.up_page_event()
-                    self.build_menu_processbar()
+            # 向上翻页
+            elif C.keyname(key).decode('utf-8') == keyMap['prevPage']:
+                self.up_page_event()
 
-                # 向下翻页
-                elif C.keyname(key).decode('utf-8') == keyMap['nextPage']:
-                    self.down_page_event()
-                    self.build_menu_processbar()
+            # 向下翻页
+            elif C.keyname(key).decode('utf-8') == keyMap['nextPage']:
+                self.down_page_event()
 
-                # 前进
-                elif C.keyname(key).decode('utf-8') == keyMap['forward'] or key == 10:
-                    self.enter_page_event()
-                    self.build_menu_processbar()
+            # 前进
+            elif C.keyname(key).decode('utf-8') == keyMap['forward'] or key == 10:
+                self.enter_page_event()
 
-                # 回退
-                elif C.keyname(key).decode('utf-8') == keyMap['back']:
-                    self.back_page_event()
-                    self.build_menu_processbar()
+            # 回退
+            elif C.keyname(key).decode('utf-8') == keyMap['back']:
+                self.back_page_event()
 
-                # 搜索
-                elif C.keyname(key).decode('utf-8') == keyMap['search']:
-                    # 9 == the 'search' menu
-                    self.dispatch_enter(9)
-                    self.build_menu_processbar()
+            # 搜索
+            elif C.keyname(key).decode('utf-8') == keyMap['search']:
+                # 9 == the 'search' menu
+                self.dispatch_enter(9)
 
-                # 播放下一曲
-                elif C.keyname(key).decode('utf-8') == keyMap['nextSong']\
-                        and pre_key not in range(ord('0'), ord('9')):
-                    self.next_key_event()
-                    # self.down_key_event()
-                    self.build_menu_processbar()
+            # 播放下一曲
+            elif C.keyname(key).decode('utf-8') == keyMap['nextSong']\
+                    and pre_key not in range(ord('0'), ord('9')):
+                self.next_key_event()
+                # self.down_key_event()
 
-                # 播放上一曲
-                elif C.keyname(key).decode('utf-8') == keyMap['prevSong']\
-                        and pre_key not in range(ord('0'), ord('9')):
-                    self.prev_key_event()
-                    # self.up_key_event()
-                    self.build_menu_processbar()
-                # 连按[ 或者 ]
-#                elif pre_key in (ord(keyMap['prevSong']), ord(keyMap['nextSong'])) and key == -1 and\
-#                        self.datatype in ('songs', 'fmsongs') and sum(self.pre_keylist) % 92 != 0:
-#                    self.space_key_event()
-#                    self.build_menu_processbar()
+            # 播放上一曲
+            elif C.keyname(key).decode('utf-8') == keyMap['prevSong']\
+                    and pre_key not in range(ord('0'), ord('9')):
+                self.prev_key_event()
 
-                # 增加音量
-                elif C.keyname(key).decode('utf-8') == keyMap['volume+']:
-                    self.player.volume_up()
-                    self.build_menu_processbar()
+            # 增加音量
+            elif C.keyname(key).decode('utf-8') == keyMap['volume+']:
+                self.player.volume_up()
 
-                # 减少音量
-                elif C.keyname(key).decode('utf-8') == keyMap['volume-']:
-                    self.player.volume_down()
-                    self.build_menu_processbar()
+            # 减少音量
+            elif C.keyname(key).decode('utf-8') == keyMap['volume-']:
+                self.player.volume_down()
 
-                # 随机播放
-                elif C.keyname(key).decode('utf-8') == keyMap['shuffle']:
+            # 随机播放
+            elif C.keyname(key).decode('utf-8') == keyMap['shuffle']:
+                if len(self.player.info['player_list']) == 0:
+                    continue
+                self.player.shuffle()
+
+            # 喜爱
+            elif C.keyname(key).decode('utf-8') == keyMap['like']:
+                return_data = self.request_api(self.api.fm_like,
+                                               self.player.playing_id)
+                if return_data:
+                    song_name = self.player.playing_name
+                    notify('%s added successfully!' % song_name, 0)
+                else:
+                    notify('Adding song failed!', 0)
+
+            # 删除FM
+            elif C.keyname(key).decode('utf-8') == keyMap['trashFM']:
+                if self.datatype == 'fmsongs':
                     if len(self.player.info['player_list']) == 0:
                         continue
-                    self.player.shuffle()
-                    self.build_menu_processbar()
-
-                # 喜爱
-                elif C.keyname(key).decode('utf-8') == keyMap['like']:
-                    return_data = self.request_api(self.api.fm_like,
-                                                   self.player.playing_id)
-                    if return_data:
-                        song_name = self.player.playing_name
-                        notify('%s added successfully!' % song_name, 0)
-                    else:
-                        notify('Adding song failed!', 0)
-                    self.build_menu_processbar()
-
-                # 删除FM
-                elif C.keyname(key).decode('utf-8') == keyMap['trashFM']:
-                    if self.datatype == 'fmsongs':
-                        if len(self.player.info['player_list']) == 0:
-                            continue
-                        self.player.next()
-                        return_data = self.request_api(
-                            self.api.fm_trash, self.player.playing_id
-                        )
-                        if return_data:
-                            notify('Deleted successfully!', 0)
-                    self.build_menu_processbar()
-
-                # 更多FM
-                elif C.keyname(key).decode('utf-8') == keyMap['nextFM']:
-                    if self.datatype == 'fmsongs':
-                        # if len(self.player.info['player_list']) == 0:
-                        #     continue
-                        if self.player.end_callback:
-                            self.player.end_callback()
-                        else:
-                            self.datalist.extend(self.get_new_fm())
-                    self.build_menu_processbar()
-                    self.index = len(self.datalist) - 1
-                    self.offset = self.index - self.index % self.step
-                    self.build_menu_processbar()
-
-                # 播放、暂停
-                elif C.keyname(key).decode('utf-8') == keyMap['playPause']:
-                    self.space_key_event()
-                    self.build_menu_processbar()
-
-                # 加载当前播放列表
-                elif C.keyname(key).decode('utf-8') == keyMap['presentHistory']:
-                    self.show_playing_song()
-                    self.build_menu_processbar()
-
-                # 播放模式切换
-                elif C.keyname(key).decode('utf-8') == keyMap['playingMode']:
-                    self.player.change_mode()
-                    self.build_menu_processbar()
-
-                # 进入专辑
-                elif C.keyname(key).decode('utf-8') == keyMap['enterAlbum']:
-                    if datatype == 'album':
-                        continue
-                    if datatype in ['songs', 'fmsongs']:
-                        song_id = datalist[idx]['song_id']
-                        album_id = datalist[idx]['album_id']
-                        album_name = datalist[idx]['album_name']
-                    elif self.player.playing_flag:
-                        song_id = self.player.playing_id
-                        song_info = self.player.songs.get(str(song_id), {})
-                        album_id = song_info.get('album_id', '')
-                        album_name = song_info.get('album_name', '')
-                    else:
-                        album_id = 0
-                    if album_id:
-                        self.stack.append([datatype, title, datalist, offset, self.index])
-                        songs = self.api.album(album_id)
-                        self.datatype = 'songs'
-                        self.datalist = self.api.dig_info(songs, 'songs')
-                        self.title = '网易云音乐 > 专辑 > %s' % album_name
-                        for i in range(len(self.datalist)):
-                            if self.datalist[i]['song_id'] == song_id:
-                                self.offset = i - i % step
-                                self.index = i
-                                break
-
-                # 添加到打碟歌单
-                elif C.keyname(key).decode('utf-8') == keyMap['add']:
-                    if datatype == 'songs' and len(datalist) != 0:
-                        self.djstack.append(datalist[idx])
-                    elif datatype == 'artists':
-                        pass
-                    self.build_menu_processbar()
-
-                # 加载打碟歌单
-                elif C.keyname(key).decode('utf-8') == keyMap['djList']:
-                    self.stack.append(
-                        [self.datatype, self.title, self.datalist, self.offset, self.index])
-                    self.datatype = 'songs'
-                    self.title = '网易云音乐 > 打碟'
-                    self.datalist = self.djstack
-                    self.offset = 0
-                    self.index = 0
-                    self.build_menu_processbar()
-
-                # 添加到本地收藏
-                elif C.keyname(key).decode('utf-8') == keyMap['star']:
-                    if (self.datatype == 'songs' or
-                            self.datatype == 'djchannels') and len(self.datalist) != 0:
-                        self.collection.append(self.datalist[self.index])
-                        notify('Added successfully', 0)
-                    self.build_menu_processbar()
-
-                # 加载本地收藏
-                elif C.keyname(key).decode("utf-8") == keyMap["collection"]:
-                    self.stack.append(
-                        [self.datatype, self.title, self.datalist, self.offset, self.index])
-                    self.datatype = 'songs'
-                    self.title = '网易云音乐 > 本地收藏'
-                    self.datalist = self.collection
-                    self.offset = 0
-                    self.index = 0
-                    self.build_menu_processbar()
-
-                # 从当前列表移除
-                elif C.keyname(key).decode('utf-8') == keyMap['remove']:
-                    if (
-                        self.datatype in ('songs', 'djchannels', 'fmsongs')
-                        and len(self.datalist) != 0
-                    ):
-                        self.datalist.pop(self.index)
-                        log.warn(self.index)
-                        log.warn(len(self.datalist))
-                        if self.index == len(self.datalist):
-                            self.up_key_event()
-                        self.index = carousel(self.offset, min(
-                            len(self.datalist), self.offset + self.step) - 1, self.index)
-                    self.build_menu_processbar()
-
-                # 倒计时
-                elif C.keyname(key).decode('utf-8') == keyMap['countDown']:
-                    self.time_key_event()
-
-                # 当前项目下移
-                elif C.keyname(key).decode('utf-8') == keyMap['moveDown']:
-                    if (
-                        self.datatype != 'main'
-                        and len(self.datalist) != 0
-                        and self.index + 1 != len(self.datalist)
-                    ):
-                        self.menu_starts = time.time()
-                        song = self.datalist.pop(self.index)
-                        self.datalist.insert(self.index + 1, song)
-                        self.index = self.index + 1
-                        # 翻页
-                        if self.index >= self.offset + self.step:
-                            self.offset = self.offset + self.step
-                    self.build_menu_processbar()
-
-                # 当前项目上移
-                elif C.keyname(key).decode('utf-8') == keyMap['moveUp']:
-                    if self.datatype != 'main' and len(self.datalist) != 0 and self.index != 0:
-                        self.menu_starts = time.time()
-                        song = self.datalist.pop(self.index)
-                        self.datalist.insert(self.index - 1, song)
-                        self.index = self.index - 1
-                        # 翻页
-                        if self.index < self.offset:
-                            self.offset = self.offset - self.step
-                    self.build_menu_processbar()
-
-                # 菜单
-                elif C.keyname(key).decode('utf-8') == keyMap['menu']:
-                    if self.datatype != 'main':
-                        self.stack.append(
-                            [self.datatype, self.title, self.datalist, self.offset, self.index])
-                        self.datatype, self.title, self.datalist, * \
-                            _ = self.stack[0]
-                        self.offset = 0
-                        self.index = 0
-                    self.build_menu_processbar()
-                # 跳到开头 g键
-                elif C.keyname(key).decode('utf-8') == keyMap['top']:
-                    if self.datatype == 'help':
-                        webbrowser.open_new_tab(
-                            'https://github.com/darknessomi/musicbox')
-                    else:
-                        self.index = 0
-                        self.offset = 0
-                    self.build_menu_processbar()
-
-                # 跳到末尾ord('G') 键
-                elif C.keyname(key).decode('utf-8') == keyMap['bottom']:
-                    self.index = len(self.datalist) - 1
-                    self.offset = self.index - self.index % self.step
-                    self.build_menu_processbar()
-
-                # 开始下载
-                elif C.keyname(key).decode('utf-8') == keyMap['cache']:
-                    s = self.datalist[self.index]
-                    cache_thread = threading.Thread(
-                        target=self.player.cache_song,
-                        args=(s['song_id'], s['song_name'],
-                              s['artist'], s['mp3_url'])
+                    self.player.next()
+                    return_data = self.request_api(
+                        self.api.fm_trash, self.player.playing_id
                     )
-                    cache_thread.start()
-                    self.build_menu_processbar()
-                # 在网页打开 ord(i)
-                elif C.keyname(key).decode('utf-8') == keyMap['musicInfo']:
-                    if self.player.playing_id != -1:
-                        webbrowser.open_new_tab(
-                            'http://music.163.com/song?id={}'.format(
-                                self.player.playing_id)
-                        )
-                    self.build_menu_processbar()
-                # term resize
-                # 刷新屏幕  按下某个键或者默认5秒刷新空白区
-                erase_coro.send(key)
-                if erase_cmd_list:
-                    self.screen.erase()
-                self.player.update_size()
-                self.build_menu_processbar()
+                    if return_data:
+                        notify('Deleted successfully!', 0)
 
-                pre_key = key
-                self.ui.screen.refresh()
-                # keylist.clear()
+            # 更多FM
+            elif C.keyname(key).decode('utf-8') == keyMap['nextFM']:
+                if self.datatype == 'fmsongs':
+                    # if len(self.player.info['player_list']) == 0:
+                    #     continue
+                    if self.player.end_callback:
+                        self.player.end_callback()
+                    else:
+                        self.datalist.extend(self.get_new_fm())
+                self.build_menu_processbar()
+                self.index = len(self.datalist) - 1
+                self.offset = self.index - self.index % self.step
+
+            # 播放、暂停
+            elif C.keyname(key).decode('utf-8') == keyMap['playPause']:
+                self.space_key_event()
+
+            # 加载当前播放列表
+            elif C.keyname(key).decode('utf-8') == keyMap['presentHistory']:
+                self.show_playing_song()
+
+            # 播放模式切换
+            elif C.keyname(key).decode('utf-8') == keyMap['playingMode']:
+                self.player.change_mode()
+
+            # 进入专辑
+            elif C.keyname(key).decode('utf-8') == keyMap['enterAlbum']:
+                if datatype == 'album':
+                    continue
+                if datatype in ['songs', 'fmsongs']:
+                    song_id = datalist[idx]['song_id']
+                    album_id = datalist[idx]['album_id']
+                    album_name = datalist[idx]['album_name']
+                elif self.player.playing_flag:
+                    song_id = self.player.playing_id
+                    song_info = self.player.songs.get(str(song_id), {})
+                    album_id = song_info.get('album_id', '')
+                    album_name = song_info.get('album_name', '')
+                else:
+                    album_id = 0
+                if album_id:
+                    self.stack.append([datatype, title, datalist, offset, self.index])
+                    songs = self.api.album(album_id)
+                    self.datatype = 'songs'
+                    self.datalist = self.api.dig_info(songs, 'songs')
+                    self.title = '网易云音乐 > 专辑 > %s' % album_name
+                    for i in range(len(self.datalist)):
+                        if self.datalist[i]['song_id'] == song_id:
+                            self.offset = i - i % step
+                            self.index = i
+                            break
+
+            # 添加到打碟歌单
+            elif C.keyname(key).decode('utf-8') == keyMap['add']:
+                if datatype == 'songs' and len(datalist) != 0:
+                    self.djstack.append(datalist[idx])
+                elif datatype == 'artists':
+                    pass
+
+            # 加载打碟歌单
+            elif C.keyname(key).decode('utf-8') == keyMap['djList']:
+                self.stack.append(
+                    [self.datatype, self.title, self.datalist, self.offset, self.index])
+                self.datatype = 'songs'
+                self.title = '网易云音乐 > 打碟'
+                self.datalist = self.djstack
+                self.offset = 0
+                self.index = 0
+
+            # 添加到本地收藏
+            elif C.keyname(key).decode('utf-8') == keyMap['star']:
+                if (self.datatype == 'songs' or
+                        self.datatype == 'djchannels') and len(self.datalist) != 0:
+                    self.collection.append(self.datalist[self.index])
+                    notify('Added successfully', 0)
+
+            # 加载本地收藏
+            elif C.keyname(key).decode("utf-8") == keyMap["collection"]:
+                self.stack.append(
+                    [self.datatype, self.title, self.datalist, self.offset, self.index])
+                self.datatype = 'songs'
+                self.title = '网易云音乐 > 本地收藏'
+                self.datalist = self.collection
+                self.offset = 0
+                self.index = 0
+
+            # 从当前列表移除
+            elif C.keyname(key).decode('utf-8') == keyMap['remove']:
+                if (
+                    self.datatype in ('songs', 'djchannels', 'fmsongs')
+                    and len(self.datalist) != 0
+                ):
+                    self.datalist.pop(self.index)
+                    log.warn(self.index)
+                    log.warn(len(self.datalist))
+                    if self.index == len(self.datalist):
+                        self.up_key_event()
+                    self.index = carousel(self.offset, min(
+                        len(self.datalist), self.offset + self.step) - 1, self.index)
+
+            # 倒计时
+            elif C.keyname(key).decode('utf-8') == keyMap['countDown']:
+                self.time_key_event()
+
+            # 当前项目下移
+            elif C.keyname(key).decode('utf-8') == keyMap['moveDown']:
+                if (
+                    self.datatype != 'main'
+                    and len(self.datalist) != 0
+                    and self.index + 1 != len(self.datalist)
+                ):
+                    self.menu_starts = time.time()
+                    song = self.datalist.pop(self.index)
+                    self.datalist.insert(self.index + 1, song)
+                    self.index = self.index + 1
+                    # 翻页
+                    if self.index >= self.offset + self.step:
+                        self.offset = self.offset + self.step
+
+            # 当前项目上移
+            elif C.keyname(key).decode('utf-8') == keyMap['moveUp']:
+                if self.datatype != 'main' and len(self.datalist) != 0 and self.index != 0:
+                    self.menu_starts = time.time()
+                    song = self.datalist.pop(self.index)
+                    self.datalist.insert(self.index - 1, song)
+                    self.index = self.index - 1
+                    # 翻页
+                    if self.index < self.offset:
+                        self.offset = self.offset - self.step
+
+            # 菜单
+            elif C.keyname(key).decode('utf-8') == keyMap['menu']:
+                if self.datatype != 'main':
+                    self.stack.append(
+                        [self.datatype, self.title, self.datalist, self.offset, self.index])
+                    self.datatype, self.title, self.datalist, * \
+                        _ = self.stack[0]
+                    self.offset = 0
+                    self.index = 0
+            # 跳到开头 g键
+            elif C.keyname(key).decode('utf-8') == keyMap['top']:
+                if self.datatype == 'help':
+                    webbrowser.open_new_tab(
+                        'https://github.com/darknessomi/musicbox')
+                else:
+                    self.index = 0
+                    self.offset = 0
+
+            # 跳到末尾ord('G') 键
+            elif C.keyname(key).decode('utf-8') == keyMap['bottom']:
+                self.index = len(self.datalist) - 1
+                self.offset = self.index - self.index % self.step
+
+            # 开始下载
+            elif C.keyname(key).decode('utf-8') == keyMap['cache']:
+                s = self.datalist[self.index]
+                cache_thread = threading.Thread(
+                    target=self.player.cache_song,
+                    args=(s['song_id'], s['song_name'],
+                          s['artist'], s['mp3_url'])
+                )
+                cache_thread.start()
+            # 在网页打开 ord(i)
+            elif C.keyname(key).decode('utf-8') == keyMap['musicInfo']:
+                if self.player.playing_id != -1:
+                    webbrowser.open_new_tab(
+                        'http://music.163.com/song?id={}'.format(
+                            self.player.playing_id)
+                    )
+            # term resize
+            # 刷新屏幕  按下某个键或者默认5秒刷新空白区
+            erase_coro.send(key)
+            if erase_cmd_list:
+                self.screen.erase()
+            self.player.update_size()
+
+            pre_key = key
+            self.ui.screen.refresh()
+            # keylist.clear()
+            self.build_menu_processbar()
         self.stop()
 
 
