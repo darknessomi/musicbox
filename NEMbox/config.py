@@ -181,19 +181,19 @@ class Config(Singleton):
         if not os.path.isfile(self.path):
             self.generate_config_file()
 
-        with open(self.path, 'r') as f:
+        with open(self.path, 'r') as config_file:
             try:
-                self.config = json.load(f)
+                self.config = json.load(config_file)
             except ValueError:
                 self.generate_config_file()
 
     def generate_config_file(self):
-        with open(self.path, 'w') as f:
-            utf8_data_to_file(f, json.dumps(self.default_config, indent=2))
+        with open(self.path, 'w') as config_file:
+            utf8_data_to_file(config_file, json.dumps(self.default_config, indent=2))
 
     def save_config_file(self):
-        with open(self.path, 'w') as f:
-            utf8_data_to_file(f, json.dumps(self.config, indent=2))
+        with open(self.path, 'w') as config_file:
+            utf8_data_to_file(config_file, json.dumps(self.config, indent=2))
 
     def get(self, name):
         if name not in self.config.keys():
