@@ -306,10 +306,10 @@ class Ui(object):
                     raise ValueError(datalist)
                 # this item is focus
                 if i == index:
-                    self.addstr(i - offset + 8, 0,
+                    self.addstr(i - offset + 9, 0,
                                 ' ' * self.startcol)
                     lead = '-> ' + str(i) + '. '
-                    self.addstr(i - offset + 8,
+                    self.addstr(i - offset + 9,
                                 self.indented_startcol, lead,
                                 curses.color_pair(2))
                     name = '{}{}{}  < {} >'.format(
@@ -319,26 +319,26 @@ class Ui(object):
                     # the length decides whether to scoll
                     if truelen(name) < self.x - self.startcol - 1:
                         self.addstr(
-                            i - offset + 8,
+                            i - offset + 9,
                             self.indented_startcol + len(lead), name,
                             curses.color_pair(2))
                     else:
                         name = scrollstring(name + '  ', start)
                         self.addstr(
-                            i - offset + 8,
+                            i - offset + 9,
                             self.indented_startcol + len(lead), str(name),
                             curses.color_pair(2))
                 else:
-                    self.addstr(i - offset + 8, 0,
+                    self.addstr(i - offset + 9, 0,
                                 ' ' * self.startcol)
                     self.addstr(
-                        i - offset + 8, self.startcol,
+                        i - offset + 9, self.startcol,
                         '{}. {}{}{}  < {} >'.format(
                             i, datalist[i]['song_name'], self.space,
                             datalist[i]['artist'],
                             datalist[i]['album_name'])[:int(self.x * 2)])
 
-            self.addstr(iter_range - offset + 8, 0, ' ' * self.x)
+            self.addstr(iter_range - offset + 9, 0, ' ' * self.x)
 
         elif datatype == 'comments':
             # 被选中的评论在最下方显示全部字符，其余评论仅显示一行
