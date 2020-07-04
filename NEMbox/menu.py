@@ -219,7 +219,7 @@ class Menu(object):
 
     def update_alert(self, version):
         latest = Menu().check_version()
-        if latest != version and latest != 0:
+        if latest > version and latest != 0:
             notify('MusicBox Update == available', 1)
             time.sleep(0.5)
             notify('NetEase-MusicBox installed version:' + version +

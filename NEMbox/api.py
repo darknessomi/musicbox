@@ -563,7 +563,7 @@ class NetEase(object):
 
     # 获取版本
     def get_version(self):
-        action = 'https://pypi.org/pypi/macmusicbox/json'
+        action = 'https://pypi.org/pypi/NetEase-MusicBox/json'
         try:
             return requests.get(action).json()
         except requests.exceptions.RequestException as e:
