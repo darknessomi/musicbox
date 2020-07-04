@@ -26,7 +26,7 @@ import webbrowser
 import locale
 from collections import namedtuple
 from copy import deepcopy
-
+from fuzzywuzzy import process
 from future.builtins import range, str
 
 from .api import NetEase
@@ -181,6 +181,18 @@ class Menu(object):
                 return False
             return self.login()
 
+    def in_place_search(self):
+        self.ui.screen.timeout(-1)
+        prompt = '模糊搜索：'
+        keyword = self.ui.get_param(prompt)
+        if not keyword:
+            return []
+        search_result = process.extract(keyword, self.datalist, limit=20)
+        if not search_result:
+            return search_result
+        search_result.sort(key=lambda ele: ele[1], reverse=True)
+        return (list(map(lambda ele: ele[0], search_result)), keyword)
+
     def search(self, category):
         self.ui.screen.timeout(-1)
         SearchArg = namedtuple(
@@ -257,19 +269,9 @@ class Menu(object):
         self.player.prev()
 
     def prev_key_event(self):
-        origin_stdout = sys.stdout
-        with open('/home/tonyfettes/function_call.log', 'a') as f:
-            sys.stdout = f
-            print('Call prev_key_event.')
-            sys.stdout = origin_stdout
         self.player.prev_idx()
 
     def next_key_event(self):
-        origin_stdout = sys.stdout
-        with open('/home/tonyfettes/function_call.log', 'a') as f:
-            sys.stdout = f
-            print('Call next_key_event.')
-            sys.stdout = origin_stdout
         self.player.next_idx()
 
     def up_key_event(self):
@@ -618,7 +620,14 @@ class Menu(object):
             # 搜索
             elif C.keyname(key).decode('utf-8') == keyMap['search']:
                 # 9 == the 'search' menu
-                self.dispatch_enter(9)
+                #self.dispatch_enter(9)
+                self.stack.append(
+                    [self.datatype, self.title, self.datalist, self.offset, self.index])
+                self.datalist, keyword = self.in_place_search()
+                self.datatype = 'songs'
+                self.title += ' > ' + keyword + ' 的搜索结果'
+                self.offset = 0
+                self.index = 0
 
             # 播放下一曲
             elif C.keyname(key).decode('utf-8') == keyMap['nextSong']\
