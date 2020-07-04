@@ -114,6 +114,11 @@ class Config(Singleton):
                 'default': False,
                 'describe': 'Set true to make curses transparency.'
             },
+            'mouse_movement': {
+                'value': False,
+                'default': False,
+                'describe': 'Use mouse or touchpad to move.'
+            },
             'colors': {
                 'value': {
                     'pair1': [22, 148],

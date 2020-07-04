@@ -46,7 +46,6 @@ locale.setlocale(locale.LC_ALL, '')
 
 log = logger.getLogger(__name__)
 
-
 def carousel(left, right, x):
     # carousel x in [left, right]
     if x > right:
@@ -55,13 +54,18 @@ def carousel(left, right, x):
         return right
     else:
         return x
+
 keyMap = Config().get("keymap")
+
+if Config().get("mouse_movement"):
+    keyMap['mouseUp'] = 259
+    keyMap['mouseDown'] = 258
 
 shortcut = [
     [keyMap['down'], 'Down      ', '下移'],
     [keyMap['up'], 'Up        ', '上移'],
-    ['<num>+j', '<num> Up ', '上移num'],
-    ['<num>+k', '<num>Down', '下移num'],
+    ['<Num>+' + keyMap['up'], '<num> Up ', '上移num'],
+    ['<Num>+' + keyMap['down'], '<num> Down', '下移num'],
     [keyMap['back'], 'Back      ', '后退'],
     [keyMap['forward'], 'Forward   ', '前进'],
     [keyMap['prevPage'], 'Prev page ', '上一页'],
@@ -69,9 +73,9 @@ shortcut = [
     [keyMap['search'], 'Search    ', '快速搜索'],
     [keyMap['prevSong'], 'Prev song ', '上一曲'],
     [keyMap['nextSong'], 'Next song ', '下一曲'],
-    ['<num>+]', '<num> Next Song ', '下num曲'],
-    ['<num>+[', '<num> Prev song ', '上num曲'],
-    ['<num>', 'goto song num ', '跳转指定歌曲id'],
+    ['<Num>+' + keyMap['nextSong'], '<Num> Next Song ', '下num曲'],
+    ['<Num>+' + keyMap['prevSong'], '<Num> Prev song ', '上num曲'],
+    ['<Num>', 'Goto song num ', '跳转指定歌曲id'],
     [keyMap['playPause'], 'Play/Pause', '播放/暂停'],
     [keyMap['shuffle'], 'Shuffle          ', '手气不错'],
     [keyMap['volume+'], 'Volume+          ', '音量增加'],
@@ -416,14 +420,14 @@ class Menu(object):
         if num == 0:  # 0j -> 1j
             num = 1
         for _ in range(num):
-            if cmd in (259, 107):
+            if cmd in (keyMap['mouseUp'], ord(keyMap['up'])):
                 self.up_key_event()
-            elif cmd in (258, 106):
+            elif cmd in (keyMap['mouseDown'], ord(keyMap['donw'])):
                 self.down_key_event()
         self.build_menu_processbar()
 
     def digit_key_song_event(self):
-        # 直接跳到指定id 歌曲
+        ''' 直接跳到指定id 歌曲 '''
         step = self.step
         song_index = parse_keylist(self.key_list)
         if self.index != song_index:
@@ -567,9 +571,13 @@ class Menu(object):
             # 上移
             elif C.keyname(key).decode('utf-8') == keyMap['up']:
                 self.up_key_event()
+            elif self.config.get('mouse_movement') and key == keyMap['mouseUp']:
+                self.up_key_event()
 
             # 下移
             elif C.keyname(key).decode('utf-8') == keyMap['down']:
+                self.down_key_event()
+            elif self.config.get('mouse_movement') and key == keyMap['mouseDown']:
                 self.down_key_event()
 
             # 数字快捷键

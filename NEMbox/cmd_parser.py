@@ -6,6 +6,7 @@
 捕获类似curses键盘输入流,生成指令流
 """
 
+from .config import Config
 from copy import deepcopy
 from functools import wraps
 import os
@@ -14,6 +15,7 @@ ERASE_SPEED = 5  # 屏幕5秒刷新一次 去除错误的显示
 
 __all__ = ['cmd_parser', 'parse_keylist', 'coroutine', 'erase_coroutine']
 
+keyMap = Config().get("keymap")
 
 def coroutine(func):
     @wraps(func)
@@ -33,14 +35,11 @@ def _cmd_parser():
     keylist = []
     while 1:
         key = yield
-        if key*pre_key < 0 and key > pre_key:
-            temp_pre_key = key
+        if key * pre_key < 0 and key > pre_key:
             keylist.append(key)
-        elif key*pre_key > 0 and key+pre_key > 0:
-            temp_pre_key = key
+        elif key * pre_key > 0 and key + pre_key > 0:
             keylist.append(key)
-        elif key*pre_key < 0 and key < pre_key:
-            temp_pre_key = key
+        elif key * pre_key < 0 and key < pre_key:
             return keylist
         pre_key = key
 
