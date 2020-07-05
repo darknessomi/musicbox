@@ -839,9 +839,9 @@ class Menu(object):
                     )
             # term resize
             # 刷新屏幕  按下某个键或者默认5秒刷新空白区
-            erase_coro.send(key)
-            if erase_cmd_list:
-                self.screen.erase()
+#            erase_coro.send(key)
+#            if erase_cmd_list:
+#                self.screen.erase()
             self.player.update_size()
 
             pre_key = key
