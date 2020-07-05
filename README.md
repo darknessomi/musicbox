@@ -33,42 +33,47 @@
 
 ### 键盘快捷键
 
-| Key   | Effect          |           |
-| ----- | --------------- | --------- |
-| j     | Down            | 下移        |
-| k     | Up              | 上移        |
-| h     | Back            | 后退        |
-| l     | Forword         | 前进        |
-| u     | Prev page       | 上一页       |
-| d     | Next page       | 下一页       |
-| f     | Search          | 快速搜索      |
-| \[    | Prev song       | 上一曲       |
-| ]     | Next song       | 下一曲       |
-| =     | Volume +        | 音量增加      |
-| -     | Volume -        | 音量减少      |
-| Space | Play/Pause      | 播放/暂停     |
-| ?     | Shuffle         | 手气不错      |
-| m     | Menu            | 主菜单       |
-| p     | Present/History | 当前/历史播放列表 |
-| i     | Music Info      | 当前音乐信息    |
-| ⇧+p   | Playing Mode    | 播放模式切换    |
-| a     | Add             | 添加曲目到打碟   |
-| ⇧+a   | Enter album     | 进入专辑      |
-| g     | To the first    | 跳至首项      |
-| ⇧+g   | To the end      | 跳至尾项      |
-| z     | DJ list         | 打碟列表      |
-| s     | Star            | 添加到收藏     |
-| c     | Collection      | 收藏列表      |
-| r     | Remove          | 删除当前条目    |
-| ⇧+j   | Move Down       | 向下移动当前项目  |
-| ⇧+k   | Move Up         | 向上移动当前项目  |
-| ⇧+c   | Cache           | 缓存歌曲到本地   |
-| ,     | Like            | 喜爱        |
-| .     | Trash FM        | 删除 FM     |
-| /     | Next FM         | 下一FM      |
-| q     | Quit            | 退出        |
-| t     | Timing Exit     | 定时退出      |
-| w     | Quit&Clear      | 退出并清除用户信息 |
+| Key      | Effect          |                    |
+| -------- | --------------- | ------------------ |
+| j        | Down            | 下移               |
+| k        | Up              | 上移               |
+|num + j   | Quick jump      | 快速向后跳转n首    |
+|num + k   | Quick up        | 快速向前跳转n首    |
+| h        | Back            | 后退               |
+| l        | Forword         | 前进               |
+| u        | Prev page       | 上一页             |
+| d        | Next page       | 下一页             |
+| f        | Search          | 当前界面模糊搜索   |
+| \[       | Prev song       | 上一曲             |
+| ]        | Next song       | 下一曲             |
+|num + \[  | Quick prev song | 快速前n首          |
+|num + ]   | Quick next Song | 快速后n首          |
+|num       | Index for song  | 跳到第n首          |
+| =        | Volume +        | 音量增加           |
+| -        | Volume -        | 音量减少           |
+| Space    | Play/Pause      | 播放/暂停          |
+| ?        | Shuffle         | 手气不错           |
+| m        | Menu            | 主菜单             |
+| p        | Present/History | 当前/历史播放列表  |
+| i        | Music Info      | 当前音乐信息       |
+| ⇧+p      | Playing Mode    | 播放模式切换       |
+| a        | Add             | 添加曲目到打碟     |
+| ⇧+a      | Enter album     | 进入专辑           |
+| g        | To the first    | 跳至首项           |
+| ⇧+g      | To the end      | 跳至尾项           |
+| z        | DJ list         | 打碟列表           |
+| s        | Star            | 添加到收藏         |
+| c        | Collection      | 收藏列表           |
+| r        | Remove          | 删除当前条目       |
+| ⇧+j      | Move Down       | 向下移动当前项目   |
+| ⇧+k      | Move Up         | 向上移动当前项目   |
+| ⇧+c      | Cache           | 缓存歌曲到本地     |
+| ,        | Like            | 喜爱               |
+| .        | Trash FM        | 删除 FM            |
+| /        | Next FM         | 下一FM             |
+| q        | Quit            | 退出               |
+| t        | Timing Exit     | 定时退出           |
+| w        | Quit&Clear      | 退出并清除用户信息 |
 
 ## 安装
 
