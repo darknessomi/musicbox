@@ -43,7 +43,7 @@
 | l        | Forword         | 前进               |
 | u        | Prev page       | 上一页             |
 | d        | Next page       | 下一页             |
-| f        | Search          | 当前界面模糊搜索   |
+| f        | Search          | 当前列表模糊搜索   |
 | \[       | Prev song       | 上一曲             |
 | ]        | Next song       | 下一曲             |
 |num + \[  | Quick prev song | 快速前n首          |
@@ -80,12 +80,14 @@
 ### 必选依赖
 
 1.  `mpg123` 用于播放歌曲，安装方法参见下面的说明
+2.  `python-fuzzywuzzy` 用于模糊搜索
 
 ### 可选依赖
 
 1.  `aria2` 用于缓存歌曲
 2.  `libnotify-bin` 用于支持消息提示（Linux平台）
 3.  `pyqt python-dbus dbus qt` 用于支持桌面歌词 (Mac 用户需要 `brew install qt --with-dbus` 获取支持 DBus 的 Qt)
+4.  `python-levenshtein` 用于模糊搜索
 
 ### PyPi安装（*nix系统）
 
@@ -141,12 +143,6 @@ curl -L ip.cn
 
 | OS       | Version               |
 | -------- | --------------------- |
-| macOS    | 10.13 / 10.12 / 10.11 |
-| Ubuntu   | 14.04                 |
-| Kali     | 1.1.0 / 2.0 / Rolling |
-| CentOS   | 7                     |
-| openSUSE | 13.2                  |
-| Fedora   | 22                    |
 | Arch     | Rolling               |
 
 ### 错误处理
