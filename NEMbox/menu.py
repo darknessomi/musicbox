@@ -414,7 +414,7 @@ class Menu(object):
         for _ in range(num):
             if cmd in (keyMap['mouseUp'], ord(keyMap['up'])):
                 self.up_key_event()
-            elif cmd in (keyMap['mouseDown'], ord(keyMap['donw'])):
+            elif cmd in (keyMap['mouseDown'], ord(keyMap['down'])):
                 self.down_key_event()
         self.build_menu_processbar()
 
@@ -565,13 +565,15 @@ class Menu(object):
                 break
 
             # 上移
-            elif C.keyname(key).decode('utf-8') == keyMap['up']:
+            elif C.keyname(key).decode('utf-8') == keyMap['up']\
+                    and pre_key not in range(ord('0'), ord('9')):
                 self.up_key_event()
             elif self.config.get('mouse_movement') and key == keyMap['mouseUp']:
                 self.up_key_event()
 
             # 下移
-            elif C.keyname(key).decode('utf-8') == keyMap['down']:
+            elif C.keyname(key).decode('utf-8') == keyMap['down']\
+                    and pre_key not in range(ord('0'), ord('9')):
                 self.down_key_event()
             elif self.config.get('mouse_movement') and key == keyMap['mouseDown']:
                 self.down_key_event()
