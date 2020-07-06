@@ -528,7 +528,7 @@ class Menu(object):
             offset = self.offset
             idx = self.index
             step = self.step
-            self.screen.timeout(500)
+            self.screen.timeout(self.config.get('input_timeout'))
             key = self.screen.getch()
             self.parser.send(key)
             if keylist:
