@@ -11,6 +11,14 @@
 
 [![NetEase-MusicBox-GIF](https://qfile.aobeef.cn/3abba3b8a3994ee3d5cd.gif)](https://pypi.org/project/NetEase-MusicBox/)
 
+## 正在做的
+
+1. 优化按键逻辑，降低时延，提高容错性
+2. 将一些分支判断命题抽象成函数减少 `menu.py` 中代码行数
+3. 尝试修复 [darknessomi #857](https://github.com/darknessomi/musicbox/issues/857)
+4. 尝试修复 [darknessomi #816](https://github.com/darknessomi/musicbox/issues/816)
+5. 尝试实现功能 [darknessomi #828](https://github.com/darknessomi/musicbox/issues/828)
+
 ## 可能打算做的
 
 按照可能的实现难度粗略的排序
