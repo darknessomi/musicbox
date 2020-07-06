@@ -75,7 +75,7 @@
 | ]        | Next Song       | 下一曲             |
 | num + \[ | Quick Prev Song | 快速前n首          |
 | num + ]  | Quick Next Song | 快速后n首          |
-| num      | Index for Song  | 跳到第n首          |
+| num + G  | Index for Song  | 跳到第n首          |
 | =        | Volume +        | 音量增加           |
 | -        | Volume -        | 音量减少           |
 | Space    | Play/Pause      | 播放/暂停          |
