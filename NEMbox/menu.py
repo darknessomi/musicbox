@@ -59,6 +59,9 @@ keyMap = Config().get("keymap")
 if Config().get("mouse_movement"):
     keyMap['mouseUp'] = 259
     keyMap['mouseDown'] = 258
+else:
+    keyMap['mouseUp'] = -259
+    keyMap['mouseDown'] = -258
 
 shortcut = [
     [keyMap['down'], 'Down', '下移'],
