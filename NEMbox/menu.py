@@ -59,6 +59,9 @@ keyMap = Config().get("keymap")
 if Config().get("mouse_movement"):
     keyMap['mouseUp'] = 259
     keyMap['mouseDown'] = 258
+else:
+    keyMap['mouseUp'] = -259
+    keyMap['mouseDown'] = -258
 
 shortcut = [
     [keyMap['down'], 'Down', '下移'],
@@ -427,7 +430,7 @@ class Menu(object):
             self.offset = self.index - self.index % step
             self.build_menu_processbar()
             self.ui.screen.refresh()
-            self.space_key_event()
+#            self.space_key_event()
 
     def time_key_event(self):
         self.countdown_start = time.time()
@@ -532,14 +535,15 @@ class Menu(object):
                 self.pre_keylist = deepcopy(keylist)
 
             # 如果 keylist 全都是数字
-            if self.datatype in ('songs', 'fmsongs') and keylist and \
-                    (set(keylist) | set(range(48, 58))) == set(range(48, 58)):
+            if keylist and (set(keylist) | set(range(48, 58))) == set(range(48, 58)):
                 # 歌曲数字映射
                 self.digit_key_song_event()
                 continue
 
             # 如果 keylist 只有 [ ]
-            if len(keylist) > 0 and (set(keylist) | {91, 93}) == {91, 93}:
+            if len(keylist) > 0 and\
+                    (set(keylist) | {ord(keyMap['prevSong']), ord(keyMap['nextSong'])})\
+                    == {ord(keyMap['prevSong']), ord(keyMap['nextSong'])}:
                 self.player.stop()
                 self.player.replay()
                 continue

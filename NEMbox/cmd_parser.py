@@ -81,11 +81,12 @@ def parse_keylist(keylist):
     keylist = deepcopy(keylist)
     if keylist == []:
         return None
-    if (set(keylist) | {91, 93}) == {91, 93}:
-        delta_key = keylist.count(93) - keylist.count(91)
+    if (set(keylist) | {ord(keyMap['prevSong']), ord(keyMap['nextSong'])})\
+            == {ord(keyMap['prevSong']), ord(keyMap['nextSong'])}:
+        delta_key = keylist.count(ord(keyMap['nextSong'])) - keylist.count(ord(keyMap['prevSong']))
         if delta_key < 0:
-            return (-delta_key, 91)
-        return (delta_key, 93)
+            return (-delta_key, ord(keyMap['prevSong']))
+        return (delta_key, ord(keyMap['nextSong']))
     tail_cmd = keylist.pop()
     if tail_cmd in range(48, 58) and (set(keylist) | set(range(48, 58))) \
             == set(range(48, 58)):
@@ -93,8 +94,9 @@ def parse_keylist(keylist):
 
     if len(keylist) == 0:
         return (0, tail_cmd)
-    if tail_cmd in (ord('['), ord(']'), ord('j'), ord('k'), 258, 259) and \
-            max(keylist) <= 57 and min(keylist) >= 48:
+    if tail_cmd in (ord(keyMap['prevSong']), ord(keyMap['nextSong']),\
+            ord(keyMap['down']), ord(keyMap['up']))\
+            and max(keylist) <= 57 and min(keylist) >= 48:
         return (int(''.join([chr(i) for i in keylist])), tail_cmd)
     return None
 
