@@ -152,6 +152,7 @@ class Config(Singleton):
                     'search': 'f',
                     'prevSong': '[',
                     'nextSong': ']',
+                    'jumpIndex': 'G',
                     'playPause': ' ',
                     'shuffle': '?',
                     'volume+': '+',
