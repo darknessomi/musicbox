@@ -11,17 +11,44 @@
 
 [![NetEase-MusicBox-GIF](https://qfile.aobeef.cn/3abba3b8a3994ee3d5cd.gif)](https://pypi.org/project/NetEase-MusicBox/)
 
+## 正在做的
+
+1. 优化按键逻辑，降低时延，提高容错性
+2. 将一些分支判断命题抽象成函数减少 `menu.py` 中代码行数
+3. 尝试修复 [darknessomi #857](https://github.com/darknessomi/musicbox/issues/857)
+4. 尝试修复 [darknessomi #816](https://github.com/darknessomi/musicbox/issues/816)
+5. 尝试实现功能 [darknessomi #828](https://github.com/darknessomi/musicbox/issues/828)
+
+## 可能打算做的
+
+按照可能的实现难度粗略的排序
+
+1. 消减 Unicode glyph 字符数量
+2. Nofitication 添加 Action
+3. 鼠标左右键的支持
+4. 歌曲评论的回复
+5. 更多配置选项，例如每页显示歌曲数目和歌词行数
+6. 版权问题的歌曲灰色显示、不自动跳过并显示 notification
+7. 后台运行
+8. 用 Rofi 和 dmenu 控制
+9. 最小化显示模式 ( i3bar 等的适配 )
+10. 运行时更改配置
+11. 容器和可定制界面
+12. 类 VIM 的增量搜索功能和命令
+13. 歌曲信息终端内显示，使用 libcaca 显示专辑封面
+14. \[大概不可能做得出来] 类似 lsp 的中间层，适配多后端和多前端（可能新开坑）
+
 ## 功能特性
 
-1.  320kbps的高品质音乐
-2.  歌曲，艺术家，专辑检索
-3.  网易22个歌曲排行榜
-4.  网易新碟推荐
-5.  网易精选歌单
-6.  网易主播电台
-7.  私人歌单，每日推荐
-8.  随心打碟
-9.  本地收藏，随时加❤
+1. 320kbps的高品质音乐
+2. 歌曲，艺术家，专辑检索
+3. 网易22个歌曲排行榜
+4. 网易新碟推荐
+5. 网易精选歌单
+6. 网易主播电台
+7. 私人歌单，每日推荐
+8. 随心打碟
+9. 本地收藏，随时加❤
 10. 播放进度及播放模式显示
 11. 现在播放及桌面歌词显示
 12. 歌曲评论显示
@@ -37,18 +64,18 @@
 | -------- | --------------- | ------------------ |
 | j        | Down            | 下移               |
 | k        | Up              | 上移               |
-|num + j   | Quick jump      | 快速向后跳转n首    |
-|num + k   | Quick up        | 快速向前跳转n首    |
+| num + j  | Quick Jump      | 快速向后跳转n首    |
+| num + k  | Quick Up        | 快速向前跳转n首    |
 | h        | Back            | 后退               |
 | l        | Forword         | 前进               |
-| u        | Prev page       | 上一页             |
-| d        | Next page       | 下一页             |
+| u        | Prev Page       | 上一页             |
+| d        | Next Page       | 下一页             |
 | f        | Search          | 当前列表模糊搜索   |
-| \[       | Prev song       | 上一曲             |
-| ]        | Next song       | 下一曲             |
-|num + \[  | Quick prev song | 快速前n首          |
-|num + ]   | Quick next Song | 快速后n首          |
-|num       | Index for song  | 跳到第n首          |
+| \[       | Prev Song       | 上一曲             |
+| ]        | Next Song       | 下一曲             |
+| num + \[ | Quick Prev Song | 快速前n首          |
+| num + ]  | Quick Next Song | 快速后n首          |
+| num      | Index for Song  | 跳到第n首          |
 | =        | Volume +        | 音量增加           |
 | -        | Volume -        | 音量减少           |
 | Space    | Play/Pause      | 播放/暂停          |
@@ -58,10 +85,10 @@
 | i        | Music Info      | 当前音乐信息       |
 | ⇧+p      | Playing Mode    | 播放模式切换       |
 | a        | Add             | 添加曲目到打碟     |
-| ⇧+a      | Enter album     | 进入专辑           |
-| g        | To the first    | 跳至首项           |
-| ⇧+g      | To the end      | 跳至尾项           |
-| z        | DJ list         | 打碟列表           |
+| ⇧+a      | Enter Album     | 进入专辑           |
+| g        | To the First    | 跳至首项           |
+| ⇧+g      | To the End      | 跳至尾项           |
+| z        | DJ List         | 打碟列表           |
 | s        | Star            | 添加到收藏         |
 | c        | Collection      | 收藏列表           |
 | r        | Remove          | 删除当前条目       |
@@ -73,21 +100,22 @@
 | /        | Next FM         | 下一FM             |
 | q        | Quit            | 退出               |
 | t        | Timing Exit     | 定时退出           |
-| w        | Quit&Clear      | 退出并清除用户信息 |
+| w        | Quit & Clear    | 退出并清除用户信息 |
 
 ## 安装
 
 ### 必选依赖
 
-1.  `mpg123` 用于播放歌曲，安装方法参见下面的说明
-2.  `python-fuzzywuzzy` 用于模糊搜索
+1. `mpg123` 用于播放歌曲，安装方法参见下面的说明
+2. `python-fuzzywuzzy` 用于模糊搜索
 
 ### 可选依赖
 
-1.  `aria2` 用于缓存歌曲
-2.  `libnotify-bin` 用于支持消息提示（Linux平台）
-3.  `pyqt python-dbus dbus qt` 用于支持桌面歌词 (Mac 用户需要 `brew install qt --with-dbus` 获取支持 DBus 的 Qt)
-4.  `python-levenshtein` 用于模糊搜索
+1. `aria2` 用于缓存歌曲
+2. `libnotify-bin` 用于支持消息提示（Linux平台）
+3. `pyqt python-dbus dbus qt` 用于支持桌面歌词
+   (Mac 用户需要 `brew install qt --with-dbus` 获取支持 DBus 的 Qt)
+4. `python-levenshtein` 用于模糊搜索
 
 ### PyPi安装（*nix系统）
 
@@ -156,10 +184,10 @@ mpg123 最新的版本可能会报找不到声音硬件的错误，测试了1.25
 
 ### 已知问题及解决方案
 
--   [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。
--   [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
--   [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
--   [#791](https://github.com/darknessomi/musicbox/issues/791) 版权问题，master分支已经修复
+- [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。
+- [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
+- [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
+- [#791](https://github.com/darknessomi/musicbox/issues/791) 版权问题，master分支已经修复
 
 ## 使用
 
