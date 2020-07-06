@@ -95,8 +95,7 @@ def parse_keylist(keylist):
     if len(keylist) == 0:
         return (0, tail_cmd)
     if tail_cmd in (ord(keyMap['prevSong']), ord(keyMap['nextSong']),\
-            ord(keyMap['down']), ord(keyMap['up']),\
-            keyMap['mouseUp'], keyMap['mouseDown'])\
+            ord(keyMap['down']), ord(keyMap['up']))\
             and max(keylist) <= 57 and min(keylist) >= 48:
         return (int(''.join([chr(i) for i in keylist])), tail_cmd)
     return None
