@@ -427,7 +427,7 @@ class Menu(object):
             self.offset = self.index - self.index % step
             self.build_menu_processbar()
             self.ui.screen.refresh()
-            self.space_key_event()
+#            self.space_key_event()
 
     def time_key_event(self):
         self.countdown_start = time.time()
