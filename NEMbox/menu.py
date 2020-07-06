@@ -532,14 +532,15 @@ class Menu(object):
                 self.pre_keylist = deepcopy(keylist)
 
             # 如果 keylist 全都是数字
-            if self.datatype in ('songs', 'fmsongs') and keylist and \
-                    (set(keylist) | set(range(48, 58))) == set(range(48, 58)):
+            if keylist and (set(keylist) | set(range(48, 58))) == set(range(48, 58)):
                 # 歌曲数字映射
                 self.digit_key_song_event()
                 continue
 
             # 如果 keylist 只有 [ ]
-            if len(keylist) > 0 and (set(keylist) | {91, 93}) == {91, 93}:
+            if len(keylist) > 0 and\
+                    (set(keylist) | {ord(keyMap['prevSong']), ord(keyMap['nextSong'])})\
+                    == {ord(keyMap['prevSong']), ord(keyMap['nextSong'])}:
                 self.player.stop()
                 self.player.replay()
                 continue
