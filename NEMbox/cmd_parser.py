@@ -6,10 +6,10 @@
 捕获类似curses键盘输入流,生成指令流
 """
 
-from .config import Config
-from copy import deepcopy
+import curses
 from functools import wraps
-import os
+from copy import deepcopy
+from .config import Config
 
 ERASE_SPEED = 5  # 屏幕5秒刷新一次 去除错误的显示
 
@@ -35,11 +35,12 @@ def _cmd_parser():
     keylist = []
     while 1:
         key = yield
-        if key * pre_key < 0 and key > pre_key:
+        if key > 0 and pre_key == -1:
             keylist.append(key)
-        elif key * pre_key > 0 and key + pre_key > 0:
+        elif key > 0 and pre_key > 0:
             keylist.append(key)
-        elif key * pre_key < 0 and key < pre_key:
+        elif curses.keyname(key).decode('utf-8') in keyMap.values() and pre_key > 0:
+            keylist.append(key)
             return keylist
         pre_key = key
 
@@ -62,7 +63,7 @@ def _erase_coroutine():
         keylist.append(key)
         if len(set(keylist)) > 1:
             return keylist
-        elif len(keylist) >= ERASE_SPEED*2:
+        elif len(keylist) >= ERASE_SPEED * 2:
             return keylist
 
 
