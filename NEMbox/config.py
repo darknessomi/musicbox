@@ -119,6 +119,11 @@ class Config(Singleton):
                 'default': False,
                 'describe': 'Use mouse or touchpad to move.'
             },
+            'input_timeout': {
+                'value': 500,
+                'default': 500,
+                'describe': 'The time wait for the next key.'
+            },
             'colors': {
                 'value': {
                     'pair1': [22, 148],
@@ -147,6 +152,7 @@ class Config(Singleton):
                     'search': 'f',
                     'prevSong': '[',
                     'nextSong': ']',
+                    'jumpIndex': 'G',
                     'playPause': ' ',
                     'shuffle': '?',
                     'volume+': '+',

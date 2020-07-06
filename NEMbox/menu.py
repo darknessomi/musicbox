@@ -55,6 +55,7 @@ def carousel(left, right, x):
         return x
 
 keyMap = Config().get("keymap")
+commandList = list(map(ord, keyMap.values()))
 
 if Config().get("mouse_movement"):
     keyMap['mouseUp'] = 259
@@ -419,11 +420,19 @@ class Menu(object):
                 self.up_key_event()
             elif cmd in (keyMap['mouseDown'], ord(keyMap['down'])):
                 self.down_key_event()
+            elif cmd == ord(keyMap['nextSong']):
+                self.next_key_event()
+            elif cmd == ord(keyMap['prevSong']):
+                self.prev_key_event()
+        if cmd in (ord(keyMap['nextSong']), ord(keyMap['prevSong'])):
+            self.player.stop()
+            self.player.replay()
         self.build_menu_processbar()
 
     def digit_key_song_event(self):
         ''' 直接跳到指定id 歌曲 '''
         step = self.step
+        self.key_list.pop()
         song_index = parse_keylist(self.key_list)
         if self.index != song_index:
             self.index = song_index
@@ -528,16 +537,35 @@ class Menu(object):
             offset = self.offset
             idx = self.index
             step = self.step
-            self.screen.timeout(500)
+            self.screen.timeout(self.config.get('input_timeout'))
             key = self.screen.getch()
-            self.parser.send(key)
-            if keylist:
-                self.pre_keylist = deepcopy(keylist)
 
-            # 如果 keylist 全都是数字
-            if keylist and (set(keylist) | set(range(48, 58))) == set(range(48, 58)):
+            if key in commandList and\
+                    key != ord(keyMap['nextSong']) and key != ord(keyMap['prevSong']):
+                if not ((set(self.pre_keylist) | {ord(keyMap['prevSong']), ord(keyMap['nextSong'])})\
+                        == {ord(keyMap['prevSong']), ord(keyMap['nextSong'])}):
+                    self.pre_keylist.append(key)
+                self.key_list = deepcopy(self.pre_keylist)
+                self.pre_keylist.clear()
+            elif key in range(48, 58) or\
+                    key == ord(keyMap['nextSong']) or key == ord(keyMap['prevSong']):
+                self.pre_keylist.append(key)
+            elif key == -1 and (pre_key == ord(keyMap['nextSong']) or pre_key == ord(keyMap['prevSong'])):
+                self.key_list = deepcopy(self.pre_keylist)
+                self.pre_keylist.clear()
+            # <Esc> 取消当前输入
+            elif key == 27:
+                self.pre_keylist.clear()
+                self.key_list.clear()
+
+            keylist = self.key_list
+
+            # 如果 keylist 全都是数字 + G
+            if keylist and (set(keylist) | set(range(48, 58)) | {ord(keyMap['jumpIndex'])})\
+                    == set(range(48, 58)) | {ord(keyMap['jumpIndex'])}:
                 # 歌曲数字映射
                 self.digit_key_song_event()
+                self.key_list.clear()
                 continue
 
             # 如果 keylist 只有 [ ]
@@ -546,12 +574,14 @@ class Menu(object):
                     == {ord(keyMap['prevSong']), ord(keyMap['nextSong'])}:
                 self.player.stop()
                 self.player.replay()
+                self.key_list.clear()
                 continue
 
             # 如果是 数字+ [ ] j k
             if len(keylist) > 1:
                 if parse_keylist(keylist):
                     self.num_jump_key_event()
+                    self.key_list.clear()
                     continue
             # if self.is_in_countdown:
             #     if time.time() - self.countdown_start > self.countdown:
@@ -852,7 +882,6 @@ class Menu(object):
 
             pre_key = key
             self.ui.screen.refresh()
-            # keylist.clear()
             self.build_menu_processbar()
         self.stop()
 
@@ -1005,7 +1034,7 @@ class Menu(object):
             self.datalist = self.search(self.datatype)
         else:
             self.enter_flag = False
-        self.parser.send(-1)
+#        self.parser.send(-1)
 
     def show_playing_song(self):
         if self.player.is_empty:
@@ -1124,4 +1153,3 @@ class Menu(object):
             self.datatype = 'help'
             self.title += ' > 帮助'
             self.datalist = shortcut
-            # 删除FM
