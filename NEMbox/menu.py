@@ -130,7 +130,7 @@ class Menu(object):
         self.api = NetEase()
         self.screen = C.initscr()
         self.screen.keypad(1)
-        self.step = 10
+        self.step = Config().get("page_length")
         self.stack = []
         self.djstack = []
         self.at_playing_list = False

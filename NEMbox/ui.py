@@ -346,7 +346,7 @@ class Ui(object):
                 maxlength = min(int(1.8 * self.startcol), len(datalist[i]))
                 if i == index:
                     self.addstr(
-                        20,
+                        step + 10,
                         self.indented_startcol,
                         "-> "
                         + str(i)
@@ -356,7 +356,7 @@ class Ui(object):
                         curses.color_pair(2),
                     )
                     self.addstr(
-                        22,
+                        step + 12,
                         self.startcol + (len(str(i)) + 2),
                         break_str(datalist[i].split(':', 1)[1][1:], self.startcol + (len(str(i)) + 2), maxlength),
                         curses.color_pair(2),
