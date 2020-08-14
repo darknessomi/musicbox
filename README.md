@@ -16,27 +16,34 @@
 - [ ] 优化按键逻辑，降低时延，提高容错性
 - [ ] 将一些分支判断命题抽象成函数减少 `menu.py` 中代码行数
 - [ ] 尝试修复 [darknessomi #857](https://github.com/darknessomi/musicbox/issues/857)
+      （当前版本无法复现）
 - [x] 尝试修复 [darknessomi #816](https://github.com/darknessomi/musicbox/issues/816)
+      [darknessomi #829](https://github.com/darknessomi/musicbox/issues/829)
 - [x] 尝试实现功能 [darknessomi #828](https://github.com/darknessomi/musicbox/issues/828)
+- [ ] 修复评论按 `L` 后出现的按键逻辑混乱
+- [ ] 每页行数根据终端窗口大小变化，config 中提供 `auto` 选项
 
 ## 可能打算做的
 
 按照可能的实现难度粗略的排序
 
 1. 消减 Unicode glyph 字符数量
-2. Nofitication 添加 Action
-3. 鼠标左右键的支持
-4. 歌曲评论的回复
-5. 更多配置选项，例如每页显示歌曲数目和歌词行数
-6. 版权问题的歌曲灰色显示、不自动跳过并显示 notification
-7. 后台运行
-8. 用 Rofi 和 dmenu 控制
-9. 最小化显示模式 ( i3bar 等的适配 )
-10. 运行时更改配置
-11. 容器和可定制界面
-12. 类 VIM 的增量搜索功能和命令
-13. 歌曲信息终端内显示，使用 libcaca 显示专辑封面
-14. \[大概不可能做得出来] 类似 lsp 的中间层，适配多后端和多前端（可能新开坑）
+1. Nofitication 添加 Action
+1. 修复长按 `j` 或 `k` 时歌词颜色闪烁的 Bug
+1. 鼠标左右键的支持
+1. 歌曲评论的回复
+1. 修复模糊搜索的一堆 Bug
+1. 更多配置选项，例如每次显示歌词行数
+1. 版权问题的歌曲灰色显示、不自动跳过并显示 notification
+1. 歌曲快进快退 [darknessomi #849](https://github.com/darknessomi/musicbox/issues/849)
+1. 后台运行
+1. 用 Rofi 和 dmenu 控制
+1. 最小化显示模式 ( i3bar 等的适配 )
+1. 运行时更改配置
+1. 容器和可定制界面
+1. 类 VIM 的增量搜索功能和命令
+1. 歌曲信息终端内显示，使用 libcaca 显示专辑封面
+1. \[大概不可能做得出来] 类似 lsp 的中间层，适配多后端和多前端（可能新开坑）
 
 ## 功能特性
 
