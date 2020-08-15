@@ -307,7 +307,7 @@ class Player(object):
                 # playing, update progress
                 out = strout.split(' ')
                 frame_cnt += 1
-                self.process_location = int(float(out[3]))
+                self.process_location = float(out[3])
                 self.process_length = int(float(out[3]) + float(out[4]))
             elif strout[:2] == '@E':
                 self.playing_flag = True

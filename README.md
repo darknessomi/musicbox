@@ -22,6 +22,7 @@
 - [x] 尝试实现功能 [darknessomi #828](https://github.com/darknessomi/musicbox/issues/828)
 - [x] 修复评论按 `L` 后出现的按键逻辑混乱
 - [ ] 每页行数根据终端窗口大小变化，config 中提供 `auto` 选项
+- [x] 修复长按 `j` 或 `k` 时歌词颜色闪烁的 Bug
 
 ## 可能打算做的
 
@@ -29,7 +30,6 @@
 
 1. 消减 Unicode glyph 字符数量
 1. Nofitication 添加 Action
-1. 修复长按 `j` 或 `k` 时歌词颜色闪烁的 Bug
 1. 鼠标左右键的支持
 1. 歌曲评论的回复
 1. 修复模糊搜索的一堆 Bug
