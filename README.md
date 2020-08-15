@@ -20,7 +20,7 @@
 - [x] 尝试修复 [darknessomi #816](https://github.com/darknessomi/musicbox/issues/816)
       [darknessomi #829](https://github.com/darknessomi/musicbox/issues/829)
 - [x] 尝试实现功能 [darknessomi #828](https://github.com/darknessomi/musicbox/issues/828)
-- [ ] 修复评论按 `L` 后出现的按键逻辑混乱
+- [x] 修复评论按 `L` 后出现的按键逻辑混乱
 - [ ] 每页行数根据终端窗口大小变化，config 中提供 `auto` 选项
 
 ## 可能打算做的

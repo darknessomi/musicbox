@@ -367,6 +367,8 @@ class Menu(object):
         self.enter_flag = True
         if len(self.datalist) <= 0:
             return
+        if self.datatype == 'comments':
+            return
         self.menu_starts = time.time()
         self.ui.build_loading()
         self.dispatch_enter(idx)
@@ -645,7 +647,7 @@ class Menu(object):
             elif C.keyname(key).decode('utf-8') == keyMap['back']:
                 self.back_page_event()
 
-            # 搜索
+            # 模糊搜索
             elif C.keyname(key).decode('utf-8') == keyMap['search']:
                 # 9 == the 'search' menu
                 #self.dispatch_enter(9)
