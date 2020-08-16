@@ -147,16 +147,24 @@ class Ui(object):
 
     def update_lyrics(self, now_playing, lyrics, tlyrics):
 
+        timestap_regex = r'\d\d:\d\d\.\d\d'
+
         def get_timestap(lyric_line):
-            return re.sub(r'\[([0-9\.:]*?)\].*', r'\1', lyric_line)
+            match_ret = re.match(r'\[(' + timestap_regex + ')\]', lyric_line)
+            if match_ret:
+                return match_ret.group(1)
+            else:
+                return ''
 
         def get_lyric_time(lyric_line):
-            if lyric_line == '':
+            lyric_timestap = get_timestap(lyric_line)
+            if lyric_timestap == '':
                 return datetime.timedelta(seconds=now_playing)
-            return datetime.datetime.strptime(get_timestap(lyric_line), '%M:%S.%f') - datetime.datetime.strptime('00:00', '%M:%S') - lyric_time_offset
+            else:
+                return datetime.datetime.strptime(get_timestap(lyric_line), '%M:%S.%f') - datetime.datetime.strptime('00:00', '%M:%S') - lyric_time_offset
 
         def strip_timestap(lyric_line):
-            return re.sub(r'\[[0-9\.:]*?\]', r'', lyric_line)
+            return re.sub(r'\[' + timestap_regex + '\]', r'', lyric_line)
 
         def append_translation(translated_lyric, origin_lyric):
             translated_lyric = strip_timestap(translated_lyric)
