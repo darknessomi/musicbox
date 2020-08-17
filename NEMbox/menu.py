@@ -130,7 +130,9 @@ class Menu(object):
         self.api = NetEase()
         self.screen = C.initscr()
         self.screen.keypad(1)
-        self.step = 10
+        self.step = Config().get("page_length")
+        if self.step == 0:
+            self.step = max(int(self.ui.y * 4 / 5) - 10, 1)
         self.stack = []
         self.djstack = []
         self.at_playing_list = False
@@ -366,6 +368,8 @@ class Menu(object):
         idx = self.index
         self.enter_flag = True
         if len(self.datalist) <= 0:
+            return
+        if self.datatype == 'comments':
             return
         self.menu_starts = time.time()
         self.ui.build_loading()
@@ -645,7 +649,7 @@ class Menu(object):
             elif C.keyname(key).decode('utf-8') == keyMap['back']:
                 self.back_page_event()
 
-            # 搜索
+            # 模糊搜索
             elif C.keyname(key).decode('utf-8') == keyMap['search']:
                 # 9 == the 'search' menu
                 #self.dispatch_enter(9)
@@ -882,6 +886,12 @@ class Menu(object):
 
             pre_key = key
             self.ui.screen.refresh()
+            self.ui.update_size()
+            current_step = max(int(self.ui.y * 4 / 5) - 10, 1)
+            if self.step != current_step:
+                self.step = current_step
+                self.index = 0
+            log.warning('self.step = ' + str(self.step))
             self.build_menu_processbar()
         self.stop()
 

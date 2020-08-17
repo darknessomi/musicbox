@@ -22,6 +22,12 @@ class Config(Singleton):
         self.path = Constant.config_path
         self.default_config = {
             'version': 8,
+            'page_length': {
+                'value': 10,
+                'default': 10,
+                'describe': ('Entries each page has. '
+                             'Set 0 to adjust automatically.')
+            },
             'cache': {
                 'value': False,
                 'default': False,

@@ -59,7 +59,6 @@ def break_str(s, start, max_len=80):
 
 
 class Ui(object):
-
     def __init__(self):
         self.screen = curses.initscr()
         # self.screen.timeout(100)  # the screen refresh every 100ms
@@ -76,9 +75,10 @@ class Ui(object):
             curses.init_pair(4, curses.COLOR_YELLOW, -1)
         else:
             colors = Config().get("colors")
-            if "TERM" in os.environ and os.environ["TERM"] == "xterm-256color" and colors:
+            if "TERM" in os.environ and os.environ[
+                    "TERM"] == "xterm-256color" and colors:
                 curses.use_default_colors()
-                for i in range(1,6):
+                for i in range(1, 6):
                     color = colors["pair" + str(i)]
                     curses.init_pair(i, color[0], color[1])
                 self.screen.bkgd(32, curses.color_pair(5))
@@ -89,9 +89,9 @@ class Ui(object):
                 curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         # term resize handling
         size = get_terminal_size()
-        self.x = max(size[0], 10)
-        self.y = max(size[1], 25)
-        self.playerX = 1 #terminalsize.get_terminal_size()[1] - 10
+        self.x = size[0]
+        self.y = size[1]
+        self.playerX = 1  #terminalsize.get_terminal_size()[1] - 10
         self.playerY = 0
         self.startcol = int(float(self.x) / 5)
         self.indented_startcol = max(self.startcol - 3, 0)
@@ -100,6 +100,7 @@ class Ui(object):
         self.now_lyric = ''
         self.post_lyric = ''
         self.now_lyric_index = 0
+        self.now_tlyric_index = 0
         self.tlyric = ''
         self.storage = Storage()
         self.config = Config()
@@ -110,8 +111,8 @@ class Ui(object):
             self.screen.addstr(args[0])
         else:
             try:
-                self.screen.addstr(
-                    args[0], args[1], args[2].encode('utf-8'), *args[3:])
+                self.screen.addstr(args[0], args[1], args[2].encode('utf-8'),
+                                   *args[3:])
             except Exception as e:
                 #  log.error(e, args)
                 pass
@@ -131,11 +132,11 @@ class Ui(object):
         self.screen.move(2, 1)
         self.screen.clrtoeol()
         if pause:
-            self.addstr(1, self.indented_startcol,
-                        '_ _ z Z Z ' + quality, curses.color_pair(3))
+            self.addstr(1, self.indented_startcol, '_ _ z Z Z ' + quality,
+                        curses.color_pair(3))
         else:
-            self.addstr(1, self.indented_startcol,
-                        '♫  ♪ ♫  ♪ ' + quality, curses.color_pair(3))
+            self.addstr(1, self.indented_startcol, '♫  ♪ ♫  ♪ ' + quality,
+                        curses.color_pair(3))
 
         self.addstr(
             1, min(self.indented_startcol + 18, self.x - 1),
@@ -144,11 +145,70 @@ class Ui(object):
 
         self.screen.refresh()
 
-    def build_process_bar(self,
-                          song,
-                          now_playing,
-                          total_length,
-                          playing_flag,
+    def update_lyrics(self, now_playing, lyrics, tlyrics):
+
+        timestap_regex = r'\d\d:\d\d\.[0-9]*'
+
+        def get_timestap(lyric_line):
+            match_ret = re.match(r'\[(' + timestap_regex + ')\]', lyric_line)
+            if match_ret:
+                return match_ret.group(1)
+            else:
+                return ''
+
+        def get_lyric_time(lyric_line):
+            lyric_timestap = get_timestap(lyric_line)
+            if lyric_timestap == '':
+                return datetime.timedelta(seconds=now_playing)
+            else:
+                return datetime.datetime.strptime(get_timestap(lyric_line), '%M:%S.%f') - datetime.datetime.strptime('00:00', '%M:%S') - lyric_time_offset
+
+        def strip_timestap(lyric_line):
+            return re.sub(r'\[' + timestap_regex + '\]', r'', lyric_line)
+
+        def append_translation(translated_lyric, origin_lyric):
+            translated_lyric = strip_timestap(translated_lyric)
+            origin_lyric = strip_timestap(origin_lyric)
+            if translated_lyric == '' or origin_lyric == '':
+                return translated_lyric + origin_lyric
+            return translated_lyric + ' || ' + origin_lyric
+
+        if self.now_lyric_index >= len(lyrics) - 1\
+                or self.now_tlyric_index >= len(lyrics) - 1:
+            self.post_lyric = ''
+            return
+
+        lyric_time_offset = datetime.timedelta(seconds=0.5)
+        next_lyric_time = get_lyric_time(lyrics[self.now_lyric_index + 1])
+        #now_lyric_time = get_lyric_time(lyrics[self.now_lyric_index])
+        now_time = datetime.timedelta(seconds=now_playing)
+        while now_time >= next_lyric_time\
+                and self.now_lyric_index < len(lyrics) - 2:
+            self.now_lyric_index = self.now_lyric_index + 1
+            next_lyric_time = get_lyric_time(lyrics[self.now_lyric_index + 1])
+        if tlyrics:
+            next_tlyric_time = get_lyric_time(
+                tlyrics[self.now_tlyric_index + 1])
+            while now_time >= next_tlyric_time\
+                    and self.now_tlyric_index < len(tlyrics) - 2:
+                self.now_tlyric_index = self.now_tlyric_index + 1
+                next_tlyric_time = get_lyric_time(
+                    tlyrics[self.now_tlyric_index + 1])
+
+        if tlyrics:
+            self.now_lyric = append_translation(tlyrics[self.now_tlyric_index],
+                                                lyrics[self.now_lyric_index])
+            if self.now_lyric_index < len(lyrics) - 1\
+                    and self.now_lyric_index < len(tlyrics) - 1:
+                self.post_lyric = append_translation(
+                    tlyrics[self.now_tlyric_index + 1],
+                    lyrics[self.now_lyric_index + 1])
+        else:
+            self.now_lyric = strip_timestap(lyrics[self.now_lyric_index])
+            if self.now_lyric_index < len(lyrics) - 1:
+                self.post_lyric = strip_timestap(lyrics[self.now_lyric_index + 1])
+
+    def build_process_bar(self, song, now_playing, total_length, playing_flag,
                           playing_mode):
 
         if not song or not playing_flag:
@@ -168,8 +228,10 @@ class Ui(object):
             total_length = 1
         if now_playing > total_length or now_playing <= 0:
             now_playing = 0
-        if now_playing == 0:
+        if int(now_playing) == 0:
             self.now_lyric_index = 0
+            if tlyrics:
+                self.now_tlyric_index = 0
             self.now_lyric = ''
             self.post_lyric = ''
         process = '['
@@ -184,10 +246,10 @@ class Ui(object):
                 process += ' '
         process += '] '
 
-        now = str(datetime.timedelta(seconds=now_playing)
-                  ).lstrip('0').lstrip(':')
-        total = str(datetime.timedelta(seconds=total_length)
-                    ).lstrip('0').lstrip(':')
+        now = str(datetime.timedelta(
+            seconds=int(now_playing))).lstrip('0').lstrip(':')
+        total = str(
+            datetime.timedelta(seconds=total_length)).lstrip('0').lstrip(':')
         process += '({}/{})'.format(now, total)
 
         if playing_mode == 0:
@@ -208,36 +270,9 @@ class Ui(object):
             self.post_lyric = ''
             if dbus_activity and self.config.get('osdlyrics'):
                 self.now_playing = '{} - {}\n'.format(name, artist)
-
         else:
-            key = now
-            index = 0
-            for line in lyrics:
-                if key in line:
-                    # 计算下一句歌词，判断刷新时的歌词和上一次是否相同来进行index计算
-                    if not (self.now_lyric == re.sub('\[.*?\]', '', line)):
-                        self.now_lyric_index = self.now_lyric_index + 1
-                    if index < len(lyrics) - 1:
-                        self.post_lyric = lyrics[index + 1]
-                    else:
-                        self.post_lyric = ''
-                    if not tlyrics:
-                        self.now_lyric = line
-                    else:
-                        self.now_lyric = line
-                        for tindex, tline in enumerate(tlyrics):
-                            if key in tline and self.config.get('translation'):
-                                self.now_lyric = tline + ' || ' + self.now_lyric
-                                if not (self.post_lyric == '') and tindex < len(tlyrics) - 1:
-                                    self.post_lyric = tlyrics[tindex +
-                                                              1] + ' || ' + self.post_lyric
-                                # 此处已经拿到，直接break即可
-                                break
-                    # 此处已经拿到，直接break即可
-                    break
-                index += 1
-        self.now_lyric = re.sub('\[.*?\]', '', self.now_lyric)
-        self.post_lyric = re.sub('\[.*?\]', '', self.post_lyric)
+            self.update_lyrics(now_playing, lyrics, tlyrics)
+
         if dbus_activity and self.config.get('osdlyrics'):
             try:
                 bus = dbus.SessionBus().get_object('org.musicbox.Bus', '/')
@@ -291,8 +326,7 @@ class Ui(object):
         if datatype == 'main':
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
-                    self.addstr(i - offset + 9,
-                                self.indented_startcol,
+                    self.addstr(i - offset + 9, self.indented_startcol,
                                 '-> ' + str(i) + '. ' + datalist[i],
                                 curses.color_pair(2))
                 else:
@@ -306,34 +340,30 @@ class Ui(object):
                     raise ValueError(datalist)
                 # this item is focus
                 if i == index:
-                    self.addstr(i - offset + 9, 0,
-                                ' ' * self.startcol)
+                    self.addstr(i - offset + 9, 0, ' ' * self.startcol)
                     lead = '-> ' + str(i) + '. '
-                    self.addstr(i - offset + 9,
-                                self.indented_startcol, lead,
+                    self.addstr(i - offset + 9, self.indented_startcol, lead,
                                 curses.color_pair(2))
-                    name = '{}{}{}  < {} >'.format(
-                        datalist[i]['song_name'], self.space,
-                        datalist[i]['artist'], datalist[i]['album_name'])
+                    name = '{}{}{}  < {} >'.format(datalist[i]['song_name'],
+                                                   self.space,
+                                                   datalist[i]['artist'],
+                                                   datalist[i]['album_name'])
 
                     # the length decides whether to scoll
                     if truelen(name) < self.x - self.startcol - 1:
-                        self.addstr(
-                            i - offset + 9,
-                            self.indented_startcol + len(lead), name,
-                            curses.color_pair(2))
+                        self.addstr(i - offset + 9,
+                                    self.indented_startcol + len(lead), name,
+                                    curses.color_pair(2))
                     else:
                         name = scrollstring(name + '  ', start)
-                        self.addstr(
-                            i - offset + 9,
-                            self.indented_startcol + len(lead), str(name),
-                            curses.color_pair(2))
+                        self.addstr(i - offset + 9,
+                                    self.indented_startcol + len(lead),
+                                    str(name), curses.color_pair(2))
                 else:
-                    self.addstr(i - offset + 9, 0,
-                                ' ' * self.startcol)
+                    self.addstr(i - offset + 9, 0, ' ' * self.startcol)
                     self.addstr(
-                        i - offset + 9, self.startcol,
-                        '{}. {}{}{}  < {} >'.format(
+                        i - offset + 9,
+                        self.startcol, '{}. {}{}{}  < {} >'.format(
                             i, datalist[i]['song_name'], self.space,
                             datalist[i]['artist'],
                             datalist[i]['album_name'])[:int(self.x * 2)])
@@ -346,26 +376,26 @@ class Ui(object):
                 maxlength = min(int(1.8 * self.startcol), len(datalist[i]))
                 if i == index:
                     self.addstr(
-                        20,
+                        step + 10,
                         self.indented_startcol,
-                        "-> "
-                        + str(i)
-                        + ". "
-                        + datalist[i].split(':', 1)[0]
-                        + ":",
+                        "-> " + str(i) + ". " + datalist[i].split(':', 1)[0] +
+                        ":",
                         curses.color_pair(2),
                     )
                     self.addstr(
-                        22,
+                        step + 12,
                         self.startcol + (len(str(i)) + 2),
-                        break_str(datalist[i].split(':', 1)[1][1:], self.startcol + (len(str(i)) + 2), maxlength),
+                        break_str(datalist[i].split(':', 1)[1][1:],
+                                  self.startcol + (len(str(i)) + 2),
+                                  maxlength),
                         curses.color_pair(2),
                     )
                 else:
                     self.addstr(
                         i - offset + 9,
                         self.startcol,
-                        str(i) + ". " + datalist[i].splitlines()[0][:maxlength],
+                        str(i) + ". " +
+                        datalist[i].splitlines()[0][:maxlength],
                     )
 
         elif datatype == 'artists':
@@ -380,20 +410,17 @@ class Ui(object):
                     self.addstr(
                         i - offset + 9, self.startcol,
                         str(i) + '. ' + datalist[i]['artists_name'] +
-                        self.space + datalist[i][
-                            'alias'])
+                        self.space + datalist[i]['alias'])
 
         elif datatype == 'artist_info':
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
-                    self.addstr(
-                        i - offset + 9, self.indented_startcol,
-                        '-> ' + str(i) + '. ' + datalist[i]['item'],
-                        curses.color_pair(2))
+                    self.addstr(i - offset + 9, self.indented_startcol,
+                                '-> ' + str(i) + '. ' + datalist[i]['item'],
+                                curses.color_pair(2))
                 else:
-                    self.addstr(
-                        i - offset + 9, self.startcol,
-                        str(i) + '. ' + datalist[i]['item'])
+                    self.addstr(i - offset + 9, self.startcol,
+                                str(i) + '. ' + datalist[i]['item'])
 
         elif datatype == 'albums':
             for i in range(offset, min(len(datalist), offset + step)):
@@ -401,46 +428,43 @@ class Ui(object):
                     self.addstr(
                         i - offset + 9, self.indented_startcol,
                         '-> ' + str(i) + '. ' + datalist[i]['albums_name'] +
-                        self.space + datalist[i]['artists_name'], curses.color_pair(2))
-                else:
-                    self.addstr(
-                        i - offset + 9, self.startcol,
-                        str(i) + '. ' + datalist[i]['albums_name'] +
-                        self.space + datalist[i][
-                            'artists_name'])
-
-        elif datatype == 'recommend_lists':
-            for i in range(offset, min(len(datalist), offset + step)):
-                if i == index:
-                    self.addstr(
-                        i - offset + 9, self.indented_startcol,
-                        '-> ' + str(i) + '. ' + datalist[i]['title'],
+                        self.space + datalist[i]['artists_name'],
                         curses.color_pair(2))
                 else:
                     self.addstr(
                         i - offset + 9, self.startcol,
-                        str(i) + '. ' + datalist[i]['title'])
+                        str(i) + '. ' + datalist[i]['albums_name'] +
+                        self.space + datalist[i]['artists_name'])
+
+        elif datatype == 'recommend_lists':
+            for i in range(offset, min(len(datalist), offset + step)):
+                if i == index:
+                    self.addstr(i - offset + 9, self.indented_startcol,
+                                '-> ' + str(i) + '. ' + datalist[i]['title'],
+                                curses.color_pair(2))
+                else:
+                    self.addstr(i - offset + 9, self.startcol,
+                                str(i) + '. ' + datalist[i]['title'])
 
         elif datatype in ('top_playlists', 'playlists'):
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
                     self.addstr(
-                        i - offset + 9, self.indented_startcol, '-> ' +
-                        str(i) + '. ' + datalist[i]['playlist_name'] +
+                        i - offset + 9, self.indented_startcol,
+                        '-> ' + str(i) + '. ' + datalist[i]['playlist_name'] +
                         self.space + datalist[i]['creator_name'],
                         curses.color_pair(2))
                 else:
                     self.addstr(
                         i - offset + 9, self.startcol,
                         str(i) + '. ' + datalist[i]['playlist_name'] +
-                        self.space + datalist[i][
-                            'creator_name'])
+                        self.space + datalist[i]['creator_name'])
 
-        elif datatype in ('toplists', 'playlist_classes', 'playlist_class_detail'):
+        elif datatype in ('toplists', 'playlist_classes',
+                          'playlist_class_detail'):
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
-                    self.addstr(i - offset + 9,
-                                self.indented_startcol,
+                    self.addstr(i - offset + 9, self.indented_startcol,
                                 '-> ' + str(i) + '. ' + datalist[i],
                                 curses.color_pair(2))
                 else:
@@ -450,27 +474,23 @@ class Ui(object):
         elif datatype == 'djchannels':
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
-                    self.addstr(
-                        i - offset + 8, self.indented_startcol,
-                        '-> ' + str(i) + '. ' + datalist[i]['name'],
-                        curses.color_pair(2))
+                    self.addstr(i - offset + 8, self.indented_startcol,
+                                '-> ' + str(i) + '. ' + datalist[i]['name'],
+                                curses.color_pair(2))
                 else:
-                    self.addstr(
-                        i - offset + 8, self.startcol,
-                        str(i) + '. ' + datalist[i]['name'])
+                    self.addstr(i - offset + 8, self.startcol,
+                                str(i) + '. ' + datalist[i]['name'])
 
         elif datatype == 'search':
             self.screen.move(6, 1)
             self.screen.clrtobot()
             self.screen.timeout(-1)
-            self.addstr(8, self.startcol, '选择搜索类型:',
-                        curses.color_pair(1))
+            self.addstr(8, self.startcol, '选择搜索类型:', curses.color_pair(1))
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
-                    self.addstr(
-                        i - offset + 10, self.indented_startcol,
-                        '-> ' + str(i) + '.' + datalist[i - 1],
-                        curses.color_pair(2))
+                    self.addstr(i - offset + 10, self.indented_startcol,
+                                '-> ' + str(i) + '.' + datalist[i - 1],
+                                curses.color_pair(2))
                 else:
                     self.addstr(i - offset + 10, self.startcol,
                                 str(i) + '.' + datalist[i - 1])
@@ -480,24 +500,23 @@ class Ui(object):
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
                     self.addstr(
-                        i - offset + 9, self.indented_startcol,
-                        '-> {}. \'{}{}   {}'.format(
+                        i - offset + 9,
+                        self.indented_startcol, '-> {}. \'{}{}   {}'.format(
                             i, (datalist[i][0] + '\'').ljust(11),
                             datalist[i][1].ljust(16), datalist[i][2]),
                         curses.color_pair(2))
                 else:
                     self.addstr(
-                        i - offset + 9, self.startcol,
-                        '{}. \'{}{}   {}'.format(
+                        i - offset + 9,
+                        self.startcol, '{}. \'{}{}   {}'.format(
                             i, (datalist[i][0] + '\'').ljust(11),
                             datalist[i][1].ljust(16), datalist[i][2]))
 
-            self.addstr(
-                20, self.startcol, 'NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存')
+            self.addstr(20, self.startcol,
+                        'NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存')
             self.addstr(21, self.startcol,
                         '按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~')
-            self.addstr(22, self.startcol,
-                        'Build with love to music by omi')
+            self.addstr(22, self.startcol, 'Build with love to music by omi')
 
         self.screen.refresh()
 
@@ -513,8 +532,7 @@ class Ui(object):
         curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
-        self.addstr(5, self.startcol, '请输入登录信息(支持手机登录)',
-                    curses.color_pair(1))
+        self.addstr(5, self.startcol, '请输入登录信息(支持手机登录)', curses.color_pair(1))
         self.addstr(8, self.startcol, '账号:', curses.color_pair(1))
         self.addstr(9, self.startcol, '密码:', curses.color_pair(1))
         self.screen.move(8, 24)
@@ -540,8 +558,7 @@ class Ui(object):
         self.screen.move(6, 1)
         self.screen.clrtobot()
         self.screen.timeout(-1)
-        self.addstr(8, self.startcol, '输入定时时间(min):',
-                    curses.color_pair(1))
+        self.addstr(8, self.startcol, '输入定时时间(min):', curses.color_pair(1))
         self.addstr(11, self.startcol, 'ps:定时时间为整数，输入0代表取消定时退出',
                     curses.color_pair(1))
         self.screen.timeout(-1)  # disable the screen timeout
@@ -569,8 +586,7 @@ class Ui(object):
         curses.echo()
         self.screen.move(4, 1)
         self.screen.clrtobot()
-        self.addstr(5, self.startcol, prompt_string,
-                    curses.color_pair(1))
+        self.addstr(5, self.startcol, prompt_string, curses.color_pair(1))
         self.screen.refresh()
         keyword = self.screen.getstr(10, self.startcol, 60)
         return keyword.decode('utf-8').strip()
@@ -579,8 +595,8 @@ class Ui(object):
         curses.curs_set(0)
         # get terminal size
         size = get_terminal_size()
-        x = max(size[0], 10)
-        y = max(size[1], 25)
+        x = size[0]
+        y = size[1]
         if (x, y) == (self.x, self.y):  # no need to resize
             return
         self.x, self.y = x, y
@@ -601,5 +617,3 @@ class Ui(object):
         else:
             self.space = ' - '
         self.screen.refresh()
-
-

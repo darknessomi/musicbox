@@ -271,6 +271,8 @@ class Player(object):
 
         # endless_loop_cnt = 0
         strout = ' '
+        copyright_issue_flag = False
+        frame_cnt = 0
         while True:
             # log.warn(self.popen_handler.poll())
             if not hasattr(self.popen_handler, 'poll') or self.popen_handler.poll():
@@ -304,7 +306,8 @@ class Player(object):
             if strout[:2] == '@F':
                 # playing, update progress
                 out = strout.split(' ')
-                self.process_location = int(float(out[3]))
+                frame_cnt += 1
+                self.process_location = float(out[3])
                 self.process_length = int(float(out[3]) + float(out[4]))
             elif strout[:2] == '@E':
                 self.playing_flag = True
@@ -313,11 +316,16 @@ class Player(object):
                     self.refresh_urls()
                 else:
                     # error, stop song and move to next
+                    copyright_issue_flag = True
                     self.notify_copyright_issue()
                 break
-            elif strout == '@P 0':
+            elif strout == '@P 0' and frame_cnt:
                 # end, moving to next
                 self.playing_flag = True
+                break
+            elif strout == '@P 0':
+                copyright_issue_flag = True
+                self.notify_copyright_issue()
                 break
             # elif strout == ' ':
                 # log.warn('kong'+strout)
@@ -337,7 +345,7 @@ class Player(object):
                 self.stop()
                 self.replay()
                 self.refrese_url_flag = False
-            else:
+            elif not copyright_issue_flag:
                 self.next()
         else:
             self.stop()

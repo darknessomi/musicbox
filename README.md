@@ -6,37 +6,52 @@
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
-[![platform](https://img.shields.io/badge/python-2.7-green.svg)](<>)
 [![platform](https://img.shields.io/badge/python-3.5-green.svg)](<>)
 
 [![NetEase-MusicBox-GIF](https://qfile.aobeef.cn/3abba3b8a3994ee3d5cd.gif)](https://pypi.org/project/NetEase-MusicBox/)
 
 ## 正在做的
 
-1. 优化按键逻辑，降低时延，提高容错性
-2. 将一些分支判断命题抽象成函数减少 `menu.py` 中代码行数
-3. 尝试修复 [darknessomi #857](https://github.com/darknessomi/musicbox/issues/857)
-4. 尝试修复 [darknessomi #816](https://github.com/darknessomi/musicbox/issues/816)
-5. 尝试实现功能 [darknessomi #828](https://github.com/darknessomi/musicbox/issues/828)
+本 fork 主要修复一些现有的 Bug，添加一些小功能，添加许多新 Bug。
+
+本人不会 `Python`，所以目前并不打算进行大改和重构。
+本人使用 Arch Linux 系统，所以可能不会修一些系统相关的 Bug，如果你遇到了问题，欢迎提 PR。
+
+- [ ] 优化按键逻辑，降低时延，提高容错性
+- [ ] 将一些分支判断命题抽象成函数减少 `menu.py` 中代码行数
+- [x] 尝试修复 [darknessomi #816](https://github.com/darknessomi/musicbox/issues/816)
+      [darknessomi #829](https://github.com/darknessomi/musicbox/issues/829)
+- [x] 尝试实现功能 [darknessomi #828](https://github.com/darknessomi/musicbox/issues/828)
+- [x] 修复评论按 `L` 后出现的按键逻辑混乱
+- [x] 每页行数根据终端窗口大小变化，config 中提供 `auto` 选项
+- [x] 修复长按 `j` 或 `k` 时歌词颜色闪烁的 Bug
 
 ## 可能打算做的
 
 按照可能的实现难度粗略的排序
 
 1. 消减 Unicode glyph 字符数量
-2. Nofitication 添加 Action
-3. 鼠标左右键的支持
-4. 歌曲评论的回复
-5. 更多配置选项，例如每页显示歌曲数目和歌词行数
-6. 版权问题的歌曲灰色显示、不自动跳过并显示 notification
-7. 后台运行
-8. 用 Rofi 和 dmenu 控制
-9. 最小化显示模式 ( i3bar 等的适配 )
-10. 运行时更改配置
-11. 容器和可定制界面
-12. 类 VIM 的增量搜索功能和命令
-13. 歌曲信息终端内显示，使用 libcaca 显示专辑封面
-14. \[大概不可能做得出来] 类似 lsp 的中间层，适配多后端和多前端（可能新开坑）
+1. Nofitication 添加 Action
+1. 鼠标左右键的支持
+1. 歌曲评论的回复
+1. 修复模糊搜索的一堆 Bug
+1. 更多配置选项，例如每次显示歌词行数
+1. 版权问题的歌曲灰色显示、不自动跳过并显示 notification
+1. 歌曲快进快退 [darknessomi #849](https://github.com/darknessomi/musicbox/issues/849)
+1. 运行时更改配置
+1. 歌曲信息终端内显示，使用 `libcaca/w3m` 显示专辑封面
+
+## 不打算做的
+
+| 不打算做的 | 原因 |
+|-|-|
+| 尝试修复 [darknessomi #857](https://github.com/darknessomi/musicbox/issues/857) | 当前版本无法复现 |
+| 后台运行 | [FeelUOwn](https://github.com/feeluown/FeelUOwn) 可以后台运行，但是目前命令行控制功能不太完善 |
+| 用 Rofi 和 dmenu 控制 | 以 [FeelUOwn](https://github.com/feeluown/FeelUOwn) 插件或者 [Mopidy](https://github.com/mopidy/mopidy) 插件实现可能会更好 |
+| 最小化显示模式 ( i3bar 等的适配 ) | 同上 |
+| 容器和可定制界面 | 感觉没必要，也写不出来 |
+| 类 VIM 的增量搜索功能和命令 | 要不直接做成 VIM 插件吧 |
+| 类似 lsp 的中间层，适配多后端和多前端 | 目前已经有 [FeelUOwn](https://github.com/feeluown/FeelUOwn) 和 [Mopidy](https://github.com/mopidy/mopidy) 这两个项目了 |
 
 ## 功能特性
 
@@ -60,47 +75,47 @@
 
 ### 键盘快捷键
 
-| Key      | Effect          |                    |
-| -------- | --------------- | ------------------ |
-| j        | Down            | 下移               |
-| k        | Up              | 上移               |
-| num + j  | Quick Jump      | 快速向后跳转n首    |
-| num + k  | Quick Up        | 快速向前跳转n首    |
-| h        | Back            | 后退               |
-| l        | Forword         | 前进               |
-| u        | Prev Page       | 上一页             |
-| d        | Next Page       | 下一页             |
-| f        | Search          | 当前列表模糊搜索   |
-| \[       | Prev Song       | 上一曲             |
-| ]        | Next Song       | 下一曲             |
-| num + \[ | Quick Prev Song | 快速前n首          |
-| num + ]  | Quick Next Song | 快速后n首          |
-| num + G  | Index for Song  | 跳到第n首          |
-| =        | Volume +        | 音量增加           |
-| -        | Volume -        | 音量减少           |
-| Space    | Play/Pause      | 播放/暂停          |
-| ?        | Shuffle         | 手气不错           |
-| m        | Menu            | 主菜单             |
-| p        | Present/History | 当前/历史播放列表  |
-| i        | Music Info      | 当前音乐信息       |
-| ⇧+p      | Playing Mode    | 播放模式切换       |
-| a        | Add             | 添加曲目到打碟     |
-| ⇧+a      | Enter Album     | 进入专辑           |
-| g        | To the First    | 跳至首项           |
-| ⇧+g      | To the End      | 跳至尾项           |
-| z        | DJ List         | 打碟列表           |
-| s        | Star            | 添加到收藏         |
-| c        | Collection      | 收藏列表           |
-| r        | Remove          | 删除当前条目       |
-| ⇧+j      | Move Down       | 向下移动当前项目   |
-| ⇧+k      | Move Up         | 向上移动当前项目   |
-| ⇧+c      | Cache           | 缓存歌曲到本地     |
-| ,        | Like            | 喜爱               |
-| .        | Trash FM        | 删除 FM            |
-| /        | Next FM         | 下一FM             |
-| q        | Quit            | 退出               |
-| t        | Timing Exit     | 定时退出           |
-| w        | Quit & Clear    | 退出并清除用户信息 |
+| Key       | Effect          |                    |
+| --------- | --------------- | ------------------ |
+| j         | Down            | 下移               |
+| k         | Up              | 上移               |
+| num + j   | Quick Jump      | 快速向后跳转n首    |
+| num + k   | Quick Up        | 快速向前跳转n首    |
+| h         | Back            | 后退               |
+| l         | Forword         | 前进               |
+| u         | Prev Page       | 上一页             |
+| d         | Next Page       | 下一页             |
+| f         | Search          | 当前列表模糊搜索   |
+| \[        | Prev Song       | 上一曲             |
+| ]         | Next Song       | 下一曲             |
+| num + \[  | Quick Prev Song | 快速前n首          |
+| num + ]   | Quick Next Song | 快速后n首          |
+| num + G   | Index for Song  | 跳到第n首          |
+| =         | Volume +        | 音量增加           |
+| -         | Volume -        | 音量减少           |
+| Space     | Play/Pause      | 播放/暂停          |
+| ?         | Shuffle         | 手气不错           |
+| m         | Menu            | 主菜单             |
+| p         | Present/History | 当前/历史播放列表  |
+| i         | Music Info      | 当前音乐信息       |
+| Shift + p | Playing Mode    | 播放模式切换       |
+| a         | Add             | 添加曲目到打碟     |
+| Shift + a | Enter Album     | 进入专辑           |
+| g         | To the First    | 跳至首项           |
+| Shift + g | To the End      | 跳至尾项           |
+| z         | DJ List         | 打碟列表           |
+| s         | Star            | 添加到收藏         |
+| c         | Collection      | 收藏列表           |
+| r         | Remove          | 删除当前条目       |
+| Shift + j | Move Down       | 向下移动当前项目   |
+| Shift + k | Move Up         | 向上移动当前项目   |
+| Shift + c | Cache           | 缓存歌曲到本地     |
+| ,         | Like            | 喜爱               |
+| .         | Trash FM        | 删除 FM            |
+| /         | Next FM         | 下一FM             |
+| q         | Quit            | 退出               |
+| t         | Timing Exit     | 定时退出           |
+| w         | Quit & Clear    | 退出并清除用户信息 |
 
 ## 安装
 
