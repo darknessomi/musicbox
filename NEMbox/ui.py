@@ -89,8 +89,8 @@ class Ui(object):
                 curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         # term resize handling
         size = get_terminal_size()
-        self.x = max(size[0], 10)
-        self.y = max(size[1], 25)
+        self.x = size[0]
+        self.y = size[1]
         self.playerX = 1  #terminalsize.get_terminal_size()[1] - 10
         self.playerY = 0
         self.startcol = int(float(self.x) / 5)
@@ -147,7 +147,7 @@ class Ui(object):
 
     def update_lyrics(self, now_playing, lyrics, tlyrics):
 
-        timestap_regex = r'\d\d:\d\d\.\d\d'
+        timestap_regex = r'\d\d:\d\d\.[0-9]*'
 
         def get_timestap(lyric_line):
             match_ret = re.match(r'\[(' + timestap_regex + ')\]', lyric_line)
@@ -204,9 +204,9 @@ class Ui(object):
                     tlyrics[self.now_tlyric_index + 1],
                     lyrics[self.now_lyric_index + 1])
         else:
-            self.now_lyric = lyrics[self.now_lyric_index]
+            self.now_lyric = strip_timestap(lyrics[self.now_lyric_index])
             if self.now_lyric_index < len(lyrics) - 1:
-                self.post_lyric = lyrics[self.now_lyric_index + 1]
+                self.post_lyric = strip_timestap(lyrics[self.now_lyric_index + 1])
 
     def build_process_bar(self, song, now_playing, total_length, playing_flag,
                           playing_mode):
@@ -595,8 +595,8 @@ class Ui(object):
         curses.curs_set(0)
         # get terminal size
         size = get_terminal_size()
-        x = max(size[0], 10)
-        y = max(size[1], 25)
+        x = size[0]
+        y = size[1]
         if (x, y) == (self.x, self.y):  # no need to resize
             return
         self.x, self.y = x, y

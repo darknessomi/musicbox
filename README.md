@@ -19,13 +19,11 @@
 
 - [ ] 优化按键逻辑，降低时延，提高容错性
 - [ ] 将一些分支判断命题抽象成函数减少 `menu.py` 中代码行数
-- [ ] 尝试修复 [darknessomi #857](https://github.com/darknessomi/musicbox/issues/857)
-      （当前版本无法复现）
 - [x] 尝试修复 [darknessomi #816](https://github.com/darknessomi/musicbox/issues/816)
       [darknessomi #829](https://github.com/darknessomi/musicbox/issues/829)
 - [x] 尝试实现功能 [darknessomi #828](https://github.com/darknessomi/musicbox/issues/828)
 - [x] 修复评论按 `L` 后出现的按键逻辑混乱
-- [ ] 每页行数根据终端窗口大小变化，config 中提供 `auto` 选项
+- [x] 每页行数根据终端窗口大小变化，config 中提供 `auto` 选项
 - [x] 修复长按 `j` 或 `k` 时歌词颜色闪烁的 Bug
 
 ## 可能打算做的
@@ -47,12 +45,13 @@
 
 | 不打算做的 | 原因 |
 |-|-|
+| 尝试修复 [darknessomi #857](https://github.com/darknessomi/musicbox/issues/857) | 当前版本无法复现 |
 | 后台运行 | [FeelUOwn](https://github.com/feeluown/FeelUOwn) 可以后台运行，但是目前命令行控制功能不太完善 |
 | 用 Rofi 和 dmenu 控制 | 以 [FeelUOwn](https://github.com/feeluown/FeelUOwn) 插件或者 [Mopidy](https://github.com/mopidy/mopidy) 插件实现可能会更好 |
 | 最小化显示模式 ( i3bar 等的适配 ) | 同上 |
 | 容器和可定制界面 | 感觉没必要，也写不出来 |
 | 类 VIM 的增量搜索功能和命令 | 要不直接做成 VIM 插件吧 |
-| 类似 lsp 的中间层，适配多后端和多前端 | 目前已经有 [FeelUOwn](https://github.com/feeluown/FeelUOwn) 和 [Mopidy](https://github.com/mopidy/mopidy) 这两个项目了）|
+| 类似 lsp 的中间层，适配多后端和多前端 | 目前已经有 [FeelUOwn](https://github.com/feeluown/FeelUOwn) 和 [Mopidy](https://github.com/mopidy/mopidy) 这两个项目了 |
 
 ## 功能特性
 

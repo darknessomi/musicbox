@@ -131,6 +131,8 @@ class Menu(object):
         self.screen = C.initscr()
         self.screen.keypad(1)
         self.step = Config().get("page_length")
+        if self.step == 0:
+            self.step = max(int(self.ui.y * 4 / 5) - 10, 1)
         self.stack = []
         self.djstack = []
         self.at_playing_list = False
@@ -884,6 +886,12 @@ class Menu(object):
 
             pre_key = key
             self.ui.screen.refresh()
+            self.ui.update_size()
+            current_step = max(int(self.ui.y * 4 / 5) - 10, 1)
+            if self.step != current_step:
+                self.step = current_step
+                self.index = 0
+            log.warning('self.step = ' + str(self.step))
             self.build_menu_processbar()
         self.stop()
 
