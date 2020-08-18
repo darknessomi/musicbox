@@ -25,6 +25,7 @@
 - [x] 修复评论按 `L` 后出现的按键逻辑混乱
 - [x] 每页行数根据终端窗口大小变化，config 中提供 `auto` 选项
 - [x] 修复长按 `j` 或 `k` 时歌词颜色闪烁的 Bug
+- [x] 添加功能（合并 PR [darknessomi PR #653](https://github.com/darknessomi/musicbox/pull/653)）
 
 ## 可能打算做的
 

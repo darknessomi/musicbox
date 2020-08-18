@@ -93,12 +93,17 @@ class Ui(object):
                 curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
                 curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         # term resize handling
+        self.config = Config()
         size = get_terminal_size()
         self.x = size[0]
         self.y = size[1]
         self.playerX = 1  # terminalsize.get_terminal_size()[1] - 10
         self.playerY = 0
-        self.startcol = int(float(self.x) / 5)
+        self.margin = self.config.get("left_margin_ratio")
+        if self.margin == 0:
+            self.startcol = 0
+        else:
+            self.startcol = max(int(float(self.x) / self.margin), 0)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
         self.lyric = ""
@@ -108,7 +113,6 @@ class Ui(object):
         self.now_tlyric_index = 0
         self.tlyric = ""
         self.storage = Storage()
-        self.config = Config()
         self.newversion = False
 
     def addstr(self, *args):
@@ -154,7 +158,7 @@ class Ui(object):
         timestap_regex = r"\d\d:\d\d\.[0-9]*"
 
         def get_timestap(lyric_line):
-            match_ret = re.match(r"\[(" + timestap_regex + ")\]", lyric_line)
+            match_ret = re.match(r"\[(" + timestap_regex + r")\]", lyric_line)
             if match_ret:
                 return match_ret.group(1)
             else:
@@ -172,7 +176,7 @@ class Ui(object):
                 )
 
         def strip_timestap(lyric_line):
-            return re.sub(r"\[" + timestap_regex + "\]", r"", lyric_line)
+            return re.sub(r"\[" + timestap_regex + r"\]", r"", lyric_line)
 
         def append_translation(translated_lyric, origin_lyric):
             translated_lyric = strip_timestap(translated_lyric)
@@ -697,7 +701,11 @@ class Ui(object):
 
         # update intendations
         curses.resizeterm(self.y, self.x)
-        self.startcol = int(float(self.x) / 5)
+        self.margin = self.config.get('left_margin_ratio')
+        if self.margin == 0:
+            self.startcol = 0
+        else:
+            self.startcol = max(int(float(self.x) / self.margin), 0)
         self.indented_startcol = max(self.startcol - 3, 0)
         self.update_space()
         self.screen.clear()
