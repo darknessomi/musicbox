@@ -1,15 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import (
-    print_function, unicode_literals, division, absolute_import
-)
+from __future__ import print_function, unicode_literals, division, absolute_import
 from time import time
 
 from future.builtins import int, chr
 
 
 class scrollstring(object):
-
     def __init__(self, content, START):
         self.content = content  # the true content of the string
         self.display = content  # the displayed string
@@ -32,6 +29,7 @@ class scrollstring(object):
 
     def __repr__(self):
         return self.display
+
 
 # determine the display length of a string
 

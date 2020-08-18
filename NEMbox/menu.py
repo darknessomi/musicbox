@@ -8,12 +8,10 @@
 # 3.使用定时器实现自动关闭功能；
 # bug：
 # 1.快速切换时会播放多首音乐
-'''
+"""
 网易云音乐 Menu
-'''
-from __future__ import (
-    print_function, unicode_literals, division, absolute_import
-)
+"""
+from __future__ import print_function, unicode_literals, division, absolute_import
 
 import time
 import curses as C
@@ -41,9 +39,10 @@ from . import logger
 from .cmd_parser import parse_keylist, cmd_parser, erase_coroutine
 
 
-locale.setlocale(locale.LC_ALL, '')
+locale.setlocale(locale.LC_ALL, "")
 
 log = logger.getLogger(__name__)
+
 
 def carousel(left, right, x):
     # carousel x in [left, right]
@@ -54,75 +53,85 @@ def carousel(left, right, x):
     else:
         return x
 
+
 keyMap = Config().get("keymap")
 commandList = list(map(ord, keyMap.values()))
 
 if Config().get("mouse_movement"):
-    keyMap['mouseUp'] = 259
-    keyMap['mouseDown'] = 258
+    keyMap["mouseUp"] = 259
+    keyMap["mouseDown"] = 258
 else:
-    keyMap['mouseUp'] = -259
-    keyMap['mouseDown'] = -258
+    keyMap["mouseUp"] = -259
+    keyMap["mouseDown"] = -258
 
 shortcut = [
-    [keyMap['down'], 'Down', '下移'],
-    [keyMap['up'], 'Up', '上移'],
-    ['<Num>+' + keyMap['up'], '<num> Up', '上移num'],
-    ['<Num>+' + keyMap['down'], '<num> Down', '下移num'],
-    [keyMap['back'], 'Back', '后退'],
-    [keyMap['forward'], 'Forward', '前进'],
-    [keyMap['prevPage'], 'Prev page', '上一页'],
-    [keyMap['nextPage'], 'Next page', '下一页'],
-    [keyMap['search'], 'Search', '快速搜索'],
-    [keyMap['prevSong'], 'Prev song', '上一曲'],
-    [keyMap['nextSong'], 'Next song', '下一曲'],
-    ['<Num>+' + keyMap['nextSong'], '<Num> Next Song', '下num曲'],
-    ['<Num>+' + keyMap['prevSong'], '<Num> Prev song', '上num曲'],
-    ['<Num>', 'Goto song <num>', '跳转指定歌曲id'],
-    [keyMap['playPause'], 'Play/Pause', '播放/暂停'],
-    [keyMap['shuffle'], 'Shuffle', '手气不错'],
-    [keyMap['volume+'], 'Volume+', '音量增加'],
-    [keyMap['volume-'], 'Volume-', '音量减少'],
-    [keyMap['menu'], 'Menu', '主菜单'],
-    [keyMap['presentHistory'], 'Present/History', '当前/历史播放列表'],
-    [keyMap['musicInfo'], 'Music Info', '当前音乐信息'],
-    [keyMap['playingMode'], 'Playing Mode', '播放模式切换'],
-    [keyMap['enterAlbum'], 'Enter album', '进入专辑'],
-    [keyMap['add'], 'Add', '添加曲目到打碟'],
-    [keyMap['djList'], 'DJ list', '打碟列表（退出后清空）'],
-    [keyMap['star'], 'Star', '添加到本地收藏'],
-    [keyMap['collection'], 'Collection', '本地收藏列表'],
-    [keyMap['remove'], 'Remove', '删除当前条目'],
-    [keyMap['moveDown'], 'Move Down', '向下移动当前条目'],
-    [keyMap['moveUp'], 'Move Up', '向上移动当前条目'],
-    [keyMap['like'], 'Like', '喜爱'],
-    [keyMap['cache'], 'Cache', '缓存歌曲到本地'],
-    [keyMap['nextFM'], 'Next FM', '下一 FM'],
-    [keyMap['trashFM'], 'Trash FM', '删除 FM'],
-    [keyMap['quit'], 'Quit', '退出'],
-    [keyMap['quitClear'], 'Quit&Clear', '退出并清除用户信息'],
-    [keyMap['help'], 'Help', '帮助'],
-    [keyMap['top'], 'Top', '回到顶部'],
-    [keyMap['bottom'], 'Bottom', '跳转到底部'],
-    [keyMap['countDown'], 'Count Down', '定时'],
+    [keyMap["down"], "Down", "下移"],
+    [keyMap["up"], "Up", "上移"],
+    ["<Num>+" + keyMap["up"], "<num> Up", "上移num"],
+    ["<Num>+" + keyMap["down"], "<num> Down", "下移num"],
+    [keyMap["back"], "Back", "后退"],
+    [keyMap["forward"], "Forward", "前进"],
+    [keyMap["prevPage"], "Prev page", "上一页"],
+    [keyMap["nextPage"], "Next page", "下一页"],
+    [keyMap["search"], "Search", "快速搜索"],
+    [keyMap["prevSong"], "Prev song", "上一曲"],
+    [keyMap["nextSong"], "Next song", "下一曲"],
+    ["<Num>+" + keyMap["nextSong"], "<Num> Next Song", "下num曲"],
+    ["<Num>+" + keyMap["prevSong"], "<Num> Prev song", "上num曲"],
+    ["<Num>", "Goto song <num>", "跳转指定歌曲id"],
+    [keyMap["playPause"], "Play/Pause", "播放/暂停"],
+    [keyMap["shuffle"], "Shuffle", "手气不错"],
+    [keyMap["volume+"], "Volume+", "音量增加"],
+    [keyMap["volume-"], "Volume-", "音量减少"],
+    [keyMap["menu"], "Menu", "主菜单"],
+    [keyMap["presentHistory"], "Present/History", "当前/历史播放列表"],
+    [keyMap["musicInfo"], "Music Info", "当前音乐信息"],
+    [keyMap["playingMode"], "Playing Mode", "播放模式切换"],
+    [keyMap["enterAlbum"], "Enter album", "进入专辑"],
+    [keyMap["add"], "Add", "添加曲目到打碟"],
+    [keyMap["djList"], "DJ list", "打碟列表（退出后清空）"],
+    [keyMap["star"], "Star", "添加到本地收藏"],
+    [keyMap["collection"], "Collection", "本地收藏列表"],
+    [keyMap["remove"], "Remove", "删除当前条目"],
+    [keyMap["moveDown"], "Move Down", "向下移动当前条目"],
+    [keyMap["moveUp"], "Move Up", "向上移动当前条目"],
+    [keyMap["like"], "Like", "喜爱"],
+    [keyMap["cache"], "Cache", "缓存歌曲到本地"],
+    [keyMap["nextFM"], "Next FM", "下一 FM"],
+    [keyMap["trashFM"], "Trash FM", "删除 FM"],
+    [keyMap["quit"], "Quit", "退出"],
+    [keyMap["quitClear"], "Quit&Clear", "退出并清除用户信息"],
+    [keyMap["help"], "Help", "帮助"],
+    [keyMap["top"], "Top", "回到顶部"],
+    [keyMap["bottom"], "Bottom", "跳转到底部"],
+    [keyMap["countDown"], "Count Down", "定时"],
 ]
 
-class Menu(object):
 
+class Menu(object):
     def __init__(self):
         self.quit = False
         self.config = Config()
-        self.datatype = 'main'
-        self.title = '网易云音乐'
+        self.datatype = "main"
+        self.title = "网易云音乐"
         self.datalist = [
-            '排行榜', '艺术家', '新碟上架', '精选歌单', '我的歌单',
-            '主播电台', '每日推荐歌曲', '每日推荐歌单', '私人FM', '搜索', '帮助'
+            "排行榜",
+            "艺术家",
+            "新碟上架",
+            "精选歌单",
+            "我的歌单",
+            "主播电台",
+            "每日推荐歌曲",
+            "每日推荐歌单",
+            "私人FM",
+            "搜索",
+            "帮助",
         ]
         self.offset = 0
         self.index = 0
         self.storage = Storage()
         self.storage.load()
-        self.collection = self.storage.database['collections']
+        self.collection = self.storage.database["collections"]
         self.player = Player()
         self.player.playing_song_changed_callback = self.song_changed_callback
         self.cache = Cache()
@@ -150,23 +159,23 @@ class Menu(object):
 
     @property
     def user(self):
-        return self.storage.database['user']
+        return self.storage.database["user"]
 
     @property
     def account(self):
-        return self.user['username']
+        return self.user["username"]
 
     @property
     def md5pass(self):
-        return self.user['password']
+        return self.user["password"]
 
     @property
     def userid(self):
-        return self.user['user_id']
+        return self.user["user_id"]
 
     @property
     def username(self):
-        return self.user['nickname']
+        return self.user["nickname"]
 
     def login(self):
         if self.account and self.md5pass:
@@ -175,21 +184,21 @@ class Menu(object):
             account, md5pass = self.ui.build_login()
 
         resp = self.api.login(account, md5pass)
-        if resp['code'] == 200:
-            userid = resp['account']['id']
-            nickname = resp['profile']['nickname']
+        if resp["code"] == 200:
+            userid = resp["account"]["id"]
+            nickname = resp["profile"]["nickname"]
             self.storage.login(account, md5pass, userid, nickname)
             return True
         else:
             self.storage.logout()
             x = self.ui.build_login_error()
-            if x >= 0 and C.keyname(x).decode('utf-8') != keyMap['forward']:
+            if x >= 0 and C.keyname(x).decode("utf-8") != keyMap["forward"]:
                 return False
             return self.login()
 
     def in_place_search(self):
         self.ui.screen.timeout(-1)
-        prompt = '模糊搜索：'
+        prompt = "模糊搜索："
         keyword = self.ui.get_param(prompt)
         if not keyword:
             return []
@@ -201,13 +210,12 @@ class Menu(object):
 
     def search(self, category):
         self.ui.screen.timeout(-1)
-        SearchArg = namedtuple(
-            'SearchArg', ['prompt', 'api_type', 'post_process'])
+        SearchArg = namedtuple("SearchArg", ["prompt", "api_type", "post_process"])
         category_map = {
-            'songs': SearchArg('搜索歌曲：', 1, lambda datalist: datalist),
-            'albums': SearchArg('搜索专辑：', 10, lambda datalist: datalist),
-            'artists': SearchArg('搜索艺术家：', 100, lambda datalist: datalist),
-            'playlists': SearchArg('搜索网易精选集：', 1000, lambda datalist: datalist)
+            "songs": SearchArg("搜索歌曲：", 1, lambda datalist: datalist),
+            "albums": SearchArg("搜索专辑：", 10, lambda datalist: datalist),
+            "artists": SearchArg("搜索艺术家：", 100, lambda datalist: datalist),
+            "playlists": SearchArg("搜索网易精选集：", 1000, lambda datalist: datalist),
         }
 
         prompt, api_type, post_process = category_map[category]
@@ -236,10 +244,15 @@ class Menu(object):
     def update_alert(self, version):
         latest = Menu().check_version()
         if latest > version and latest != 0:
-            notify('MusicBox Update == available', 1)
+            notify("MusicBox Update == available", 1)
             time.sleep(0.5)
-            notify('NetEase-MusicBox installed version:' + version +
-                   '\nNetEase-MusicBox latest version:' + latest, 0)
+            notify(
+                "NetEase-MusicBox installed version:"
+                + version
+                + "\nNetEase-MusicBox latest version:"
+                + latest,
+                0,
+            )
 
     def check_version(self):
         # 检查更新 && 签到
@@ -247,13 +260,13 @@ class Menu(object):
             mobile = self.api.daily_task(is_mobile=True)
             pc = self.api.daily_task(is_mobile=False)
 
-            if mobile['code'] == 200:
-                notify('移动端签到成功', 1)
-            if pc['code'] == 200:
-                notify('PC端签到成功', 1)
+            if mobile["code"] == 200:
+                notify("移动端签到成功", 1)
+            if pc["code"] == 200:
+                notify("PC端签到成功", 1)
 
             data = self.api.get_version()
-            return data['info']['version']
+            return data["info"]["version"]
         except KeyError as e:
             return 0
 
@@ -292,8 +305,9 @@ class Menu(object):
             # 移动光标到最后一列
             self.index = offset - 1
         else:
-            self.index = carousel(offset, min(
-                len(datalist), offset + step) - 1, idx - 1)
+            self.index = carousel(
+                offset, min(len(datalist), offset + step) - 1, idx - 1
+            )
         self.menu_starts = time.time()
 
     def down_key_event(self):
@@ -308,8 +322,9 @@ class Menu(object):
             # 移动光标到第一列
             self.index = offset + step
         else:
-            self.index = carousel(offset, min(
-                len(datalist), offset + step) - 1, idx + 1)
+            self.index = carousel(
+                offset, min(len(datalist), offset + step) - 1, idx + 1
+            )
         self.menu_starts = time.time()
 
     def space_key_event(self):
@@ -318,50 +333,50 @@ class Menu(object):
         if not self.datalist:
             return
         if idx < 0 or idx >= len(self.datalist):
-            self.player.info['idx'] = 0
+            self.player.info["idx"] = 0
 
         # If change to a new playing list. Add playing list and play.
-        if datatype == 'songs':
-            self.player.new_player_list('songs', self.title,
-                                        self.datalist, -1)
+        if datatype == "songs":
+            self.player.new_player_list("songs", self.title, self.datalist, -1)
             self.player.end_callback = None
             self.player.play_or_pause(idx, self.at_playing_list)
             self.at_playing_list = True
-        elif datatype == 'djchannels':
-            self.player.new_player_list('djchannels', self.title,
-                                        self.datalist, -1)
+        elif datatype == "djchannels":
+            self.player.new_player_list("djchannels", self.title, self.datalist, -1)
             self.player.end_callback = None
             self.player.play_or_pause(idx, self.at_playing_list)
             self.at_playing_list = True
-        elif datatype == 'fmsongs':
+        elif datatype == "fmsongs":
             self.player.change_mode(0)
-            self.player.new_player_list('fmsongs', self.title,
-                                        self.datalist, -1)
+            self.player.new_player_list("fmsongs", self.title, self.datalist, -1)
             self.player.end_callback = self.fm_callback
             self.player.play_or_pause(idx, self.at_playing_list)
             self.at_playing_list = True
         else:
             # 所在列表类型不是歌曲
             is_not_songs = True
-            self.player.play_or_pause(
-                self.player.info['idx'], is_not_songs)
+            self.player.play_or_pause(self.player.info["idx"], is_not_songs)
         self.build_menu_processbar()
 
     def like_event(self):
-        return_data = self.request_api(self.api.fm_like,
-                                       self.player.playing_id)
+        return_data = self.request_api(self.api.fm_like, self.player.playing_id)
         if return_data:
             song_name = self.player.playing_name
-            notify('%s added successfully!' % song_name, 0)
+            notify("%s added successfully!" % song_name, 0)
         else:
-            notify('Adding song failed!', 0)
+            notify("Adding song failed!", 0)
 
     def back_page_event(self):
         if len(self.stack) == 1:
             return
         self.menu_starts = time.time()
-        self.datatype, self.title, self.datalist,\
-            self.offset, self.index = self.stack.pop()
+        (
+            self.datatype,
+            self.title,
+            self.datalist,
+            self.offset,
+            self.index,
+        ) = self.stack.pop()
         self.at_playing_list = False
 
     def enter_page_event(self):
@@ -369,7 +384,7 @@ class Menu(object):
         self.enter_flag = True
         if len(self.datalist) <= 0:
             return
-        if self.datatype == 'comments':
+        if self.datatype == "comments":
             return
         self.menu_starts = time.time()
         self.ui.build_loading()
@@ -385,28 +400,27 @@ class Menu(object):
         offset = self.offset
         idx = self.index
         step = self.step
-        if datatype == 'album':
+        if datatype == "album":
             return
-        if datatype in ['songs', 'fmsongs']:
-            song_id = datalist[idx]['song_id']
-            album_id = datalist[idx]['album_id']
-            album_name = datalist[idx]['album_name']
+        if datatype in ["songs", "fmsongs"]:
+            song_id = datalist[idx]["song_id"]
+            album_id = datalist[idx]["album_id"]
+            album_name = datalist[idx]["album_name"]
         elif self.player.playing_flag:
             song_id = self.player.playing_id
             song_info = self.player.songs.get(str(song_id), {})
-            album_id = song_info.get('album_id', '')
-            album_name = song_info.get('album_name', '')
+            album_id = song_info.get("album_id", "")
+            album_name = song_info.get("album_name", "")
         else:
             album_id = 0
         if album_id:
-            self.stack.append(
-                [datatype, title, datalist, offset, self.index])
+            self.stack.append([datatype, title, datalist, offset, self.index])
             songs = self.api.album(album_id)
-            self.datatype = 'songs'
-            self.datalist = self.api.dig_info(songs, 'songs')
-            self.title = '网易云音乐 > 专辑 > %s' % album_name
+            self.datatype = "songs"
+            self.datalist = self.api.dig_info(songs, "songs")
+            self.title = "网易云音乐 > 专辑 > %s" % album_name
             for i in range(len(self.datalist)):
-                if self.datalist[i]['song_id'] == song_id:
+                if self.datalist[i]["song_id"] == song_id:
                     self.offset = i - i % step
                     self.index = i
                     return
@@ -420,21 +434,21 @@ class Menu(object):
         if num == 0:  # 0j -> 1j
             num = 1
         for _ in range(num):
-            if cmd in (keyMap['mouseUp'], ord(keyMap['up'])):
+            if cmd in (keyMap["mouseUp"], ord(keyMap["up"])):
                 self.up_key_event()
-            elif cmd in (keyMap['mouseDown'], ord(keyMap['down'])):
+            elif cmd in (keyMap["mouseDown"], ord(keyMap["down"])):
                 self.down_key_event()
-            elif cmd == ord(keyMap['nextSong']):
+            elif cmd == ord(keyMap["nextSong"]):
                 self.next_key_event()
-            elif cmd == ord(keyMap['prevSong']):
+            elif cmd == ord(keyMap["prevSong"]):
                 self.prev_key_event()
-        if cmd in (ord(keyMap['nextSong']), ord(keyMap['prevSong'])):
+        if cmd in (ord(keyMap["nextSong"]), ord(keyMap["prevSong"])):
             self.player.stop()
             self.player.replay()
         self.build_menu_processbar()
 
     def digit_key_song_event(self):
-        ''' 直接跳到指定id 歌曲 '''
+        """ 直接跳到指定id 歌曲 """
         step = self.step
         self.key_list.pop()
         song_index = parse_keylist(self.key_list)
@@ -443,24 +457,24 @@ class Menu(object):
             self.offset = self.index - self.index % step
             self.build_menu_processbar()
             self.ui.screen.refresh()
-#            self.space_key_event()
+
+    #            self.space_key_event()
 
     def time_key_event(self):
         self.countdown_start = time.time()
         countdown = self.ui.build_timing()
         if not countdown.isdigit():
-            notify('The input should be digit')
+            notify("The input should be digit")
 
         countdown = int(countdown)
         if countdown > 0:
-            notify(
-                'The musicbox will exit in {} minutes'.format(countdown))
+            notify("The musicbox will exit in {} minutes".format(countdown))
             self.countdown = countdown * 60
             self.is_in_countdown = True
             self.timer = Timer(self.countdown, self.stop, ())
             self.timer.start()
         else:
-            notify('The timing exit has been canceled')
+            notify("The timing exit has been canceled")
             self.is_in_countdown = False
             if self.timer:
                 self.timer.cancel()
@@ -495,11 +509,20 @@ class Menu(object):
     def build_menu_processbar(self):
         self.ui.build_process_bar(
             self.player.current_song,
-            self.player.process_location, self.player.process_length,
-            self.player.playing_flag, self.player.info['playing_mode']
+            self.player.process_location,
+            self.player.process_length,
+            self.player.playing_flag,
+            self.player.info["playing_mode"],
         )
-        self.ui.build_menu(self.datatype, self.title, self.datalist,
-                           self.offset, self.index, self.step, self.menu_starts)
+        self.ui.build_menu(
+            self.datatype,
+            self.title,
+            self.datalist,
+            self.offset,
+            self.index,
+            self.step,
+            self.menu_starts,
+        )
 
     def quit_event(self):
         sys.exit(0)
@@ -522,9 +545,9 @@ class Menu(object):
             self.step,
             self.menu_starts,
         )
-        self.stack.append([
-            self.datatype, self.title, self.datalist, self.offset, self.index
-        ])
+        self.stack.append(
+            [self.datatype, self.title, self.datalist, self.offset, self.index]
+        )
         if pyqt_activity:
             show_lyrics_new_process()
         pre_key = -1
@@ -541,20 +564,33 @@ class Menu(object):
             offset = self.offset
             idx = self.index
             step = self.step
-            self.screen.timeout(self.config.get('input_timeout'))
+            self.screen.timeout(self.config.get("input_timeout"))
             key = self.screen.getch()
 
-            if key in commandList and\
-                    key != ord(keyMap['nextSong']) and key != ord(keyMap['prevSong']):
-                if not ((set(self.pre_keylist) | {ord(keyMap['prevSong']), ord(keyMap['nextSong'])})\
-                        == {ord(keyMap['prevSong']), ord(keyMap['nextSong'])}):
+            if (
+                key in commandList
+                and key != ord(keyMap["nextSong"])
+                and key != ord(keyMap["prevSong"])
+            ):
+                if not (
+                    (
+                        set(self.pre_keylist)
+                        | {ord(keyMap["prevSong"]), ord(keyMap["nextSong"])}
+                    )
+                    == {ord(keyMap["prevSong"]), ord(keyMap["nextSong"])}
+                ):
                     self.pre_keylist.append(key)
                 self.key_list = deepcopy(self.pre_keylist)
                 self.pre_keylist.clear()
-            elif key in range(48, 58) or\
-                    key == ord(keyMap['nextSong']) or key == ord(keyMap['prevSong']):
+            elif (
+                key in range(48, 58)
+                or key == ord(keyMap["nextSong"])
+                or key == ord(keyMap["prevSong"])
+            ):
                 self.pre_keylist.append(key)
-            elif key == -1 and (pre_key == ord(keyMap['nextSong']) or pre_key == ord(keyMap['prevSong'])):
+            elif key == -1 and (
+                pre_key == ord(keyMap["nextSong"]) or pre_key == ord(keyMap["prevSong"])
+            ):
                 self.key_list = deepcopy(self.pre_keylist)
                 self.pre_keylist.clear()
             # <Esc> 取消当前输入
@@ -565,17 +601,18 @@ class Menu(object):
             keylist = self.key_list
 
             # 如果 keylist 全都是数字 + G
-            if keylist and (set(keylist) | set(range(48, 58)) | {ord(keyMap['jumpIndex'])})\
-                    == set(range(48, 58)) | {ord(keyMap['jumpIndex'])}:
+            if keylist and (
+                set(keylist) | set(range(48, 58)) | {ord(keyMap["jumpIndex"])}
+            ) == set(range(48, 58)) | {ord(keyMap["jumpIndex"])}:
                 # 歌曲数字映射
                 self.digit_key_song_event()
                 self.key_list.clear()
                 continue
 
             # 如果 keylist 只有 [ ]
-            if len(keylist) > 0 and\
-                    (set(keylist) | {ord(keyMap['prevSong']), ord(keyMap['nextSong'])})\
-                    == {ord(keyMap['prevSong']), ord(keyMap['nextSong'])}:
+            if len(keylist) > 0 and (
+                set(keylist) | {ord(keyMap["prevSong"]), ord(keyMap["nextSong"])}
+            ) == {ord(keyMap["prevSong"]), ord(keyMap["nextSong"])}:
                 self.player.stop()
                 self.player.replay()
                 self.key_list.clear()
@@ -594,123 +631,127 @@ class Menu(object):
                 self.player.update_size()
 
             # 退出
-            elif C.keyname(key).decode('utf-8') == keyMap['quit']:
+            elif C.keyname(key).decode("utf-8") == keyMap["quit"]:
                 break
 
             # 退出并清除用户信息
-            elif C.keyname(key).decode('utf-8') == keyMap['quitClear']:
+            elif C.keyname(key).decode("utf-8") == keyMap["quitClear"]:
                 self.api.logout()
                 break
 
             # 上移
-            elif C.keyname(key).decode('utf-8') == keyMap['up']\
-                    and pre_key not in range(ord('0'), ord('9')):
+            elif C.keyname(key).decode("utf-8") == keyMap[
+                "up"
+            ] and pre_key not in range(ord("0"), ord("9")):
                 self.up_key_event()
-            elif self.config.get('mouse_movement') and key == keyMap['mouseUp']:
+            elif self.config.get("mouse_movement") and key == keyMap["mouseUp"]:
                 self.up_key_event()
 
             # 下移
-            elif C.keyname(key).decode('utf-8') == keyMap['down']\
-                    and pre_key not in range(ord('0'), ord('9')):
+            elif C.keyname(key).decode("utf-8") == keyMap[
+                "down"
+            ] and pre_key not in range(ord("0"), ord("9")):
                 self.down_key_event()
-            elif self.config.get('mouse_movement') and key == keyMap['mouseDown']:
+            elif self.config.get("mouse_movement") and key == keyMap["mouseDown"]:
                 self.down_key_event()
 
             # 数字快捷键
-#            elif ord('0') <= key <= ord('9') and self.datatype not in ('songs', 'fmsongs'):
-#                idx = key - ord('0')
-#                self.ui.build_menu(
-#                    self.datatype,
-#                    self.title,
-#                    self.datalist,
-#                    self.offset,
-#                    idx,
-#                    self.step,
-#                    self.menu_starts,
-#                )
-#                self.ui.build_loading()
-#                self.dispatch_enter(idx)
-#                self.index = 0
-#                self.offset = 0
+            #            elif ord('0') <= key <= ord('9') and self.datatype not in ('songs', 'fmsongs'):
+            #                idx = key - ord('0')
+            #                self.ui.build_menu(
+            #                    self.datatype,
+            #                    self.title,
+            #                    self.datalist,
+            #                    self.offset,
+            #                    idx,
+            #                    self.step,
+            #                    self.menu_starts,
+            #                )
+            #                self.ui.build_loading()
+            #                self.dispatch_enter(idx)
+            #                self.index = 0
+            #                self.offset = 0
 
             # 向上翻页
-            elif C.keyname(key).decode('utf-8') == keyMap['prevPage']:
+            elif C.keyname(key).decode("utf-8") == keyMap["prevPage"]:
                 self.up_page_event()
 
             # 向下翻页
-            elif C.keyname(key).decode('utf-8') == keyMap['nextPage']:
+            elif C.keyname(key).decode("utf-8") == keyMap["nextPage"]:
                 self.down_page_event()
 
             # 前进
-            elif C.keyname(key).decode('utf-8') == keyMap['forward'] or key == 10:
+            elif C.keyname(key).decode("utf-8") == keyMap["forward"] or key == 10:
                 self.enter_page_event()
 
             # 回退
-            elif C.keyname(key).decode('utf-8') == keyMap['back']:
+            elif C.keyname(key).decode("utf-8") == keyMap["back"]:
                 self.back_page_event()
 
             # 模糊搜索
-            elif C.keyname(key).decode('utf-8') == keyMap['search']:
+            elif C.keyname(key).decode("utf-8") == keyMap["search"]:
                 # 9 == the 'search' menu
-                #self.dispatch_enter(9)
+                # self.dispatch_enter(9)
                 self.stack.append(
-                    [self.datatype, self.title, self.datalist, self.offset, self.index])
+                    [self.datatype, self.title, self.datalist, self.offset, self.index]
+                )
                 self.datalist, keyword = self.in_place_search()
-                self.datatype = 'songs'
-                self.title += ' > ' + keyword + ' 的搜索结果'
+                self.datatype = "songs"
+                self.title += " > " + keyword + " 的搜索结果"
                 self.offset = 0
                 self.index = 0
 
             # 播放下一曲
-            elif C.keyname(key).decode('utf-8') == keyMap['nextSong']\
-                    and pre_key not in range(ord('0'), ord('9')):
+            elif C.keyname(key).decode("utf-8") == keyMap[
+                "nextSong"
+            ] and pre_key not in range(ord("0"), ord("9")):
                 self.next_key_event()
                 # self.down_key_event()
 
             # 播放上一曲
-            elif C.keyname(key).decode('utf-8') == keyMap['prevSong']\
-                    and pre_key not in range(ord('0'), ord('9')):
+            elif C.keyname(key).decode("utf-8") == keyMap[
+                "prevSong"
+            ] and pre_key not in range(ord("0"), ord("9")):
                 self.prev_key_event()
 
             # 增加音量
-            elif C.keyname(key).decode('utf-8') == keyMap['volume+']:
+            elif C.keyname(key).decode("utf-8") == keyMap["volume+"]:
                 self.player.volume_up()
 
             # 减少音量
-            elif C.keyname(key).decode('utf-8') == keyMap['volume-']:
+            elif C.keyname(key).decode("utf-8") == keyMap["volume-"]:
                 self.player.volume_down()
 
             # 随机播放
-            elif C.keyname(key).decode('utf-8') == keyMap['shuffle']:
-                if len(self.player.info['player_list']) == 0:
+            elif C.keyname(key).decode("utf-8") == keyMap["shuffle"]:
+                if len(self.player.info["player_list"]) == 0:
                     continue
                 self.player.shuffle()
 
             # 喜爱
-            elif C.keyname(key).decode('utf-8') == keyMap['like']:
-                return_data = self.request_api(self.api.fm_like,
-                                               self.player.playing_id)
+            elif C.keyname(key).decode("utf-8") == keyMap["like"]:
+                return_data = self.request_api(self.api.fm_like, self.player.playing_id)
                 if return_data:
                     song_name = self.player.playing_name
-                    notify('%s added successfully!' % song_name, 0)
+                    notify("%s added successfully!" % song_name, 0)
                 else:
-                    notify('Adding song failed!', 0)
+                    notify("Adding song failed!", 0)
 
             # 删除FM
-            elif C.keyname(key).decode('utf-8') == keyMap['trashFM']:
-                if self.datatype == 'fmsongs':
-                    if len(self.player.info['player_list']) == 0:
+            elif C.keyname(key).decode("utf-8") == keyMap["trashFM"]:
+                if self.datatype == "fmsongs":
+                    if len(self.player.info["player_list"]) == 0:
                         continue
                     self.player.next()
                     return_data = self.request_api(
                         self.api.fm_trash, self.player.playing_id
                     )
                     if return_data:
-                        notify('Deleted successfully!', 0)
+                        notify("Deleted successfully!", 0)
 
             # 更多FM
-            elif C.keyname(key).decode('utf-8') == keyMap['nextFM']:
-                if self.datatype == 'fmsongs':
+            elif C.keyname(key).decode("utf-8") == keyMap["nextFM"]:
+                if self.datatype == "fmsongs":
                     # if len(self.player.info['player_list']) == 0:
                     #     continue
                     if self.player.end_callback:
@@ -722,82 +763,85 @@ class Menu(object):
                 self.offset = self.index - self.index % self.step
 
             # 播放、暂停
-            elif C.keyname(key).decode('utf-8') == keyMap['playPause']:
+            elif C.keyname(key).decode("utf-8") == keyMap["playPause"]:
                 self.space_key_event()
 
             # 加载当前播放列表
-            elif C.keyname(key).decode('utf-8') == keyMap['presentHistory']:
+            elif C.keyname(key).decode("utf-8") == keyMap["presentHistory"]:
                 self.show_playing_song()
 
             # 播放模式切换
-            elif C.keyname(key).decode('utf-8') == keyMap['playingMode']:
+            elif C.keyname(key).decode("utf-8") == keyMap["playingMode"]:
                 self.player.change_mode()
 
             # 进入专辑
-            elif C.keyname(key).decode('utf-8') == keyMap['enterAlbum']:
-                if datatype == 'album':
+            elif C.keyname(key).decode("utf-8") == keyMap["enterAlbum"]:
+                if datatype == "album":
                     continue
-                if datatype in ['songs', 'fmsongs']:
-                    song_id = datalist[idx]['song_id']
-                    album_id = datalist[idx]['album_id']
-                    album_name = datalist[idx]['album_name']
+                if datatype in ["songs", "fmsongs"]:
+                    song_id = datalist[idx]["song_id"]
+                    album_id = datalist[idx]["album_id"]
+                    album_name = datalist[idx]["album_name"]
                 elif self.player.playing_flag:
                     song_id = self.player.playing_id
                     song_info = self.player.songs.get(str(song_id), {})
-                    album_id = song_info.get('album_id', '')
-                    album_name = song_info.get('album_name', '')
+                    album_id = song_info.get("album_id", "")
+                    album_name = song_info.get("album_name", "")
                 else:
                     album_id = 0
                 if album_id:
                     self.stack.append([datatype, title, datalist, offset, self.index])
                     songs = self.api.album(album_id)
-                    self.datatype = 'songs'
-                    self.datalist = self.api.dig_info(songs, 'songs')
-                    self.title = '网易云音乐 > 专辑 > %s' % album_name
+                    self.datatype = "songs"
+                    self.datalist = self.api.dig_info(songs, "songs")
+                    self.title = "网易云音乐 > 专辑 > %s" % album_name
                     for i in range(len(self.datalist)):
-                        if self.datalist[i]['song_id'] == song_id:
+                        if self.datalist[i]["song_id"] == song_id:
                             self.offset = i - i % step
                             self.index = i
                             break
 
             # 添加到打碟歌单
-            elif C.keyname(key).decode('utf-8') == keyMap['add']:
-                if datatype == 'songs' and len(datalist) != 0:
+            elif C.keyname(key).decode("utf-8") == keyMap["add"]:
+                if datatype == "songs" and len(datalist) != 0:
                     self.djstack.append(datalist[idx])
-                elif datatype == 'artists':
+                elif datatype == "artists":
                     pass
 
             # 加载打碟歌单
-            elif C.keyname(key).decode('utf-8') == keyMap['djList']:
+            elif C.keyname(key).decode("utf-8") == keyMap["djList"]:
                 self.stack.append(
-                    [self.datatype, self.title, self.datalist, self.offset, self.index])
-                self.datatype = 'songs'
-                self.title = '网易云音乐 > 打碟'
+                    [self.datatype, self.title, self.datalist, self.offset, self.index]
+                )
+                self.datatype = "songs"
+                self.title = "网易云音乐 > 打碟"
                 self.datalist = self.djstack
                 self.offset = 0
                 self.index = 0
 
             # 添加到本地收藏
-            elif C.keyname(key).decode('utf-8') == keyMap['star']:
-                if (self.datatype == 'songs' or
-                        self.datatype == 'djchannels') and len(self.datalist) != 0:
+            elif C.keyname(key).decode("utf-8") == keyMap["star"]:
+                if (self.datatype == "songs" or self.datatype == "djchannels") and len(
+                    self.datalist
+                ) != 0:
                     self.collection.append(self.datalist[self.index])
-                    notify('Added successfully', 0)
+                    notify("Added successfully", 0)
 
             # 加载本地收藏
             elif C.keyname(key).decode("utf-8") == keyMap["collection"]:
                 self.stack.append(
-                    [self.datatype, self.title, self.datalist, self.offset, self.index])
-                self.datatype = 'songs'
-                self.title = '网易云音乐 > 本地收藏'
+                    [self.datatype, self.title, self.datalist, self.offset, self.index]
+                )
+                self.datatype = "songs"
+                self.title = "网易云音乐 > 本地收藏"
                 self.datalist = self.collection
                 self.offset = 0
                 self.index = 0
 
             # 从当前列表移除
-            elif C.keyname(key).decode('utf-8') == keyMap['remove']:
+            elif C.keyname(key).decode("utf-8") == keyMap["remove"]:
                 if (
-                    self.datatype in ('songs', 'djchannels', 'fmsongs')
+                    self.datatype in ("songs", "djchannels", "fmsongs")
                     and len(self.datalist) != 0
                 ):
                     self.datalist.pop(self.index)
@@ -805,17 +849,20 @@ class Menu(object):
                     log.warn(len(self.datalist))
                     if self.index == len(self.datalist):
                         self.up_key_event()
-                    self.index = carousel(self.offset, min(
-                        len(self.datalist), self.offset + self.step) - 1, self.index)
+                    self.index = carousel(
+                        self.offset,
+                        min(len(self.datalist), self.offset + self.step) - 1,
+                        self.index,
+                    )
 
             # 倒计时
-            elif C.keyname(key).decode('utf-8') == keyMap['countDown']:
+            elif C.keyname(key).decode("utf-8") == keyMap["countDown"]:
                 self.time_key_event()
 
             # 当前项目下移
-            elif C.keyname(key).decode('utf-8') == keyMap['moveDown']:
+            elif C.keyname(key).decode("utf-8") == keyMap["moveDown"]:
                 if (
-                    self.datatype != 'main'
+                    self.datatype != "main"
                     and len(self.datalist) != 0
                     and self.index + 1 != len(self.datalist)
                 ):
@@ -828,8 +875,12 @@ class Menu(object):
                         self.offset = self.offset + self.step
 
             # 当前项目上移
-            elif C.keyname(key).decode('utf-8') == keyMap['moveUp']:
-                if self.datatype != 'main' and len(self.datalist) != 0 and self.index != 0:
+            elif C.keyname(key).decode("utf-8") == keyMap["moveUp"]:
+                if (
+                    self.datatype != "main"
+                    and len(self.datalist) != 0
+                    and self.index != 0
+                ):
                     self.menu_starts = time.time()
                     song = self.datalist.pop(self.index)
                     self.datalist.insert(self.index - 1, song)
@@ -839,49 +890,52 @@ class Menu(object):
                         self.offset = self.offset - self.step
 
             # 菜单
-            elif C.keyname(key).decode('utf-8') == keyMap['menu']:
-                if self.datatype != 'main':
+            elif C.keyname(key).decode("utf-8") == keyMap["menu"]:
+                if self.datatype != "main":
                     self.stack.append(
-                        [self.datatype, self.title, self.datalist, self.offset, self.index])
-                    self.datatype, self.title, self.datalist, * \
-                        _ = self.stack[0]
+                        [
+                            self.datatype,
+                            self.title,
+                            self.datalist,
+                            self.offset,
+                            self.index,
+                        ]
+                    )
+                    self.datatype, self.title, self.datalist, *_ = self.stack[0]
                     self.offset = 0
                     self.index = 0
             # 跳到开头 g键
-            elif C.keyname(key).decode('utf-8') == keyMap['top']:
-                if self.datatype == 'help':
-                    webbrowser.open_new_tab(
-                        'https://github.com/darknessomi/musicbox')
+            elif C.keyname(key).decode("utf-8") == keyMap["top"]:
+                if self.datatype == "help":
+                    webbrowser.open_new_tab("https://github.com/darknessomi/musicbox")
                 else:
                     self.index = 0
                     self.offset = 0
 
             # 跳到末尾ord('G') 键
-            elif C.keyname(key).decode('utf-8') == keyMap['bottom']:
+            elif C.keyname(key).decode("utf-8") == keyMap["bottom"]:
                 self.index = len(self.datalist) - 1
                 self.offset = self.index - self.index % self.step
 
             # 开始下载
-            elif C.keyname(key).decode('utf-8') == keyMap['cache']:
+            elif C.keyname(key).decode("utf-8") == keyMap["cache"]:
                 s = self.datalist[self.index]
                 cache_thread = threading.Thread(
                     target=self.player.cache_song,
-                    args=(s['song_id'], s['song_name'],
-                          s['artist'], s['mp3_url'])
+                    args=(s["song_id"], s["song_name"], s["artist"], s["mp3_url"]),
                 )
                 cache_thread.start()
             # 在网页打开 ord(i)
-            elif C.keyname(key).decode('utf-8') == keyMap['musicInfo']:
+            elif C.keyname(key).decode("utf-8") == keyMap["musicInfo"]:
                 if self.player.playing_id != -1:
                     webbrowser.open_new_tab(
-                        'http://music.163.com/song?id={}'.format(
-                            self.player.playing_id)
+                        "http://music.163.com/song?id={}".format(self.player.playing_id)
                     )
             # term resize
             # 刷新屏幕  按下某个键或者默认5秒刷新空白区
-#            erase_coro.send(key)
-#            if erase_cmd_list:
-#                self.screen.erase()
+            #            erase_coro.send(key)
+            #            if erase_cmd_list:
+            #                self.screen.erase()
             self.player.update_size()
 
             pre_key = key
@@ -891,10 +945,9 @@ class Menu(object):
             if self.step != current_step:
                 self.step = current_step
                 self.index = 0
-            log.warning('self.step = ' + str(self.step))
+            log.warning("self.step = " + str(self.step))
             self.build_menu_processbar()
         self.stop()
-
 
     def dispatch_enter(self, idx):
         # The end of stack
@@ -909,92 +962,88 @@ class Menu(object):
         if idx >= len(self.datalist):
             return False
 
-        if datatype == 'main':
+        if datatype == "main":
             self.choice_channel(idx)
 
         # 该艺术家的热门歌曲
-        elif datatype == 'artists':
-            artist_name = datalist[idx]['artists_name']
-            artist_id = datalist[idx]['artist_id']
+        elif datatype == "artists":
+            artist_name = datalist[idx]["artists_name"]
+            artist_id = datalist[idx]["artist_id"]
 
-            self.datatype = 'artist_info'
-            self.title += ' > ' + artist_name
-            self.datalist = [{
-                'item': '{}的热门歌曲'.format(artist_name),
-                'id': artist_id,
-            }, {
-                'item': '{}的所有专辑'.format(artist_name),
-                'id': artist_id,
-            }]
+            self.datatype = "artist_info"
+            self.title += " > " + artist_name
+            self.datalist = [
+                {"item": "{}的热门歌曲".format(artist_name), "id": artist_id,},
+                {"item": "{}的所有专辑".format(artist_name), "id": artist_id,},
+            ]
 
-        elif datatype == 'artist_info':
-            self.title += ' > ' + datalist[idx]['item']
-            artist_id = datalist[0]['id']
+        elif datatype == "artist_info":
+            self.title += " > " + datalist[idx]["item"]
+            artist_id = datalist[0]["id"]
             if idx == 0:
-                self.datatype = 'songs'
+                self.datatype = "songs"
                 songs = netease.artists(artist_id)
-                self.datalist = netease.dig_info(songs, 'songs')
+                self.datalist = netease.dig_info(songs, "songs")
 
             elif idx == 1:
                 albums = netease.get_artist_album(artist_id)
-                self.datatype = 'albums'
-                self.datalist = netease.dig_info(albums, 'albums')
+                self.datatype = "albums"
+                self.datalist = netease.dig_info(albums, "albums")
 
-        elif datatype == 'djchannels':
-            radio_id = datalist[idx]['id']
+        elif datatype == "djchannels":
+            radio_id = datalist[idx]["id"]
             programs = netease.djprograms(radio_id)
-            self.title += ' > ' + datalist[idx]['name']
-            self.datatype = 'songs'
-            self.datalist = netease.dig_info(programs, 'songs')
+            self.title += " > " + datalist[idx]["name"]
+            self.datatype = "songs"
+            self.datalist = netease.dig_info(programs, "songs")
 
         # 该专辑包含的歌曲
-        elif datatype == 'albums':
-            album_id = datalist[idx]['album_id']
+        elif datatype == "albums":
+            album_id = datalist[idx]["album_id"]
             songs = netease.album(album_id)
-            self.datatype = 'songs'
-            self.datalist = netease.dig_info(songs, 'songs')
-            self.title += ' > ' + datalist[idx]['albums_name']
+            self.datatype = "songs"
+            self.datalist = netease.dig_info(songs, "songs")
+            self.title += " > " + datalist[idx]["albums_name"]
 
         # 精选歌单选项
-        elif datatype == 'recommend_lists':
+        elif datatype == "recommend_lists":
             data = self.datalist[idx]
-            self.datatype = data['datatype']
-            self.datalist = netease.dig_info(data['callback'](), self.datatype)
-            self.title += ' > ' + data['title']
+            self.datatype = data["datatype"]
+            self.datalist = netease.dig_info(data["callback"](), self.datatype)
+            self.title += " > " + data["title"]
 
         # 全站置顶歌单包含的歌曲
-        elif datatype in ['top_playlists', 'playlists']:
-            playlist_id = datalist[idx]['playlist_id']
+        elif datatype in ["top_playlists", "playlists"]:
+            playlist_id = datalist[idx]["playlist_id"]
             songs = netease.playlist_detail(playlist_id)
-            self.datatype = 'songs'
-            self.datalist = netease.dig_info(songs, 'songs')
-            self.title += ' > ' + datalist[idx]['playlist_name']
+            self.datatype = "songs"
+            self.datalist = netease.dig_info(songs, "songs")
+            self.title += " > " + datalist[idx]["playlist_name"]
 
         # 分类精选
-        elif datatype == 'playlist_classes':
+        elif datatype == "playlist_classes":
             # 分类名称
             data = self.datalist[idx]
-            self.datatype = 'playlist_class_detail'
+            self.datatype = "playlist_class_detail"
             self.datalist = netease.dig_info(data, self.datatype)
-            self.title += ' > ' + data
+            self.title += " > " + data
 
         # 某一分类的详情
-        elif datatype == 'playlist_class_detail':
+        elif datatype == "playlist_class_detail":
             # 子类别
             data = self.datalist[idx]
-            self.datatype = 'top_playlists'
+            self.datatype = "top_playlists"
             log.error(data)
-            self.datalist = netease.dig_info(
-                netease.top_playlists(data), self.datatype)
-            self.title += ' > ' + data
+            self.datalist = netease.dig_info(netease.top_playlists(data), self.datatype)
+            self.title += " > " + data
 
         # 歌曲评论
-        elif datatype in ['songs', 'fmsongs']:
-            song_id = datalist[idx]['song_id']
+        elif datatype in ["songs", "fmsongs"]:
+            song_id = datalist[idx]["song_id"]
             comments = self.api.song_comments(song_id, limit=100)
             try:
-                hotcomments = comments['hotComments']
-                comcomments = comments['comments']
+                hotcomments = comments["hotComments"]
+                comcomments = comments["comments"]
             except KeyError:
                 hotcomments = comcomments = []
             self.datalist = []
@@ -1008,7 +1057,7 @@ class Menu(object):
                     )
                 )
             for one_comment in comcomments:
-                #self.datalist.append(one_comment["content"])
+                # self.datalist.append(one_comment["content"])
                 self.datalist.append(
                     "(%s❤️ ️) %s: %s"
                     % (
@@ -1023,44 +1072,44 @@ class Menu(object):
             self.index = 0
 
         # 歌曲榜单
-        elif datatype == 'toplists':
+        elif datatype == "toplists":
             songs = netease.top_songlist(idx)
-            self.title += ' > ' + self.datalist[idx]
-            self.datalist = netease.dig_info(songs, 'songs')
-            self.datatype = 'songs'
+            self.title += " > " + self.datalist[idx]
+            self.datalist = netease.dig_info(songs, "songs")
+            self.datatype = "songs"
 
         # 搜索菜单
-        elif datatype == 'search':
+        elif datatype == "search":
             self.index = 0
             self.offset = 0
-            SearchCategory = namedtuple('SearchCategory', ['type', 'title'])
+            SearchCategory = namedtuple("SearchCategory", ["type", "title"])
             idx_map = {
-                0: SearchCategory('playlists', '精选歌单搜索列表'),
-                1: SearchCategory('songs', '歌曲搜索列表'),
-                2: SearchCategory('artists', '艺术家搜索列表'),
-                3: SearchCategory('albums', '专辑搜索列表')
+                0: SearchCategory("playlists", "精选歌单搜索列表"),
+                1: SearchCategory("songs", "歌曲搜索列表"),
+                2: SearchCategory("artists", "艺术家搜索列表"),
+                3: SearchCategory("albums", "专辑搜索列表"),
             }
             self.datatype, self.title = idx_map[idx]
             self.datalist = self.search(self.datatype)
         else:
             self.enter_flag = False
-#        self.parser.send(-1)
+
+    #        self.parser.send(-1)
 
     def show_playing_song(self):
         if self.player.is_empty:
             return
 
         if not self.at_playing_list:
-            self.stack.append([self.datatype, self.title, self.datalist,
-                               self.offset, self.index])
+            self.stack.append(
+                [self.datatype, self.title, self.datalist, self.offset, self.index]
+            )
             self.at_playing_list = True
 
-        self.datatype = self.player.info['player_list_type']
-        self.title = self.player.info['player_list_title']
-        self.datalist = [
-            self.player.songs[i] for i in self.player.info['player_list']
-        ]
-        self.index = self.player.info['idx']
+        self.datatype = self.player.info["player_list_type"]
+        self.title = self.player.info["player_list_title"]
+        self.datalist = [self.player.songs[i] for i in self.player.info["player_list"]]
+        self.index = self.player.info["idx"]
         self.offset = self.index // self.step * self.step
 
     def song_changed_callback(self):
@@ -1071,15 +1120,15 @@ class Menu(object):
         # log.debug('FM CallBack.')
         data = self.get_new_fm()
         self.player.append_songs(data)
-        if self.datatype == 'fmsongs':
+        if self.datatype == "fmsongs":
             if self.player.is_empty:
                 return
-            self.datatype = self.player.info['player_list_type']
-            self.title = self.player.info['player_list_title']
+            self.datatype = self.player.info["player_list_type"]
+            self.title = self.player.info["player_list_title"]
             self.datalist = []
-            for i in self.player.info['player_list']:
+            for i in self.player.info["player_list"]:
                 self.datalist.append(self.player.songs[i])
-            self.index = self.player.info['idx']
+            self.index = self.player.info["idx"]
             self.offset = self.index // self.step * self.step
             if not self.player.playing_flag:
                 switch_flag = False
@@ -1090,7 +1139,7 @@ class Menu(object):
         if result:
             return result
         if not self.login():
-            notify('You need to log in')
+            notify("You need to log in")
             return False
         return func(*args)
 
@@ -1098,7 +1147,7 @@ class Menu(object):
         data = self.request_api(self.api.personal_fm)
         if not data:
             return []
-        return self.api.dig_info(data, 'fmsongs')
+        return self.api.dig_info(data, "fmsongs")
 
     def choice_channel(self, idx):
         self.offset = 0
@@ -1106,60 +1155,63 @@ class Menu(object):
 
         if idx == 0:
             self.datalist = self.api.toplists
-            self.title += ' > 排行榜'
-            self.datatype = 'toplists'
+            self.title += " > 排行榜"
+            self.datatype = "toplists"
         elif idx == 1:
             artists = self.api.top_artists()
-            self.datalist = self.api.dig_info(artists, 'artists')
-            self.title += ' > 艺术家'
-            self.datatype = 'artists'
+            self.datalist = self.api.dig_info(artists, "artists")
+            self.title += " > 艺术家"
+            self.datatype = "artists"
         elif idx == 2:
             albums = self.api.new_albums()
-            self.datalist = self.api.dig_info(albums, 'albums')
-            self.title += ' > 新碟上架'
-            self.datatype = 'albums'
+            self.datalist = self.api.dig_info(albums, "albums")
+            self.title += " > 新碟上架"
+            self.datatype = "albums"
         elif idx == 3:
-            self.datalist = [{
-                'title': '全站置顶',
-                'datatype': 'top_playlists',
-                'callback': self.api.top_playlists
-            }, {
-                'title': '分类精选',
-                'datatype': 'playlist_classes',
-                'callback': lambda: []
-            }]
-            self.title += ' > 精选歌单'
-            self.datatype = 'recommend_lists'
+            self.datalist = [
+                {
+                    "title": "全站置顶",
+                    "datatype": "top_playlists",
+                    "callback": self.api.top_playlists,
+                },
+                {
+                    "title": "分类精选",
+                    "datatype": "playlist_classes",
+                    "callback": lambda: [],
+                },
+            ]
+            self.title += " > 精选歌单"
+            self.datatype = "recommend_lists"
         elif idx == 4:
             myplaylist = self.request_api(self.api.user_playlist, self.userid)
-            self.datatype = 'top_playlists'
+            self.datatype = "top_playlists"
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
-            self.title += ' > ' + self.username + ' 的歌单'
+            self.title += " > " + self.username + " 的歌单"
         elif idx == 5:
-            self.datatype = 'djchannels'
-            self.title += ' > 主播电台'
+            self.datatype = "djchannels"
+            self.title += " > 主播电台"
             self.datalist = self.api.djchannels()
         elif idx == 6:
-            self.datatype = 'songs'
-            self.title += ' > 每日推荐歌曲'
+            self.datatype = "songs"
+            self.title += " > 每日推荐歌曲"
             myplaylist = self.request_api(self.api.recommend_playlist)
             if myplaylist == -1:
                 return
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
         elif idx == 7:
             myplaylist = self.request_api(self.api.recommend_resource)
-            self.datatype = 'top_playlists'
-            self.title += ' > 每日推荐歌单'
+            self.datatype = "top_playlists"
+            self.title += " > 每日推荐歌单"
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
         elif idx == 8:
-            self.datatype = 'fmsongs'
-            self.title += ' > 私人FM'
+            self.datatype = "fmsongs"
+            self.title += " > 私人FM"
             self.datalist = self.get_new_fm()
         elif idx == 9:
-            self.datatype = 'search'
-            self.title += ' > 搜索'
-            self.datalist = ['歌曲', '艺术家', '专辑', '网易精选集']
+            self.datatype = "search"
+            self.title += " > 搜索"
+            self.datalist = ["歌曲", "艺术家", "专辑", "网易精选集"]
         elif idx == 10:
-            self.datatype = 'help'
-            self.title += ' > 帮助'
+            self.datatype = "help"
+            self.title += " > 帮助"
             self.datalist = shortcut
