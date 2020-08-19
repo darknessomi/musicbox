@@ -224,5 +224,6 @@ class Config(Singleton):
                 if key not in self.config[name]["value"].keys():
                     self.config[name]["value"][key] = self.default_config[name]["value"][key]
         if name not in self.config.keys():
+            self.config[name] = self.default_config[name]
             return self.default_config[name]["value"]
         return self.config[name]["value"]

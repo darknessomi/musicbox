@@ -525,6 +525,7 @@ class Menu(object):
         )
 
     def quit_event(self):
+        self.config.save_config_file()
         sys.exit(0)
 
     def stop(self):

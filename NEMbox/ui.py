@@ -306,11 +306,11 @@ class Ui(object):
         # 根据索引计算双行歌词的显示，其中当前歌词颜色为红色，下一句歌词颜色为白色；
         # 当前歌词从下一句歌词刷新颜色变换，所以当前歌词和下一句歌词位置会交替
         if self.now_lyric_index % 2 == 0:
-            self.addstr(4, self.startcol - 2, str(self.now_lyric), curses.color_pair(3))
-            self.addstr(5, self.startcol + 1, str(self.post_lyric), curses.A_DIM)
+            self.addstr(4, max(self.startcol - 2, 0), str(self.now_lyric), curses.color_pair(3))
+            self.addstr(5, max(self.startcol + 1, 0), str(self.post_lyric), curses.A_DIM)
         else:
-            self.addstr(4, self.startcol - 2, str(self.post_lyric), curses.A_DIM)
-            self.addstr(5, self.startcol + 1, str(self.now_lyric), curses.color_pair(3))
+            self.addstr(4, max(self.startcol - 2, 0), str(self.post_lyric), curses.A_DIM)
+            self.addstr(5, max(self.startcol + 1, 0), str(self.now_lyric), curses.color_pair(3))
         self.screen.refresh()
 
     def build_loading(self):
