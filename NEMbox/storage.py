@@ -58,7 +58,7 @@ class Storage(Singleton):
         self._init = True
 
         self.database = {
-            "user": {"username": "", "password": "", "user_id": "", "nickname": ""},
+            "user": {"username": "", "password": "", "user_id": "", "nickname": "",},
             "collections": [],
             "songs": {},
             "player_info": {

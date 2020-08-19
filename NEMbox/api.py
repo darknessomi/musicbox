@@ -344,10 +344,10 @@ class NetEase(object):
             discard=False,
             comment=None,
             comment_url=None,
-            rest={},
+            rest=None,
         )
 
-    def request(self, method, path, params={}, default={"code": -1}, custom_cookies={'os':'pc'}):
+    def request(self, method, path, params={}, default={"code": -1}, custom_cookies={}):
         endpoint = "{}{}".format(BASE_URL, path)
         csrf_token = ""
         for cookie in self.session.cookies:
@@ -376,7 +376,7 @@ class NetEase(object):
         self.session.cookies.load()
         if username.isdigit():
             path = "/weapi/login/cellphone"
-            params = dict(phone=username, password=password, rememberLogin="true")
+            params = dict(phone=username, password=password, rememberLogin="true",)
         else:
             # magic token for login
             # see https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/router/login.js#L15
@@ -433,7 +433,7 @@ class NetEase(object):
     # FM trash
     def fm_trash(self, songid, time=25, alg="RT"):
         path = "/weapi/radio/trash/add"
-        params = dict(songId=songid, alg=alg, time=time)
+        params = dict(songId=songid, alg=alg, time=time,)
         return self.request("POST", path, params)["code"] == 200
 
     # 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002) *(type)*
@@ -445,7 +445,7 @@ class NetEase(object):
     # 新碟上架
     def new_albums(self, offset=0, limit=50):
         path = "/weapi/album/new"
-        params = dict(area="ALL", offset=offset, total=True, limit=limit)
+        params = dict(area="ALL", offset=offset, total=True, limit=limit,)
         return self.request("POST", path, params).get("albums", [])
 
     # 歌单（网友精选碟） hot||new http://music.163.com/#/discover/playlist/
@@ -506,7 +506,7 @@ class NetEase(object):
     # song ids --> song urls ( details )
     def songs_detail(self, ids):
         path = "/weapi/v3/song/detail"
-        params = dict(c=json.dumps([{"id": _id} for _id in ids]), ids=json.dumps(ids))
+        params = dict(c=json.dumps([{"id": _id} for _id in ids]), ids=json.dumps(ids),)
         return self.request("POST", path, params).get("songs", [])
 
     def songs_url(self, ids):
