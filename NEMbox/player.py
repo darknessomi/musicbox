@@ -263,6 +263,10 @@ class Player(object):
             para, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
+        if not url:
+            self.notify_copyright_issue()
+            return
+
         self.tune_volume()
         try:
             self.popen_handler.stdin.write(b"L " + url.encode("utf-8") + b"\n")

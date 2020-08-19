@@ -128,8 +128,10 @@ class Config(Singleton):
             "left_margin_ratio": {
                 "value": 5,
                 "default": 5,
-                "describe": ("Controls the ratio between width and left margin."
-                             "Set to 0 to minimize the margin."),
+                "describe": (
+                    "Controls the ratio between width and left margin."
+                    "Set to 0 to minimize the margin."
+                ),
             },
             "mouse_movement": {
                 "value": False,
@@ -222,7 +224,9 @@ class Config(Singleton):
         if name == "keymap":
             for key in self.default_config[name]["value"].keys():
                 if key not in self.config[name]["value"].keys():
-                    self.config[name]["value"][key] = self.default_config[name]["value"][key]
+                    self.config[name]["value"][key] = self.default_config[name][
+                        "value"
+                    ][key]
         if name not in self.config.keys():
             self.config[name] = self.default_config[name]
             return self.default_config[name]["value"]

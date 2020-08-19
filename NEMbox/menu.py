@@ -243,7 +243,7 @@ class Menu(object):
 
     def update_alert(self, version):
         latest = Menu().check_version()
-        if latest > version and latest != 0:
+        if str(latest) > str(version) and latest != 0:
             notify("MusicBox Update == available", 1)
             time.sleep(0.5)
             notify(
@@ -946,7 +946,6 @@ class Menu(object):
             if self.step != current_step:
                 self.step = current_step
                 self.index = 0
-            log.warning("self.step = " + str(self.step))
             self.build_menu_processbar()
         self.stop()
 
