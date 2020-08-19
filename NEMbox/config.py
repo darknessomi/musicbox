@@ -220,9 +220,9 @@ class Config(Singleton):
 
     def get(self, name):
         if name == "keymap":
-            for key in self.default_config[name].keys():
-                if not self.config[name][key]:
-                    self.config[name][key] = self.default_config[name][key]
+            for key in self.default_config[name]["value"].keys():
+                if key not in self.config[name]["value"].keys():
+                    self.config[name]["value"][key] = self.default_config[name]["value"][key]
         if name not in self.config.keys():
             return self.default_config[name]["value"]
         return self.config[name]["value"]
