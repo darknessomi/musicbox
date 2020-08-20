@@ -715,7 +715,7 @@ class Ui(object):
 
         # update intendations
         curses.resizeterm(self.y, self.x)
-        self.left_margin_ratio = self.config.get('left_margin_ratio')
+        self.left_margin_ratio = self.config.get("left_margin_ratio")
         if self.left_margin_ratio == 0:
             self.startcol = 0
         else:
