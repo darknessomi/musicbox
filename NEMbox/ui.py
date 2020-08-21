@@ -64,8 +64,6 @@ def break_substr(s, start, max_len=80):
     return "\n{}".format(" " * start).join(res)
 
 def break_str(s, start, max_len=80):
-    # res = [s.split(':', 1)[0] + ":\n"]
-    # s = s.split(':', 1)[1][1:]
     res = []
     for substr in s.splitlines():
         res.append(break_substr(substr, start, max_len))
@@ -187,15 +185,21 @@ class Ui(object):
             )
 
         song_info = song_name + self.space + artist + "  < " + album_name + " >"
-        song_info = scrollstring(song_info + " ", start)
-
-        self.addstr(
-            1,
-            min(self.indented_startcol + 18, self.indented_endcol - 1),
-            # song_name + self.space + artist + "  < " + album_name + " >",
-            truelen_cut(str(song_info), self.endcol - self.indented_startcol - 19),
-            curses.color_pair(4),
-        )
+        if truelen(song_info) <= self.endcol - self.indented_startcol - 19:
+            self.addstr(
+                1,
+                min(self.indented_startcol + 18, self.indented_endcol - 1),
+                song_info,
+                curses.color_pair(4),
+            )
+        else:
+            song_info = scrollstring(song_info + " ", start)
+            self.addstr(
+                1,
+                min(self.indented_startcol + 18, self.indented_endcol - 1),
+                truelen_cut(str(song_info), self.endcol - self.indented_startcol - 19),
+                curses.color_pair(4),
+            )
 
         self.screen.refresh()
 
@@ -287,6 +291,8 @@ class Ui(object):
         self.screen.clrtoeol()
         self.screen.move(5, 1)
         self.screen.clrtoeol()
+        self.screen.move(6, 1)
+        self.screen.clrtoeol()
         if total_length <= 0:
             total_length = 1
         if now_playing > total_length or now_playing <= 0:
@@ -298,9 +304,10 @@ class Ui(object):
             self.now_lyric = ""
             self.post_lyric = ""
         process = "["
-        for i in range(0, 33):
-            if i < now_playing / total_length * 33:
-                if (i + 1) > now_playing / total_length * 33:
+        process_bar_width = self.content_width - 24
+        for i in range(0, process_bar_width):
+            if i < now_playing / total_length * process_bar_width:
+                if (i + 1) > now_playing / total_length * process_bar_width:
                     if playing_flag:
                         process += ">"
                         continue
@@ -464,7 +471,7 @@ class Ui(object):
                     self.addstr(
                         i - offset + 9,
                         self.indented_startcol,
-                        truelen_cut("-> " + str(i) + ". " + datalist[i].splitlines()[0], self.content_width),
+                        truelen_cut("-> " + str(i) + ". " + datalist[i].splitlines()[0], self.content_width + len("-> " + str(i))),
                         curses.color_pair(2),
                     )
                     self.addstr(
