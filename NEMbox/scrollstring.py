@@ -51,11 +51,12 @@ def truelen(string):
     """
     return len(string) + sum(1 for c in string if c > chr(127))
 
+
 def truelen_cut(string, length):
     current_length = 0
     current_pos = 0
     for c in string:
-        current_length += (2 if c > chr(127) else 1)
+        current_length += 2 if c > chr(127) else 1
         if current_length > length:
             return string[:current_pos]
         current_pos += 1

@@ -49,19 +49,20 @@ def break_substr(s, start, max_len=80):
     start_pos = 0
     end_pos = 0
     for c in s:
-        current_truelen += (2 if c > chr(127) else 1)
+        current_truelen += 2 if c > chr(127) else 1
         if current_truelen > max_len:
-            res.append(s[start_pos : end_pos])
+            res.append(s[start_pos:end_pos])
             current_truelen = 0
             start_pos = end_pos + 1
             end_pos += 1
         else:
             end_pos += 1
     try:
-        res.append(s[start_pos : end_pos])
+        res.append(s[start_pos:end_pos])
     except Exception:
         pass
     return "\n{}".format(" " * start).join(res)
+
 
 def break_str(s, start, max_len=80):
     res = []
@@ -73,11 +74,6 @@ def break_str(s, start, max_len=80):
 class Ui(object):
     def __init__(self):
         self.screen = curses.initscr()
-        # self.screen.timeout(100)  # the screen refresh every 100ms
-        # # charactor break buffer
-        # curses.cbreak()
-        # self.screen.keypad(1)
-
         curses.start_color()
         if Config().get("curses_transparency"):
             curses.use_default_colors()
@@ -109,25 +105,7 @@ class Ui(object):
         self.y = size[1]
         self.playerX = 1  # terminalsize.get_terminal_size()[1] - 10
         self.playerY = 0
-
-        # Margins
-        # Left margin
-        self.left_margin_ratio = self.config.get("left_margin_ratio")
-        if self.left_margin_ratio == 0:
-            self.startcol = 0
-        else:
-            self.startcol = max(int(float(self.x) / self.left_margin_ratio), 0)
-        self.indented_startcol = max(self.startcol - 3, 0)
-        # Right margin
-        self.right_margin_ratio = self.config.get("right_margin_ratio")
-        if self.right_margin_ratio == 0:
-            self.endcol = 0
-        else:
-            self.endcol = max(int(float(self.x) - float(self.x) / self.right_margin_ratio), self.startcol + 1)
-        self.indented_endcol = max(self.endcol - 3, 0)
-
-        self.content_width = self.endcol - self.startcol - 1
-
+        self.update_margin()
         self.update_space()
         self.lyric = ""
         self.now_lyric = ""
@@ -161,7 +139,11 @@ class Ui(object):
         if self.right_margin_ratio == 0:
             self.endcol = 0
         else:
-            self.endcol = max(int(float(self.x) - float(self.x) / self.right_margin_ratio), self.startcol + 1)
+            self.endcol = max(
+                int(float(self.x) - float(self.x) / self.right_margin_ratio),
+                self.startcol + 1,
+            )
+
         self.indented_endcol = max(self.endcol - 3, 0)
         self.content_width = self.endcol - self.startcol - 1
 
@@ -444,7 +426,9 @@ class Ui(object):
                         self.addstr(
                             i - offset + 9,
                             self.indented_startcol + len(lead),
-                            truelen_cut(str(name), self.content_width - len(str(i)) - 2),
+                            truelen_cut(
+                                str(name), self.content_width - len(str(i)) - 2
+                            ),
                             curses.color_pair(2),
                         )
                 else:
@@ -452,13 +436,16 @@ class Ui(object):
                     self.addstr(
                         i - offset + 9,
                         self.startcol,
-                        truelen_cut("{}. {}{}{}  < {} >".format(
-                            i,
-                            datalist[i]["song_name"],
-                            self.space,
-                            datalist[i]["artist"],
-                            datalist[i]["album_name"],
-                        ), self.content_width),
+                        truelen_cut(
+                            "{}. {}{}{}  < {} >".format(
+                                i,
+                                datalist[i]["song_name"],
+                                self.space,
+                                datalist[i]["artist"],
+                                datalist[i]["album_name"],
+                            ),
+                            self.content_width,
+                        ),
                     )
 
             self.addstr(iter_range - offset + 9, 0, " " * self.x)
@@ -471,7 +458,10 @@ class Ui(object):
                     self.addstr(
                         i - offset + 9,
                         self.indented_startcol,
-                        truelen_cut("-> " + str(i) + ". " + datalist[i].splitlines()[0], self.content_width + len("-> " + str(i))),
+                        truelen_cut(
+                            "-> " + str(i) + ". " + datalist[i].splitlines()[0],
+                            self.content_width + len("-> " + str(i)),
+                        ),
                         curses.color_pair(2),
                     )
                     self.addstr(
@@ -494,7 +484,10 @@ class Ui(object):
                     self.addstr(
                         i - offset + 9,
                         self.startcol,
-                        truelen_cut(str(i) + ". " + datalist[i].splitlines()[0], self.content_width),
+                        truelen_cut(
+                            str(i) + ". " + datalist[i].splitlines()[0],
+                            self.content_width,
+                        ),
                     )
 
         elif datatype == "artists":
