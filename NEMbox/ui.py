@@ -42,14 +42,26 @@ except ImportError:
 
 
 def break_substr(s, start, max_len=80):
-    length = len(s)
-    i, x = 0, max_len
+    if truelen(s) <= max_len:
+        return s
     res = []
-    while i < length:
-        res.append(s[i : i + max_len])
-        i += x
+    current_truelen = 0
+    start_pos = 0
+    end_pos = 0
+    for c in s:
+        current_truelen += (2 if c > chr(127) else 1)
+        if current_truelen > max_len:
+            res.append(s[start_pos : end_pos])
+            current_truelen = 0
+            start_pos = end_pos + 1
+            end_pos += 1
+        else:
+            end_pos += 1
+    try:
+        res.append(s[start_pos : end_pos])
+    except Exception:
+        pass
     return "\n{}".format(" " * start).join(res)
-
 
 def break_str(s, start, max_len=80):
     # res = [s.split(':', 1)[0] + ":\n"]
@@ -447,12 +459,12 @@ class Ui(object):
         elif datatype == "comments":
             # 被选中的评论在最下方显示全部字符，其余评论仅显示一行
             for i in range(offset, min(len(datalist), offset + step)):
-                maxlength = min(int(1.8 * self.startcol), len(datalist[i]))
+                maxlength = min(self.content_width, truelen(datalist[i]))
                 if i == index:
                     self.addstr(
                         i - offset + 9,
                         self.indented_startcol,
-                        "-> " + str(i) + ". " + datalist[i].split(":", 1)[0] + ":",
+                        truelen_cut("-> " + str(i) + ". " + datalist[i].splitlines()[0], self.content_width),
                         curses.color_pair(2),
                     )
                     self.addstr(
@@ -475,7 +487,7 @@ class Ui(object):
                     self.addstr(
                         i - offset + 9,
                         self.startcol,
-                        str(i) + ". " + datalist[i].splitlines()[0][:maxlength],
+                        truelen_cut(str(i) + ". " + datalist[i].splitlines()[0], self.content_width),
                     )
 
         elif datatype == "artists":

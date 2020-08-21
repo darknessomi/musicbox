@@ -943,7 +943,7 @@ class Menu(object):
             self.ui.screen.refresh()
             self.ui.update_size()
             current_step = max(int(self.ui.y * 4 / 5) - 10, 1)
-            if self.step != current_step:
+            if self.step != current_step and self.config.get("page_length") == 0:
                 self.step = current_step
                 self.index = 0
             self.build_menu_processbar()
