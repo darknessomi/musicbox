@@ -18,7 +18,7 @@ import datetime
 
 from future.builtins import range, str, int
 
-from .scrollstring import truelen, scrollstring
+from .scrollstring import truelen, scrollstring, truelen_cut
 from .storage import Storage
 from .config import Config
 
@@ -99,12 +99,25 @@ class Ui(object):
         self.y = size[1]
         self.playerX = 1  # terminalsize.get_terminal_size()[1] - 10
         self.playerY = 0
+
+        # Margins
+        # Left margin
         self.left_margin_ratio = self.config.get("left_margin_ratio")
         if self.left_margin_ratio == 0:
             self.startcol = 0
         else:
             self.startcol = max(int(float(self.x) / self.left_margin_ratio), 0)
         self.indented_startcol = max(self.startcol - 3, 0)
+        # Right margin
+        self.right_margin_ratio = self.config.get("right_margin_ratio")
+        if self.right_margin_ratio == 0:
+            self.endcol = 0
+        else:
+            self.endcol = max(int(float(self.x) - float(self.x) / self.right_margin_ratio), self.startcol + 1)
+        self.indented_endcol = max(self.endcol - 3, 0)
+
+        self.content_width = self.endcol - self.startcol - 1
+
         self.update_space()
         self.lyric = ""
         self.now_lyric = ""
@@ -125,6 +138,23 @@ class Ui(object):
                 #  log.error(e, args)
                 pass
 
+    def update_margin(self):
+        # Left margin
+        self.left_margin_ratio = self.config.get("left_margin_ratio")
+        if self.left_margin_ratio == 0:
+            self.startcol = 0
+        else:
+            self.startcol = max(int(float(self.x) / self.left_margin_ratio), 0)
+        self.indented_startcol = max(self.startcol - 3, 0)
+        # Right margin
+        self.right_margin_ratio = self.config.get("right_margin_ratio")
+        if self.right_margin_ratio == 0:
+            self.endcol = 0
+        else:
+            self.endcol = max(int(float(self.x) - float(self.x) / self.right_margin_ratio), self.startcol + 1)
+        self.indented_endcol = max(self.endcol - 3, 0)
+        self.content_width = self.endcol - self.startcol - 1
+
     def build_playinfo(
         self, song_name, artist, album_name, quality, start, pause=False
     ):
@@ -144,10 +174,14 @@ class Ui(object):
                 1, self.indented_startcol, "♫  ♪ ♫  ♪ " + quality, curses.color_pair(3)
             )
 
+        song_info = song_name + self.space + artist + "  < " + album_name + " >"
+        song_info = scrollstring(song_info + " ", start)
+
         self.addstr(
             1,
-            min(self.indented_startcol + 18, self.x - 1),
-            song_name + self.space + artist + "  < " + album_name + " >",
+            min(self.indented_startcol + 18, self.indented_endcol - 1),
+            # song_name + self.space + artist + "  < " + album_name + " >",
+            truelen_cut(str(song_info), self.endcol - self.indented_startcol - 19),
             curses.color_pair(4),
         )
 
@@ -379,7 +413,7 @@ class Ui(object):
                     )
 
                     # the length decides whether to scoll
-                    if truelen(name) < self.x - self.startcol - 1:
+                    if truelen(name) < self.content_width:
                         self.addstr(
                             i - offset + 9,
                             self.indented_startcol + len(lead),
@@ -391,7 +425,7 @@ class Ui(object):
                         self.addstr(
                             i - offset + 9,
                             self.indented_startcol + len(lead),
-                            str(name),
+                            truelen_cut(str(name), self.content_width - len(str(i)) - 2),
                             curses.color_pair(2),
                         )
                 else:
@@ -399,13 +433,13 @@ class Ui(object):
                     self.addstr(
                         i - offset + 9,
                         self.startcol,
-                        "{}. {}{}{}  < {} >".format(
+                        truelen_cut("{}. {}{}{}  < {} >".format(
                             i,
                             datalist[i]["song_name"],
                             self.space,
                             datalist[i]["artist"],
                             datalist[i]["album_name"],
-                        )[: int(self.x * 2)],
+                        ), self.content_width),
                     )
 
             self.addstr(iter_range - offset + 9, 0, " " * self.x)
@@ -715,12 +749,7 @@ class Ui(object):
 
         # update intendations
         curses.resizeterm(self.y, self.x)
-        self.left_margin_ratio = self.config.get("left_margin_ratio")
-        if self.left_margin_ratio == 0:
-            self.startcol = 0
-        else:
-            self.startcol = max(int(float(self.x) / self.left_margin_ratio), 0)
-        self.indented_startcol = max(self.startcol - 3, 0)
+        self.update_margin()
         self.update_space()
         self.screen.clear()
         self.screen.refresh()

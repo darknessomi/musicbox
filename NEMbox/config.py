@@ -133,6 +133,14 @@ class Config(Singleton):
                     "Set to 0 to minimize the margin."
                 ),
             },
+            "right_margin_ratio": {
+                "value": 5,
+                "default": 5,
+                "describe": (
+                    "Controls the ratio between width and right margin."
+                    "Set to 0 to minimize the margin."
+                ),
+            },
             "mouse_movement": {
                 "value": False,
                 "default": False,

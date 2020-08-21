@@ -55,6 +55,7 @@ class Player(object):
         self.end_callback = None
         self.playing_song_changed_callback = None
         self.api = NetEase()
+        self.playinfo_starts = time.time()
 
     @property
     def info(self):
@@ -166,7 +167,7 @@ class Player(object):
             self.current_song["artist"],
             self.current_song["album_name"],
             self.current_song["quality"],
-            time.time(),
+            self.playinfo_starts,
             pause=not self.playing_flag,
         )
 
@@ -254,6 +255,7 @@ class Player(object):
             self.popen_handler.stdin.write(b"P\n")
             self.popen_handler.stdin.flush()
 
+        self.playinfo_starts = time.time()
         self.build_playinfo()
 
     def run_mpg123(self, on_exit, url, expires=-1, get_time=-1):
@@ -439,6 +441,7 @@ class Player(object):
             return
 
         self.playing_flag = True
+        self.playinfo_starts = time.time()
         self.build_playinfo()
         self.notify_playing()
         self.start_playing(lambda: 0, self.current_song)
