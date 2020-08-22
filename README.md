@@ -32,47 +32,49 @@
 
 ### 键盘快捷键
 
+有 num + 字样的指可以用数字修饰，按键顺序为先输入数字再键入被修饰的键。
+
 | Key       | Effect          |                    |
 | --------- | --------------- | ------------------ |
-| j         | Down            | 下移               |
-| k         | Up              | 上移               |
-| num + j   | Quick Jump      | 快速向后跳转n首    |
-| num + k   | Quick Up        | 快速向前跳转n首    |
-| h         | Back            | 后退               |
-| l         | Forword         | 前进               |
-| u         | Prev Page       | 上一页             |
-| d         | Next Page       | 下一页             |
-| f         | Search          | 当前列表模糊搜索   |
-| \[        | Prev Song       | 上一曲             |
-| ]         | Next Song       | 下一曲             |
-| num + \[  | Quick Prev Song | 快速前n首          |
-| num + ]   | Quick Next Song | 快速后n首          |
-| num + G   | Index for Song  | 跳到第n首          |
-| =         | Volume +        | 音量增加           |
-| -         | Volume -        | 音量减少           |
-| Space     | Play/Pause      | 播放/暂停          |
-| ?         | Shuffle         | 手气不错           |
-| m         | Menu            | 主菜单             |
-| p         | Present/History | 当前/历史播放列表  |
-| i         | Music Info      | 当前音乐信息       |
-| Shift + p | Playing Mode    | 播放模式切换       |
-| a         | Add             | 添加曲目到打碟     |
-| Shift + a | Enter Album     | 进入专辑           |
-| g         | To the First    | 跳至首项           |
-| Shift + g | To the End      | 跳至尾项           |
-| z         | DJ List         | 打碟列表           |
-| s         | Star            | 添加到收藏         |
-| c         | Collection      | 收藏列表           |
-| r         | Remove          | 删除当前条目       |
-| Shift + j | Move Down       | 向下移动当前项目   |
-| Shift + k | Move Up         | 向上移动当前项目   |
-| Shift + c | Cache           | 缓存歌曲到本地     |
-| ,         | Like            | 喜爱               |
-| .         | Trash FM        | 删除 FM            |
-| /         | Next FM         | 下一FM             |
-| q         | Quit            | 退出               |
-| t         | Timing Exit     | 定时退出           |
-| w         | Quit & Clear    | 退出并清除用户信息 |
+| <kbd>j</kbd>         | Down            | 下移               |
+| <kbd>k</kbd>         | Up              | 上移               |
+| num + <kbd>j</kbd>   | Quick Jump      | 快速向后跳转n首    |
+| num + <kbd>k</kbd>   | Quick Up        | 快速向前跳转n首    |
+| <kbd>h</kbd>         | Back            | 后退               |
+| <kbd>l</kbd>         | Forword         | 前进               |
+| <kbd>u</kbd>         | Prev Page       | 上一页             |
+| <kbd>d</kbd>         | Next Page       | 下一页             |
+| <kbd>f</kbd>         | Search          | 当前列表模糊搜索   |
+| <kbd>\[</kbd>        | Prev Song       | 上一曲             |
+| <kbd>]</kbd>         | Next Song       | 下一曲             |
+| num + <kbd>\[</kbd>  | Quick Prev Song | 快速前n首          |
+| num + <kbd>]</kbd>   | Quick Next Song | 快速后n首          |
+| num + <kbd>Shift</kbd> + <kbd>g</kbd>   | Index for Song  | 跳到第n首          |
+| <kbd>=</kbd>         | Volume +        | 音量增加           |
+| <kbd>-</kbd>         | Volume -        | 音量减少           |
+| <kbd>Space</kbd>     | Play/Pause      | 播放/暂停          |
+| <kbd>?</kbd>         | Shuffle         | 手气不错           |
+| <kbd>m</kbd>         | Menu            | 主菜单             |
+| <kbd>p</kbd>         | Present/History | 当前/历史播放列表  |
+| <kbd>i</kbd>         | Music Info      | 当前音乐信息       |
+| <kbd>Shift</kbd> + <kbd>p</kbd> | Playing Mode    | 播放模式切换       |
+| <kbd>a</kbd>         | Add             | 添加曲目到打碟     |
+| <kbd>Shift</kbd> + <kbd>a</kbd> | Enter Album     | 进入专辑           |
+| <kbd>g</kbd>         | To the First    | 跳至首项           |
+| <kbd>Shift</kbd> + <kbd>g</kbd> | To the End      | 跳至尾项           |
+| <kbd>z</kbd>         | DJ List         | 打碟列表           |
+| <kbd>s</kbd>         | Star            | 添加到收藏         |
+| <kbd>c</kbd>         | Collection      | 收藏列表           |
+| <kbd>r</kbd>         | Remove          | 删除当前条目       |
+| <kbd>Shift</kbd> + <kbd>j</kbd> | Move Down       | 向下移动当前项目   |
+| <kbd>Shift</kbd> + <kbd>k</kbd> | Move Up         | 向上移动当前项目   |
+| <kbd>Shift</kbd> + <kbd>c</kbd> | Cache           | 缓存歌曲到本地     |
+| <kbd>,</kbd>         | Like            | 喜爱               |
+| <kbd>.</kbd>         | Trash FM        | 删除 FM            |
+| <kbd>/</kbd>         | Next FM         | 下一FM             |
+| <kbd>q</kbd>         | Quit            | 退出               |
+| <kbd>t</kbd>         | Timing Exit     | 定时退出           |
+| <kbd>w</kbd>         | Quit & Clear    | 退出并清除用户信息 |
 
 ## 安装
 
@@ -156,6 +158,7 @@ mpg123 最新的版本可能会报找不到声音硬件的错误，测试了1.25
 
 ### 已知问题及解决方案
 
+- [#858](https://github.com/darknessomi/musicbox/pull/858) 模糊搜索的一些 Bug，目前没有解决方案，在修了。
 - [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。
 - [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
 - [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
