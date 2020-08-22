@@ -218,8 +218,8 @@ class Ui(object):
             return translated_lyric + " || " + origin_lyric
 
         if (
-            self.now_lyric_index >= len(lyrics) - 1
-            or self.now_tlyric_index >= len(lyrics) - 1
+            self.now_tlyric_index >= len(tlyrics) - 1
+            or self.now_lyric_index >= len(lyrics) - 1
         ):
             self.post_lyric = ""
             return
@@ -231,6 +231,7 @@ class Ui(object):
         while now_time >= next_lyric_time and self.now_lyric_index < len(lyrics) - 2:
             self.now_lyric_index = self.now_lyric_index + 1
             next_lyric_time = get_lyric_time(lyrics[self.now_lyric_index + 1])
+
         if tlyrics:
             next_tlyric_time = get_lyric_time(tlyrics[self.now_tlyric_index + 1])
             while (
@@ -245,16 +246,20 @@ class Ui(object):
                 tlyrics[self.now_tlyric_index], lyrics[self.now_lyric_index]
             )
             if (
-                self.now_lyric_index < len(lyrics) - 1
-                and self.now_lyric_index < len(tlyrics) - 1
+                self.now_tlyric_index < len(tlyrics) - 1
+                and self.now_lyric_index < len(lyrics) - 1
             ):
                 self.post_lyric = append_translation(
                     tlyrics[self.now_tlyric_index + 1], lyrics[self.now_lyric_index + 1]
                 )
+            else:
+                self.post_lyric = ""
         else:
             self.now_lyric = strip_timestap(lyrics[self.now_lyric_index])
             if self.now_lyric_index < len(lyrics) - 1:
                 self.post_lyric = strip_timestap(lyrics[self.now_lyric_index + 1])
+            else:
+                self.post_lyric = ""
 
     def build_process_bar(
         self, song, now_playing, total_length, playing_flag, playing_mode
