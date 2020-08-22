@@ -154,6 +154,7 @@ class Menu(object):
         self.key_list = []
         self.pre_keylist = []
         self.parser = None
+        self.is_in_search_result = False
 
     @property
     def user(self):
@@ -200,6 +201,10 @@ class Menu(object):
         keyword = self.ui.get_param(prompt)
         if not keyword:
             return []
+        origin_index = 0
+        for item in self.datalist:
+            item["origin_index"] = origin_index
+            origin_index += 1
         search_result = process.extract(keyword, self.datalist, limit=20)
         if not search_result:
             return search_result
@@ -324,6 +329,37 @@ class Menu(object):
                 offset, min(len(datalist), offset + step) - 1, idx + 1
             )
         self.menu_starts = time.time()
+
+    def space_key_event_in_search_result(self):
+        origin_index = self.datalist[self.index]["origin_index"]
+        (
+            datatype,
+            title,
+            datalist,
+            offset,
+            index,
+        ) = self.stack[-1]
+        if datatype == "songs":
+            self.player.new_player_list("songs", title, datalist, -1)
+            self.player.end_callback = None
+            self.player.play_or_pause(origin_index, self.at_playing_list)
+            self.at_playing_list = False
+        elif datatype == "djchannels":
+            self.player.new_player_list("djchannels", title, datalist, -1)
+            self.player.end_callback = None
+            self.player.play_or_pause(origin_index, self.at_playing_list)
+            self.at_playing_list = False
+        elif datatype == "fmsongs":
+            self.player.change_mode(0)
+            self.player.new_player_list("fmsongs", title, datalist, -1)
+            self.player.end_callback = self.fm_callback
+            self.player.play_or_pause(origin_index, self.at_playing_list)
+            self.at_playing_list = False
+        else:
+            # 所在列表类型不是歌曲
+            is_not_songs = True
+            self.player.play_or_pause(self.player.info["idx"], is_not_songs)
+        self.build_menu_processbar()
 
     def space_key_event(self):
         idx = self.index
@@ -695,10 +731,11 @@ class Menu(object):
                     [self.datatype, self.title, self.datalist, self.offset, self.index]
                 )
                 self.datalist, keyword = self.in_place_search()
-                self.datatype = "songs"
+                # self.datatype = "songs"
                 self.title += " > " + keyword + " 的搜索结果"
                 self.offset = 0
                 self.index = 0
+                self.is_in_search_result = True
 
             # 播放下一曲
             elif C.keyname(key).decode("utf-8") == keyMap[
@@ -763,7 +800,10 @@ class Menu(object):
 
             # 播放、暂停
             elif C.keyname(key).decode("utf-8") == keyMap["playPause"]:
-                self.space_key_event()
+                if self.is_in_search_result:
+                    self.space_key_event_in_search_result()
+                else:
+                    self.space_key_event()
 
             # 加载当前播放列表
             elif C.keyname(key).decode("utf-8") == keyMap["presentHistory"]:
