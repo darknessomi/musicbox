@@ -53,7 +53,7 @@ setup(
     long_description_content_type="text/markdown",
     license=about["__license__"],
     packages=find_packages(),
-    install_requires=["requests-cache", "pycryptodomex", "future"],
+    install_requires=["requests-cache", "pycryptodomex", "future", "fuzzywuzzy"],
     entry_points={"console_scripts": ["musicbox = NEMbox.__main__:start"]},
     keywords=["music", "netease", "cli", "player"],
     classifiers=[
