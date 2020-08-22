@@ -6,8 +6,6 @@
 # 1.增加按键映射功能；
 # 2.修复搜索按键功能映射错误；
 # 3.使用定时器实现自动关闭功能；
-# bug：
-# 1.快速切换时会播放多首音乐
 """
 网易云音乐 Menu
 """
@@ -243,7 +241,7 @@ class Menu(object):
 
     def update_alert(self, version):
         latest = Menu().check_version()
-        if latest > version and latest != 0:
+        if str(latest) > str(version) and latest != 0:
             notify("MusicBox Update == available", 1)
             time.sleep(0.5)
             notify(
@@ -525,6 +523,7 @@ class Menu(object):
         )
 
     def quit_event(self):
+        self.config.save_config_file()
         sys.exit(0)
 
     def stop(self):
@@ -942,10 +941,9 @@ class Menu(object):
             self.ui.screen.refresh()
             self.ui.update_size()
             current_step = max(int(self.ui.y * 4 / 5) - 10, 1)
-            if self.step != current_step:
+            if self.step != current_step and self.config.get("page_length") == 0:
                 self.step = current_step
                 self.index = 0
-            log.warning("self.step = " + str(self.step))
             self.build_menu_processbar()
         self.stop()
 

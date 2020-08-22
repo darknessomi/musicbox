@@ -20,10 +20,10 @@ class scrollstring(object):
         while offset > 0:
             if self.display[0] > chr(127):
                 offset -= 1
-                self.display = self.display[3:] + self.display[:3]
+                self.display = self.display[1:] + self.display[:1]
             else:
                 offset -= 1
-                self.display = self.display[1:] + self.display[:1]
+                self.display = self.display[2:] + self.display[:2]
 
         # self.display = self.content[offset:] + self.content[:offset]
 
@@ -50,3 +50,14 @@ def truelen(string):
     0
     """
     return len(string) + sum(1 for c in string if c > chr(127))
+
+
+def truelen_cut(string, length):
+    current_length = 0
+    current_pos = 0
+    for c in string:
+        current_length += 2 if c > chr(127) else 1
+        if current_length > length:
+            return string[:current_pos]
+        current_pos += 1
+    return string

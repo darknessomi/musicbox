@@ -47,7 +47,7 @@ class Player(object):
         self.popen_handler = None
         # flag stop, prevent thread start
         self.playing_flag = False
-        self.refrese_url_flag = False
+        self.refresh_url_flag = False
         self.process_length = 0
         self.process_location = 0
         self.storage = Storage()
@@ -55,6 +55,7 @@ class Player(object):
         self.end_callback = None
         self.playing_song_changed_callback = None
         self.api = NetEase()
+        self.playinfo_starts = time.time()
 
     @property
     def info(self):
@@ -166,7 +167,7 @@ class Player(object):
             self.current_song["artist"],
             self.current_song["album_name"],
             self.current_song["quality"],
-            time.time(),
+            self.playinfo_starts,
             pause=not self.playing_flag,
         )
 
@@ -190,7 +191,7 @@ class Player(object):
                     self.songs[song_id]["get_time"] = song["get_time"]
                 else:
                     self.songs[song_id] = song
-            self.refrese_url_flag = True
+            self.refresh_url_flag = True
 
     def stop(self):
         if not hasattr(self.popen_handler, "poll") or self.popen_handler.poll():
@@ -254,6 +255,7 @@ class Player(object):
             self.popen_handler.stdin.write(b"P\n")
             self.popen_handler.stdin.flush()
 
+        self.playinfo_starts = time.time()
         self.build_playinfo()
 
     def run_mpg123(self, on_exit, url, expires=-1, get_time=-1):
@@ -262,6 +264,10 @@ class Player(object):
         self.popen_handler = subprocess.Popen(
             para, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
+
+        if not url:
+            self.notify_copyright_issue()
+            return
 
         self.tune_volume()
         try:
@@ -348,10 +354,10 @@ class Player(object):
             # log.warn([i.is_alive() for i in self.MUSIC_THREADS])
 
         if self.playing_flag:
-            if self.refrese_url_flag:
+            if self.refresh_url_flag:
                 self.stop()
-                self.replay()
-                self.refrese_url_flag = False
+                self.start_playing(lambda: 0, self.current_song)
+                self.refresh_url_flag = False
             elif not copyright_issue_flag:
                 self.next()
         else:
@@ -435,6 +441,7 @@ class Player(object):
             return
 
         self.playing_flag = True
+        self.playinfo_starts = time.time()
         self.build_playinfo()
         self.notify_playing()
         self.start_playing(lambda: 0, self.current_song)
