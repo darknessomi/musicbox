@@ -218,8 +218,8 @@ class Ui(object):
             return translated_lyric + " || " + origin_lyric
 
         if (
-            self.now_lyric_index >= len(lyrics) - 1
-            or self.now_tlyric_index >= len(lyrics) - 1
+            self.now_tlyric_index >= len(tlyrics) - 1
+            or self.now_lyric_index >= len(lyrics) - 1
         ):
             self.post_lyric = ""
             return
@@ -231,6 +231,7 @@ class Ui(object):
         while now_time >= next_lyric_time and self.now_lyric_index < len(lyrics) - 2:
             self.now_lyric_index = self.now_lyric_index + 1
             next_lyric_time = get_lyric_time(lyrics[self.now_lyric_index + 1])
+
         if tlyrics:
             next_tlyric_time = get_lyric_time(tlyrics[self.now_tlyric_index + 1])
             while (
@@ -245,16 +246,20 @@ class Ui(object):
                 tlyrics[self.now_tlyric_index], lyrics[self.now_lyric_index]
             )
             if (
-                self.now_lyric_index < len(lyrics) - 1
-                and self.now_lyric_index < len(tlyrics) - 1
+                self.now_tlyric_index < len(tlyrics) - 1
+                and self.now_lyric_index < len(lyrics) - 1
             ):
                 self.post_lyric = append_translation(
                     tlyrics[self.now_tlyric_index + 1], lyrics[self.now_lyric_index + 1]
                 )
+            else:
+                self.post_lyric = ""
         else:
             self.now_lyric = strip_timestap(lyrics[self.now_lyric_index])
             if self.now_lyric_index < len(lyrics) - 1:
                 self.post_lyric = strip_timestap(lyrics[self.now_lyric_index + 1])
+            else:
+                self.post_lyric = ""
 
     def build_process_bar(
         self, song, now_playing, total_length, playing_flag, playing_mode
@@ -383,12 +388,14 @@ class Ui(object):
                     self.addstr(
                         i - offset + 9,
                         self.indented_startcol,
-                        "-> " + str(i) + ". " + datalist[i],
+                        "-> " + str(i) + ". " + datalist[i]["entry_name"],
                         curses.color_pair(2),
                     )
                 else:
                     self.addstr(
-                        i - offset + 9, self.startcol, str(i) + ". " + datalist[i]
+                        i - offset + 9,
+                        self.startcol,
+                        str(i) + ". " + datalist[i]["entry_name"],
                     )
 
         elif datatype == "songs" or datatype == "fmsongs":
@@ -453,13 +460,18 @@ class Ui(object):
         elif datatype == "comments":
             # 被选中的评论在最下方显示全部字符，其余评论仅显示一行
             for i in range(offset, min(len(datalist), offset + step)):
-                maxlength = min(self.content_width, truelen(datalist[i]))
+                maxlength = min(
+                    self.content_width, truelen(datalist[i]["comment_content"])
+                )
                 if i == index:
                     self.addstr(
                         i - offset + 9,
                         self.indented_startcol,
                         truelen_cut(
-                            "-> " + str(i) + ". " + datalist[i].splitlines()[0],
+                            "-> "
+                            + str(i)
+                            + ". "
+                            + datalist[i]["comment_content"].splitlines()[0],
                             self.content_width + len("-> " + str(i)),
                         ),
                         curses.color_pair(2),
@@ -467,14 +479,18 @@ class Ui(object):
                     self.addstr(
                         step + 10,
                         self.indented_startcol,
-                        "-> " + str(i) + ". " + datalist[i].split(":", 1)[0] + ":",
+                        "-> "
+                        + str(i)
+                        + ". "
+                        + datalist[i]["comment_content"].split(":", 1)[0]
+                        + ":",
                         curses.color_pair(2),
                     )
                     self.addstr(
                         step + 12,
                         self.startcol + (len(str(i)) + 2),
                         break_str(
-                            datalist[i].split(":", 1)[1][1:],
+                            datalist[i]["comment_content"].split(":", 1)[1][1:],
                             self.startcol + (len(str(i)) + 2),
                             maxlength,
                         ),
@@ -485,7 +501,9 @@ class Ui(object):
                         i - offset + 9,
                         self.startcol,
                         truelen_cut(
-                            str(i) + ". " + datalist[i].splitlines()[0],
+                            str(i)
+                            + ". "
+                            + datalist[i]["comment_content"].splitlines()[0],
                             self.content_width,
                         ),
                     )
@@ -710,6 +728,18 @@ class Ui(object):
         self.screen.refresh()
         x = self.screen.getch()
         self.screen.timeout(100)  # restore the screen timeout
+        return x
+
+    def build_search_error(self):
+        curses.curs_set(0)
+        self.screen.move(4, 1)
+        self.screen.timeout(-1)
+        self.screen.clrtobot()
+        self.addstr(8, self.startcol, "是不支持的搜索类型呢...", curses.color_pair(3))
+        self.addstr(9, self.startcol, "（在做了，在做了，按任意键关掉这个提示）", curses.color_pair(3))
+        self.screen.refresh()
+        x = self.screen.getch()
+        self.screen.timeout(100)
         return x
 
     def build_timing(self):

@@ -129,7 +129,7 @@
 
 ## 配置和错误处理
 
-配置文件地址: `~/.netease-musicbox/config.json`
+配置文件地址: `~/.config/netease-musicbox/config.json`
 可配置缓存，快捷键，消息，桌面歌词。
 由于歌曲 API 只接受中国大陆地区访问，非中国大陆地区用户请自行设置代理（可用polipo将socks5代理转换成http代理）：
 
