@@ -29,10 +29,11 @@
 15. Vimer式快捷键让操作丝般顺滑
 16. 可使用数字快捷键
 17. 可使用自定义全局快捷键
+18. 对当前歌单列表进行本地模糊搜索
 
 ### 键盘快捷键
 
-有 num + 字样的指可以用数字修饰，按键顺序为先输入数字再键入被修饰的键。
+有 num + 字样的快捷键可以用数字修饰，按键顺序为先输入数字再键入被修饰的键，即 num + 后的快捷键。
 
 | Key       | Effect          |                    |
 | --------- | --------------- | ------------------ |
@@ -153,12 +154,11 @@ curl -L ip.cn
 
 如遇到在特定终端下不能播放问题，首先检查**此终端**下mpg123能否正常使用，其次检查**其他终端**下musicbox能否正常使用，报告issue的时候请告知以上使用情况以及出问题终端的报错信息。
 
-同时，您可以通过`tail -f ~/.netease-musicbox/musicbox.log`自行查看日志。
+同时，您可以通过`tail -f ~/.local/share/netease-musicbox/musicbox.log`自行查看日志。
 mpg123 最新的版本可能会报找不到声音硬件的错误，测试了1.25.6版本可以正常使用。
 
 ### 已知问题及解决方案
 
-- [#858](https://github.com/darknessomi/musicbox/pull/858) 模糊搜索的一些 Bug，目前没有解决方案，在修了。
 - [#374](https://github.com/darknessomi/musicbox/issues/374) i3wm下播放杂音或快进问题，此问题常见于Arch Linux。尝试更改mpg123配置。
 - [#405](https://github.com/darknessomi/musicbox/issues/405) 32位Python下cookie时间戳超出了32位整数最大值。尝试使用64位版本的Python或者拷贝cookie文件到对应位置。
 - [#347](https://github.com/darknessomi/musicbox/issues/347) 暂停时间超过一定长度（数分钟）之后mpg123停止输出，导致切换到下一首歌。此问题是mpg123的bug，暂时无解决方案。
