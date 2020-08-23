@@ -154,7 +154,7 @@ class Menu(object):
         self.key_list = []
         self.pre_keylist = []
         self.parser = None
-        self.is_in_search_result = False
+        self.at_search_result = False
 
     @property
     def user(self):
@@ -725,8 +725,9 @@ class Menu(object):
 
             # 模糊搜索
             elif C.keyname(key).decode("utf-8") == keyMap["search"]:
-                # 9 == the 'search' menu
-                # self.dispatch_enter(9)
+                if self.at_search_result == True:
+                    self.back_page_event()
+                    self.at_search_result = False
                 self.stack.append(
                     [self.datatype, self.title, self.datalist, self.offset, self.index]
                 )
@@ -735,7 +736,7 @@ class Menu(object):
                 self.title += " > " + keyword + " 的搜索结果"
                 self.offset = 0
                 self.index = 0
-                self.is_in_search_result = True
+                self.at_search_result = True
 
             # 播放下一曲
             elif C.keyname(key).decode("utf-8") == keyMap[
@@ -800,7 +801,7 @@ class Menu(object):
 
             # 播放、暂停
             elif C.keyname(key).decode("utf-8") == keyMap["playPause"]:
-                if self.is_in_search_result:
+                if self.at_search_result:
                     self.space_key_event_in_search_result()
                 else:
                     self.space_key_event()
@@ -1138,11 +1139,15 @@ class Menu(object):
         if self.player.is_empty:
             return
 
-        if not self.at_playing_list:
+        if (not self.at_playing_list) and (not self.at_search_result):
             self.stack.append(
                 [self.datatype, self.title, self.datalist, self.offset, self.index]
             )
             self.at_playing_list = True
+
+        if self.at_search_result == True:
+            self.back_page_event()
+            self.at_search_result = False
 
         self.datatype = self.player.info["player_list_type"]
         self.title = self.player.info["player_list_title"]
