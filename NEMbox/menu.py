@@ -207,11 +207,14 @@ class Menu(object):
         for item in self.datalist:
             item["origin_index"] = origin_index
             origin_index += 1
-        search_result = process.extract(
-            keyword, self.datalist, limit=max(10, 2 * self.step)
-        )
+        try:
+            search_result = process.extract(
+                keyword, self.datalist, limit=max(10, 2 * self.step)
+            )
+        except Exception as e:
+            log.warn(e)
         if not search_result:
-            return search_result
+            return search_result, keyword
         search_result.sort(key=lambda ele: ele[1], reverse=True)
         return (list(map(lambda ele: ele[0], search_result)), keyword)
 

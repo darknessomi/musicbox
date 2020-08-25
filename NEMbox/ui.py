@@ -218,7 +218,7 @@ class Ui(object):
             return translated_lyric + " || " + origin_lyric
 
         if (
-            self.now_tlyric_index >= len(tlyrics) - 1
+            (tlyrics and self.now_tlyric_index >= len(tlyrics) - 1)
             or self.now_lyric_index >= len(lyrics) - 1
         ):
             self.post_lyric = ""
