@@ -310,7 +310,7 @@ class Player(object):
                     and get_time >= 0
                     and time.time() - expires - get_time >= 0
                 ):
-                    # 刷新URL
+                    # 刷新URL，设 refresh_url_flag = True
                     self.refresh_urls()
                 else:
                     # error, stop song and move to next
@@ -328,7 +328,8 @@ class Player(object):
 
         if self.playing_flag:
             if self.refresh_url_flag:
-                self.stop()
+                self.stop() # Will set self.playing_flag = False
+                self.playing_flag = True
                 self.start_playing(lambda: 0, self.current_song)
                 self.refresh_url_flag = False
             elif copyright_issue_flag == True and not self.is_single_loop_mode:
