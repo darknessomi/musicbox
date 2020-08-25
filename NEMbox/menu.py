@@ -371,7 +371,11 @@ class Menu(object):
             self.player.info["idx"] = 0
 
         # If change to a new playing list. Add playing list and play.
-        datatype_callback = { "songs": None, "djchannels": None, "fmsongs": self.fm_callback, }
+        datatype_callback = {
+            "songs": None,
+            "djchannels": None,
+            "fmsongs": self.fm_callback,
+        }
 
         if datatype in ["songs", "djchannels", "fmsongs"]:
             self.player.new_player_list(datatype, self.title, self.datalist, -1)

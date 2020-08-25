@@ -328,7 +328,7 @@ class Player(object):
 
         if self.playing_flag:
             if self.refresh_url_flag:
-                self.stop() # Will set self.playing_flag = False
+                self.stop()  # Will set self.playing_flag = False
                 self.playing_flag = True
                 self.start_playing(lambda: 0, self.current_song)
                 self.refresh_url_flag = False
@@ -340,7 +340,7 @@ class Player(object):
         elif copyright_issue_flag == True and not self.is_single_loop_mode:
             self.next()
             copyright_issue_flag = False
-        else: # copyright_issue_flag == True and self.is_single_loop_mode
+        else:  # copyright_issue_flag == True and self.is_single_loop_mode
             self.stop()
 
     def download_lyric(self, is_transalted=False):
