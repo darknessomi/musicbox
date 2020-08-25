@@ -371,22 +371,14 @@ class Menu(object):
             self.player.info["idx"] = 0
 
         # If change to a new playing list. Add playing list and play.
-        if datatype == "songs":
-            self.player.new_player_list("songs", self.title, self.datalist, -1)
-            self.player.end_callback = None
+        datatype_callback = { "songs": None, "djchannels": None, "fmsongs": self.fm_callback, }
+
+        if datatype in ["songs", "djchannels", "fmsongs"]:
+            self.player.new_player_list(datatype, self.title, self.datalist, -1)
+            self.player.end_callback = datatype_callback[datatype]
             self.player.play_or_pause(idx, self.at_playing_list)
             self.at_playing_list = True
-        elif datatype == "djchannels":
-            self.player.new_player_list("djchannels", self.title, self.datalist, -1)
-            self.player.end_callback = None
-            self.player.play_or_pause(idx, self.at_playing_list)
-            self.at_playing_list = True
-        elif datatype == "fmsongs":
-            self.player.change_mode(0)
-            self.player.new_player_list("fmsongs", self.title, self.datalist, -1)
-            self.player.end_callback = self.fm_callback
-            self.player.play_or_pause(idx, self.at_playing_list)
-            self.at_playing_list = True
+
         else:
             # 所在列表类型不是歌曲
             is_not_songs = True
