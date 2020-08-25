@@ -216,7 +216,11 @@ class Player(object):
                         pass
 
     def tune_volume(self, up=0):
-        if self.popen_handler.poll():
+        try:
+            if self.popen_handler.poll():
+                return
+        except Exception as e:
+            log.warn("Unable to tune volume: " + str(e))
             return
 
         new_volume = self.info["playing_volume"] + up
@@ -235,8 +239,8 @@ class Player(object):
             log.warn(e)
 
     def switch(self):
-        # if not self.popen_handler:
-        # return
+        if not self.popen_handler:
+            return
         if self.popen_handler.poll():
             return
         self.playing_flag = not self.playing_flag
@@ -255,6 +259,7 @@ class Player(object):
 
         if not url:
             self.notify_copyright_issue()
+            self.next()
             return
 
         self.tune_volume()
@@ -282,7 +287,8 @@ class Player(object):
                 break
             else:
                 strout_new = stroutlines.decode().strip()
-                if strout_new[:2] != strout[:2]: # if status of mpg123 changed
+                # if status of mpg123 changed
+                if strout_new[:2] != strout[:2]:
                     for thread_i in range(0, len(self.MUSIC_THREADS) - 1):
                         if self.MUSIC_THREADS[thread_i].is_alive():
                             try:
@@ -325,9 +331,15 @@ class Player(object):
                 self.stop()
                 self.start_playing(lambda: 0, self.current_song)
                 self.refresh_url_flag = False
-            elif not copyright_issue_flag:
+            elif copyright_issue_flag == True and not self.is_single_loop_mode:
                 self.next()
-        else:
+                copyright_issue_flag = False
+            else:
+                self.stop()
+        elif copyright_issue_flag == True and not self.is_single_loop_mode:
+            self.next()
+            copyright_issue_flag = False
+        else: # copyright_issue_flag == True and self.is_single_loop_mode
             self.stop()
 
     def download_lyric(self, is_transalted=False):
