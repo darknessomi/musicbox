@@ -6,8 +6,6 @@
 # 1.增加按键映射功能；
 # 2.修复搜索按键功能映射错误；
 # 3.使用定时器实现自动关闭功能；
-# bug：
-# 1.快速切换时会播放多首音乐
 """
 网易云音乐 Menu
 """
@@ -115,17 +113,17 @@ class Menu(object):
         self.datatype = "main"
         self.title = "网易云音乐"
         self.datalist = [
-            "排行榜",
-            "艺术家",
-            "新碟上架",
-            "精选歌单",
-            "我的歌单",
-            "主播电台",
-            "每日推荐歌曲",
-            "每日推荐歌单",
-            "私人FM",
-            "搜索",
-            "帮助",
+            {"entry_name": "排行榜"},
+            {"entry_name": "艺术家"},
+            {"entry_name": "新碟上架"},
+            {"entry_name": "精选歌单"},
+            {"entry_name": "我的歌单"},
+            {"entry_name": "主播电台"},
+            {"entry_name": "每日推荐歌曲"},
+            {"entry_name": "每日推荐歌单"},
+            {"entry_name": "私人FM"},
+            {"entry_name": "搜索"},
+            {"entry_name": "帮助"},
         ]
         self.offset = 0
         self.index = 0
@@ -156,6 +154,7 @@ class Menu(object):
         self.key_list = []
         self.pre_keylist = []
         self.parser = None
+        self.at_search_result = False
 
     @property
     def user(self):
@@ -201,10 +200,21 @@ class Menu(object):
         prompt = "模糊搜索："
         keyword = self.ui.get_param(prompt)
         if not keyword:
-            return []
-        search_result = process.extract(keyword, self.datalist, limit=20)
+            return [], ""
+        if self.datalist == []:
+            return [], keyword
+        origin_index = 0
+        for item in self.datalist:
+            item["origin_index"] = origin_index
+            origin_index += 1
+        try:
+            search_result = process.extract(
+                keyword, self.datalist, limit=max(10, 2 * self.step)
+            )
+        except Exception as e:
+            log.warn(e)
         if not search_result:
-            return search_result
+            return search_result, keyword
         search_result.sort(key=lambda ele: ele[1], reverse=True)
         return (list(map(lambda ele: ele[0], search_result)), keyword)
 
@@ -243,7 +253,7 @@ class Menu(object):
 
     def update_alert(self, version):
         latest = Menu().check_version()
-        if latest > version and latest != 0:
+        if str(latest) > str(version) and latest != 0:
             notify("MusicBox Update == available", 1)
             time.sleep(0.5)
             notify(
@@ -327,6 +337,31 @@ class Menu(object):
             )
         self.menu_starts = time.time()
 
+    def space_key_event_in_search_result(self):
+        origin_index = self.datalist[self.index]["origin_index"]
+        (datatype, title, datalist, offset, index,) = self.stack[-1]
+        if datatype == "songs":
+            self.player.new_player_list("songs", title, datalist, -1)
+            self.player.end_callback = None
+            self.player.play_or_pause(origin_index, self.at_playing_list)
+            self.at_playing_list = False
+        elif datatype == "djchannels":
+            self.player.new_player_list("djchannels", title, datalist, -1)
+            self.player.end_callback = None
+            self.player.play_or_pause(origin_index, self.at_playing_list)
+            self.at_playing_list = False
+        elif datatype == "fmsongs":
+            self.player.change_mode(0)
+            self.player.new_player_list("fmsongs", title, datalist, -1)
+            self.player.end_callback = self.fm_callback
+            self.player.play_or_pause(origin_index, self.at_playing_list)
+            self.at_playing_list = False
+        else:
+            # 所在列表类型不是歌曲
+            is_not_songs = True
+            self.player.play_or_pause(self.player.info["idx"], is_not_songs)
+        self.build_menu_processbar()
+
     def space_key_event(self):
         idx = self.index
         datatype = self.datatype
@@ -336,22 +371,18 @@ class Menu(object):
             self.player.info["idx"] = 0
 
         # If change to a new playing list. Add playing list and play.
-        if datatype == "songs":
-            self.player.new_player_list("songs", self.title, self.datalist, -1)
-            self.player.end_callback = None
+        datatype_callback = {
+            "songs": None,
+            "djchannels": None,
+            "fmsongs": self.fm_callback,
+        }
+
+        if datatype in ["songs", "djchannels", "fmsongs"]:
+            self.player.new_player_list(datatype, self.title, self.datalist, -1)
+            self.player.end_callback = datatype_callback[datatype]
             self.player.play_or_pause(idx, self.at_playing_list)
             self.at_playing_list = True
-        elif datatype == "djchannels":
-            self.player.new_player_list("djchannels", self.title, self.datalist, -1)
-            self.player.end_callback = None
-            self.player.play_or_pause(idx, self.at_playing_list)
-            self.at_playing_list = True
-        elif datatype == "fmsongs":
-            self.player.change_mode(0)
-            self.player.new_player_list("fmsongs", self.title, self.datalist, -1)
-            self.player.end_callback = self.fm_callback
-            self.player.play_or_pause(idx, self.at_playing_list)
-            self.at_playing_list = True
+
         else:
             # 所在列表类型不是歌曲
             is_not_songs = True
@@ -378,6 +409,7 @@ class Menu(object):
             self.index,
         ) = self.stack.pop()
         self.at_playing_list = False
+        self.at_search_result = False
 
     def enter_page_event(self):
         idx = self.index
@@ -458,8 +490,6 @@ class Menu(object):
             self.build_menu_processbar()
             self.ui.screen.refresh()
 
-    #            self.space_key_event()
-
     def time_key_event(self):
         self.countdown_start = time.time()
         countdown = self.ui.build_timing()
@@ -525,6 +555,7 @@ class Menu(object):
         )
 
     def quit_event(self):
+        self.config.save_config_file()
         sys.exit(0)
 
     def stop(self):
@@ -655,23 +686,6 @@ class Menu(object):
             elif self.config.get("mouse_movement") and key == keyMap["mouseDown"]:
                 self.down_key_event()
 
-            # 数字快捷键
-            #            elif ord('0') <= key <= ord('9') and self.datatype not in ('songs', 'fmsongs'):
-            #                idx = key - ord('0')
-            #                self.ui.build_menu(
-            #                    self.datatype,
-            #                    self.title,
-            #                    self.datalist,
-            #                    self.offset,
-            #                    idx,
-            #                    self.step,
-            #                    self.menu_starts,
-            #                )
-            #                self.ui.build_loading()
-            #                self.dispatch_enter(idx)
-            #                self.index = 0
-            #                self.offset = 0
-
             # 向上翻页
             elif C.keyname(key).decode("utf-8") == keyMap["prevPage"]:
                 self.up_page_event()
@@ -690,23 +704,22 @@ class Menu(object):
 
             # 模糊搜索
             elif C.keyname(key).decode("utf-8") == keyMap["search"]:
-                # 9 == the 'search' menu
-                # self.dispatch_enter(9)
+                if self.at_search_result == True:
+                    self.back_page_event()
                 self.stack.append(
                     [self.datatype, self.title, self.datalist, self.offset, self.index]
                 )
                 self.datalist, keyword = self.in_place_search()
-                self.datatype = "songs"
                 self.title += " > " + keyword + " 的搜索结果"
                 self.offset = 0
                 self.index = 0
+                self.at_search_result = True
 
             # 播放下一曲
             elif C.keyname(key).decode("utf-8") == keyMap[
                 "nextSong"
             ] and pre_key not in range(ord("0"), ord("9")):
                 self.next_key_event()
-                # self.down_key_event()
 
             # 播放上一曲
             elif C.keyname(key).decode("utf-8") == keyMap[
@@ -764,7 +777,10 @@ class Menu(object):
 
             # 播放、暂停
             elif C.keyname(key).decode("utf-8") == keyMap["playPause"]:
-                self.space_key_event()
+                if self.at_search_result:
+                    self.space_key_event_in_search_result()
+                else:
+                    self.space_key_event()
 
             # 加载当前播放列表
             elif C.keyname(key).decode("utf-8") == keyMap["presentHistory"]:
@@ -942,10 +958,9 @@ class Menu(object):
             self.ui.screen.refresh()
             self.ui.update_size()
             current_step = max(int(self.ui.y * 4 / 5) - 10, 1)
-            if self.step != current_step:
+            if self.step != current_step and self.config.get("page_length") == 0:
                 self.step = current_step
                 self.index = 0
-            log.warning("self.step = " + str(self.step))
             self.build_menu_processbar()
         self.stop()
 
@@ -1049,22 +1064,26 @@ class Menu(object):
             self.datalist = []
             for one_comment in hotcomments:
                 self.datalist.append(
-                    "(热评 %s❤️ ️) %s: %s"
-                    % (
-                        one_comment["likedCount"],
-                        one_comment["user"]["nickname"],
-                        one_comment["content"],
-                    )
+                    {
+                        "comment_content": "(热评 %s❤️ ️) %s: %s"
+                        % (
+                            one_comment["likedCount"],
+                            one_comment["user"]["nickname"],
+                            one_comment["content"],
+                        )
+                    }
                 )
             for one_comment in comcomments:
                 # self.datalist.append(one_comment["content"])
                 self.datalist.append(
-                    "(%s❤️ ️) %s: %s"
-                    % (
-                        one_comment["likedCount"],
-                        one_comment["user"]["nickname"],
-                        one_comment["content"],
-                    )
+                    {
+                        "comment_content": "(%s❤️ ️) %s: %s"
+                        % (
+                            one_comment["likedCount"],
+                            one_comment["user"]["nickname"],
+                            one_comment["content"],
+                        )
+                    }
                 )
             self.datatype = "comments"
             self.title = "网易云音乐 > 评论: %s" % datalist[idx]["song_name"]
@@ -1100,11 +1119,14 @@ class Menu(object):
         if self.player.is_empty:
             return
 
-        if not self.at_playing_list:
+        if (not self.at_playing_list) and (not self.at_search_result):
             self.stack.append(
                 [self.datatype, self.title, self.datalist, self.offset, self.index]
             )
             self.at_playing_list = True
+
+        if self.at_search_result == True:
+            self.back_page_event()
 
         self.datatype = self.player.info["player_list_type"]
         self.title = self.player.info["player_list_title"]

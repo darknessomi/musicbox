@@ -125,6 +125,22 @@ class Config(Singleton):
                 "default": False,
                 "describe": "Set true to make curses transparency.",
             },
+            "left_margin_ratio": {
+                "value": 5,
+                "default": 5,
+                "describe": (
+                    "Controls the ratio between width and left margin."
+                    "Set to 0 to minimize the margin."
+                ),
+            },
+            "right_margin_ratio": {
+                "value": 5,
+                "default": 5,
+                "describe": (
+                    "Controls the ratio between width and right margin."
+                    "Set to 0 to minimize the margin."
+                ),
+            },
             "mouse_movement": {
                 "value": False,
                 "default": False,
@@ -213,6 +229,13 @@ class Config(Singleton):
             utf8_data_to_file(config_file, json.dumps(self.config, indent=2))
 
     def get(self, name):
+        if name == "keymap":
+            for key in self.default_config[name]["value"].keys():
+                if key not in self.config[name]["value"].keys():
+                    self.config[name]["value"][key] = self.default_config[name][
+                        "value"
+                    ][key]
         if name not in self.config.keys():
+            self.config[name] = self.default_config[name]
             return self.default_config[name]["value"]
         return self.config[name]["value"]

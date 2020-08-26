@@ -47,7 +47,7 @@ class Player(object):
         self.popen_handler = None
         # flag stop, prevent thread start
         self.playing_flag = False
-        self.refrese_url_flag = False
+        self.refresh_url_flag = False
         self.process_length = 0
         self.process_location = 0
         self.storage = Storage()
@@ -55,6 +55,7 @@ class Player(object):
         self.end_callback = None
         self.playing_song_changed_callback = None
         self.api = NetEase()
+        self.playinfo_starts = time.time()
 
     @property
     def info(self):
@@ -166,7 +167,7 @@ class Player(object):
             self.current_song["artist"],
             self.current_song["album_name"],
             self.current_song["quality"],
-            time.time(),
+            self.playinfo_starts,
             pause=not self.playing_flag,
         )
 
@@ -190,7 +191,7 @@ class Player(object):
                     self.songs[song_id]["get_time"] = song["get_time"]
                 else:
                     self.songs[song_id] = song
-            self.refrese_url_flag = True
+            self.refresh_url_flag = True
 
     def stop(self):
         if not hasattr(self.popen_handler, "poll") or self.popen_handler.poll():
@@ -206,27 +207,20 @@ class Player(object):
         except Exception as e:
             log.warn(e)
         finally:
-            Player.SUBPROCESS_LIST.append(self.popen_handler)
-            # log.debug(Player.SUBPROCESS_LIST)
-
             for thread_i in range(0, len(self.MUSIC_THREADS) - 1):
                 if self.MUSIC_THREADS[thread_i].is_alive():
                     try:
                         stop_thread(self.MUSIC_THREADS[thread_i])
-                    except:
+                    except Exception as e:
+                        log.warn(e)
                         pass
-            for i in Player.SUBPROCESS_LIST:
-                try:
-                    if not subprocess.call(
-                        " ".join(["kill", "-9", str(i.pid), "2>/dev/null"]), shell=True
-                    ):
-                        Player.SUBPROCESS_LIST.remove(i)
-                except Exception as e:
-                    log.warn(e)
-        # time.sleep(0.5)
 
     def tune_volume(self, up=0):
-        if self.popen_handler.poll():
+        try:
+            if self.popen_handler.poll():
+                return
+        except Exception as e:
+            log.warn("Unable to tune volume: " + str(e))
             return
 
         new_volume = self.info["playing_volume"] + up
@@ -245,8 +239,8 @@ class Player(object):
             log.warn(e)
 
     def switch(self):
-        # if not self.popen_handler:
-        # return
+        if not self.popen_handler:
+            return
         if self.popen_handler.poll():
             return
         self.playing_flag = not self.playing_flag
@@ -254,14 +248,19 @@ class Player(object):
             self.popen_handler.stdin.write(b"P\n")
             self.popen_handler.stdin.flush()
 
+        self.playinfo_starts = time.time()
         self.build_playinfo()
 
     def run_mpg123(self, on_exit, url, expires=-1, get_time=-1):
         para = ["mpg123", "-R"] + self.config_mpg123
-        # print(para)
         self.popen_handler = subprocess.Popen(
             para, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
+
+        if not url:
+            self.notify_copyright_issue()
+            self.next()
+            return
 
         self.tune_volume()
         try:
@@ -270,19 +269,15 @@ class Player(object):
         except:
             pass
 
-        # endless_loop_cnt = 0
         strout = " "
         copyright_issue_flag = False
         frame_cnt = 0
         while True:
-            # log.warn(self.popen_handler.poll())
             if not hasattr(self.popen_handler, "poll") or self.popen_handler.poll():
                 break
             if self.popen_handler.stdout.closed:
                 break
             try:
-                # stroutlines = self.popen_handler.stdout.readlines(
-                # 500)
                 stroutlines = self.popen_handler.stdout.readline()
             except Exception as e:
                 log.warn(e)
@@ -291,19 +286,15 @@ class Player(object):
                 strout = " "
                 break
             else:
-                # endless_loop_cnt = 0
-                # strout_new = stroutlines.pop().decode().strip()
                 strout_new = stroutlines.decode().strip()
+                # if status of mpg123 changed
                 if strout_new[:2] != strout[:2]:
-                    for i in Player.SUBPROCESS_LIST:
-                        try:
-                            if not subprocess.call(
-                                " ".join(["kill", "-9", str(i.pid), "2>/dev/null"]),
-                                shell=True,
-                            ):
-                                Player.SUBPROCESS_LIST.remove(i)
-                        except Exception as e:
-                            log.warn(e)
+                    for thread_i in range(0, len(self.MUSIC_THREADS) - 1):
+                        if self.MUSIC_THREADS[thread_i].is_alive():
+                            try:
+                                stop_thread(self.MUSIC_THREADS[thread_i])
+                            except Exception as e:
+                                log.warn(e)
 
                 strout = strout_new
             if strout[:2] == "@F":
@@ -319,7 +310,7 @@ class Player(object):
                     and get_time >= 0
                     and time.time() - expires - get_time >= 0
                 ):
-                    # 刷新URL
+                    # 刷新URL，设 refresh_url_flag = True
                     self.refresh_urls()
                 else:
                     # error, stop song and move to next
@@ -334,27 +325,22 @@ class Player(object):
                 copyright_issue_flag = True
                 self.notify_copyright_issue()
                 break
-            # elif strout == ' ':
-            # log.warn('kong'+strout)
-            # endless_loop_cnt += 1
-            # # 有播放后没有退出，mpg123一直在发送空消息的情况，此处直接终止处理
-            # log.warn(endless_loop_cnt)
-            # time.sleep(endless_loop_cnt)
-            # if endless_loop_cnt > 100:
-            # log.warning(
-            # 'mpg123 error, halt, endless loop and high cpu use, then we kill it')
-            # break
-            # log.warn(self.MUSIC_THREADS)
-            # log.warn([i.is_alive() for i in self.MUSIC_THREADS])
 
         if self.playing_flag:
-            if self.refrese_url_flag:
-                self.stop()
-                self.replay()
-                self.refrese_url_flag = False
-            elif not copyright_issue_flag:
+            if self.refresh_url_flag:
+                self.stop()  # Will set self.playing_flag = False
+                self.playing_flag = True
+                self.start_playing(lambda: 0, self.current_song)
+                self.refresh_url_flag = False
+            elif copyright_issue_flag == True and not self.is_single_loop_mode:
                 self.next()
-        else:
+                copyright_issue_flag = False
+            else:
+                self.stop()
+        elif copyright_issue_flag == True and not self.is_single_loop_mode:
+            self.next()
+            copyright_issue_flag = False
+        else:  # copyright_issue_flag == True and self.is_single_loop_mode
             self.stop()
 
     def download_lyric(self, is_transalted=False):
@@ -409,11 +395,7 @@ class Player(object):
             cache_thread.start()
         thread.start()
         self.MUSIC_THREADS.append(thread)
-        # log.warn(self.MUSIC_THREADS)
-        # log.warn([i.is_alive() for i in self.MUSIC_THREADS])
         self.MUSIC_THREADS = [i for i in self.MUSIC_THREADS if i.is_alive()]
-        # log.warn(self.MUSIC_THREADS)
-        # log.warn(threading.enumerate())
         lyric_download_thread = threading.Thread(target=self.download_lyric)
         lyric_download_thread.start()
         tlyric_download_thread = threading.Thread(
@@ -435,6 +417,7 @@ class Player(object):
             return
 
         self.playing_flag = True
+        self.playinfo_starts = time.time()
         self.build_playinfo()
         self.notify_playing()
         self.start_playing(lambda: 0, self.current_song)
