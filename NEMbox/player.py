@@ -335,8 +335,10 @@ class Player(object):
             elif copyright_issue_flag == True and not self.is_single_loop_mode:
                 self.next()
                 copyright_issue_flag = False
-            else:
+            elif copyright_issue_flag == True:  # self.is_single_loop_mode == True
                 self.stop()
+            else:
+                self.next()
         elif copyright_issue_flag == True and not self.is_single_loop_mode:
             self.next()
             copyright_issue_flag = False
