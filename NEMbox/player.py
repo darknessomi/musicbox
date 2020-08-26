@@ -259,7 +259,10 @@ class Player(object):
 
         if not url:
             self.notify_copyright_issue()
-            self.next()
+            if not self.is_single_loop_mode:
+                self.next()
+            else:
+                self.stop()
             return
 
         self.tune_volume()
@@ -273,10 +276,13 @@ class Player(object):
         copyright_issue_flag = False
         frame_cnt = 0
         while True:
+            # Check the handler/stdin/stdout
             if not hasattr(self.popen_handler, "poll") or self.popen_handler.poll():
                 break
             if self.popen_handler.stdout.closed:
                 break
+
+            # try to read the stdout of mpg123
             try:
                 stroutlines = self.popen_handler.stdout.readline()
             except Exception as e:
@@ -287,8 +293,8 @@ class Player(object):
                 break
             else:
                 strout_new = stroutlines.decode().strip()
-                # if status of mpg123 changed
                 if strout_new[:2] != strout[:2]:
+                    # if status of mpg123 changed
                     for thread_i in range(0, len(self.MUSIC_THREADS) - 1):
                         if self.MUSIC_THREADS[thread_i].is_alive():
                             try:
@@ -297,6 +303,8 @@ class Player(object):
                                 log.warn(e)
 
                 strout = strout_new
+
+            # Update application status according to mpg123 output
             if strout[:2] == "@F":
                 # playing, update progress
                 out = strout.split(" ")
@@ -310,40 +318,54 @@ class Player(object):
                     and get_time >= 0
                     and time.time() - expires - get_time >= 0
                 ):
-                    # 刷新URL，设 refresh_url_flag = True
+                    # 刷新URL，设 self.refresh_url_flag = True
                     self.refresh_urls()
                 else:
-                    # error, stop song and move to next
+                    # copyright issue raised, next if not single loop
                     copyright_issue_flag = True
                     self.notify_copyright_issue()
                 break
             elif strout == "@P 0" and frame_cnt:
-                # end, moving to next
+                # normally end, moving to next
                 self.playing_flag = True
+                copyright_issue_flag = False
                 break
             elif strout == "@P 0":
+                # copyright issue raised, next if not single loop
+                self.playing_flag = True
                 copyright_issue_flag = True
                 self.notify_copyright_issue()
                 break
 
-        if self.playing_flag:
-            if self.refresh_url_flag:
-                self.stop()  # Will set self.playing_flag = False
-                self.playing_flag = True
-                self.start_playing(lambda: 0, self.current_song)
-                self.refresh_url_flag = False
-            elif copyright_issue_flag == True and not self.is_single_loop_mode:
-                self.next()
-                copyright_issue_flag = False
-            elif copyright_issue_flag == True:  # self.is_single_loop_mode == True
+        # Ideal behavior:
+        # if refresh_url_flag are set, then replay.
+        # if not, do action like following:
+        #   [self.playing_flag, copyright_issue_flag, self.is_single_loop_mode]: function()
+        #       [0, 0, 0]: self.stop()
+        #       [0, 0, 1]: self.stop()
+        #       [0, 1, 0]: self.stop()
+        #       [0, 1, 1]: self.stop()
+        #       [1, 0, 0]: self.next()
+        #       [1, 0, 1]: self.next()
+        #       [1, 1, 0]: self.next()
+        #       [1, 1, 1]: self.stop()
+
+        # Do corresponding action according to status
+        if self.playing_flag and self.refresh_url_flag:
+            self.stop() # Will set self.playing_flag = False
+            # So set the playing_flag here to be True is necessary
+            # to keep the play/pause status right
+            self.playing_flag = True
+            self.start_playing(lambda: 0, self.current_song)
+            self.refresh_url_flag = False
+        else:
+            # When no replay are needed
+            if not self.playing_flag:
+                self.stop()
+            elif copyright_issue_flag and self.is_single_loop_mode:
                 self.stop()
             else:
                 self.next()
-        elif copyright_issue_flag == True and not self.is_single_loop_mode:
-            self.next()
-            copyright_issue_flag = False
-        else:  # copyright_issue_flag == True and self.is_single_loop_mode
-            self.stop()
 
     def download_lyric(self, is_transalted=False):
         key = "lyric" if not is_transalted else "tlyric"
