@@ -146,6 +146,7 @@ class Menu(object):
         self.enter_flag = True
         signal.signal(signal.SIGWINCH, self.change_term)
         signal.signal(signal.SIGINT, self.send_kill)
+        signal.signal(signal.SIGTERM, self.send_kill)
         self.menu_starts = time.time()
         self.countdown_start = time.time()
         self.countdown = -1
