@@ -1,0 +1,33 @@
+repos:
+  - repo: https://github.com/ambv/black
+    rev: stable
+    hooks:
+      - id: black
+        exclude: venv
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+
+  - repo: https://github.com/asottile/reorder_python_imports
+    rev: v2.3.5
+    hooks:
+      - id: reorder-python-imports
+        args: ["--py3-plus"]
+
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.3
+    hooks:
+      - id: flake8
+        # allow "imported but unused" for pre-commit, forbid it elsewhere e.g. in vscode
+        args: ["--config=setup.cfg", "--ignore=E402,F401"]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.782
+    hooks:
+      - id: mypy
+        exclude: "migrations"
+        additional_dependencies:
+          ["git+https://github.com/typeddjango/django-stubs.git"]

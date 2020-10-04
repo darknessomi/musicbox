@@ -8,25 +8,20 @@
 网易云音乐 Player
 """
 # Let's make some noise
-from __future__ import print_function, unicode_literals, division, absolute_import
-
+import os
+import random
 import subprocess
 import threading
 import time
-import os
-import random
 
-from future.builtins import str
-
-from .ui import Ui
-from .storage import Storage
+from . import logger
 from .api import NetEase
 from .cache import Cache
 from .config import Config
-from .utils import notify
 from .kill_thread import stop_thread
-
-from . import logger
+from .storage import Storage
+from .ui import Ui
+from .utils import notify
 
 
 log = logger.getLogger(__name__)
@@ -352,7 +347,7 @@ class Player(object):
 
         # Do corresponding action according to status
         if self.playing_flag and self.refresh_url_flag:
-            self.stop() # Will set self.playing_flag = False
+            self.stop()  # Will set self.playing_flag = False
             # So set the playing_flag here to be True is necessary
             # to keep the play/pause status right
             self.playing_flag = True

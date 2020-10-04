@@ -8,26 +8,20 @@
 """
 网易云音乐 Ui
 """
-from __future__ import print_function, unicode_literals, division, absolute_import
-import os
-import hashlib
-import re
 import curses
-from curses import textpad
 import datetime
-
-from future.builtins import range, str, int
-
-from .scrollstring import truelen, scrollstring, truelen_cut
-from .storage import Storage
-from .config import Config
+import hashlib
+import os
+import re
+from curses import textpad
+from shutil import get_terminal_size
 
 from . import logger
-
-try:
-    from os import get_terminal_size
-except:
-    from .terminalsize import get_terminal_size
+from .config import Config
+from .scrollstring import scrollstring
+from .scrollstring import truelen
+from .scrollstring import truelen_cut
+from .storage import Storage
 
 log = logger.getLogger(__name__)
 

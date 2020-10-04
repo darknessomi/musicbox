@@ -4,11 +4,7 @@
 """
 Class to stores everything into a json file.
 """
-from __future__ import print_function, unicode_literals, division, absolute_import
-
 import json
-
-from future.builtins import open
 
 from .const import Constant
 from .singleton import Singleton
@@ -58,7 +54,7 @@ class Storage(Singleton):
         self._init = True
 
         self.database = {
-            "user": {"username": "", "password": "", "user_id": "", "nickname": "",},
+            "user": {"username": "", "password": "", "user_id": "", "nickname": ""},
             "collections": [],
             "songs": {},
             "player_info": {

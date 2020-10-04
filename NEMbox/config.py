@@ -1,13 +1,9 @@
 # encoding: UTF-8
-from __future__ import print_function, unicode_literals, division, absolute_import
 import json
 import os
 
-# from future.builtins import open
-
-import sys
-from .singleton import Singleton
 from .const import Constant
+from .singleton import Singleton
 from .utils import utf8_data_to_file
 
 

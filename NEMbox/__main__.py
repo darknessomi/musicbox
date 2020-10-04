@@ -3,16 +3,13 @@
 """
 网易云音乐 Entry
 """
-from __future__ import print_function, unicode_literals, division, absolute_import
-import curses
-import traceback
 import argparse
+import curses
 import sys
+import traceback
 
-from future.builtins import str
-
-from .menu import Menu
 from .__version__ import __version__ as version
+from .menu import Menu
 
 
 def start():

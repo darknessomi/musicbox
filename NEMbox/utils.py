@@ -5,14 +5,11 @@
 """
 定义几个函数 写文件 通知 返回键 创建目录 创建文件
 """
-from __future__ import print_function, unicode_literals, division, absolute_import
-
+import os
 import platform
 import subprocess
-import os
 from collections import OrderedDict
 
-from future.builtins import str
 
 __all__ = ["utf8_data_to_file", "notify", "uniq", "create_dir", "create_file"]
 
