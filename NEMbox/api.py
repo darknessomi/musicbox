@@ -15,15 +15,15 @@ from http.cookiejar import LWPCookieJar
 import requests
 import requests_cache
 
-from . import logger
 from .config import Config
 from .const import Constant
 from .encrypt import encrypted_request
 from .storage import Storage
+from .logger import getLogger
 
 requests_cache.install_cache(Constant.cache_path, expire_after=3600)
 
-log = logger.getLogger(__name__)
+log = getLogger(__name__)
 
 # 歌曲榜单地址
 TOP_LIST_ALL = {
