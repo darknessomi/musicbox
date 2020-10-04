@@ -11,7 +11,13 @@ import subprocess
 from collections import OrderedDict
 
 
-__all__ = ["utf8_data_to_file", "notify", "uniq", "create_dir", "create_file"]
+__all__ = [
+    "utf8_data_to_file",
+    "notify",
+    "uniq",
+    "create_dir",
+    "create_file",
+]
 
 
 def mkdir(path):
@@ -25,12 +31,11 @@ def mkdir(path):
 def create_dir(path):
     if not os.path.exists(path):
         return mkdir(path)
-
-    if os.path.isdir(path):
+    elif os.path.isdir(path):
         return True
-
-    os.remove(path)
-    return mkdir(path)
+    else:
+        os.remove(path)
+        return mkdir(path)
 
 
 def create_file(path, default="\n"):
