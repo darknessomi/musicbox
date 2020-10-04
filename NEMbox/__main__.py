@@ -8,18 +8,7 @@ from pathlib import Path
 
 import toml
 
-from .const import Constant
 from .menu import Menu
-from .utils import create_dir
-from .utils import create_file
-
-
-def create_config():
-    create_dir(Constant.conf_dir)
-    create_dir(Constant.download_dir)
-    create_file(Constant.storage_path)
-    create_file(Constant.log_path, default="")
-    create_file(Constant.cookie_path, default="#LWP-Cookies-2.0\n")
 
 
 def get_current_version():
@@ -30,7 +19,6 @@ def get_current_version():
 
 
 def start():
-    create_config()
     version = get_current_version()
 
     parser = argparse.ArgumentParser()
