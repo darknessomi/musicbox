@@ -387,6 +387,7 @@ class NetEase(object):
             params = dict(
                 username=username,
                 password=password,
+                countrycode='86',
                 rememberLogin="true",
                 clientToken=client_token,
             )
