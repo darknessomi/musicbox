@@ -4,19 +4,16 @@
 """
 Class to cache songs into local storage.
 """
-from __future__ import print_function, unicode_literals, division, absolute_import
-import threading
-import subprocess
 import os
 import signal
+import subprocess
+import threading
 
-from future.builtins import str
-
-from .const import Constant
-from .config import Config
-from .singleton import Singleton
-from .api import NetEase
 from . import logger
+from .api import NetEase
+from .config import Config
+from .const import Constant
+from .singleton import Singleton
 
 log = logger.getLogger(__name__)
 

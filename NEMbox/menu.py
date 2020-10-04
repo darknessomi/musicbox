@@ -9,32 +9,33 @@
 """
 网易云音乐 Menu
 """
-from __future__ import print_function, unicode_literals, division, absolute_import
-
-import time
 import curses as C
-import threading
-import sys
-from threading import Timer
+import locale
 import os
 import signal
+import sys
+import threading
+import time
 import webbrowser
-import locale
 from collections import namedtuple
 from copy import deepcopy
-from fuzzywuzzy import process
-from future.builtins import range, str
+from threading import Timer
 
-from .api import NetEase
-from .player import Player
-from .ui import Ui
-from .osdlyrics import show_lyrics_new_process, pyqt_activity
-from .config import Config
-from .utils import notify
-from .storage import Storage
-from .cache import Cache
+from fuzzywuzzy import process
+
 from . import logger
-from .cmd_parser import parse_keylist, cmd_parser, erase_coroutine
+from .api import NetEase
+from .cache import Cache
+from .cmd_parser import cmd_parser
+from .cmd_parser import erase_coroutine
+from .cmd_parser import parse_keylist
+from .config import Config
+from .osdlyrics import pyqt_activity
+from .osdlyrics import show_lyrics_new_process
+from .player import Player
+from .storage import Storage
+from .ui import Ui
+from .utils import notify
 
 
 locale.setlocale(locale.LC_ALL, "")
@@ -340,7 +341,7 @@ class Menu(object):
 
     def space_key_event_in_search_result(self):
         origin_index = self.datalist[self.index]["origin_index"]
-        (datatype, title, datalist, offset, index,) = self.stack[-1]
+        (datatype, title, datalist, offset, index) = self.stack[-1]
         if datatype == "songs":
             self.player.new_player_list("songs", title, datalist, -1)
             self.player.end_callback = None
@@ -989,8 +990,8 @@ class Menu(object):
             self.datatype = "artist_info"
             self.title += " > " + artist_name
             self.datalist = [
-                {"item": "{}的热门歌曲".format(artist_name), "id": artist_id,},
-                {"item": "{}的所有专辑".format(artist_name), "id": artist_id,},
+                {"item": "{}的热门歌曲".format(artist_name), "id": artist_id},
+                {"item": "{}的所有专辑".format(artist_name), "id": artist_id},
             ]
 
         elif datatype == "artist_info":

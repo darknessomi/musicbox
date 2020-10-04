@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # coding=utf-8
 # __author__='walker'
-
 """
 捕获类似curses键盘输入流,生成指令流
 """
-
 import curses
-from functools import wraps
 from copy import deepcopy
+from functools import wraps
+
 from .config import Config
 
 ERASE_SPEED = 5  # 屏幕5秒刷新一次 去除错误的显示
@@ -149,4 +148,4 @@ def main(data):
 
 
 if __name__ == "__main__":
-    main(list(range(1, 12,)[::-1]))
+    main(list(range(1, 12)[::-1]))

@@ -1,18 +1,40 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-网易云音乐 Entry
+__   ___________________________________________
+| \  ||______   |   |______|_____||______|______
+|  \_||______   |   |______|     |______||______
+
+________     __________________________  _____ _     _
+|  |  ||     ||______  |  |      |_____]|     | \___/
+|  |  ||_____|______|__|__|_____ |_____]|_____|_/   \_
+
+
++ ------------------------------------------ +
+|   NetEase-MusicBox               320kbps   |
++ ------------------------------------------ +
+|                                            |
+|   ++++++++++++++++++++++++++++++++++++++   |
+|   ++++++++++++++++++++++++++++++++++++++   |
+|   ++++++++++++++++++++++++++++++++++++++   |
+|   ++++++++++++++++++++++++++++++++++++++   |
+|   ++++++++++++++++++++++++++++++++++++++   |
+|                                            |
+|   A sexy cli musicbox based on Python      |
+|   Music resource from music.163.com        |
+|                                            |
+|   Built with love to music by omi          |
+|                                            |
++ ------------------------------------------ +
+
 """
-from __future__ import print_function, unicode_literals, division, absolute_import
-import curses
-import traceback
 import argparse
+import curses
 import sys
+import traceback
 
-from future.builtins import str
-
-from .menu import Menu
 from .__version__ import __version__ as version
+from .menu import Menu
 
 
 def start():

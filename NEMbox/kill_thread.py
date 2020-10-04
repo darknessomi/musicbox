@@ -1,7 +1,7 @@
+import ctypes
+import inspect
 import threading
 import time
-import inspect
-import ctypes
 
 __all__ = ["stop_thread"]
 

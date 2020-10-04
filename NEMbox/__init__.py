@@ -1,5 +1,6 @@
-from .utils import create_dir, create_file
 from .const import Constant
+from .utils import create_dir
+from .utils import create_file
 
 create_dir(Constant.conf_dir)
 create_dir(Constant.download_dir)

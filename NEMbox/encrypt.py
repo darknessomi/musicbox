@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals, division, absolute_import
 import base64
 import binascii
 import hashlib
@@ -8,7 +7,6 @@ import json
 import os
 
 from Cryptodome.Cipher import AES
-from future.builtins import int, pow
 
 __all__ = ["encrypted_id", "encrypted_request"]
 

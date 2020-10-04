@@ -1,13 +1,9 @@
 #!/usr/bin/env python
-from __future__ import print_function, unicode_literals, division, absolute_import
-
 import os
+import platform
 import shlex
 import struct
-import platform
 import subprocess
-
-from future.builtins import int
 
 from . import logger
 
@@ -15,11 +11,11 @@ log = logger.getLogger(__name__)
 
 
 def get_terminal_size():
-    """ getTerminalSize()
-     - get width and height of console
-     - works on linux,os x,windows,cygwin(windows)
-     originally retrieved from:
-     http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
+    """getTerminalSize()
+    - get width and height of console
+    - works on linux,os x,windows,cygwin(windows)
+    originally retrieved from:
+    http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
     """
     current_os = platform.system()
     tuple_xy = None

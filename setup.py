@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """
 __   ___________________________________________
 | \  ||______   |   |______|_____||______|______
@@ -29,10 +28,11 @@ ________     __________________________  _____ _     _
 + ------------------------------------------ +
 
 """
-from pprint import pprint
 import os
+from pprint import pprint
 
-from setuptools import setup, find_packages
+from setuptools import find_packages
+from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 about = {}  # type: dict

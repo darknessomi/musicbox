@@ -1,6 +1,5 @@
 # encoding: UTF-8
 # KenHuang: 使配置文件夹符合XDG标准
-from __future__ import print_function, unicode_literals, division, absolute_import
 import os
 
 
