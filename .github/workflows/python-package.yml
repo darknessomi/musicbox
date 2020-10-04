@@ -30,4 +30,3 @@ jobs:
       - name: Test with pytest
         run: |
           poetry run pytest -s
-          poetry run musicbox --version
