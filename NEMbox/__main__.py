@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
+r"""
 __   ___________________________________________
 | \  ||______   |   |______|_____||______|______
 |  \_||______   |   |______|     |______||______
@@ -26,8 +26,8 @@ ________     __________________________  _____ _     _
 |   Built with love to music by omi          |
 |                                            |
 + ------------------------------------------ +
-
 """
+
 import argparse
 import curses
 import sys
@@ -51,7 +51,7 @@ def create_config():
 
 def get_current_version():
     path = Path(".").parent.parent / "pyproject.toml"
-    with open(path) as f:
+    with path.open() as f:
         config = toml.load(f)
     return config["tool"]["poetry"]["version"]
 
