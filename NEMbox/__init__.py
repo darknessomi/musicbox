@@ -37,3 +37,6 @@ def create_config():
     create_file(Constant.storage_path)
     create_file(Constant.log_path, default="")
     create_file(Constant.cookie_path, default="#LWP-Cookies-2.0\n")
+
+
+create_config()
