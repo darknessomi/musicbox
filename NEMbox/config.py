@@ -225,12 +225,6 @@ class Config(Singleton):
             utf8_data_to_file(config_file, json.dumps(self.config, indent=2))
 
     def get(self, name):
-        if name == "keymap":
-            for key in self.default_config[name]["value"].keys():
-                if key not in self.config[name]["value"].keys():
-                    self.config[name]["value"][key] = self.default_config[name][
-                        "value"
-                    ][key]
         if name not in self.config.keys():
             self.config[name] = self.default_config[name]
             return self.default_config[name]["value"]
