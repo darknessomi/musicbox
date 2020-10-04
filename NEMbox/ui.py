@@ -13,7 +13,6 @@ import datetime
 import hashlib
 import os
 import re
-from curses import textpad
 from shutil import get_terminal_size
 
 from . import logger
@@ -117,8 +116,7 @@ class Ui(object):
             try:
                 self.screen.addstr(args[0], args[1], args[2].encode("utf-8"), *args[3:])
             except Exception as e:
-                #  log.error(e, args)
-                pass
+                log.error(e)
 
     def update_margin(self):
         # Left margin

@@ -279,7 +279,7 @@ class Menu(object):
 
             data = self.api.get_version()
             return data["info"]["version"]
-        except KeyError as e:
+        except KeyError:
             return 0
 
     def start_fork(self, version):
@@ -423,7 +423,7 @@ class Menu(object):
         self.menu_starts = time.time()
         self.ui.build_loading()
         self.dispatch_enter(idx)
-        if self.enter_flag == True:
+        if self.enter_flag:
             self.index = 0
             self.offset = 0
 
@@ -706,7 +706,7 @@ class Menu(object):
 
             # 模糊搜索
             elif C.keyname(key).decode("utf-8") == keyMap["search"]:
-                if self.at_search_result == True:
+                if self.at_search_result:
                     self.back_page_event()
                 self.stack.append(
                     [self.datatype, self.title, self.datalist, self.offset, self.index]
@@ -1050,7 +1050,6 @@ class Menu(object):
             # 子类别
             data = self.datalist[idx]
             self.datatype = "top_playlists"
-            log.error(data)
             self.datalist = netease.dig_info(netease.top_playlists(data), self.datatype)
             self.title += " > " + data
 
@@ -1127,7 +1126,7 @@ class Menu(object):
             )
             self.at_playing_list = True
 
-        if self.at_search_result == True:
+        if self.at_search_result:
             self.back_page_event()
 
         self.datatype = self.player.info["player_list_type"]

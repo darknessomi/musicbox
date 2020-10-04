@@ -4,9 +4,11 @@
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于Python编写。
 
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
-[![platform](https://img.shields.io/badge/python-3.5-green.svg)](<>)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
+
+## Demo
 
 [![NetEase-MusicBox-GIF](https://qfile.aobeef.cn/3abba3b8a3994ee3d5cd.gif)](https://pypi.org/project/NetEase-MusicBox/)
 
@@ -94,39 +96,53 @@
 
 ### PyPi安装（*nix系统）
 
-    $ pip(3) install NetEase-MusicBox
+```bash
+    pip3 install NetEase-MusicBox
+```
 
 ### Git clone安装master分支（*nix系统）
 
-    $ git clone https://github.com/darknessomi/musicbox.git && cd musicbox
-    $ python(3) setup.py install
+```bash
+    git clone https://github.com/darknessomi/musicbox.git && cd musicbox
+    poetry build && poetry install
+```
 
 ### macOS安装
 
-    $ pip(3) install NetEase-MusicBox
-    $ brew install mpg123
+```bash
+    pip3 install NetEase-MusicBox
+    brew install mpg123
+```
 
 ### Linux安装
 
+**注意：通过以下方法安装可能仍然需要`pip3 install -U NetEase-MusicBox`更新到最新版**。
+
 #### Fedora
 
-首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`（通过此方法安装可能仍然需要`pip install -U NetEase-MusicBox`更新到最新版）。
+首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`。
 
 #### Ubuntu/Debian
 
-    $ (sudo) pip install NetEase-MusicBox
+```bash
+    pip3 install NetEase-MusicBox
 
-    $ (sudo) apt-get install mpg123
+    sudo apt-get install mpg123
+```
 
 #### Arch Linux
 
-    $ pacaur -S netease-musicbox-git # or $ yaourt musicbox
+```bash
+    pacaur -S netease-musicbox-git # or $ yaourt musicbox
+```
 
 #### Centos/Red Hat
 
-    $ (sudo) pip(3) install NetEase-MusicBox
-    $ (sudo) wget http://mirror.centos.org/centos/7/os/x86_64/Packages/mpg123-1.25.6-1.el7.x86_64.rpm
-    $ (sudo) yum install mpg123-1.25.6-1.el7.x86_64.rpm
+```bash
+    pip3 install NetEase-MusicBox
+    wget http://mirror.centos.org/centos/7/os/x86_64/Packages/mpg123-1.25.6-1.el7.x86_64.rpm
+    sudo yum install -y mpg123-1.25.6-1.el7.x86_64.rpm
+```
 
 ## 配置和错误处理
 
@@ -166,7 +182,9 @@ mpg123 最新的版本可能会报找不到声音硬件的错误，测试了1.25
 
 ## 使用
 
-    $ musicbox
+```bash
+    musicbox
+```
 
 Enjoy it !
 
@@ -180,60 +198,8 @@ Enjoy it !
 
 2018-06-05 版本 0.2.5.0    全部迁移到新版api，大量错误修复
 
-2018-05-21 版本 0.2.4.3    更新依赖，错误修复
+[更多>>](https://github.com/darknessomi/musicbox/blob/master/CHANGELOG.md)
 
-2017-11-28 版本 0.2.4.2    更新获取歌曲列表的api
+## LICENSE
 
-2017-06-03 版本 0.2.4.1    修正mpg123状态异常导致的cpu占用，增加歌词双行显示功能
-
-2017-03-17 版本 0.2.4.0    修复通知可能造成的崩溃
-
-2017-03-03 版本 0.2.3.9    邮箱用户登录修复
-
-2017-03-02 版本 0.2.3.8    登录接口修复
-
-2016-11-24 版本 0.2.3.7    新增背景色设置
-
-2016-11-07 版本 0.2.3.6    已知错误修复
-
-2016-10-16 版本 0.2.3.5    新增进入歌曲专辑功能
-
-2016-10-13 版本 0.2.3.4    新增查看歌曲评论
-
-2016-09-26 版本 0.2.3.3    keybinder 错误修复
-
-2016-09-15 版本 0.2.3.2    已知错误修复
-
-2016-09-12 版本 0.2.3.1    已知错误修复
-
-2016-09-11 版本 0.2.3.0    Python 2 和 3 支持
-
-2016-05-09 版本 0.2.2.10   修复最后一行歌名过长的问题
-
-2016-05-08 版本 0.2.2.9    缓存问题修复
-
-2016-05-07 版本 0.2.2.8    解决通知在Gnome桌面持续驻留（#303）的问题
-
-[更多>>](https://github.com/darknessomi/musicbox/blob/master/ChangeLog.md)
-
-## MIT License
-
-Copyright (c) 2018 omi <mailto:4399.omi@gmail.com>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+[MIT](LICENSE)

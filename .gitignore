@@ -140,7 +140,6 @@ cython_debug/
 # vscode
 .vscode/
 
-setup.cfg
 nemcache.sqlite
 
 #Jetbrains

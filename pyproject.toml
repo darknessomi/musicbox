@@ -12,19 +12,19 @@ authors = [
     "omi <4399.omi@gmail.com>",
     "Weiliang Li <to.be.impressive@gmail.com>"
 ]
+maintainers = [
+    "omi <4399.omi@gmail.com>",
+    "Weiliang Li <to.be.impressive@gmail.com>"
+]
 keywords = ["music", "netease", "cli", "player"]
 classifiers = [
-        "Development Status :: 4 - Beta",
-        "Intended Audience :: Developers",
-        "Natural Language :: Chinese (Simplified)",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: Implementation :: CPython",
-        "Topic :: Multimedia :: Sound/Audio",
-    ]
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Natural Language :: Chinese (Simplified)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Multimedia :: Sound/Audio",
+]
 
 
 [tool.poetry.dependencies]
@@ -34,6 +34,7 @@ requests-cache = "^0.5.2"
 fuzzywuzzy = "^0.18.0"
 pycryptodomex = "^3.9.8"
 python-Levenshtein = "^0.12.0"
+toml = "^0.10.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.782"
