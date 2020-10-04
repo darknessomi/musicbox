@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from hashlib import md5
 
 from NEMbox.api import NetEase
 from NEMbox.api import Parse
