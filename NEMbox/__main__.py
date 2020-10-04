@@ -27,16 +27,16 @@ ________     __________________________  _____ _     _
 |                                            |
 + ------------------------------------------ +
 """
-
 import argparse
 import curses
 import sys
 import traceback
 from pathlib import Path
+
 import toml
 
-from .menu import Menu
 from .const import Constant
+from .menu import Menu
 from .utils import create_dir
 from .utils import create_file
 

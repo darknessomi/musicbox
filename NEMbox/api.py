@@ -300,7 +300,7 @@ class NetEase(object):
 
     @property
     def toplists(self):
-        return [l[0] for l in TOP_LIST_ALL.values()]
+        return [item[0] for item in TOP_LIST_ALL.values()]
 
     def logout(self):
         self.session.cookies.clear()
@@ -314,6 +314,7 @@ class NetEase(object):
         self.storage.save()
 
     def _raw_request(self, method, endpoint, data=None):
+        resp = None
         if method == "GET":
             resp = self.session.get(
                 endpoint, params=data, headers=self.header, timeout=DEFAULT_TIMEOUT
@@ -360,12 +361,13 @@ class NetEase(object):
             self.session.cookies.set_cookie(cookie)
 
         params = encrypted_request(params)
+        resp = None
         try:
             resp = self._raw_request(method, endpoint, params)
             data = resp.json()
         except requests.exceptions.RequestException as e:
             log.error(e)
-        except ValueError as e:
+        except ValueError:
             log.error("Path: {}, response: {}".format(path, resp.text[:200]))
         finally:
             return data
