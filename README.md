@@ -116,9 +116,11 @@
 
 ### Linux安装
 
+**注意：通过以下方法安装可能仍然需要`pip3 install -U NetEase-MusicBox`更新到最新版**。
+
 #### Fedora
 
-首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`（通过此方法安装可能仍然需要`pip install -U NetEase-MusicBox`更新到最新版）。
+首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`。
 
 #### Ubuntu/Debian
 
