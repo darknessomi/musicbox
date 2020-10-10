@@ -26,9 +26,9 @@ ________     __________________________  _____ _     _
 + ------------------------------------------ +
 
 """
+from .const import Constant
 from .utils import create_dir
 from .utils import create_file
-from .const import Constant
 
 
 def create_config():

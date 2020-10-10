@@ -18,8 +18,8 @@ import requests_cache
 from .config import Config
 from .const import Constant
 from .encrypt import encrypted_request
-from .storage import Storage
 from .logger import getLogger
+from .storage import Storage
 
 requests_cache.install_cache(Constant.cache_path, expire_after=3600)
 
