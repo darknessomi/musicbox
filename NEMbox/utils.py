@@ -11,13 +11,7 @@ import subprocess
 from collections import OrderedDict
 
 
-__all__ = [
-    "utf8_data_to_file",
-    "notify",
-    "uniq",
-    "create_dir",
-    "create_file",
-]
+__all__ = ["utf8_data_to_file", "notify", "uniq", "create_dir", "create_file"]
 
 
 def mkdir(path):
