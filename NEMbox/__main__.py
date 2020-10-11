@@ -5,8 +5,8 @@ import curses
 import sys
 import traceback
 
-from .menu import Menu
 from . import __version__
+from .menu import Menu
 
 
 def start():
