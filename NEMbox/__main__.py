@@ -9,13 +9,18 @@ from pathlib import Path
 import toml
 
 from .menu import Menu
+default = "0.3.0"
 
 
 def get_current_version():
     path = Path(".").parent.parent / "pyproject.toml"
-    with path.open() as f:
-        config = toml.load(f)
-    return config["tool"]["poetry"]["version"]
+    if path.exists():
+        with path.open() as f:
+            config = toml.load(f)
+        version = config["tool"]["poetry"]["version"]
+    else:
+        version = default
+    return version
 
 
 def start():
