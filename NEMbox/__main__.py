@@ -4,22 +4,13 @@ import argparse
 import curses
 import sys
 import traceback
-from pathlib import Path
 
-import toml
-
+from . import __version__
 from .menu import Menu
 
 
-def get_current_version():
-    path = Path(".").parent.parent / "pyproject.toml"
-    with path.open() as f:
-        config = toml.load(f)
-    return config["tool"]["poetry"]["version"]
-
-
 def start():
-    version = get_current_version()
+    version = __version__
 
     parser = argparse.ArgumentParser()
     parser.add_argument(

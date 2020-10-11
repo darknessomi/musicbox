@@ -34,7 +34,7 @@ requests-cache = "^0.5.2"
 fuzzywuzzy = "^0.18.0"
 pycryptodomex = "^3.9.8"
 python-Levenshtein = "^0.12.0"
-toml = "^0.10.1"
+importlib-metadata = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.782"

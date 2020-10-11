@@ -26,9 +26,13 @@ ________     __________________________  _____ _     _
 + ------------------------------------------ +
 
 """
+from importlib_metadata import version
+
 from .const import Constant
 from .utils import create_dir
 from .utils import create_file
+
+__version__ = version("NetEase-MusicBox")
 
 
 def create_config():
