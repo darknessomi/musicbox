@@ -390,7 +390,7 @@ class NetEase(object):
                 rememberLogin="true",
                 clientToken=client_token,
             )
-        data = self.request("POST", path, params)
+        data = self.request("POST", path, params,custom_cookies={'os': 'pc'})
         self.session.cookies.save()
         return data
 
