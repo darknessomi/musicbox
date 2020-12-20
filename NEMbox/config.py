@@ -178,7 +178,7 @@ class Config(Singleton):
                     "jumpIndex": "G",
                     "playPause": " ",
                     "shuffle": "?",
-                    "volume+": "+",
+                    "volume+": "=",
                     "volume-": "-",
                     "menu": "m",
                     "presentHistory": "p",
