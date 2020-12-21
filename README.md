@@ -90,8 +90,8 @@
 
 1. `aria2` 用于缓存歌曲
 2. `libnotify-bin` 用于支持消息提示（Linux平台）
-3. `pyqt python-dbus dbus qt` 用于支持桌面歌词
-   (Mac 用户需要 `brew install qt --with-dbus` 获取支持 DBus 的 Qt)
+3. `qtpy python-dbus dbus qt` 用于支持桌面歌词
+    (根据系统qt的版本还需要安装 pyqt4 pyqt4 pyside pyside2 中的任意一个)
 4. `python-levenshtein` 用于模糊搜索
 
 ### PyPi安装（*nix系统）

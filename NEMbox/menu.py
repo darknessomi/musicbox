@@ -31,7 +31,7 @@ from .cmd_parser import erase_coroutine
 from .cmd_parser import parse_keylist
 from .config import Config
 from .osdlyrics import pyqt_activity
-from .osdlyrics import show_lyrics_new_process
+from .osdlyrics import show_lyrics_new_process, stop_lyrics_process
 from .player import Player
 from .storage import Storage
 from .ui import Ui
@@ -247,6 +247,8 @@ class Menu(object):
         self.ui.screen.refresh()
 
     def send_kill(self, signum, fram):
+        if pyqt_activity:
+            stop_lyrics_process()
         self.player.stop()
         self.cache.quit()
         self.storage.save()
@@ -665,10 +667,14 @@ class Menu(object):
 
             # 退出
             elif C.keyname(key).decode("utf-8") == keyMap["quit"]:
+                if pyqt_activity:
+                    stop_lyrics_process()
                 break
 
             # 退出并清除用户信息
             elif C.keyname(key).decode("utf-8") == keyMap["quitClear"]:
+                if pyqt_activity:
+                  stop_lyrics_process()
                 self.api.logout()
                 break
 
@@ -1032,7 +1038,7 @@ class Menu(object):
         # 全站置顶歌单包含的歌曲
         elif datatype in ["top_playlists", "playlists"]:
             playlist_id = datalist[idx]["playlist_id"]
-            songs = netease.playlist_detail(playlist_id)
+            songs = netease.playlist_songlist(playlist_id)
             self.datatype = "songs"
             self.datalist = netease.dig_info(songs, "songs")
             self.title += " > " + datalist[idx]["playlist_name"]
