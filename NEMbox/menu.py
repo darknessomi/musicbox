@@ -1038,7 +1038,7 @@ class Menu(object):
         # 全站置顶歌单包含的歌曲
         elif datatype in ["top_playlists", "playlists"]:
             playlist_id = datalist[idx]["playlist_id"]
-            songs = netease.playlist_detail(playlist_id)
+            songs = netease.playlist_songlist(playlist_id)
             self.datatype = "songs"
             self.datalist = netease.dig_info(songs, "songs")
             self.title += " > " + datalist[idx]["playlist_name"]
