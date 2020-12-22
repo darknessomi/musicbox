@@ -411,7 +411,7 @@ class Ui(object):
                         datalist[i]["album_name"],
                     )
 
-                    # the length decides whether to scoll
+                    # the length decides whether to scroll
                     if truelen(name) < self.content_width:
                         self.addstr(
                             i - offset + 9,
