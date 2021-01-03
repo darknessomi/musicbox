@@ -31,7 +31,8 @@ from .cmd_parser import erase_coroutine
 from .cmd_parser import parse_keylist
 from .config import Config
 from .osdlyrics import pyqt_activity
-from .osdlyrics import show_lyrics_new_process, stop_lyrics_process
+from .osdlyrics import show_lyrics_new_process
+from .osdlyrics import stop_lyrics_process
 from .player import Player
 from .storage import Storage
 from .ui import Ui
@@ -674,7 +675,7 @@ class Menu(object):
             # 退出并清除用户信息
             elif C.keyname(key).decode("utf-8") == keyMap["quitClear"]:
                 if pyqt_activity:
-                  stop_lyrics_process()
+                    stop_lyrics_process()
                 self.api.logout()
                 break
 
