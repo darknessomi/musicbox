@@ -376,7 +376,12 @@ class NetEase(object):
         self.session.cookies.load()
         if username.isdigit():
             path = "/weapi/login/cellphone"
-            params = dict(phone=username, password=password, countrycode="86", rememberLogin="true")
+            params = dict(
+                phone=username,
+                password=password,
+                countrycode="86",
+                rememberLogin="true",
+            )
         else:
             # magic token for login
             # see https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/router/login.js#L15
@@ -390,7 +395,7 @@ class NetEase(object):
                 rememberLogin="true",
                 clientToken=client_token,
             )
-        data = self.request("POST", path, params,custom_cookies={'os': 'pc'})
+        data = self.request("POST", path, params, custom_cookies={"os": "pc"})
         self.session.cookies.save()
         return data
 
@@ -562,12 +567,12 @@ class NetEase(object):
         if not data:
             return []
         if dig_type == "songs" or dig_type == "fmsongs":
-            sids = [x['id'] for x in data]
+            sids = [x["id"] for x in data]
             urls = self.songs_url(sids)
             i = 0
             sds = []
             while i < len(sids):
-                sds.extend(self.songs_detail(sids[i:i+500]))
+                sds.extend(self.songs_detail(sids[i : i + 500]))
                 i += 500
             timestamp = time.time()
             # api 返回的 urls 的 id 顺序和 data 的 id 顺序不一致

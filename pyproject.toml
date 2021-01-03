@@ -1,52 +1,50 @@
 [tool.poetry]
 name = "NetEase-MusicBox"
 packages = [
-    { include = "NEMbox" },
+  {include = "NEMbox"},
 ]
 version = "0.3.0"
-repository = "https://github.com/darknessomi/musicbox"
-description = "A sexy command line interface musicbox"
-license = "MIT"
-readme = "README.md"
+# docs
 authors = [
-    "omi <4399.omi@gmail.com>",
-    "Weiliang Li <to.be.impressive@gmail.com>"
+  "omi <4399.omi@gmail.com>",
+  "Weiliang Li <to.be.impressive@gmail.com>",
 ]
-maintainers = [
-    "omi <4399.omi@gmail.com>",
-    "Weiliang Li <to.be.impressive@gmail.com>"
-]
-keywords = ["music", "netease", "cli", "player"]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Natural Language :: Chinese (Simplified)",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Topic :: Multimedia :: Sound/Audio",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Natural Language :: Chinese (Simplified)",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Topic :: Multimedia :: Sound/Audio",
 ]
-
+description = "A sexy command line interface musicbox"
+keywords = ["music", "netease", "cli", "player"]
+license = "MIT"
+maintainers = [
+  "omi <4399.omi@gmail.com>",
+  "Weiliang Li <to.be.impressive@gmail.com>",
+]
+readme = "README.md"
+repository = "https://github.com/darknessomi/musicbox"
 
 [tool.poetry.dependencies]
+fuzzywuzzy = "^0.18.0"
+importlib-metadata = "^2.0.0"
+pycryptodomex = "^3.9.8"
 python = "^3.6"
+python-Levenshtein = "^0.12.0"
 requests = "^2.24.0"
 requests-cache = "^0.5.2"
-fuzzywuzzy = "^0.18.0"
-pycryptodomex = "^3.9.8"
-python-Levenshtein = "^0.12.0"
-importlib-metadata = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
-mypy = "^0.782"
+black = {version = "^20.8b1", python = "^3.7"}
 flake8 = "^3.8.4"
-black = { version = "^20.8b1", python = "^3.7" }
+mypy = "^0.782"
 pytest = "^6.1.1"
-
 
 [tool.poetry.scripts]
 musicbox = "NEMbox.__main__:start"
 
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]

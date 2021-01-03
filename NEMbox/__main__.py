@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import _curses
 import argparse
 import curses
 import sys
@@ -17,9 +18,13 @@ def start():
         "-v", "--version", help="show this version and exit", action="store_true"
     )
     args = parser.parse_args()
+
     if args.version:
         latest = Menu().check_version()
-        curses.endwin()
+        try:
+            curses.endwin()
+        except _curses.error:
+            pass
         print("NetEase-MusicBox installed version:" + version)
         if latest != version:
             print("NetEase-MusicBox latest version:" + str(latest))
@@ -30,9 +35,12 @@ def start():
         nembox_menu.start_fork(version)
     except (OSError, TypeError, ValueError, KeyError, IndexError):
         # clean up terminal while failed
-        curses.echo()
-        curses.nocbreak()
-        curses.endwin()
+        try:
+            curses.echo()
+            curses.nocbreak()
+            curses.endwin()
+        except _curses.error:
+            pass
         traceback.print_exc()
 
 
