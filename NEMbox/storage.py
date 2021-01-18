@@ -73,7 +73,10 @@ class Storage(Singleton):
 
     def login(self, username, password, userid, nickname):
         self.database["user"] = dict(
-            username=username, password=password, user_id=userid, nickname=nickname
+            username=username,
+            password=password,
+            user_id=userid,
+            nickname=nickname,
         )
 
     def logout(self):
@@ -92,7 +95,7 @@ class Storage(Singleton):
                         self.database[k].update(v)
                     else:
                         self.database[k] = v
-        except (OSError, KeyError, ValueError) as e:
+        except (OSError, KeyError, ValueError):
             pass
         self.save()
 

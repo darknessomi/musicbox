@@ -3,7 +3,7 @@ name = "NetEase-MusicBox"
 packages = [
   {include = "NEMbox"},
 ]
-version = "0.3.0"
+version = "0.3.1"
 # docs
 authors = [
   "omi <4399.omi@gmail.com>",

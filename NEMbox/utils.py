@@ -8,10 +8,23 @@
 import os
 import platform
 import subprocess
+import hashlib
+
 from collections import OrderedDict
 
 
-__all__ = ["utf8_data_to_file", "notify", "uniq", "create_dir", "create_file"]
+__all__ = [
+    "utf8_data_to_file",
+    "notify",
+    "uniq",
+    "create_dir",
+    "create_file",
+    "md5",
+]
+
+
+def md5(s):
+    return hashlib.md5(s.encode("utf-8")).hexdigest()
 
 
 def mkdir(path):

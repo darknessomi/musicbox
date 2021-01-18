@@ -278,7 +278,7 @@ class NetEase(object):
             "Content-Type": "application/x-www-form-urlencoded",
             "Host": "music.163.com",
             "Referer": "http://music.163.com",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.87 Safari/537.36",
         }
 
         self.storage = Storage()
@@ -383,17 +383,11 @@ class NetEase(object):
                 rememberLogin="true",
             )
         else:
-            # magic token for login
-            # see https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/router/login.js#L15
-            client_token = (
-                "1_jVUMqWEPke0/1/Vu56xCmJpo5vP1grjn_SOVVDzOc78w8OKLVZ2JH7IfkjSXqgfmh"
-            )
             path = "/weapi/login"
             params = dict(
                 username=username,
                 password=password,
                 rememberLogin="true",
-                clientToken=client_token,
             )
         data = self.request("POST", path, params, custom_cookies={"os": "pc"})
         self.session.cookies.save()
@@ -408,7 +402,7 @@ class NetEase(object):
     # 用户歌单
     def user_playlist(self, uid, offset=0, limit=50):
         path = "/weapi/user/playlist"
-        params = dict(uid=uid, offset=offset, limit=limit, csrf_token="")
+        params = dict(uid=uid, offset=offset, limit=limit)
         return self.request("POST", path, params).get("playlist", [])
 
     # 每日推荐歌单
@@ -418,8 +412,8 @@ class NetEase(object):
 
     # 每日推荐歌曲
     def recommend_playlist(self, total=True, offset=0, limit=20):
-        path = "/weapi/v1/discovery/recommend/songs"  # NOQA
-        params = dict(total=total, offset=offset, limit=limit, csrf_token="")
+        path = "/weapi/v1/discovery/recommend/songs"
+        params = dict(total=total, offset=offset, limit=limit)
         return self.request("POST", path, params).get("recommend", [])
 
     # 私人FM

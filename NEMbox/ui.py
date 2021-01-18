@@ -10,7 +10,6 @@
 """
 import curses
 import datetime
-import hashlib
 import os
 import re
 from shutil import get_terminal_size
@@ -21,6 +20,7 @@ from .scrollstring import scrollstring
 from .scrollstring import truelen
 from .scrollstring import truelen_cut
 from .storage import Storage
+from .utils import md5
 
 log = logger.getLogger(__name__)
 
@@ -693,7 +693,7 @@ class Ui(object):
         curses.curs_set(0)
         self.build_login_bar()
         account = self.get_account()
-        password = hashlib.md5(self.get_password().encode("utf-8")).hexdigest()
+        password = md5(self.get_password())
         return account, password
 
     def build_login_bar(self):

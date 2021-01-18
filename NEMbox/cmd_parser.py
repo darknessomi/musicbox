@@ -14,7 +14,7 @@ ERASE_SPEED = 5  # 屏幕5秒刷新一次 去除错误的显示
 
 __all__ = ["cmd_parser", "parse_keylist", "coroutine", "erase_coroutine"]
 
-keyMap = Config().get("keymap")
+KEY_MAP = Config().get("keymap")
 
 
 def coroutine(func):
@@ -40,7 +40,7 @@ def _cmd_parser():
             keylist.append(key)
         elif key > 0 and pre_key > 0:
             keylist.append(key)
-        elif curses.keyname(key).decode("utf-8") in keyMap.values() and pre_key > 0:
+        elif curses.keyname(key).decode("utf-8") in KEY_MAP.values() and pre_key > 0:
             keylist.append(key)
             return keylist
         pre_key = key
@@ -83,16 +83,16 @@ def parse_keylist(keylist):
     keylist = deepcopy(keylist)
     if keylist == []:
         return None
-    if (set(keylist) | {ord(keyMap["prevSong"]), ord(keyMap["nextSong"])}) == {
-        ord(keyMap["prevSong"]),
-        ord(keyMap["nextSong"]),
+    if (set(keylist) | {ord(KEY_MAP["prevSong"]), ord(KEY_MAP["nextSong"])}) == {
+        ord(KEY_MAP["prevSong"]),
+        ord(KEY_MAP["nextSong"]),
     }:
-        delta_key = keylist.count(ord(keyMap["nextSong"])) - keylist.count(
-            ord(keyMap["prevSong"])
+        delta_key = keylist.count(ord(KEY_MAP["nextSong"])) - keylist.count(
+            ord(KEY_MAP["prevSong"])
         )
         if delta_key < 0:
-            return (-delta_key, ord(keyMap["prevSong"]))
-        return (delta_key, ord(keyMap["nextSong"]))
+            return (-delta_key, ord(KEY_MAP["prevSong"]))
+        return (delta_key, ord(KEY_MAP["nextSong"]))
     tail_cmd = keylist.pop()
     if tail_cmd in range(48, 58) and (set(keylist) | set(range(48, 58))) == set(
         range(48, 58)
@@ -104,10 +104,10 @@ def parse_keylist(keylist):
     if (
         tail_cmd
         in (
-            ord(keyMap["prevSong"]),
-            ord(keyMap["nextSong"]),
-            ord(keyMap["down"]),
-            ord(keyMap["up"]),
+            ord(KEY_MAP["prevSong"]),
+            ord(KEY_MAP["nextSong"]),
+            ord(KEY_MAP["down"]),
+            ord(KEY_MAP["up"]),
         )
         and max(keylist) <= 57
         and min(keylist) >= 48
