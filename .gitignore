@@ -149,3 +149,5 @@ nemcache.sqlite
 .undodir
 Session.vim
 .vim
+
+test_login.py
