@@ -126,7 +126,6 @@
 
 ```bash
     pip3 install NetEase-MusicBox
-
     sudo apt-get install mpg123
 ```
 
@@ -139,6 +138,7 @@
 #### Centos/Red Hat
 
 ```bash
+    sudo yum install -y python3-devel
     pip3 install NetEase-MusicBox
     wget http://mirror.centos.org/centos/7/os/x86_64/Packages/mpg123-1.25.6-1.el7.x86_64.rpm
     sudo yum install -y mpg123-1.25.6-1.el7.x86_64.rpm
