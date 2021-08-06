@@ -21,7 +21,6 @@ from .scrollstring import truelen
 from .scrollstring import truelen_cut
 from .storage import Storage
 from .utils import md5
-from .utils import safe_string
 
 log = logger.getLogger(__name__)
 
@@ -159,7 +158,12 @@ class Ui(object):
                 1, self.indented_startcol, "♫  ♪ ♫  ♪ " + quality, curses.color_pair(3)
             )
 
-        song_info = safe_string(song_name) + self.space + safe_string(artist) + "  < " + safe_string(album_name) + " >"
+        song_info = "{}{}{}  < {} >".format(
+                        song_name,
+                        self.space,
+                        artist,
+                        album_name,
+                    )
         if truelen(song_info) <= self.endcol - self.indented_startcol - 19:
             self.addstr(
                 1,

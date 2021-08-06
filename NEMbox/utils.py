@@ -20,13 +20,7 @@ __all__ = [
     "create_dir",
     "create_file",
     "md5",
-    'safe_string',
 ]
-
-def safe_string(str):
-    if str != None:
-        return str
-    return ""
 
 def md5(s):
     return hashlib.md5(s.encode("utf-8")).hexdigest()
