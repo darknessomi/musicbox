@@ -542,7 +542,7 @@ class NetEase(object):
         channels = self.request("POST", path, params).get("djRadios", [])
         return channels
 
-    def djprograms(self, radio_id, asc=False, offset=0, limit=50):
+    def djprograms(self, radio_id, asc=False, offset=0, limit=100):
         path = "/weapi/dj/program/byradio"
         params = dict(asc=asc, radioId=radio_id, offset=offset, limit=limit)
         programs = self.request("POST", path, params).get("programs", [])
@@ -560,14 +560,18 @@ class NetEase(object):
     def dig_info(self, data, dig_type):
         if not data:
             return []
-        if dig_type == "songs" or dig_type == "fmsongs":
+        if dig_type == "songs" or dig_type == "fmsongs" or dig_type == "djprograms":
             sids = [x["id"] for x in data]
             urls = self.songs_url(sids)
-            i = 0
-            sds = []
-            while i < len(sids):
-                sds.extend(self.songs_detail(sids[i : i + 500]))
-                i += 500
+            # songs_detail api会返回空的电台歌名，故使用原数据
+            if dig_type == "djprograms":
+                sds = data
+            else:
+                i = 0
+                sds = []
+                while i < len(sids):
+                    sds.extend(self.songs_detail(sids[i : i + 500]))
+                    i += 500
             timestamp = time.time()
             # api 返回的 urls 的 id 顺序和 data 的 id 顺序不一致
             # 为了获取到对应 id 的 url，对返回的 urls 做一个 id2index 的缓存

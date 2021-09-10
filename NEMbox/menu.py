@@ -1024,7 +1024,7 @@ class Menu(object):
             programs = netease.djprograms(radio_id)
             self.title += " > " + datalist[idx]["name"]
             self.datatype = "songs"
-            self.datalist = netease.dig_info(programs, "songs")
+            self.datalist = netease.dig_info(programs, "djprograms")
 
         # 该专辑包含的歌曲
         elif datatype == "albums":
