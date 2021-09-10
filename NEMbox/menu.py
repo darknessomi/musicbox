@@ -120,7 +120,7 @@ class Menu(object):
             {"entry_name": "新碟上架"},
             {"entry_name": "精选歌单"},
             {"entry_name": "我的歌单"},
-            {"entry_name": "主播电台"},
+            {"entry_name": "今日最热主播电台"},
             {"entry_name": "每日推荐歌曲"},
             {"entry_name": "每日推荐歌单"},
             {"entry_name": "私人FM"},
@@ -229,6 +229,7 @@ class Menu(object):
             "albums": SearchArg("搜索专辑：", 10, lambda datalist: datalist),
             "artists": SearchArg("搜索艺术家：", 100, lambda datalist: datalist),
             "playlists": SearchArg("搜索网易精选集：", 1000, lambda datalist: datalist),
+            "djchannels": SearchArg("搜索主播电台：", 1009, lambda datalist: datalist),
         }
 
         prompt, api_type, post_process = category_map[category]
@@ -240,8 +241,11 @@ class Menu(object):
         if not data:
             return data
 
-        datalist = post_process(data.get(category, []))
-        return self.api.dig_info(datalist, category)
+        if category == "djchannels":
+            return post_process(data.get("djRadios", []))
+        else:
+            datalist = post_process(data.get(category, []))
+            return self.api.dig_info(datalist, category)
 
     def change_term(self, signum, frame):
         self.ui.screen.clear()
@@ -1116,6 +1120,7 @@ class Menu(object):
                 1: SearchCategory("songs", "歌曲搜索列表"),
                 2: SearchCategory("artists", "艺术家搜索列表"),
                 3: SearchCategory("albums", "专辑搜索列表"),
+                4: SearchCategory("djchannels", "主播电台搜索列表"),
             }
             self.datatype, self.title = idx_map[idx]
             self.datalist = self.search(self.datatype)
@@ -1243,7 +1248,7 @@ class Menu(object):
         elif idx == 9:
             self.datatype = "search"
             self.title += " > 搜索"
-            self.datalist = ["歌曲", "艺术家", "专辑", "网易精选集"]
+            self.datalist = ["歌曲", "艺术家", "专辑", "主播电台", "网易精选集"]
         elif idx == 10:
             self.datatype = "help"
             self.title += " > 帮助"
