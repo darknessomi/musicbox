@@ -562,23 +562,32 @@ class NetEase(object):
             return []
         if dig_type == "songs" or dig_type == "fmsongs" or dig_type == "djprograms":
             sids = [x["id"] for x in data]
-            urls = self.songs_url(sids)
+            # 可能因网络波动，返回空值，在Parse.songs中引发KeyError
+            # 导致日志记录大量can't get song url的可能原因
+            for count in range(3):
+                urls = self.songs_url(sids)
+                if urls: break
+            else:
+                log.error("urls is null, check network connection")
+                return []
             # songs_detail api会返回空的电台歌名，故使用原数据
             if dig_type == "djprograms":
                 sds = data
+            # 支持超过1000首歌曲的歌单
             else:
                 i = 0
                 sds = []
                 while i < len(sids):
                     sds.extend(self.songs_detail(sids[i : i + 500]))
                     i += 500
-            timestamp = time.time()
             # api 返回的 urls 的 id 顺序和 data 的 id 顺序不一致
             # 为了获取到对应 id 的 url，对返回的 urls 做一个 id2index 的缓存
             # 同时保证 data 的 id 顺序不变
             url_id_index = {}
             for index, url in enumerate(urls):
                 url_id_index[url["id"]] = index
+
+            timestamp = time.time()
             for s in sds:
                 url_index = url_id_index.get(s["id"])
                 if url_index is None:
