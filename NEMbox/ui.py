@@ -158,12 +158,16 @@ class Ui(object):
                 1, self.indented_startcol, "♫  ♪ ♫  ♪ " + quality, curses.color_pair(3)
             )
 
-        song_info = "{}{}{}  < {} >".format(
-                        song_name,
-                        self.space,
-                        artist,
-                        album_name,
-                    )
+        if artist or album_name:
+            song_info = "{}{}{}  < {} >".format(
+                            song_name,
+                            self.space,
+                            artist,
+                            album_name,
+                        )
+        else:
+            song_info = song_name
+
         if truelen(song_info) <= self.endcol - self.indented_startcol - 19:
             self.addstr(
                 1,
