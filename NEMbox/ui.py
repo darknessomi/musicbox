@@ -160,11 +160,11 @@ class Ui(object):
 
         if artist or album_name:
             song_info = "{}{}{}  < {} >".format(
-                            song_name,
-                            self.space,
-                            artist,
-                            album_name,
-                        )
+                song_name,
+                self.space,
+                artist,
+                album_name,
+            )
         else:
             song_info = song_name
 

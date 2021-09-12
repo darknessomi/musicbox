@@ -489,7 +489,7 @@ class Menu(object):
         self.build_menu_processbar()
 
     def digit_key_song_event(self):
-        """ 直接跳到指定id 歌曲 """
+        """直接跳到指定id 歌曲"""
         step = self.step
         self.key_list.pop()
         song_index = parse_keylist(self.key_list)

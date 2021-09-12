@@ -80,7 +80,7 @@ def notify_command_linux(msg, duration_time=None):
 
 
 def notify(msg, msg_type=0, duration_time=None):
-    """ Show system notification with duration t (ms) """
+    """Show system notification with duration t (ms)"""
     msg = msg.replace('"', '\\"')
     if platform.system() == "Darwin":
         command = notify_command_osx(msg, msg_type, duration_time)
