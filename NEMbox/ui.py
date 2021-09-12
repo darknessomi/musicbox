@@ -398,7 +398,7 @@ class Ui(object):
                         str(i) + ". " + datalist[i]["entry_name"],
                     )
 
-        elif datatype == "songs" or datatype == "fmsongs":
+        elif datatype == "songs" or datatype == "djprograms" or datatype == "fmsongs":
             iter_range = min(len(datalist), offset + step)
             for i in range(offset, iter_range):
                 if isinstance(datalist[i], str):

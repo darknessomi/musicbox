@@ -120,7 +120,7 @@ class Menu(object):
             {"entry_name": "新碟上架"},
             {"entry_name": "精选歌单"},
             {"entry_name": "我的歌单"},
-            {"entry_name": "今日最热主播电台"},
+            {"entry_name": "主播电台"},
             {"entry_name": "每日推荐歌曲"},
             {"entry_name": "每日推荐歌单"},
             {"entry_name": "私人FM"},
@@ -354,8 +354,8 @@ class Menu(object):
             self.player.end_callback = None
             self.player.play_or_pause(origin_index, self.at_playing_list)
             self.at_playing_list = False
-        elif datatype == "djchannels":
-            self.player.new_player_list("djchannels", title, datalist, -1)
+        elif datatype == "djprograms":
+            self.player.new_player_list("djprograms", title, datalist, -1)
             self.player.end_callback = None
             self.player.play_or_pause(origin_index, self.at_playing_list)
             self.at_playing_list = False
@@ -382,11 +382,11 @@ class Menu(object):
         # If change to a new playing list. Add playing list and play.
         datatype_callback = {
             "songs": None,
-            "djchannels": None,
+            "djprograms": None,
             "fmsongs": self.fm_callback,
         }
 
-        if datatype in ["songs", "djchannels", "fmsongs"]:
+        if datatype in ["songs", "djprograms", "fmsongs"]:
             self.player.new_player_list(datatype, self.title, self.datalist, -1)
             self.player.end_callback = datatype_callback[datatype]
             self.player.play_or_pause(idx, self.at_playing_list)
@@ -833,7 +833,9 @@ class Menu(object):
 
             # 添加到打碟歌单
             elif C.keyname(key).decode("utf-8") == KEY_MAP["add"]:
-                if datatype == "songs" and len(datalist) != 0:
+                if (self.datatype == "songs" or self.datatype == "djprograms") and len(
+                    self.datalist
+                ) != 0:
                     self.djstack.append(datalist[idx])
                 elif datatype == "artists":
                     pass
@@ -851,7 +853,7 @@ class Menu(object):
 
             # 添加到本地收藏
             elif C.keyname(key).decode("utf-8") == KEY_MAP["star"]:
-                if (self.datatype == "songs" or self.datatype == "djchannels") and len(
+                if (self.datatype == "songs" or self.datatype == "djprograms") and len(
                     self.datalist
                 ) != 0:
                     self.collection.append(self.datalist[self.index])
@@ -871,7 +873,7 @@ class Menu(object):
             # 从当前列表移除
             elif C.keyname(key).decode("utf-8") == KEY_MAP["remove"]:
                 if (
-                    self.datatype in ("songs", "djchannels", "fmsongs")
+                    self.datatype in ("songs", "djprograms", "fmsongs")
                     and len(self.datalist) != 0
                 ):
                     self.datalist.pop(self.index)
@@ -1023,7 +1025,7 @@ class Menu(object):
             radio_id = datalist[idx]["id"]
             programs = netease.djprograms(radio_id)
             self.title += " > " + datalist[idx]["name"]
-            self.datatype = "songs"
+            self.datatype = "djprograms"
             self.datalist = netease.dig_info(programs, "djprograms")
 
         # 该专辑包含的歌曲

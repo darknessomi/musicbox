@@ -460,7 +460,7 @@ class Player(object):
         self.add_songs(datalist)
 
     # switch_flag为true表示：
-    # 在播放列表中 || 当前所在列表类型不在"songs"、"djchannels"、"fmsongs"中
+    # 在播放列表中 || 当前所在列表类型不在"songs"、"djprograms"、"fmsongs"中
     def play_or_pause(self, idx, switch_flag):
         if self.is_empty:
             return
