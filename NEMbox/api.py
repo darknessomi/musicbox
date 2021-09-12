@@ -564,22 +564,23 @@ class NetEase(object):
             sids = [x["id"] for x in data]
             # 可能因网络波动，返回空值，在Parse.songs中引发KeyError
             # 导致日志记录大量can't get song url的可能原因
-            for count in range(3):
-                urls = self.songs_url(sids)
-                if urls: break
-            else:
-                log.error("urls is null, check network connection")
-                return []
+            urls = []
+            for i in range(0, len(sids), 350):
+                for count in range(3):
+                    urls_group = self.songs_url(sids[i:i + 350])
+                    if urls_group: break
+                else:
+                    log.error("self.songs_url return [], check network connection")
+                    return []
+                urls.extend(urls_group)
             # songs_detail api会返回空的电台歌名，故使用原数据
+            sds = []
             if dig_type == "djprograms":
-                sds = data
+                sds.extend(data)
             # 支持超过1000首歌曲的歌单
             else:
-                i = 0
-                sds = []
-                while i < len(sids):
-                    sds.extend(self.songs_detail(sids[i : i + 500]))
-                    i += 500
+                for i in range(0, len(sids), 500):
+                    sds.extend(self.songs_detail(sids[i:i + 500]))
             # api 返回的 urls 的 id 顺序和 data 的 id 顺序不一致
             # 为了获取到对应 id 的 url，对返回的 urls 做一个 id2index 的缓存
             # 同时保证 data 的 id 顺序不变
