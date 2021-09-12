@@ -1023,7 +1023,7 @@ class Menu(object):
 
         elif datatype == "djchannels":
             radio_id = datalist[idx]["id"]
-            programs = netease.djprograms(radio_id)
+            programs = netease.alldjprograms(radio_id)
             self.title += " > " + datalist[idx]["name"]
             self.datatype = "djprograms"
             self.datalist = netease.dig_info(programs, "djprograms")

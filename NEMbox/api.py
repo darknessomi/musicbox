@@ -542,11 +542,20 @@ class NetEase(object):
         channels = self.request("POST", path, params).get("djRadios", [])
         return channels
 
-    def djprograms(self, radio_id, asc=False, offset=0, limit=100):
+    def djprograms(self, radio_id, asc=False, offset=0, limit=50):
         path = "/weapi/dj/program/byradio"
         params = dict(asc=asc, radioId=radio_id, offset=offset, limit=limit)
         programs = self.request("POST", path, params).get("programs", [])
         return [p["mainSong"] for p in programs]
+
+    def alldjprograms(self, radio_id, asc=False, offset=0, limit=500):
+        programs = []
+        ps = self.djprograms(radio_id, asc=asc, offset=offset, limit=limit)
+        while ps:
+            programs.extend(ps)
+            offset += limit
+            ps = self.djprograms(radio_id, asc=asc, offset=offset, limit=limit)
+        return programs
 
     # 获取版本
     def get_version(self):
