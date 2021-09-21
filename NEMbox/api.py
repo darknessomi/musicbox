@@ -611,7 +611,9 @@ class NetEase(object):
             return Parse.songs(sds)
 
         elif dig_type == "refresh_urls":
-            urls_info = self.songs_url(data)
+            urls_info = []
+            for i in range(0, len(data), 350):
+                urls_info.extend(self.songs_url(data[i : i + 350]))
             timestamp = time.time()
 
             songs = []
