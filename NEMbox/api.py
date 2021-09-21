@@ -575,14 +575,7 @@ class NetEase(object):
             # 导致日志记录大量can't get song url的可能原因
             urls = []
             for i in range(0, len(sids), 350):
-                for count in range(3):
-                    urls_group = self.songs_url(sids[i : i + 350])
-                    if urls_group:
-                        urls.extend(urls_group)
-                        break
-                else:
-                    log.error("self.songs_url return [], check network connection")
-                    return []
+                urls.extend(self.songs_url(sids[i : i + 350]))
             # songs_detail api会返回空的电台歌名，故使用原数据
             sds = []
             if dig_type == "djprograms":
@@ -603,7 +596,7 @@ class NetEase(object):
                 url_index = url_id_index.get(s["id"])
                 if url_index is None:
                     log.error("can't get song url, id: %s", s["id"])
-                    continue
+                    return []
                 s["url"] = urls[url_index]["url"]
                 s["br"] = urls[url_index]["br"]
                 s["expires"] = urls[url_index]["expi"]
