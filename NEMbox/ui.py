@@ -629,7 +629,7 @@ class Ui(object):
                         i - offset + 9, self.startcol, str(i) + ". " + datalist[i]
                     )
 
-        elif datatype == "djchannels":
+        elif datatype == "djRadios":
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
                     self.addstr(

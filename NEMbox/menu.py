@@ -229,7 +229,7 @@ class Menu(object):
             "albums": SearchArg("搜索专辑：", 10, lambda datalist: datalist),
             "artists": SearchArg("搜索艺术家：", 100, lambda datalist: datalist),
             "playlists": SearchArg("搜索网易精选集：", 1000, lambda datalist: datalist),
-            "djchannels": SearchArg("搜索主播电台：", 1009, lambda datalist: datalist),
+            "djRadios": SearchArg("搜索主播电台：", 1009, lambda datalist: datalist),
         }
 
         prompt, api_type, post_process = category_map[category]
@@ -241,11 +241,8 @@ class Menu(object):
         if not data:
             return data
 
-        if category == "djchannels":
-            return post_process(data.get("djRadios", []))
-        else:
-            datalist = post_process(data.get(category, []))
-            return self.api.dig_info(datalist, category)
+        datalist = post_process(data.get(category, []))
+        return self.api.dig_info(datalist, category)
 
     def change_term(self, signum, frame):
         self.ui.screen.clear()
@@ -1021,7 +1018,7 @@ class Menu(object):
                 self.datatype = "albums"
                 self.datalist = netease.dig_info(albums, "albums")
 
-        elif datatype == "djchannels":
+        elif datatype == "djRadios":
             radio_id = datalist[idx]["id"]
             programs = netease.alldjprograms(radio_id)
             self.title += " > " + datalist[idx]["name"]
@@ -1122,7 +1119,7 @@ class Menu(object):
                 1: SearchCategory("songs", "歌曲搜索列表"),
                 2: SearchCategory("artists", "艺术家搜索列表"),
                 3: SearchCategory("albums", "专辑搜索列表"),
-                4: SearchCategory("djchannels", "主播电台搜索列表"),
+                4: SearchCategory("djRadios", "主播电台搜索列表"),
             }
             self.datatype, self.title = idx_map[idx]
             self.datalist = self.search(self.datatype)
@@ -1228,9 +1225,9 @@ class Menu(object):
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
             self.title += " > " + self.username + " 的歌单"
         elif idx == 5:
-            self.datatype = "djchannels"
+            self.datatype = "djRadios"
             self.title += " > 主播电台"
-            self.datalist = self.api.djchannels()
+            self.datalist = self.api.djRadios()
         elif idx == 6:
             self.datatype = "songs"
             self.title += " > 每日推荐歌曲"

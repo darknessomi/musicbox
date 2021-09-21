@@ -536,11 +536,10 @@ class NetEase(object):
             return lyric.split("\n")
 
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
-    def djchannels(self, offset=0, limit=50):
+    def djRadios(self, offset=0, limit=50):
         path = "/weapi/djradio/hot/v1"
         params = dict(limit=limit, offset=offset)
-        channels = self.request("POST", path, params).get("djRadios", [])
-        return channels
+        return self.request("POST", path, params).get("djRadios", [])
 
     def djprograms(self, radio_id, asc=False, offset=0, limit=50):
         path = "/weapi/dj/program/byradio"
@@ -633,5 +632,8 @@ class NetEase(object):
 
         elif dig_type == "playlist_class_detail":
             return PLAYLIST_CLASSES[data]
+
+        elif dig_type == "djRadios":
+            return data
         else:
             raise ValueError("Invalid dig type")
