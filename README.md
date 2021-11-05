@@ -53,7 +53,7 @@
 | num + <kbd>\[</kbd>                   | Quick Prev Song | 快速前 n 首        |
 | num + <kbd>]</kbd>                    | Quick Next Song | 快速后 n 首        |
 | num + <kbd>Shift</kbd> + <kbd>g</kbd> | Index for Song  | 跳到第 n 首        |
-| <kbd>=</kbd>                          | Volume +        | 音量增加           |
+| <kbd>+</kbd>                          | Volume +        | 音量增加           |
 | <kbd>-</kbd>                          | Volume -        | 音量减少           |
 | <kbd>Space</kbd>                      | Play/Pause      | 播放/暂停          |
 | <kbd>?</kbd>                          | Shuffle         | 手气不错           |
