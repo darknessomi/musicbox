@@ -184,7 +184,7 @@ class Ui(object):
 
     def update_lyrics(self, now_playing, lyrics, tlyrics):
 
-        timestap_regex = r"\d\d:\d\d\.[0-9]*"
+        timestap_regex = r"[0-5][0-9]:[0-5][0-9]\.[0-9]*"
 
         def get_timestap(lyric_line):
             match_ret = re.match(r"\[(" + timestap_regex + r")\]", lyric_line)
