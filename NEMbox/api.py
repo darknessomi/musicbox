@@ -10,7 +10,7 @@ import platform
 import time
 from collections import OrderedDict
 from http.cookiejar import Cookie
-from http.cookiejar import LWPCookieJar
+from .cookiejar import LWPCookieJar
 
 import requests
 import requests_cache
