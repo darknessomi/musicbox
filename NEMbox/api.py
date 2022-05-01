@@ -10,7 +10,7 @@ import platform
 import time
 from collections import OrderedDict
 from http.cookiejar import Cookie
-from http.cookiejar import LWPCookieJar
+from http.cookiejar import MozillaCookieJar
 
 import requests
 import requests_cache
@@ -282,7 +282,7 @@ class NetEase(object):
         }
 
         self.storage = Storage()
-        cookie_jar = LWPCookieJar(self.storage.cookie_path)
+        cookie_jar = MozillaCookieJar(self.storage.cookie_path)
         cookie_jar.load()
         self.session = requests.Session()
         self.session.cookies = cookie_jar

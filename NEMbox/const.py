@@ -22,10 +22,10 @@ class Constant(object):
         dataDir = os.path.join(os.environ["XDG_DATA_HOME"], "netease-musicbox")
         if not os.path.exists(dataDir):
             os.mkdir(dataDir)
-        cookie_path = os.path.join(dataDir, "cookie")
+        cookie_path = os.path.join(dataDir, "cookie.txt")
         log_path = os.path.join(dataDir, "musicbox.log")
         storage_path = os.path.join(dataDir, "database.json")
     else:
-        cookie_path = os.path.join(conf_dir, "cookie")
+        cookie_path = os.path.join(conf_dir, "cookie.txt")
         log_path = os.path.join(conf_dir, "musicbox.log")
         storage_path = os.path.join(conf_dir, "database.json")
