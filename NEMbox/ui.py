@@ -158,12 +158,16 @@ class Ui(object):
                 1, self.indented_startcol, "♫  ♪ ♫  ♪ " + quality, curses.color_pair(3)
             )
 
-        song_info = "{}{}{}  < {} >".format(
-                        song_name,
-                        self.space,
-                        artist,
-                        album_name,
-                    )
+        if artist or album_name:
+            song_info = "{}{}{}  < {} >".format(
+                song_name,
+                self.space,
+                artist,
+                album_name,
+            )
+        else:
+            song_info = song_name
+
         if truelen(song_info) <= self.endcol - self.indented_startcol - 19:
             self.addstr(
                 1,
@@ -394,7 +398,7 @@ class Ui(object):
                         str(i) + ". " + datalist[i]["entry_name"],
                     )
 
-        elif datatype == "songs" or datatype == "fmsongs":
+        elif datatype == "songs" or datatype == "djprograms" or datatype == "fmsongs":
             iter_range = min(len(datalist), offset + step)
             for i in range(offset, iter_range):
                 if isinstance(datalist[i], str):
@@ -625,7 +629,7 @@ class Ui(object):
                         i - offset + 9, self.startcol, str(i) + ". " + datalist[i]
                     )
 
-        elif datatype == "djchannels":
+        elif datatype == "djRadios":
             for i in range(offset, min(len(datalist), offset + step)):
                 if i == index:
                     self.addstr(

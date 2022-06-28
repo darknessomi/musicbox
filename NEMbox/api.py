@@ -536,17 +536,25 @@ class NetEase(object):
             return lyric.split("\n")
 
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
-    def djchannels(self, offset=0, limit=50):
+    def djRadios(self, offset=0, limit=50):
         path = "/weapi/djradio/hot/v1"
         params = dict(limit=limit, offset=offset)
-        channels = self.request("POST", path, params).get("djRadios", [])
-        return channels
+        return self.request("POST", path, params).get("djRadios", [])
 
     def djprograms(self, radio_id, asc=False, offset=0, limit=50):
         path = "/weapi/dj/program/byradio"
         params = dict(asc=asc, radioId=radio_id, offset=offset, limit=limit)
         programs = self.request("POST", path, params).get("programs", [])
         return [p["mainSong"] for p in programs]
+
+    def alldjprograms(self, radio_id, asc=False, offset=0, limit=500):
+        programs = []
+        ps = self.djprograms(radio_id, asc=asc, offset=offset, limit=limit)
+        while ps:
+            programs.extend(ps)
+            offset += limit
+            ps = self.djprograms(radio_id, asc=asc, offset=offset, limit=limit)
+        return programs
 
     # 获取版本
     def get_version(self):
@@ -560,26 +568,34 @@ class NetEase(object):
     def dig_info(self, data, dig_type):
         if not data:
             return []
-        if dig_type == "songs" or dig_type == "fmsongs":
+        if dig_type == "songs" or dig_type == "fmsongs" or dig_type == "djprograms":
             sids = [x["id"] for x in data]
-            urls = self.songs_url(sids)
-            i = 0
+            # 可能因网络波动，返回空值，在Parse.songs中引发KeyError
+            # 导致日志记录大量can't get song url的可能原因
+            urls = []
+            for i in range(0, len(sids), 350):
+                urls.extend(self.songs_url(sids[i : i + 350]))
+            # songs_detail api会返回空的电台歌名，故使用原数据
             sds = []
-            while i < len(sids):
-                sds.extend(self.songs_detail(sids[i : i + 500]))
-                i += 500
-            timestamp = time.time()
+            if dig_type == "djprograms":
+                sds.extend(data)
+            # 支持超过1000首歌曲的歌单
+            else:
+                for i in range(0, len(sids), 500):
+                    sds.extend(self.songs_detail(sids[i : i + 500]))
             # api 返回的 urls 的 id 顺序和 data 的 id 顺序不一致
             # 为了获取到对应 id 的 url，对返回的 urls 做一个 id2index 的缓存
             # 同时保证 data 的 id 顺序不变
             url_id_index = {}
             for index, url in enumerate(urls):
                 url_id_index[url["id"]] = index
+
+            timestamp = time.time()
             for s in sds:
                 url_index = url_id_index.get(s["id"])
                 if url_index is None:
                     log.error("can't get song url, id: %s", s["id"])
-                    continue
+                    return []
                 s["url"] = urls[url_index]["url"]
                 s["br"] = urls[url_index]["br"]
                 s["expires"] = urls[url_index]["expi"]
@@ -587,7 +603,9 @@ class NetEase(object):
             return Parse.songs(sds)
 
         elif dig_type == "refresh_urls":
-            urls_info = self.songs_url(data)
+            urls_info = []
+            for i in range(0, len(data), 350):
+                urls_info.extend(self.songs_url(data[i : i + 350]))
             timestamp = time.time()
 
             songs = []
@@ -614,5 +632,8 @@ class NetEase(object):
 
         elif dig_type == "playlist_class_detail":
             return PLAYLIST_CLASSES[data]
+
+        elif dig_type == "djRadios":
+            return data
         else:
             raise ValueError("Invalid dig type")

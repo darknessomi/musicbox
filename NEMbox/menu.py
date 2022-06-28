@@ -229,6 +229,7 @@ class Menu(object):
             "albums": SearchArg("搜索专辑：", 10, lambda datalist: datalist),
             "artists": SearchArg("搜索艺术家：", 100, lambda datalist: datalist),
             "playlists": SearchArg("搜索网易精选集：", 1000, lambda datalist: datalist),
+            "djRadios": SearchArg("搜索主播电台：", 1009, lambda datalist: datalist),
         }
 
         prompt, api_type, post_process = category_map[category]
@@ -350,8 +351,8 @@ class Menu(object):
             self.player.end_callback = None
             self.player.play_or_pause(origin_index, self.at_playing_list)
             self.at_playing_list = False
-        elif datatype == "djchannels":
-            self.player.new_player_list("djchannels", title, datalist, -1)
+        elif datatype == "djprograms":
+            self.player.new_player_list("djprograms", title, datalist, -1)
             self.player.end_callback = None
             self.player.play_or_pause(origin_index, self.at_playing_list)
             self.at_playing_list = False
@@ -378,11 +379,11 @@ class Menu(object):
         # If change to a new playing list. Add playing list and play.
         datatype_callback = {
             "songs": None,
-            "djchannels": None,
+            "djprograms": None,
             "fmsongs": self.fm_callback,
         }
 
-        if datatype in ["songs", "djchannels", "fmsongs"]:
+        if datatype in ["songs", "djprograms", "fmsongs"]:
             self.player.new_player_list(datatype, self.title, self.datalist, -1)
             self.player.end_callback = datatype_callback[datatype]
             self.player.play_or_pause(idx, self.at_playing_list)
@@ -485,7 +486,7 @@ class Menu(object):
         self.build_menu_processbar()
 
     def digit_key_song_event(self):
-        """ 直接跳到指定id 歌曲 """
+        """直接跳到指定id 歌曲"""
         step = self.step
         self.key_list.pop()
         song_index = parse_keylist(self.key_list)
@@ -829,7 +830,9 @@ class Menu(object):
 
             # 添加到打碟歌单
             elif C.keyname(key).decode("utf-8") == KEY_MAP["add"]:
-                if datatype == "songs" and len(datalist) != 0:
+                if (self.datatype == "songs" or self.datatype == "djprograms") and len(
+                    self.datalist
+                ) != 0:
                     self.djstack.append(datalist[idx])
                 elif datatype == "artists":
                     pass
@@ -847,7 +850,7 @@ class Menu(object):
 
             # 添加到本地收藏
             elif C.keyname(key).decode("utf-8") == KEY_MAP["star"]:
-                if (self.datatype == "songs" or self.datatype == "djchannels") and len(
+                if (self.datatype == "songs" or self.datatype == "djprograms") and len(
                     self.datalist
                 ) != 0:
                     self.collection.append(self.datalist[self.index])
@@ -867,7 +870,7 @@ class Menu(object):
             # 从当前列表移除
             elif C.keyname(key).decode("utf-8") == KEY_MAP["remove"]:
                 if (
-                    self.datatype in ("songs", "djchannels", "fmsongs")
+                    self.datatype in ("songs", "djprograms", "fmsongs")
                     and len(self.datalist) != 0
                 ):
                     self.datalist.pop(self.index)
@@ -1015,12 +1018,12 @@ class Menu(object):
                 self.datatype = "albums"
                 self.datalist = netease.dig_info(albums, "albums")
 
-        elif datatype == "djchannels":
+        elif datatype == "djRadios":
             radio_id = datalist[idx]["id"]
-            programs = netease.djprograms(radio_id)
+            programs = netease.alldjprograms(radio_id)
             self.title += " > " + datalist[idx]["name"]
-            self.datatype = "songs"
-            self.datalist = netease.dig_info(programs, "songs")
+            self.datatype = "djprograms"
+            self.datalist = netease.dig_info(programs, "djprograms")
 
         # 该专辑包含的歌曲
         elif datatype == "albums":
@@ -1116,6 +1119,7 @@ class Menu(object):
                 1: SearchCategory("songs", "歌曲搜索列表"),
                 2: SearchCategory("artists", "艺术家搜索列表"),
                 3: SearchCategory("albums", "专辑搜索列表"),
+                4: SearchCategory("djRadios", "主播电台搜索列表"),
             }
             self.datatype, self.title = idx_map[idx]
             self.datalist = self.search(self.datatype)
@@ -1221,9 +1225,9 @@ class Menu(object):
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
             self.title += " > " + self.username + " 的歌单"
         elif idx == 5:
-            self.datatype = "djchannels"
+            self.datatype = "djRadios"
             self.title += " > 主播电台"
-            self.datalist = self.api.djchannels()
+            self.datalist = self.api.djRadios()
         elif idx == 6:
             self.datatype = "songs"
             self.title += " > 每日推荐歌曲"
@@ -1243,7 +1247,7 @@ class Menu(object):
         elif idx == 9:
             self.datatype = "search"
             self.title += " > 搜索"
-            self.datalist = ["歌曲", "艺术家", "专辑", "网易精选集"]
+            self.datalist = ["歌曲", "艺术家", "专辑", "主播电台", "网易精选集"]
         elif idx == 10:
             self.datatype = "help"
             self.title += " > 帮助"
