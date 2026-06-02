@@ -22,6 +22,7 @@ htmlcov/
 .hypothesis/
 .ruff_cache/
 .mypy_cache/
+.ty_cache/
 
 # Environments
 .env
@@ -42,7 +43,6 @@ nemcache.sqlite
 
 # Local dev scratch
 test_login.py
-.poetry-cache
-
+.poetry-cache/
 # Logs
 *.log

@@ -1,6 +1,7 @@
 # encoding: UTF-8
 import json
 import os
+from typing import Any, cast
 
 from .const import Constant
 from .singleton import Singleton
@@ -238,5 +239,6 @@ class Config(Singleton):
     def get(self, name):
         if name not in self.config:
             self.config[name] = self.default_config[name]
-            return self.default_config[name]["value"]
+            entry = cast(dict[str, Any], self.default_config[name])
+            return entry["value"]
         return self.config[name]["value"]

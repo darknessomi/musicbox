@@ -1,14 +1,18 @@
-[tool.poetry]
+[project]
 name = "NetEase-MusicBox"
-packages = [
-  {include = "NEMbox"},
-]
 version = "0.5.1"
-# docs
+description = "A sexy command line interface musicbox"
+readme = "README.md"
+license = { text = "MIT" }
 authors = [
-  "omi <4399.omi@gmail.com>",
-  "Weiliang Li <to.be.impressive@gmail.com>",
+  { name = "omi", email = "4399.omi@gmail.com" },
+  { name = "Weiliang Li", email = "to.be.impressive@gmail.com" },
 ]
+maintainers = [
+  { name = "omi", email = "4399.omi@gmail.com" },
+  { name = "Weiliang Li", email = "to.be.impressive@gmail.com" },
+]
+keywords = ["music", "netease", "cli", "player"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
@@ -17,41 +21,39 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Topic :: Multimedia :: Sound/Audio",
 ]
-description = "A sexy command line interface musicbox"
-keywords = ["music", "netease", "cli", "player"]
-license = "MIT"
-maintainers = [
-  "omi <4399.omi@gmail.com>",
-  "Weiliang Li <to.be.impressive@gmail.com>",
+requires-python = ">=3.10"
+dependencies = [
+  "pycryptodomex>=3.20",
+  "rapidfuzz>=3.0",
+  "requests>=2.32",
+  "requests-cache>=1.2",
+  "urllib3>=2.0",
+  "qrcode>=8.2",
 ]
-readme = "README.md"
-repository = "https://github.com/darknessomi/musicbox"
 
-[tool.poetry.dependencies]
-python = "^3.10"
-pycryptodomex = "^3.20"
-rapidfuzz = "^3.0"
-requests = "^2.32"
-requests-cache = "^1.2"
-urllib3 = "^2.0"
-qrcode = "^8.2"
+[project.urls]
+Repository = "https://github.com/darknessomi/musicbox"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.0"
-ruff = "^0.9"
-pre-commit = "^4.6.0"
-
-[tool.poetry.scripts]
+[project.scripts]
 musicbox = "NEMbox.__main__:start"
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=1.0.0"]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.pyright]
-venvPath = "."
-venv = ".venv"
-exclude = [".venv", "**/__pycache__"]
+[tool.hatch.build.targets.wheel]
+packages = ["NEMbox"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [".poetry-cache", ".venv", ".git"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.9",
+  "ty",
+  "pre-commit>=4.6",
+]
 
 [tool.ruff]
 target-version = "py310"
@@ -63,3 +65,31 @@ ignore = ["E501", "E402", "E203"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["NEMbox"]
+
+[tool.ty.environment]
+python-version = "3.10"
+
+[tool.ty.src]
+include = ["NEMbox", "tests", "tools"]
+exclude = [".venv", "build", "dist"]
+
+[tool.ty.rules]
+# Baseline relaxations for legacy code; tighten in follow-up PRs.
+possibly-missing-attribute = "warn"
+invalid-argument-type = "warn"
+invalid-return-type = "warn"
+unsupported-operator = "warn"
+unresolved-attribute = "warn"
+unresolved-import = "warn"
+not-subscriptable = "warn"
+invalid-assignment = "warn"
+invalid-type-form = "warn"
+
+[[tool.ty.overrides]]
+include = ["tests/**", "tools/**"]
+
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+invalid-return-type = "ignore"
+possibly-missing-attribute = "ignore"
+invalid-assignment = "ignore"
