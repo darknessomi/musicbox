@@ -18,6 +18,7 @@ __all__ = [
     "create_dir",
     "create_file",
     "md5",
+    "decode_terminal_input",
 ]
 
 
@@ -47,6 +48,13 @@ def create_file(path, default="\n"):
     if not os.path.exists(path):
         with open(path, "w") as f:
             f.write(default)
+
+
+def decode_terminal_input(raw: bytes) -> str:
+    """Decode curses getstr bytes, ignoring broken UTF-8 from byte-wise backspace."""
+    if not raw:
+        return ""
+    return raw.decode("utf-8", errors="ignore").strip()
 
 
 def uniq(arr):
