@@ -21,6 +21,7 @@ from . import logger
 from .config import Config
 from .scrollstring import scrollstring, truelen, truelen_cut
 from .storage import Storage
+from .utils import decode_terminal_input
 
 log = logger.getLogger(__name__)
 
@@ -767,6 +768,47 @@ class Ui:
         self.screen.timeout(100)
         return x
 
+    def _read_line_input(self, y, x, max_len=60):
+        """Read a line with UTF-8 aware backspace (get_wch), fallback to getstr."""
+        if not hasattr(self.screen, "get_wch"):
+            raw = self.screen.getstr(y, x, max_len)
+            return decode_terminal_input(raw)
+
+        curses.curs_set(1)
+        chars = []
+        self.screen.move(y, x)
+
+        while True:
+            try:
+                ch = self.screen.get_wch()
+            except curses.error:
+                ch = self.screen.getch()
+
+            if isinstance(ch, str):
+                if len(chars) >= max_len:
+                    continue
+                chars.append(ch)
+                with contextlib.suppress(curses.error):
+                    self.addstr(ch)
+            elif ch in (curses.KEY_ENTER, 10, 13):
+                break
+            elif ch in (curses.KEY_BACKSPACE, 8, 127, 263):
+                if chars:
+                    chars.pop()
+                    line = "".join(chars)
+                    self.screen.move(y, x)
+                    self.screen.clrtoeol()
+                    if line:
+                        self.addstr(y, x, line)
+                    self.screen.move(y, x + truelen(line))
+            elif ch == 27:
+                chars.clear()
+                self.screen.move(y, x)
+                self.screen.clrtoeol()
+                break
+
+        return "".join(chars)
+
     def build_timing(self):
         curses.curs_set(0)
         self.screen.move(6, 1)
@@ -780,20 +822,22 @@ class Ui:
             curses.color_pair(1),
         )
         self.screen.timeout(-1)  # disable the screen timeout
-        curses.echo()
-        timing_time = self.screen.getstr(8, self.startcol + 19, 60)
+        curses.noecho()
+        timing_time = self._read_line_input(8, self.startcol + 19, 60)
         self.screen.timeout(100)  # restore the screen timeout
         return timing_time
 
     def get_param(self, prompt_string):
         # keep playing info in line 1
-        curses.echo()
+        curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
         self.addstr(5, self.startcol, prompt_string, curses.color_pair(1))
         self.screen.refresh()
-        keyword = self.screen.getstr(10, self.startcol, 60)
-        return keyword.decode("utf-8").strip()
+        try:
+            return self._read_line_input(10, self.startcol, 60).strip()
+        finally:
+            curses.curs_set(0)
 
     def update_size(self):
         curses.curs_set(0)
