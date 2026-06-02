@@ -25,6 +25,26 @@ from .utils import decode_terminal_input
 
 log = logger.getLogger(__name__)
 
+_BACKSPACE_KEYS = {8, 127, 263, 330, getattr(curses, "KEY_BACKSPACE", 259)}
+
+
+def _is_backspace_key(ch) -> bool:
+    if isinstance(ch, str):
+        return len(ch) == 1 and ord(ch) in (8, 127)
+    return ch in _BACKSPACE_KEYS
+
+
+def _is_enter_key(ch) -> bool:
+    if isinstance(ch, str):
+        return ch in ("\n", "\r")
+    return ch in (curses.KEY_ENTER, 10, 13)
+
+
+def _is_escape_key(ch) -> bool:
+    if isinstance(ch, str):
+        return ch == "\x1b"
+    return ch == 27
+
 try:
     dbus: Any | None = importlib.import_module("dbus")
 except ImportError:
@@ -768,6 +788,17 @@ class Ui:
         self.screen.timeout(100)
         return x
 
+    def _apply_input_backspace(self, y, x, chars):
+        if not chars:
+            return
+        chars.pop()
+        line = "".join(chars)
+        self.screen.move(y, x)
+        self.screen.clrtoeol()
+        if line:
+            self.addstr(y, x, line)
+        self.screen.move(y, x + truelen(line))
+
     def _read_line_input(self, y, x, max_len=60):
         """Read a line with UTF-8 aware backspace (get_wch), fallback to getstr."""
         if not hasattr(self.screen, "get_wch"):
@@ -777,6 +808,7 @@ class Ui:
         curses.curs_set(1)
         chars = []
         self.screen.move(y, x)
+        self.screen.keypad(True)
 
         while True:
             try:
@@ -784,28 +816,24 @@ class Ui:
             except curses.error:
                 ch = self.screen.getch()
 
+            if _is_enter_key(ch):
+                break
+            if _is_backspace_key(ch):
+                self._apply_input_backspace(y, x, chars)
+                continue
+            if _is_escape_key(ch):
+                chars.clear()
+                self.screen.move(y, x)
+                self.screen.clrtoeol()
+                break
             if isinstance(ch, str):
+                if len(ch) != 1 or ord(ch) < 32:
+                    continue
                 if len(chars) >= max_len:
                     continue
                 chars.append(ch)
                 with contextlib.suppress(curses.error):
                     self.addstr(ch)
-            elif ch in (curses.KEY_ENTER, 10, 13):
-                break
-            elif ch in (curses.KEY_BACKSPACE, 8, 127, 263):
-                if chars:
-                    chars.pop()
-                    line = "".join(chars)
-                    self.screen.move(y, x)
-                    self.screen.clrtoeol()
-                    if line:
-                        self.addstr(y, x, line)
-                    self.screen.move(y, x + truelen(line))
-            elif ch == 27:
-                chars.clear()
-                self.screen.move(y, x)
-                self.screen.clrtoeol()
-                break
 
         return "".join(chars)
 
