@@ -164,7 +164,17 @@ musicbox
 
 无损播放相关配置：
 
-- `music_quality`: `0/exhigh`、`1/higher`、`2/standard`、`3/lossless`、`4/hires`，也可直接填写 `lossless`、`hires`、`jymaster`。
+- `music_quality`：音质等级，可填数字或 level 名称。
+
+  | 配置值 | 说明 |
+  | --- | --- |
+  | `jymaster` | 超清母带，192kHz/24bit |
+  | `4` / `hires` | 高清臻音，96kHz/24bit |
+  | `3` / `lossless` | 无损，最高 48kHz/16bit |
+  | `0` / `exhigh` | 极高，最高 320kbps |
+  | `1` / `higher` | 较高，192kbps |
+  | `2` / `standard` | 标准，128kbps |
+  
 - `player_backend`: 默认 `mpg123`。设置为 `mpv` 后所有歌曲都用 `mpv` 播放；保持默认时，FLAC 链接会自动切到 `mpv`。
 - `mpv_parameters`: 传给 `mpv` 的额外参数列表。
 
