@@ -13,6 +13,8 @@ import random
 import subprocess
 import threading
 import time
+from collections.abc import Callable
+from typing import Any, cast
 
 from . import logger
 from .api import NetEase
@@ -38,7 +40,7 @@ class Player:
     def __init__(self):
         self.config = Config()
         self.ui = Ui()
-        self.popen_handler = None
+        self.popen_handler: Any = None
         # flag stop, prevent thread start
         self.playing_flag = False
         self.refresh_url_flag = False
@@ -46,30 +48,30 @@ class Player:
         self.process_location = 0
         self.storage = Storage()
         self.cache = Cache()
-        self.end_callback = None
-        self.playing_song_changed_callback = None
+        self.end_callback: Callable[[], None] | None = None
+        self.playing_song_changed_callback: Callable[[], None] | None = None
         self.api = NetEase()
         self.playinfo_starts = time.time()
 
     @property
-    def info(self):
-        return self.storage.database["player_info"]
+    def info(self) -> dict[str, Any]:
+        return cast(dict[str, Any], self.storage.database["player_info"])
 
     @property
-    def songs(self):
-        return self.storage.database["songs"]
+    def songs(self) -> dict[str, dict[str, Any]]:
+        return cast(dict[str, dict[str, Any]], self.storage.database["songs"])
 
     @property
     def index(self):
         return self.info["idx"]
 
     @property
-    def list(self):
-        return self.info["player_list"]
+    def list(self) -> list[str]:
+        return cast(list[str], self.info["player_list"])
 
     @property
-    def order(self):
-        return self.info["playing_order"]
+    def order(self) -> list[int]:
+        return cast(list[int], self.info["playing_order"])
 
     @property
     def mode(self):
@@ -104,7 +106,7 @@ class Player:
         return self.config.get("mpg123_parameters")
 
     @property
-    def current_song(self):
+    def current_song(self) -> dict[str, Any]:
         if not self.songs:
             return {}
 
@@ -173,7 +175,7 @@ class Player:
                 self.songs[song_id] = song
 
     def refresh_urls(self):
-        songs = self.api.dig_info(self.list, "refresh_urls")
+        songs = cast(list[dict[str, Any]], self.api.dig_info(self.list, "refresh_urls"))
         if songs:
             for song in songs:
                 song_id = str(song["song_id"])

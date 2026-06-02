@@ -5,6 +5,7 @@ import gzip
 import hashlib
 import json
 import os
+from typing import Any
 
 from Cryptodome.Cipher import AES
 
@@ -41,8 +42,7 @@ def encrypted_id(id):
 
 
 # 登录加密算法, 基于https://github.com/stkevintan/nw_musicbox
-def encrypted_request(text):
-    # type: (str) -> dict
+def encrypted_request(text: Any) -> dict:
     data = json.dumps(text).encode("utf-8")
     secret = create_key(16)
     params = aes(aes(data, NONCE), secret)

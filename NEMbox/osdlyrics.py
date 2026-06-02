@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # osdlyrics.py --- desktop lyrics for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
+import importlib
 import sys
 from multiprocessing import Process, set_start_method
+from typing import Any
 
 from . import logger
 from .config import Config
@@ -11,11 +13,20 @@ log = logger.getLogger(__name__)
 
 config = Config()
 
+dbus: Any = None
+dbus_mainloop_glib: Any = None
+dbus_service: Any = None
+QtCore: Any = None
+QtGui: Any = None
+QtWidgets: Any = None
+
 try:
-    import dbus
-    import dbus.mainloop.glib
-    import dbus.service
-    from qtpy import QtCore, QtGui, QtWidgets
+    dbus = importlib.import_module("dbus")
+    dbus_mainloop_glib = importlib.import_module("dbus.mainloop.glib")
+    dbus_service = importlib.import_module("dbus.service")
+    QtCore = importlib.import_module("qtpy.QtCore")
+    QtGui = importlib.import_module("qtpy.QtGui")
+    QtWidgets = importlib.import_module("qtpy.QtWidgets")
 
     pyqt_activity = True
 except ImportError:
@@ -100,32 +111,32 @@ if pyqt_activity:
             self.text = text
             self.repaint()
 
-    class LyricsAdapter(dbus.service.Object):
+    class LyricsAdapter(dbus_service.Object):
         def __init__(self, name, session):
-            dbus.service.Object.__init__(self, name, session)
+            dbus_service.Object.__init__(self, name, session)
             self.widget = Lyrics()
 
-        @dbus.service.method(
+        @dbus_service.method(
             "local.musicbox.Lyrics", in_signature="s", out_signature=""
         )
         def refresh_lyrics(self, text):
             self.widget.setText(text.replace("||", "\n"))
 
-        @dbus.service.method("local.musicbox.Lyrics", in_signature="", out_signature="")
+        @dbus_service.method("local.musicbox.Lyrics", in_signature="", out_signature="")
         def exit(self):
             QApplication.quit()
 
     def show_lyrics():
         app = QApplication(sys.argv)
-        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        dbus_mainloop_glib.DBusGMainLoop(set_as_default=True)
         session_bus = dbus.SessionBus()
-        dbus.service.BusName("org.musicbox.Bus", session_bus)
+        dbus_service.BusName("org.musicbox.Bus", session_bus)
         LyricsAdapter(session_bus, "/")
         app.exec_()
 
 
 def stop_lyrics_process():
-    if pyqt_activity:
+    if dbus is not None:
         bus = dbus.SessionBus().get_object("org.musicbox.Bus", "/")
         bus.exit(dbus_interface="local.musicbox.Lyrics")
 

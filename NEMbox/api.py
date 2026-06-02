@@ -12,6 +12,7 @@ import random
 import time
 from collections import OrderedDict
 from http.cookiejar import Cookie, MozillaCookieJar
+from typing import Any, cast
 
 import requests
 from requests_cache import CachedSession
@@ -314,16 +315,16 @@ class NetEase:
         self.header["X-Forwarded-For"] = cn_ip
 
         self.storage = Storage()
-        cookie_jar = MozillaCookieJar(self.storage.cookie_path)
-        cookie_jar.load()
+        self.cookie_jar = MozillaCookieJar(self.storage.cookie_path)
+        self.cookie_jar.load()
         self.session = CachedSession(
             cache_name=Constant.cache_path,
             expire_after=3600,
         )
-        self.session.cookies = cookie_jar
-        for cookie in cookie_jar:
+        self.session.cookies = cast(Any, self.cookie_jar)
+        for cookie in self.cookie_jar:
             if cookie.is_expired():
-                cookie_jar.clear()
+                self.cookie_jar.clear()
                 self.storage.database["user"] = {
                     "username": "",
                     "password": "",
@@ -365,7 +366,7 @@ class NetEase:
             "user_id": "",
             "nickname": "",
         }
-        self.session.cookies.save()
+        self.cookie_jar.save()
         self.storage.save()
 
     def _raw_request(self, method, endpoint, data=None):
@@ -401,7 +402,14 @@ class NetEase:
             rest={},
         )
 
-    def request(self, method, path, params=None, default=None, custom_cookies=None):
+    def request(
+        self,
+        method,
+        path,
+        params: dict[str, Any] | None = None,
+        default: dict[str, Any] | None = None,
+        custom_cookies=None,
+    ) -> dict[str, Any]:
         if custom_cookies is None:
             custom_cookies = {}
         if default is None:
@@ -425,11 +433,14 @@ class NetEase:
         resp = None
         try:
             resp = self._raw_request(method, endpoint, params)
+            if resp is None:
+                return data
             data = resp.json()
         except requests.exceptions.RequestException as e:
             log.error(e)
         except ValueError:
-            log.error(f"Path: {path}, response: {resp.text[:200]}")
+            preview = resp.text[:200] if resp is not None else ""
+            log.error(f"Path: {path}, response: {preview}")
         return data
 
     def _eapi_header_cookie(self):
@@ -452,7 +463,12 @@ class NetEase:
             header["MUSIC_U"] = music_u
         return header
 
-    def eapi_request(self, path, params=None, default=None):
+    def eapi_request(
+        self,
+        path,
+        params: dict[str, Any] | None = None,
+        default: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """POST eapi 接口（interface.music.163.com）。"""
         if default is None:
             default = {"code": -1}
@@ -473,9 +489,7 @@ class NetEase:
             "Content-Type": "application/x-www-form-urlencoded",
             "Host": "interface.music.163.com",
             "User-Agent": "NeteaseMusic 9.0.90/5038 (iPhone; iOS 16.2; zh_CN)",
-            "Cookie": "; ".join(
-                f"{k}={v}" for k, v in header.items() if v is not None
-            ),
+            "Cookie": "; ".join(f"{k}={v}" for k, v in header.items() if v is not None),
             "X-Real-IP": self.header.get("X-Real-IP", ""),
             "X-Forwarded-For": self.header.get("X-Forwarded-For", ""),
         }
@@ -530,12 +544,12 @@ class NetEase:
         username = anonymous_username(self._device_id)
         path = "/weapi/register/anonimous"
         data = self.request("POST", path, {"username": username})
-        self.session.cookies.save()
+        self.cookie_jar.save()
         return data
 
     def login_qr_key(self):
         """获取二维码 unikey。返回 unikey 字符串或 None。"""
-        self.session.cookies.load()
+        self.cookie_jar.load()
         self._ensure_anon_cookies()
         path = "/weapi/login/qrcode/unikey"
         data = self.request("POST", path, {"type": 1})
@@ -554,7 +568,7 @@ class NetEase:
         path = "/weapi/login/qrcode/client/login"
         data = self.request("POST", path, {"type": 1, "key": unikey})
         if data.get("code") == 803:
-            self.session.cookies.save()
+            self.cookie_jar.save()
         return data
 
     def get_account_info(self):
@@ -706,9 +720,9 @@ class NetEase:
             "level": level,
             "encodeType": "mp3",
         }
-        result = self.eapi_request(
-            "/api/song/enhance/player/url/v1", params
-        ).get("data", [])
+        result = self.eapi_request("/api/song/enhance/player/url/v1", params).get(
+            "data", []
+        )
         if result:
             return result
         # 降级：旧 weapi 按码率取链

@@ -20,6 +20,7 @@ import webbrowser
 from collections import namedtuple
 from copy import deepcopy
 from threading import Timer
+from typing import Any, cast
 
 from rapidfuzz import process
 
@@ -49,7 +50,7 @@ def carousel(left, right, x):
         return x
 
 
-KEY_MAP = Config().get("keymap")
+KEY_MAP = cast(dict[str, Any], Config().get("keymap"))
 COMMAND_LIST = list(map(ord, KEY_MAP.values()))
 
 if Config().get("mouse_movement"):
@@ -109,7 +110,7 @@ class Menu:
         self.config = Config()
         self.datatype = "main"
         self.title = "网易云音乐"
-        self.datalist = [
+        self.datalist: list[Any] = [
             {"entry_name": "排行榜"},
             {"entry_name": "艺术家"},
             {"entry_name": "新碟上架"},
@@ -126,19 +127,19 @@ class Menu:
         self.index = 0
         self.storage = Storage()
         self.storage.load()
-        self.collection = self.storage.database["collections"]
+        self.collection: list[Any] = self.storage.database["collections"]
         self.player = Player()
         self.player.playing_song_changed_callback = self.song_changed_callback
         self.cache = Cache()
         self.ui = Ui()
         self.api = NetEase()
         self.screen = C.initscr()
-        self.screen.keypad(1)
-        self.step = Config().get("page_length")
+        self.screen.keypad(True)
+        self.step = cast(int, Config().get("page_length"))
         if self.step == 0:
             self.step = max(int(self.ui.y * 4 / 5) - 10, 1)
-        self.stack = []
-        self.djstack = []
+        self.stack: list[list[Any]] = []
+        self.djstack: list[Any] = []
         self.at_playing_list = False
         self.enter_flag = True
         signal.signal(signal.SIGWINCH, self.change_term)
@@ -148,10 +149,10 @@ class Menu:
         self.countdown_start = time.time()
         self.countdown = -1
         self.is_in_countdown = False
-        self.timer = 0
-        self.key_list = []
-        self.pre_keylist = []
-        self.parser = None
+        self.timer: Timer | None = None
+        self.key_list: list[int] = []
+        self.pre_keylist: list[int] = []
+        self.parser: Any = None
         self.at_search_result = False
 
     @property
@@ -200,9 +201,10 @@ class Menu:
                 if code == 800:
                     break
                 if code != last_code:
-                    self.ui.update_login_qr_status(
-                        status_row, status_map.get(code, str(code))
+                    status_text = (
+                        status_map.get(code) if isinstance(code, int) else None
                     )
+                    self.ui.update_login_qr_status(status_row, status_text or str(code))
                     last_code = code
                 # 等待约 2 秒，期间允许用户按 Q/ESC 取消
                 wait_until = time.time() + 2
@@ -247,7 +249,9 @@ class Menu:
             search_result = process.extract(
                 keyword,
                 self.datalist,
-                processor=lambda item: item.get("item", ""),
+                processor=lambda item: item.get("item", "")
+                if isinstance(item, dict)
+                else str(item),
                 limit=max(10, 2 * self.step),
             )
             if not search_result:
@@ -256,6 +260,7 @@ class Menu:
             return ([ele[0] for ele in search_result], keyword)
         except Exception as e:
             log.warn(e)
+            return [], keyword
 
     def search(self, category):
         self.ui.screen.timeout(-1)
@@ -474,6 +479,8 @@ class Menu:
         offset = self.offset
         idx = self.index
         step = self.step
+        song_id = None
+        album_name = ""
         if datatype == "album":
             return
         if datatype in ["songs", "fmsongs"]:
@@ -504,6 +511,8 @@ class Menu:
         # 键盘映射ascii编码 91 [ 93 ] 258<KEY_DOWN> 259 <KEY_UP> 106 j 107 k
         # 歌单快速跳跃
         result = parse_keylist(self.key_list)
+        if not isinstance(result, tuple):
+            return
         num, cmd = result
         if num == 0:  # 0j -> 1j
             num = 1
@@ -526,6 +535,8 @@ class Menu:
         step = self.step
         self.key_list.pop()
         song_index = parse_keylist(self.key_list)
+        if not isinstance(song_index, int):
+            return
         if self.index != song_index:
             self.index = song_index
             self.offset = self.index - self.index % step
@@ -839,6 +850,8 @@ class Menu:
             elif C.keyname(key).decode("utf-8") == KEY_MAP["enterAlbum"]:
                 if datatype == "album":
                     continue
+                song_id = None
+                album_name = ""
                 if datatype in ["songs", "fmsongs"]:
                     song_id = datalist[idx]["song_id"]
                     album_id = datalist[idx]["album_id"]

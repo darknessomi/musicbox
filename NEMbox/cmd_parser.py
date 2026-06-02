@@ -139,7 +139,7 @@ def main(data):
     print(x.send(3))
     try:
         print(x.send(-1))
-    except Exception as e:
+    except StopIteration as e:
         print(e.value)
 
 

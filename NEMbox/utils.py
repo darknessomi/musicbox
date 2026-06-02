@@ -64,13 +64,13 @@ def notify_command_osx(msg, msg_type, duration_time=None):
     command = ["/usr/bin/osascript", "-e"]
     tpl = 'display notification "{}" {} with title "musicbox"'
     sound = 'sound name "/System/Library/Sounds/Ping.aiff"' if msg_type else ""
-    command.append(tpl.format(msg, sound).encode("utf-8"))
+    command.append(tpl.format(msg, sound))
     return command
 
 
 def notify_command_linux(msg, duration_time=None):
     command = ["/usr/bin/notify-send"]
-    command.append(msg.encode("utf-8"))
+    command.append(msg)
     if duration_time:
         command.extend(["-t", str(duration_time)])
     command.extend(["-h", "int:transient:1"])

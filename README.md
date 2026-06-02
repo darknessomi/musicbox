@@ -39,45 +39,45 @@
 
 | Key                                   | Effect          |                    |
 | ------------------------------------- | --------------- | ------------------ |
-| <kbd>j</kbd>                          | Down            | 下移               |
-| <kbd>k</kbd>                          | Up              | 上移               |
-| num + <kbd>j</kbd>                    | Quick Jump      | 快速向后跳转 n 首  |
-| num + <kbd>k</kbd>                    | Quick Up        | 快速向前跳转 n 首  |
-| <kbd>h</kbd>                          | Back            | 后退               |
-| <kbd>l</kbd>                          | Forword         | 前进               |
-| <kbd>u</kbd>                          | Prev Page       | 上一页             |
-| <kbd>d</kbd>                          | Next Page       | 下一页             |
-| <kbd>f</kbd>                          | Search          | 当前列表模糊搜索   |
-| <kbd>\[</kbd>                         | Prev Song       | 上一曲             |
-| <kbd>]</kbd>                          | Next Song       | 下一曲             |
-| num + <kbd>\[</kbd>                   | Quick Prev Song | 快速前 n 首        |
-| num + <kbd>]</kbd>                    | Quick Next Song | 快速后 n 首        |
-| num + <kbd>Shift</kbd> + <kbd>g</kbd> | Index for Song  | 跳到第 n 首        |
-| <kbd>=</kbd>                          | Volume +        | 音量增加           |
-| <kbd>-</kbd>                          | Volume -        | 音量减少           |
-| <kbd>Space</kbd>                      | Play/Pause      | 播放/暂停          |
-| <kbd>?</kbd>                          | Shuffle         | 手气不错           |
-| <kbd>m</kbd>                          | Menu            | 主菜单             |
-| <kbd>p</kbd>                          | Present/History | 当前/历史播放列表  |
-| <kbd>i</kbd>                          | Music Info      | 当前音乐信息       |
-| <kbd>Shift</kbd> + <kbd>p</kbd>       | Playing Mode    | 播放模式切换       |
-| <kbd>a</kbd>                          | Add             | 添加曲目到打碟     |
-| <kbd>Shift</kbd> + <kbd>a</kbd>       | Enter Album     | 进入专辑           |
-| <kbd>g</kbd>                          | To the First    | 跳至首项           |
-| <kbd>Shift</kbd> + <kbd>g</kbd>       | To the End      | 跳至尾项           |
-| <kbd>z</kbd>                          | DJ List         | 打碟列表           |
-| <kbd>s</kbd>                          | Star            | 添加到收藏         |
-| <kbd>c</kbd>                          | Collection      | 收藏列表           |
-| <kbd>r</kbd>                          | Remove          | 删除当前条目       |
-| <kbd>Shift</kbd> + <kbd>j</kbd>       | Move Down       | 向下移动当前项目   |
-| <kbd>Shift</kbd> + <kbd>k</kbd>       | Move Up         | 向上移动当前项目   |
-| <kbd>Shift</kbd> + <kbd>c</kbd>       | Cache           | 缓存歌曲到本地     |
-| <kbd>,</kbd>                          | Like            | 喜爱               |
-| <kbd>.</kbd>                          | Trash FM        | 删除 FM            |
-| <kbd>/</kbd>                          | Next FM         | 下一 FM            |
-| <kbd>q</kbd>                          | Quit            | 退出               |
-| <kbd>t</kbd>                          | Timing Exit     | 定时退出           |
-| <kbd>w</kbd>                          | Quit & Clear    | 退出并清除用户信息 |
+| `j`                                   | Down            | 下移               |
+| `k`                                   | Up              | 上移               |
+| num + `j`                             | Quick Jump      | 快速向后跳转 n 首  |
+| num + `k`                             | Quick Up        | 快速向前跳转 n 首  |
+| `h`                                   | Back            | 后退               |
+| `l`                                   | Forword         | 前进               |
+| `u`                                   | Prev Page       | 上一页             |
+| `d`                                   | Next Page       | 下一页             |
+| `f`                                   | Search          | 当前列表模糊搜索   |
+| `[`                                   | Prev Song       | 上一曲             |
+| `]`                                   | Next Song       | 下一曲             |
+| num + `[`                             | Quick Prev Song | 快速前 n 首        |
+| num + `]`                             | Quick Next Song | 快速后 n 首        |
+| num + `Shift` + `g`                   | Index for Song  | 跳到第 n 首        |
+| `=`                                   | Volume +        | 音量增加           |
+| `-`                                   | Volume -        | 音量减少           |
+| `Space`                               | Play/Pause      | 播放/暂停          |
+| `?`                                   | Shuffle         | 手气不错           |
+| `m`                                   | Menu            | 主菜单             |
+| `p`                                   | Present/History | 当前/历史播放列表  |
+| `i`                                   | Music Info      | 当前音乐信息       |
+| `Shift` + `p`                         | Playing Mode    | 播放模式切换       |
+| `a`                                   | Add             | 添加曲目到打碟     |
+| `Shift` + `a`                         | Enter Album     | 进入专辑           |
+| `g`                                   | To the First    | 跳至首项           |
+| `Shift` + `g`                         | To the End      | 跳至尾项           |
+| `z`                                   | DJ List         | 打碟列表           |
+| `s`                                   | Star            | 添加到收藏         |
+| `c`                                   | Collection      | 收藏列表           |
+| `r`                                   | Remove          | 删除当前条目       |
+| `Shift` + `j`                         | Move Down       | 向下移动当前项目   |
+| `Shift` + `k`                         | Move Up         | 向上移动当前项目   |
+| `Shift` + `c`                         | Cache           | 缓存歌曲到本地     |
+| `,`                                   | Like            | 喜爱               |
+| `.`                                   | Trash FM        | 删除 FM            |
+| `/`                                   | Next FM         | 下一 FM            |
+| `q`                                   | Quit            | 退出               |
+| `t`                                   | Timing Exit     | 定时退出           |
+| `w`                                   | Quit & Clear    | 退出并清除用户信息 |
 
 ## 安装
 
