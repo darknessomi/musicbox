@@ -7,11 +7,11 @@
 
 import json
 import os
-import platform
 import random
 import time
 from collections import OrderedDict
 from http.cookiejar import Cookie, MozillaCookieJar
+from http.cookies import SimpleCookie
 from typing import Any, cast
 
 import requests
@@ -29,35 +29,6 @@ from .logger import getLogger
 from .storage import Storage
 
 log = getLogger(__name__)
-
-# 歌曲榜单地址
-TOP_LIST_ALL = {
-    0: ["云音乐新歌榜", "3779629"],
-    1: ["云音乐热歌榜", "3778678"],
-    2: ["网易原创歌曲榜", "2884035"],
-    3: ["云音乐飙升榜", "19723756"],
-    4: ["云音乐电音榜", "10520166"],
-    5: ["UK排行榜周榜", "180106"],
-    6: ["美国Billboard周榜", "60198"],
-    7: ["KTV嗨榜", "21845217"],
-    8: ["iTunes榜", "11641012"],
-    9: ["Hit FM Top榜", "120001"],
-    10: ["日本Oricon周榜", "60131"],
-    11: ["韩国Melon排行榜周榜", "3733003"],
-    12: ["韩国Mnet排行榜周榜", "60255"],
-    13: ["韩国Melon原声周榜", "46772709"],
-    14: ["中国TOP排行榜(港台榜)", "112504"],
-    15: ["中国TOP排行榜(内地榜)", "64016"],
-    16: ["香港电台中文歌曲龙虎榜", "10169002"],
-    17: ["华语金曲榜", "4395559"],
-    18: ["中国嘻哈榜", "1899724"],
-    19: ["法国 NRJ EuroHot 30周榜", "27135204"],
-    20: ["台湾Hito排行榜", "112463"],
-    21: ["Beatport全球电子舞曲榜", "3812895"],
-    22: ["云音乐ACG音乐榜", "71385702"],
-    23: ["云音乐嘻哈榜", "991319590"],
-}
-
 
 PLAYLIST_CLASSES = OrderedDict(
     [
@@ -396,6 +367,7 @@ class NetEase:
                 self.storage.save()
                 break
         self._device_id = self._get_cookie_value("deviceId") or self._gen_device_id()
+        self._toplists_cache = None
 
     @staticmethod
     def _gen_device_id():
@@ -416,9 +388,44 @@ class NetEase:
     def _set_cookie(self, name, value):
         self.session.cookies.set_cookie(self.make_cookie(name, value))
 
+    def _apply_cookie_string(self, cookie_text):
+        if not cookie_text:
+            return
+        cookie = SimpleCookie()
+        try:
+            cookie.load(cookie_text)
+        except Exception as e:
+            log.error("failed to parse login cookie: %s", e)
+            return
+        for name, morsel in cookie.items():
+            if morsel.value:
+                self._set_cookie(name, morsel.value)
+
+    def fetch_toplists(self):
+        try:
+            with self.session.cache_disabled():
+                resp = self._raw_request("GET", f"{BASE_URL}/api/toplist")
+            if resp is None:
+                log.error("fetch_toplists: no response")
+                return []
+            data = resp.json()
+        except requests.exceptions.RequestException as e:
+            log.error("fetch_toplists: %s", e)
+            return []
+        except ValueError as e:
+            log.error("fetch_toplists: invalid json: %s", e)
+            return []
+        items = data.get("list") or []
+        if not items:
+            log.error("fetch_toplists: empty list, code=%s", data.get("code"))
+            return []
+        return [(item["name"], str(item["id"])) for item in items if item.get("id")]
+
     @property
     def toplists(self):
-        return [item[0] for item in TOP_LIST_ALL.values()]
+        if self._toplists_cache is None:
+            self._toplists_cache = self.fetch_toplists()
+        return [name for name, _ in self._toplists_cache]
 
     def logout(self):
         self.session.cookies.clear()
@@ -614,9 +621,13 @@ class NetEase:
         self.cookie_jar.load()
         self._ensure_anon_cookies()
         path = "/weapi/login/qrcode/unikey"
-        data = self.request("POST", path, {"type": 1})
-        if data.get("code") == 200:
-            return data.get("unikey")
+        data = self.request("POST", path, {"type": 3}) or {}
+        nested = data.get("data")
+        if not isinstance(nested, dict):
+            nested = {}
+        unikey = data.get("unikey") or nested.get("unikey")
+        if unikey:
+            return unikey
         log.error("login_qr_key failed: %s", data)
         return None
 
@@ -628,15 +639,19 @@ class NetEase:
     def login_qr_check(self, unikey):
         """轮询扫码状态。code: 800 过期 / 801 待扫码 / 802 待确认 / 803 成功。"""
         path = "/weapi/login/qrcode/client/login"
-        data = self.request("POST", path, {"type": 1, "key": unikey})
+        data = self.request("POST", path, {"type": 3, "key": unikey})
         if data.get("code") == 803:
+            self._apply_cookie_string(data.get("cookie"))
             self.cookie_jar.save()
         return data
 
     def get_account_info(self):
         """获取当前登录账号信息（含 account.id 与 profile.nickname）。"""
-        path = "/weapi/w/nuser/account/get"
-        return self.request("POST", path)
+        path = "/weapi/nuser/account/get"
+        data = self.request("POST", path)
+        if data.get("account") or data.get("profile"):
+            return data
+        return self.request("POST", "/weapi/w/nuser/account/get")
 
     # 用户歌单
     def user_playlist(self, uid, offset=0, limit=50):
@@ -657,9 +672,12 @@ class NetEase:
 
     # 每日推荐歌曲
     def recommend_playlist(self, total=True, offset=0, limit=20):
-        path = "/weapi/v1/discovery/recommend/songs"
-        params = {"total": total, "offset": offset, "limit": limit}
-        return self.request("POST", path, params).get("recommend", [])
+        path = "/weapi/v3/discovery/recommend/songs"
+        data = self.request("POST", path, {"afresh": False})
+        songs = data.get("recommend")
+        if songs is None:
+            songs = data.get("data", {}).get("dailySongs", [])
+        return songs[offset : offset + limit] if limit else songs[offset:]
 
     # 私人FM
     def personal_fm(self):
@@ -719,18 +737,10 @@ class NetEase:
 
     # 歌单详情
     def playlist_songlist(self, playlist_id):
-        path = "/weapi/v3/playlist/detail"
-        params = {
-            "id": playlist_id,
-            "total": "true",
-            "limit": 1000,
-            "n": 1000,
-            "offest": 0,
-        }
-        # cookie添加os字段
-        custom_cookies = {"os": platform.system()}
+        path = "/api/v6/playlist/detail"
+        params = {"id": playlist_id, "n": 100000, "s": 8}
         return (
-            self.request("POST", path, params, {"code": -1}, custom_cookies)
+            self.eapi_request(path, params)
             .get("playlist", {})
             .get("trackIds", [])
         )
@@ -743,7 +753,12 @@ class NetEase:
 
     # 热门单曲 http://music.163.com/discover/toplist?id=
     def top_songlist(self, idx=0, offset=0, limit=100):
-        playlist_id = TOP_LIST_ALL[idx][1]
+        if self._toplists_cache is None:
+            self._toplists_cache = self.fetch_toplists()
+        if idx < 0 or idx >= len(self._toplists_cache):
+            log.error("top_songlist: invalid idx %s", idx)
+            return []
+        playlist_id = self._toplists_cache[idx][1]
         return self.playlist_songlist(playlist_id)
 
     # 歌手单曲
@@ -800,24 +815,40 @@ class NetEase:
         fallback_params = {"ids": ids, "br": rate_map.get(level, 320000)}
         return self.request("POST", path, fallback_params).get("data", [])
 
-    # lyric http://music.163.com/api/song/lyric?os=osx&id= &lv=-1&kv=-1&tv=-1
-    def song_lyric(self, music_id):
-        path = "/weapi/song/lyric"
-        params = {"os": "osx", "id": music_id, "lv": -1, "kv": -1, "tv": -1}
-        lyric = self.request("POST", path, params).get("lrc", {}).get("lyric", [])
+    def _song_lyric_data(self, music_id):
+        path = "/api/song/lyric/v1"
+        params = {
+            "id": music_id,
+            "cp": False,
+            "tv": 0,
+            "lv": 0,
+            "rv": 0,
+            "kv": 0,
+            "yv": 0,
+            "ytv": 0,
+            "yrv": 0,
+        }
+        return self.eapi_request(path, params)
+
+    @staticmethod
+    def _parse_lyric_lines(lyric):
+        """拆分歌词文本，过滤逐字歌词的 JSON 元信息行（如 {"t":14000,"c":[...]}）。"""
         if not lyric:
             return []
-        else:
-            return lyric.split("\n")
+        lines = []
+        for line in lyric.split("\n"):
+            if line.lstrip().startswith("{"):
+                continue
+            lines.append(line)
+        return lines
+
+    def song_lyric(self, music_id):
+        lyric = self._song_lyric_data(music_id).get("lrc", {}).get("lyric", [])
+        return self._parse_lyric_lines(lyric)
 
     def song_tlyric(self, music_id):
-        path = "/weapi/song/lyric"
-        params = {"os": "osx", "id": music_id, "lv": -1, "kv": -1, "tv": -1}
-        lyric = self.request("POST", path, params).get("tlyric", {}).get("lyric", [])
-        if not lyric:
-            return []
-        else:
-            return lyric.split("\n")
+        lyric = self._song_lyric_data(music_id).get("tlyric", {}).get("lyric", [])
+        return self._parse_lyric_lines(lyric)
 
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
     def djRadios(self, offset=0, limit=50):
