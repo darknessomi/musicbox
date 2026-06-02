@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # KenHuang:
@@ -9,6 +8,7 @@
 """
 网易云音乐 Menu
 """
+
 import curses as C
 import locale
 import os
@@ -20,24 +20,20 @@ import webbrowser
 from collections import namedtuple
 from copy import deepcopy
 from threading import Timer
+from typing import Any, cast
 
-from fuzzywuzzy import process
+from rapidfuzz import process
 
 from . import logger
 from .api import NetEase
 from .cache import Cache
-from .cmd_parser import cmd_parser
-from .cmd_parser import erase_coroutine
-from .cmd_parser import parse_keylist
+from .cmd_parser import cmd_parser, erase_coroutine, parse_keylist
 from .config import Config
-from .osdlyrics import pyqt_activity
-from .osdlyrics import show_lyrics_new_process
-from .osdlyrics import stop_lyrics_process
+from .osdlyrics import pyqt_activity, show_lyrics_new_process, stop_lyrics_process
 from .player import Player
 from .storage import Storage
 from .ui import Ui
 from .utils import notify
-
 
 locale.setlocale(locale.LC_ALL, "")
 
@@ -54,7 +50,7 @@ def carousel(left, right, x):
         return x
 
 
-KEY_MAP = Config().get("keymap")
+KEY_MAP = cast(dict[str, Any], Config().get("keymap"))
 COMMAND_LIST = list(map(ord, KEY_MAP.values()))
 
 if Config().get("mouse_movement"):
@@ -108,13 +104,13 @@ shortcut = [
 ]
 
 
-class Menu(object):
+class Menu:
     def __init__(self):
         self.quit = False
         self.config = Config()
         self.datatype = "main"
         self.title = "网易云音乐"
-        self.datalist = [
+        self.datalist: list[Any] = [
             {"entry_name": "排行榜"},
             {"entry_name": "艺术家"},
             {"entry_name": "新碟上架"},
@@ -131,19 +127,19 @@ class Menu(object):
         self.index = 0
         self.storage = Storage()
         self.storage.load()
-        self.collection = self.storage.database["collections"]
+        self.collection: list[Any] = self.storage.database["collections"]
         self.player = Player()
         self.player.playing_song_changed_callback = self.song_changed_callback
         self.cache = Cache()
         self.ui = Ui()
         self.api = NetEase()
         self.screen = C.initscr()
-        self.screen.keypad(1)
-        self.step = Config().get("page_length")
+        self.screen.keypad(True)
+        self.step = cast(int, Config().get("page_length"))
         if self.step == 0:
             self.step = max(int(self.ui.y * 4 / 5) - 10, 1)
-        self.stack = []
-        self.djstack = []
+        self.stack: list[list[Any]] = []
+        self.djstack: list[Any] = []
         self.at_playing_list = False
         self.enter_flag = True
         signal.signal(signal.SIGWINCH, self.change_term)
@@ -153,10 +149,10 @@ class Menu(object):
         self.countdown_start = time.time()
         self.countdown = -1
         self.is_in_countdown = False
-        self.timer = 0
-        self.key_list = []
-        self.pre_keylist = []
-        self.parser = None
+        self.timer: Timer | None = None
+        self.key_list: list[int] = []
+        self.pre_keylist: list[int] = []
+        self.parser: Any = None
         self.at_search_result = False
 
     @property
@@ -180,23 +176,64 @@ class Menu(object):
         return self.user["nickname"]
 
     def login(self):
-        if self.account and self.md5pass:
-            account, md5pass = self.account, self.md5pass
-        else:
-            account, md5pass = self.ui.build_login()
+        # 扫码登录，不再支持账号密码
+        unikey = self.api.login_qr_key()
+        if not unikey:
+            return self._login_retry()
 
-        resp = self.api.login(account, md5pass)
-        if resp["code"] == 200:
-            userid = resp["account"]["id"]
-            nickname = resp["profile"]["nickname"]
-            self.storage.login(account, md5pass, userid, nickname)
-            return True
-        else:
-            self.storage.logout()
-            x = self.ui.build_login_error()
-            if x >= 0 and C.keyname(x).decode("utf-8") != KEY_MAP["forward"]:
-                return False
-            return self.login()
+        url = self.api.login_qr_url(unikey)
+        status_row = self.ui.build_login_qr(url)
+        status_map = {
+            801: "等待扫码...",
+            802: "已扫码，请在手机上点击确认",
+            800: "二维码已过期",
+        }
+
+        deadline = time.time() + 300
+        last_code = None
+        self.ui.screen.nodelay(True)
+        try:
+            while time.time() < deadline:
+                resp = self.api.login_qr_check(unikey)
+                code = resp.get("code")
+                if code == 803:
+                    return self._on_qr_login_success()
+                if code == 800:
+                    break
+                if code != last_code:
+                    status_text = (
+                        status_map.get(code) if isinstance(code, int) else None
+                    )
+                    self.ui.update_login_qr_status(status_row, status_text or str(code))
+                    last_code = code
+                # 等待约 2 秒，期间允许用户按 Q/ESC 取消
+                wait_until = time.time() + 2
+                while time.time() < wait_until:
+                    ch = self.ui.screen.getch()
+                    if ch in (ord("q"), ord("Q"), 27):
+                        return False
+                    time.sleep(0.05)
+        finally:
+            self.ui.screen.nodelay(False)
+            self.ui.screen.timeout(100)
+
+        return self._login_retry()
+
+    def _on_qr_login_success(self):
+        info = self.api.get_account_info()
+        account = info.get("account") or {}
+        profile = info.get("profile") or {}
+        userid = account.get("id")
+        nickname = profile.get("nickname") or ""
+        self.storage.login(nickname, "", userid, nickname)
+        return True
+
+    def _login_retry(self):
+        self.storage.logout()
+        x = self.ui.build_login_error()
+        if x >= 0 and C.keyname(x).decode("utf-8") != KEY_MAP["forward"]:
+            return False
+        return self.login()
 
     def in_place_search(self):
         self.ui.screen.timeout(-1)
@@ -206,20 +243,24 @@ class Menu(object):
             return [], ""
         if self.datalist == []:
             return [], keyword
-        origin_index = 0
-        for item in self.datalist:
+        for origin_index, item in enumerate(self.datalist):
             item["origin_index"] = origin_index
-            origin_index += 1
         try:
             search_result = process.extract(
-                keyword, self.datalist, limit=max(10, 2 * self.step)
+                keyword,
+                self.datalist,
+                processor=lambda item: item.get("item", "")
+                if isinstance(item, dict)
+                else str(item),
+                limit=max(10, 2 * self.step),
             )
             if not search_result:
                 return search_result, keyword
             search_result.sort(key=lambda ele: ele[1], reverse=True)
-            return (list(map(lambda ele: ele[0], search_result)), keyword)
+            return ([ele[0] for ele in search_result], keyword)
         except Exception as e:
             log.warn(e)
+            return [], keyword
 
     def search(self, category):
         self.ui.screen.timeout(-1)
@@ -399,7 +440,7 @@ class Menu(object):
         return_data = self.request_api(self.api.fm_like, self.player.playing_id)
         if return_data:
             song_name = self.player.playing_name
-            notify("%s added successfully!" % song_name, 0)
+            notify(f"{song_name} added successfully!", 0)
         else:
             notify("Adding song failed!", 0)
 
@@ -438,6 +479,8 @@ class Menu(object):
         offset = self.offset
         idx = self.index
         step = self.step
+        song_id = None
+        album_name = ""
         if datatype == "album":
             return
         if datatype in ["songs", "fmsongs"]:
@@ -456,7 +499,7 @@ class Menu(object):
             songs = self.api.album(album_id)
             self.datatype = "songs"
             self.datalist = self.api.dig_info(songs, "songs")
-            self.title = "网易云音乐 > 专辑 > %s" % album_name
+            self.title = f"网易云音乐 > 专辑 > {album_name}"
             for i in range(len(self.datalist)):
                 if self.datalist[i]["song_id"] == song_id:
                     self.offset = i - i % step
@@ -468,6 +511,8 @@ class Menu(object):
         # 键盘映射ascii编码 91 [ 93 ] 258<KEY_DOWN> 259 <KEY_UP> 106 j 107 k
         # 歌单快速跳跃
         result = parse_keylist(self.key_list)
+        if not isinstance(result, tuple):
+            return
         num, cmd = result
         if num == 0:  # 0j -> 1j
             num = 1
@@ -490,6 +535,8 @@ class Menu(object):
         step = self.step
         self.key_list.pop()
         song_index = parse_keylist(self.key_list)
+        if not isinstance(song_index, int):
+            return
         if self.index != song_index:
             self.index = song_index
             self.offset = self.index - self.index % step
@@ -504,7 +551,7 @@ class Menu(object):
 
         countdown = int(countdown)
         if countdown > 0:
-            notify("The musicbox will exit in {} minutes".format(countdown))
+            notify(f"The musicbox will exit in {countdown} minutes")
             self.countdown = countdown * 60
             self.is_in_countdown = True
             self.timer = Timer(self.countdown, self.stop, ())
@@ -609,13 +656,10 @@ class Menu(object):
                 and key != ord(KEY_MAP["nextSong"])
                 and key != ord(KEY_MAP["prevSong"])
             ):
-                if not (
-                    (
-                        set(self.pre_keylist)
-                        | {ord(KEY_MAP["prevSong"]), ord(KEY_MAP["nextSong"])}
-                    )
-                    == {ord(KEY_MAP["prevSong"]), ord(KEY_MAP["nextSong"])}
-                ):
+                if set(self.pre_keylist) | {
+                    ord(KEY_MAP["prevSong"]),
+                    ord(KEY_MAP["nextSong"]),
+                } != {ord(KEY_MAP["prevSong"]), ord(KEY_MAP["nextSong"])}:
                     self.pre_keylist.append(key)
                 self.key_list = deepcopy(self.pre_keylist)
                 self.pre_keylist.clear()
@@ -657,11 +701,10 @@ class Menu(object):
                 continue
 
             # 如果是 数字+ [ ] j k
-            if len(keylist) > 1:
-                if parse_keylist(keylist):
-                    self.num_jump_key_event()
-                    self.key_list.clear()
-                    continue
+            if len(keylist) > 1 and parse_keylist(keylist):
+                self.num_jump_key_event()
+                self.key_list.clear()
+                continue
             # if self.is_in_countdown:
             #     if time.time() - self.countdown_start > self.countdown:
             #         break
@@ -682,19 +725,21 @@ class Menu(object):
                 break
 
             # 上移
-            elif C.keyname(key).decode("utf-8") == KEY_MAP[
-                "up"
-            ] and pre_key not in range(ord("0"), ord("9")):
-                self.up_key_event()
-            elif self.config.get("mouse_movement") and key == KEY_MAP["mouseUp"]:
+            elif (
+                C.keyname(key).decode("utf-8") == KEY_MAP["up"]
+                and pre_key not in range(ord("0"), ord("9"))
+                or self.config.get("mouse_movement")
+                and key == KEY_MAP["mouseUp"]
+            ):
                 self.up_key_event()
 
             # 下移
-            elif C.keyname(key).decode("utf-8") == KEY_MAP[
-                "down"
-            ] and pre_key not in range(ord("0"), ord("9")):
-                self.down_key_event()
-            elif self.config.get("mouse_movement") and key == KEY_MAP["mouseDown"]:
+            elif (
+                C.keyname(key).decode("utf-8") == KEY_MAP["down"]
+                and pre_key not in range(ord("0"), ord("9"))
+                or self.config.get("mouse_movement")
+                and key == KEY_MAP["mouseDown"]
+            ):
                 self.down_key_event()
 
             # 向上翻页
@@ -757,7 +802,7 @@ class Menu(object):
                 return_data = self.request_api(self.api.fm_like, self.player.playing_id)
                 if return_data:
                     song_name = self.player.playing_name
-                    notify("%s added successfully!" % song_name, 0)
+                    notify(f"{song_name} added successfully!", 0)
                 else:
                     notify("Adding song failed!", 0)
 
@@ -805,6 +850,8 @@ class Menu(object):
             elif C.keyname(key).decode("utf-8") == KEY_MAP["enterAlbum"]:
                 if datatype == "album":
                     continue
+                song_id = None
+                album_name = ""
                 if datatype in ["songs", "fmsongs"]:
                     song_id = datalist[idx]["song_id"]
                     album_id = datalist[idx]["album_id"]
@@ -821,7 +868,7 @@ class Menu(object):
                     songs = self.api.album(album_id)
                     self.datatype = "songs"
                     self.datalist = self.api.dig_info(songs, "songs")
-                    self.title = "网易云音乐 > 专辑 > %s" % album_name
+                    self.title = f"网易云音乐 > 专辑 > {album_name}"
                     for i in range(len(self.datalist)):
                         if self.datalist[i]["song_id"] == song_id:
                             self.offset = i - i % step
@@ -955,11 +1002,13 @@ class Menu(object):
                 )
                 cache_thread.start()
             # 在网页打开 ord(i)
-            elif C.keyname(key).decode("utf-8") == KEY_MAP["musicInfo"]:
-                if self.player.playing_id != -1:
-                    webbrowser.open_new_tab(
-                        "http://music.163.com/song?id={}".format(self.player.playing_id)
-                    )
+            elif (
+                C.keyname(key).decode("utf-8") == KEY_MAP["musicInfo"]
+                and self.player.playing_id != -1
+            ):
+                webbrowser.open_new_tab(
+                    f"http://music.163.com/song?id={self.player.playing_id}"
+                )
             # term resize
             # 刷新屏幕  按下某个键或者默认5秒刷新空白区
             #            erase_coro.send(key)
@@ -1001,8 +1050,8 @@ class Menu(object):
             self.datatype = "artist_info"
             self.title += " > " + artist_name
             self.datalist = [
-                {"item": "{}的热门歌曲".format(artist_name), "id": artist_id},
-                {"item": "{}的所有专辑".format(artist_name), "id": artist_id},
+                {"item": f"{artist_name}的热门歌曲", "id": artist_id},
+                {"item": f"{artist_name}的所有专辑", "id": artist_id},
             ]
 
         elif datatype == "artist_info":
@@ -1077,8 +1126,7 @@ class Menu(object):
             for one_comment in hotcomments:
                 self.datalist.append(
                     {
-                        "comment_content": "(热评 %s❤️ ️) %s: %s"
-                        % (
+                        "comment_content": "(热评 {}❤️ ️) {}: {}".format(
                             one_comment["likedCount"],
                             one_comment["user"]["nickname"],
                             one_comment["content"],
@@ -1089,8 +1137,7 @@ class Menu(object):
                 # self.datalist.append(one_comment["content"])
                 self.datalist.append(
                     {
-                        "comment_content": "(%s❤️ ️) %s: %s"
-                        % (
+                        "comment_content": "({}❤️ ️) {}: {}".format(
                             one_comment["likedCount"],
                             one_comment["user"]["nickname"],
                             one_comment["content"],
@@ -1098,7 +1145,7 @@ class Menu(object):
                     }
                 )
             self.datatype = "comments"
-            self.title = "网易云音乐 > 评论: %s" % datalist[idx]["song_name"]
+            self.title = "网易云音乐 > 评论: {}".format(datalist[idx]["song_name"])
             self.offset = 0
             self.index = 0
 

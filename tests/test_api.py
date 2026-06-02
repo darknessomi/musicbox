@@ -1,5 +1,4 @@
-from NEMbox.api import NetEase
-from NEMbox.api import Parse
+from NEMbox.api import NetEase, Parse
 
 
 def test_api():

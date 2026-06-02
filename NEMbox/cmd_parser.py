@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# coding=utf-8
 # __author__='walker'
 """
 捕获类似curses键盘输入流,生成指令流
 """
+
 import curses
 from copy import deepcopy
 from functools import wraps
@@ -36,9 +36,7 @@ def _cmd_parser():
     keylist = []
     while 1:
         key = yield
-        if key > 0 and pre_key == -1:
-            keylist.append(key)
-        elif key > 0 and pre_key > 0:
+        if key > 0 and pre_key == -1 or key > 0 and pre_key > 0:
             keylist.append(key)
         elif curses.keyname(key).decode("utf-8") in KEY_MAP.values() and pre_key > 0:
             keylist.append(key)
@@ -62,9 +60,7 @@ def _erase_coroutine():
     while 1:
         key = yield
         keylist.append(key)
-        if len(set(keylist)) > 1:
-            return keylist
-        elif len(keylist) >= ERASE_SPEED * 2:
+        if len(set(keylist)) > 1 or len(keylist) >= ERASE_SPEED * 2:
             return keylist
 
 
@@ -143,7 +139,7 @@ def main(data):
     print(x.send(3))
     try:
         print(x.send(-1))
-    except Exception as e:
+    except StopIteration as e:
         print(e.value)
 
 

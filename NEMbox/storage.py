@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 # @Author: Catofes
 # @Date:   2015-08-15
 """
 Class to stores everything into a json file.
 """
+
 import json
 
 from .const import Constant
@@ -72,12 +72,12 @@ class Storage(Singleton):
         self.cookie_path = Constant.cookie_path
 
     def login(self, username, password, userid, nickname):
-        self.database["user"] = dict(
-            username=username,
-            password=password,
-            user_id=userid,
-            nickname=nickname,
-        )
+        self.database["user"] = {
+            "username": username,
+            "password": password,
+            "user_id": userid,
+            "nickname": nickname,
+        }
 
     def logout(self):
         self.database["user"] = {
@@ -89,7 +89,7 @@ class Storage(Singleton):
 
     def load(self):
         try:
-            with open(self.storage_path, "r") as f:
+            with open(self.storage_path) as f:
                 for k, v in json.load(f).items():
                     if isinstance(self.database[k], dict):
                         self.database[k].update(v)

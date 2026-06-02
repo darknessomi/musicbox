@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-07-15 15:48:27
 # @Last Modified by:   AlanAlbert
@@ -7,12 +6,17 @@
 """
 网易云音乐 Player
 """
+
+from __future__ import annotations
+
 # Let's make some noise
 import os
 import random
 import subprocess
 import threading
 import time
+from collections.abc import Callable
+from typing import Any, cast
 
 from . import logger
 from .api import NetEase
@@ -23,11 +27,10 @@ from .storage import Storage
 from .ui import Ui
 from .utils import notify
 
-
 log = logger.getLogger(__name__)
 
 
-class Player(object):
+class Player:
     MODE_ORDERED = 0
     MODE_ORDERED_LOOP = 1
     MODE_SINGLE_LOOP = 2
@@ -39,7 +42,7 @@ class Player(object):
     def __init__(self):
         self.config = Config()
         self.ui = Ui()
-        self.popen_handler = None
+        self.popen_handler: Any = None
         # flag stop, prevent thread start
         self.playing_flag = False
         self.refresh_url_flag = False
@@ -47,30 +50,30 @@ class Player(object):
         self.process_location = 0
         self.storage = Storage()
         self.cache = Cache()
-        self.end_callback = None
-        self.playing_song_changed_callback = None
+        self.end_callback: Callable[[], None] | None = None
+        self.playing_song_changed_callback: Callable[[], None] | None = None
         self.api = NetEase()
         self.playinfo_starts = time.time()
 
     @property
-    def info(self):
-        return self.storage.database["player_info"]
+    def info(self) -> dict[str, Any]:
+        return cast(dict[str, Any], self.storage.database["player_info"])
 
     @property
-    def songs(self):
-        return self.storage.database["songs"]
+    def songs(self) -> dict[str, dict[str, Any]]:
+        return cast(dict[str, dict[str, Any]], self.storage.database["songs"])
 
     @property
     def index(self):
         return self.info["idx"]
 
     @property
-    def list(self):
-        return self.info["player_list"]
+    def list(self) -> list[str]:
+        return cast(list[str], self.info["player_list"])
 
     @property
-    def order(self):
-        return self.info["playing_order"]
+    def order(self) -> list[int]:
+        return cast(list[int], self.info["playing_order"])
 
     @property
     def mode(self):
@@ -105,7 +108,7 @@ class Player(object):
         return self.config.get("mpg123_parameters")
 
     @property
-    def current_song(self):
+    def current_song(self) -> dict[str, Any]:
         if not self.songs:
             return {}
 
@@ -145,9 +148,7 @@ class Player(object):
         )
 
     def notify_copyright_issue(self):
-        log.warning(
-            "Song {} is unavailable due to copyright issue.".format(self.playing_id)
-        )
+        log.warning(f"Song {self.playing_id} is unavailable due to copyright issue.")
         notify("版权限制，无法播放此歌曲")
 
     def change_mode(self, step=1):
@@ -176,7 +177,7 @@ class Player(object):
                 self.songs[song_id] = song
 
     def refresh_urls(self):
-        songs = self.api.dig_info(self.list, "refresh_urls")
+        songs = cast(list[dict[str, Any]], self.api.dig_info(self.list, "refresh_urls"))
         if songs:
             for song in songs:
                 song_id = str(song["song_id"])
@@ -264,7 +265,7 @@ class Player(object):
         try:
             self.popen_handler.stdin.write(b"L " + url.encode("utf-8") + b"\n")
             self.popen_handler.stdin.flush()
-        except:
+        except Exception:
             pass
 
         strout = " "
@@ -355,9 +356,11 @@ class Player(object):
             self.refresh_url_flag = False
         else:
             # When no replay are needed
-            if not self.playing_flag:
-                self.stop()
-            elif copyright_issue_flag and self.is_single_loop_mode:
+            if (
+                not self.playing_flag
+                or copyright_issue_flag
+                and self.is_single_loop_mode
+            ):
                 self.stop()
             else:
                 self.next()
@@ -393,7 +396,7 @@ class Player(object):
         that would give to subprocess.Popen.
         """
         # print(args.get('cache'))
-        if "cache" in args.keys() and os.path.isfile(args["cache"]):
+        if "cache" in args and os.path.isfile(args["cache"]):
             thread = threading.Thread(
                 target=self.run_mpg123, args=(on_exit, args["cache"])
             )
@@ -483,13 +486,10 @@ class Player(object):
     def _need_to_shuffle(self):
         playing_order = self.order
         random_index = self.info["random_index"]
-        if (
+        return bool(
             random_index >= len(playing_order)
             or playing_order[random_index] != self.index
-        ):
-            return True
-        else:
-            return False
+        )
 
     def next_idx(self):
         if not self.is_index_valid:

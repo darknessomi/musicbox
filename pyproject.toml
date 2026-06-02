@@ -3,7 +3,7 @@ name = "NetEase-MusicBox"
 packages = [
   {include = "NEMbox"},
 ]
-version = "0.3.1"
+version = "0.5.0"
 # docs
 authors = [
   "omi <4399.omi@gmail.com>",
@@ -28,19 +28,18 @@ readme = "README.md"
 repository = "https://github.com/darknessomi/musicbox"
 
 [tool.poetry.dependencies]
-fuzzywuzzy = "^0.18.0"
-importlib-metadata = "^2.0.0"
-pycryptodomex = "^3.9.8"
-python = "^3.6"
-python-Levenshtein = "^0.12.0"
-requests = "^2.24.0"
-requests-cache = "^0.5.2"
+python = "^3.10"
+pycryptodomex = "^3.20"
+rapidfuzz = "^3.0"
+requests = "^2.32"
+requests-cache = "^1.2"
+urllib3 = "^2.0"
+qrcode = "^8.2"
 
-[tool.poetry.dev-dependencies]
-black = {version = "^20.8b1", python = "^3.7"}
-flake8 = "^3.8.4"
-mypy = "^0.782"
-pytest = "^6.1.1"
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.0"
+pytest = "^8.0"
+ruff = "^0.9"
 
 [tool.poetry.scripts]
 musicbox = "NEMbox.__main__:start"
@@ -48,3 +47,19 @@ musicbox = "NEMbox.__main__:start"
 [build-system]
 build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core>=1.0.0"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+exclude = [".venv", "**/__pycache__"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+ignore = ["E501", "E402", "E203"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["NEMbox"]

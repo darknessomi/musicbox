@@ -19,9 +19,7 @@ class Config(Singleton):
             "page_length": {
                 "value": 10,
                 "default": 10,
-                "describe": (
-                    "Entries each page has. " "Set 0 to adjust automatically."
-                ),
+                "describe": ("Entries each page has. Set 0 to adjust automatically."),
             },
             "cache": {
                 "value": False,
@@ -40,8 +38,7 @@ class Config(Singleton):
                 "value": [],
                 "default": [],
                 "describe": (
-                    "The additional parameters when "
-                    "aria2c start to download something."
+                    "The additional parameters when aria2c start to download something."
                 ),
             },
             "music_quality": {
@@ -210,7 +207,7 @@ class Config(Singleton):
         if not os.path.isfile(self.path):
             self.generate_config_file()
 
-        with open(self.path, "r") as config_file:
+        with open(self.path) as config_file:
             try:
                 self.config = json.load(config_file)
             except ValueError:
@@ -225,7 +222,7 @@ class Config(Singleton):
             utf8_data_to_file(config_file, json.dumps(self.config, indent=2))
 
     def get(self, name):
-        if name not in self.config.keys():
+        if name not in self.config:
             self.config[name] = self.default_config[name]
             return self.default_config[name]["value"]
         return self.config[name]["value"]

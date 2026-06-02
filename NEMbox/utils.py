@@ -1,17 +1,15 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # utils.py --- utils for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
 """
 定义几个函数 写文件 通知 返回键 创建目录 创建文件
 """
+
+import hashlib
 import os
 import platform
 import subprocess
-import hashlib
-
 from collections import OrderedDict
-
 
 __all__ = [
     "utf8_data_to_file",
@@ -66,13 +64,13 @@ def notify_command_osx(msg, msg_type, duration_time=None):
     command = ["/usr/bin/osascript", "-e"]
     tpl = 'display notification "{}" {} with title "musicbox"'
     sound = 'sound name "/System/Library/Sounds/Ping.aiff"' if msg_type else ""
-    command.append(tpl.format(msg, sound).encode("utf-8"))
+    command.append(tpl.format(msg, sound))
     return command
 
 
 def notify_command_linux(msg, duration_time=None):
     command = ["/usr/bin/notify-send"]
-    command.append(msg.encode("utf-8"))
+    command.append(msg)
     if duration_time:
         command.extend(["-t", str(duration_time)])
     command.extend(["-h", "int:transient:1"])

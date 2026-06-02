@@ -26,13 +26,28 @@ ________     __________________________  _____ _     _
 + ------------------------------------------ +
 
 """
-from importlib_metadata import version
+
+from importlib.metadata import distributions
 
 from .const import Constant
-from .utils import create_dir
-from .utils import create_file
+from .utils import create_dir, create_file
 
-__version__ = version("NetEase-MusicBox")
+
+def _parse_version(version: str) -> tuple[int, ...]:
+    parts = []
+    for part in version.split("."):
+        digits = ""
+        for char in part:
+            if char.isdigit():
+                digits += char
+            else:
+                break
+        parts.append(int(digits) if digits else 0)
+    return tuple(parts)
+
+
+_versions = [_parse_version(d.version) for d in distributions(name="NetEase-MusicBox")]
+__version__ = ".".join(map(str, max(_versions))) if _versions else "0.5.0"
 
 
 def create_config():

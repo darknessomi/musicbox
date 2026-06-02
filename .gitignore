@@ -151,3 +151,4 @@ Session.vim
 .vim
 
 test_login.py
+.poetry-cache
