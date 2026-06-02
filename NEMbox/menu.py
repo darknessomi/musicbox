@@ -104,6 +104,38 @@ shortcut = [
 ]
 
 
+def _item_search_text(item: Any) -> str:
+    if isinstance(item, dict):
+        parts = [
+            item.get("item"),
+            item.get("song_name"),
+            item.get("artist"),
+            item.get("album_name"),
+            item.get("artists_name"),
+            item.get("albums_name"),
+            item.get("playlist_name"),
+            item.get("title"),
+            item.get("entry_name"),
+            item.get("comment_content"),
+            item.get("_search_label"),
+        ]
+        return " ".join(part for part in parts if part)
+    return str(item)
+
+
+def _prepare_search_items(datalist: list[Any]) -> list[Any]:
+    search_items: list[Any] = []
+    for origin_index, item in enumerate(datalist):
+        if isinstance(item, dict):
+            item["origin_index"] = origin_index
+            search_items.append(item)
+        else:
+            search_items.append(
+                {"_search_label": str(item), "origin_index": origin_index}
+            )
+    return search_items
+
+
 class Menu:
     def __init__(self):
         self.quit = False
@@ -229,7 +261,6 @@ class Menu:
         return True
 
     def _login_retry(self):
-        self.storage.logout()
         x = self.ui.build_login_error()
         if x >= 0 and C.keyname(x).decode("utf-8") != KEY_MAP["forward"]:
             return False
@@ -243,15 +274,12 @@ class Menu:
             return [], ""
         if self.datalist == []:
             return [], keyword
-        for origin_index, item in enumerate(self.datalist):
-            item["origin_index"] = origin_index
+        search_items = _prepare_search_items(self.datalist)
         try:
             search_result = process.extract(
                 keyword,
-                self.datalist,
-                processor=lambda item: item.get("item", "")
-                if isinstance(item, dict)
-                else str(item),
+                search_items,
+                processor=_item_search_text,
                 limit=max(10, 2 * self.step),
             )
             if not search_result:
@@ -995,7 +1023,11 @@ class Menu:
 
             # 开始下载
             elif C.keyname(key).decode("utf-8") == KEY_MAP["cache"]:
+                if self.datatype not in ("songs", "fmsongs", "djprograms"):
+                    continue
                 s = self.datalist[self.index]
+                if not isinstance(s, dict) or "song_id" not in s:
+                    continue
                 cache_thread = threading.Thread(
                     target=self.player.cache_song,
                     args=(s["song_id"], s["song_name"], s["artist"], s["mp3_url"]),
@@ -1220,6 +1252,9 @@ class Menu:
         result = func(*args)
         if result:
             return result
+        # 已登录时，空列表是合法返回值，不应触发重新登录导致用户被下线
+        if isinstance(result, list) and self.account:
+            return result
         if not self.login():
             notify("You need to log in")
             return False
@@ -1276,13 +1311,19 @@ class Menu:
             self.title += " > 主播电台"
             self.datalist = self.api.djRadios()
         elif idx == 6:
+            if not self.account:
+                if not self.login():
+                    return
             self.datatype = "songs"
             self.title += " > 每日推荐歌曲"
             myplaylist = self.request_api(self.api.recommend_playlist)
-            if myplaylist == -1:
+            if myplaylist is False:
                 return
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
         elif idx == 7:
+            if not self.account:
+                if not self.login():
+                    return
             myplaylist = self.request_api(self.api.recommend_resource)
             self.datatype = "top_playlists"
             self.title += " > 每日推荐歌单"
