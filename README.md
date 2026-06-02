@@ -6,7 +6,9 @@
 
 高品质网易云音乐命令行客户端，基于 Python 编写。
 
-感谢为 MusicBox 的开发付出过努力的[每一个人](https://github.com/darknessomi/musicbox/graphs/contributors)。网易云音乐 API 能力由 [NeteaseCloudMusicApiEnhanced/api-enhanced](https://github.com/neteasecloudmusicapienhanced/api-enhanced) 提供支持。
+感谢为 MusicBox 的开发付出过努力的[每一个人](https://github.com/darknessomi/musicbox/graphs/contributors)。
+
+网易云音乐 API 能力由 [NeteaseCloudMusicApiEnhanced/api-enhanced](https://github.com/neteasecloudmusicapienhanced/api-enhanced) 提供支持。
 
 ## Demo
 
