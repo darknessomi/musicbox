@@ -1036,7 +1036,7 @@ class Menu:
             # 在网页打开 ord(i)
             elif (
                 C.keyname(key).decode("utf-8") == KEY_MAP["musicInfo"]
-                and self.player.playing_id != -1
+                and self.player.playing_id is not None
             ):
                 webbrowser.open_new_tab(
                     f"http://music.163.com/song?id={self.player.playing_id}"
