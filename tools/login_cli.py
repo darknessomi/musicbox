@@ -2,7 +2,7 @@
 """命令行扫码登录测试入口。
 
 用法:
-    poetry run python tools/login_cli.py
+    uv run python tools/login_cli.py
 
 流程：获取二维码 -> 终端打印二维码与链接 -> 轮询扫码状态 -> 成功后拉取账号信息。
 """

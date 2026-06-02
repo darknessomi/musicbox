@@ -160,7 +160,9 @@ class Menu:
         self.index = 0
         self.storage = Storage()
         self.storage.load()
-        self.collection: list[Any] = self.storage.database["collections"]
+        self.collection: list[Any] = cast(
+            list[Any], self.storage.database["collections"]
+        )
         self.player = Player()
         self.player.playing_song_changed_callback = self.song_changed_callback
         self.cache = Cache()

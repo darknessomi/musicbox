@@ -19,7 +19,11 @@ import tempfile
 import threading
 import time
 from collections.abc import Callable
-from typing import Any, cast
+from typing import (  # noqa: UP035 — List avoids shadowing by @property list
+    Any,
+    List,
+    cast,
+)
 
 from . import logger
 from .api import NetEase
@@ -74,11 +78,11 @@ class Player:
         return self.info["idx"]
 
     @property
-    def list(self) -> list[str]:
+    def list(self) -> List[str]:  # noqa: UP006
         return cast(list[str], self.info["player_list"])
 
     @property
-    def order(self) -> list[int]:
+    def order(self) -> List[int]:  # noqa: UP006
         return cast(list[int], self.info["playing_order"])
 
     @property

@@ -26,15 +26,12 @@
 
 ## 安装
 
-`musicbox` 是命令行应用。普通用户建议用 [uv](https://docs.astral.sh/uv/) 或 [pipx](https://pipx.pypa.io/) 安装为全局命令；Poetry 只用于本仓库开发调试，不会提供全局 `musicbox` 命令。
+推荐用 [uv](https://docs.astral.sh/uv/) 或 [pipx](https://pipx.pypa.io/) 安装为全局命令 `musicbox`；参与开发见下文「本地开发」。
 
 ### 环境要求
 
 - Python 3.10 及以上
-- `mpg123`，用于默认 MP3 播放
-- `mpv`，可选，用于 FLAC 无损/Hi-Res 播放
-
-`rapidfuzz` 和 `qrcode` 会随 MusicBox 自动安装，分别用于模糊搜索和扫码登录二维码生成。
+- `mpg123`（MP3）、`mpv`（可选，FLAC / Hi-Res）
 
 ### 安装系统依赖
 
@@ -58,36 +55,29 @@ sudo yum install -y python3-devel mpg123 mpv
 
 ### 安装 MusicBox
 
-从源码安装最新代码：
-
-```bash
-git clone https://github.com/darknessomi/musicbox.git
-cd musicbox
-uv tool install .
-```
-
-也可以使用 `pipx install .`。如果希望源码改动实时生效，使用 `uv tool install -e .`。
-
-> `uv tool install .` / `pipx install .` 安装的是源码的一份快照副本，之后修改源码不会自动生效，需重新执行安装命令。如需源码改动实时生效，用 `uv tool install -e .`。
-
-从 PyPI 安装：
+**PyPI**（可能落后于源码）：
 
 ```bash
 uv tool install netease-musicbox
-# 或
-pipx install NetEase-MusicBox
+# 或 pipx install NetEase-MusicBox
 ```
 
-PyPI 版本可能落后于源码。
-
-### 开发调试
+**源码**（全局命令；改代码后需重装，开发期可用 `-e`）：
 
 ```bash
 git clone https://github.com/darknessomi/musicbox.git
 cd musicbox
-poetry env use python3.12
-poetry install
-poetry run musicbox
+uv tool install .      # 或 pipx install .
+uv tool install -e .   # 可编辑安装，源码改动即时生效
+```
+
+**本地开发**（不装全局命令）：
+
+```bash
+git clone https://github.com/darknessomi/musicbox.git
+cd musicbox
+uv sync
+uv run musicbox
 ```
 
 ### 可选依赖
@@ -107,10 +97,9 @@ musicbox
 进入需要登录的功能时，终端会显示二维码。登录方式仅支持扫码登录，已不再支持账号密码登录。
 
 1. 用网易云音乐手机 App 扫描二维码，并在手机上确认。
-2. 登录成功后 Cookie 会保存到 `~/.local/share/netease-musicbox/cookie.txt`。
-3. 未设置 `XDG_DATA_HOME` 时，Cookie 会保存到 `~/.config/netease-musicbox/cookie.txt`。
+2. 登录成功后 Cookie 写入 `~/.local/share/netease-musicbox/cookie.txt`（未设置 `XDG_DATA_HOME` 时为 `~/.netease-musicbox/cookie.txt`）。
 
-二维码会在终端中以字符块渲染。请保证终端窗口足够高，约 25 行以上，并使用等宽字体。若终端二维码无法扫描，可复制提示中的 `https://music.163.com/login?codekey=...` 链接，用其他工具生成二维码后再扫码。
+终端以字符块渲染二维码，窗口建议 ≥25 行、等宽字体。无法扫描时，可复制提示中的 `https://music.163.com/login?codekey=...` 链接另行生成二维码。
 
 ## 快捷键
 
@@ -174,8 +163,8 @@ musicbox
   | `0` / `exhigh` | 极高，最高 320kbps |
   | `1` / `higher` | 较高，192kbps |
   | `2` / `standard` | 标准，128kbps |
-  
-- `player_backend`: 默认 `mpg123`。设置为 `mpv` 后所有歌曲都用 `mpv` 播放；保持默认时，FLAC 链接会自动切到 `mpv`。
+
+- `player_backend`：默认 `mpg123`；设为 `mpv` 则全程用 `mpv`，否则仅 FLAC 自动切到 `mpv`。
 - `mpv_parameters`: 传给 `mpv` 的额外参数列表。
 
 由于歌曲 API 只接受中国大陆地区访问，非中国大陆地区用户需要自行设置代理。可用 polipo 将 socks5 代理转换成 http 代理：
@@ -193,30 +182,8 @@ curl -L ip.cn
 - 某些歌曲不能播放且总时长为 `00:01` 时，通常是版权问题。
 - 特定终端不能播放时，先检查同一终端下 `mpg123` 能否正常使用，再检查其他终端下 `musicbox` 能否正常使用。报告 issue 时请附上这些检查结果和终端报错。
 - 可通过 `tail -f ~/.local/share/netease-musicbox/musicbox.log` 查看日志。
-- `mpg123` 部分新版本可能会报找不到声音硬件的错误，已知 `1.25.6` 可正常使用。
 
-### 已知问题
 
-- [#374](https://github.com/darknessomi/musicbox/issues/374)：i3wm 下播放杂音或快进，常见于 Arch Linux，可尝试更改 `mpg123` 配置。
-- [#405](https://github.com/darknessomi/musicbox/issues/405)：32 位 Python 下 Cookie 时间戳超出 32 位整数最大值，可尝试使用 64 位 Python，或拷贝 Cookie 文件到对应位置。
-- [#347](https://github.com/darknessomi/musicbox/issues/347)：暂停数分钟后 `mpg123` 停止输出，导致切换到下一首歌。该问题来自 `mpg123`，暂时无解决方案。
-- [#791](https://github.com/darknessomi/musicbox/issues/791)：版权问题，`master` 分支已修复。
-
-## 其他安装方式
-
-以下方式可能不是最新版本，仅作备选。
-
-Fedora:
-
-```bash
-sudo dnf install musicbox
-```
-
-Arch Linux:
-
-```bash
-pacaur -S netease-musicbox-git
-```
 
 ## 更新日志
 
