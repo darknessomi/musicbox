@@ -264,7 +264,7 @@ class Player(object):
         try:
             self.popen_handler.stdin.write(b"L " + url.encode("utf-8") + b"\n")
             self.popen_handler.stdin.flush()
-        except:
+        except Exception:
             pass
 
         strout = " "
