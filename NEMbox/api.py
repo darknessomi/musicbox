@@ -428,6 +428,13 @@ class NetEase:
         return [name for name, _ in self._toplists_cache]
 
     def logout(self):
+        """服务端登出后清理本地 cookie 与账号缓存，对照 api-enhanced logout。"""
+        try:
+            resp = self.eapi_request("/api/logout", {})
+            if resp.get("code") != 200:
+                log.warning("logout api failed: %s", resp)
+        except Exception as e:
+            log.warning("logout api error: %s", e)
         self.session.cookies.clear()
         self.storage.database["user"] = {
             "username": "",

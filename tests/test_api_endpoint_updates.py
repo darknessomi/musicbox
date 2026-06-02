@@ -184,6 +184,48 @@ def _fake_toplist_response():
     )()
 
 
+def test_logout_calls_eapi_logout_before_clearing_local(monkeypatch):
+    api = make_api()
+    eapi_calls = []
+    cleared = []
+    saved = []
+
+    def fake_eapi_request(path, params=None):
+        eapi_calls.append((path, params or {}))
+        return {"code": 200}
+
+    class FakeCookies:
+        def clear(self):
+            cleared.append(True)
+
+    api.session.cookies = FakeCookies()
+    api.cookie_jar = type("Jar", (), {"save": lambda self: saved.append(True)})()
+    api.storage = type(
+        "Storage",
+        (),
+        {
+            "database": {
+                "user": {
+                    "username": "u",
+                    "password": "",
+                    "user_id": "1",
+                    "nickname": "n",
+                }
+            },
+            "save": lambda self: None,
+        },
+    )()
+
+    monkeypatch.setattr(api, "eapi_request", fake_eapi_request)
+
+    api.logout()
+
+    assert eapi_calls == [("/api/logout", {})]
+    assert cleared == [True]
+    assert saved == [True]
+    assert api.storage.database["user"]["nickname"] == ""
+
+
 def test_fetch_toplists_uses_api_toplist(monkeypatch):
     api = make_api()
     calls = []
