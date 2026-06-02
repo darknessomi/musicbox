@@ -46,6 +46,11 @@ def _is_escape_key(ch) -> bool:
     return ch == 27
 
 
+def _safe_curs_set(visibility):
+    with contextlib.suppress(curses.error):
+        curses.curs_set(visibility)
+
+
 def playinfo_song_start(indented_startcol, prefix, quality):
     return indented_startcol + truelen(prefix + quality) + 2
 
@@ -165,7 +170,7 @@ class Ui:
         self, song_name, artist, album_name, quality, start, pause=False
     ):
         curses.noecho()
-        curses.curs_set(0)
+        _safe_curs_set(0)
         # refresh top 2 line
         self.screen.move(1, 1)
         self.screen.clrtoeol()
@@ -284,7 +289,7 @@ class Ui:
         lyrics, tlyrics = song.get("lyric", []), song.get("tlyric", [])
 
         curses.noecho()
-        curses.curs_set(0)
+        _safe_curs_set(0)
         self.screen.move(3, 1)
         self.screen.clrtoeol()
         self.screen.move(4, 1)
@@ -375,7 +380,7 @@ class Ui:
         self.screen.refresh()
 
     def build_loading(self):
-        curses.curs_set(0)
+        _safe_curs_set(0)
         self.addstr(
             7, self.startcol, "享受高品质音乐，loading...", curses.color_pair(1)
         )
@@ -388,7 +393,7 @@ class Ui:
     def build_menu(self, datatype, title, datalist, offset, index, step, start):
         # keep playing info in line 1
         curses.noecho()
-        curses.curs_set(0)
+        _safe_curs_set(0)
         self.screen.move(7, 1)
         self.screen.clrtobot()
         self.addstr(7, self.startcol, title, curses.color_pair(1))
@@ -725,14 +730,44 @@ class Ui:
 
         import qrcode
 
-        qr = qrcode.QRCode(border=1)
-        qr.add_data(url)
-        qr.make(fit=True)
-        buf = io.StringIO()
-        qr.print_ascii(out=buf, invert=True)
-        lines = buf.getvalue().splitlines()
+        max_rows, _ = self.screen.getmaxyx()
+        qr_start_row = 6
 
-        curses.curs_set(0)
+        qr = None
+        lines = []
+        status_row = qr_start_row
+        show_link = False
+        for border in (4, 2, 1, 0):
+            candidate = qrcode.QRCode(border=border)
+            candidate.add_data(url)
+            candidate.make(fit=True)
+            buf = io.StringIO()
+            candidate.print_ascii(out=buf, invert=True)
+            candidate_lines = buf.getvalue().splitlines()
+            qr_height = len(candidate_lines)
+            link_row = qr_start_row + qr_height + 1
+            candidate_status_row = link_row + 2
+            if candidate_status_row < max_rows:
+                qr = candidate
+                lines = candidate_lines
+                status_row = candidate_status_row
+                show_link = True
+                break
+            if link_row < max_rows:
+                qr = candidate
+                lines = candidate_lines
+                status_row = link_row
+                break
+        if qr is None:
+            qr = qrcode.QRCode(border=0)
+            qr.add_data(url)
+            qr.make(fit=True)
+            buf = io.StringIO()
+            qr.print_ascii(out=buf, invert=True)
+            lines = buf.getvalue().splitlines()
+            status_row = min(qr_start_row + len(lines), max_rows - 1)
+
+        _safe_curs_set(0)
         curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
@@ -742,24 +777,30 @@ class Ui:
             "请使用网易云音乐 App 扫描二维码登录（按 [Q] 取消）",
             curses.color_pair(1),
         )
-        row = 6
+        row = qr_start_row
         for line in lines:
+            if row >= max_rows:
+                break
             self.addstr(row, self.startcol, line)
             row += 1
-        self.addstr(row + 1, self.startcol, "链接: " + url, curses.A_DIM)
-        status_row = row + 3
+        if show_link and row + 1 < max_rows:
+            self.addstr(row + 1, self.startcol, "链接: " + url, curses.A_DIM)
+        status_row = min(status_row, max_rows - 1)
         self.addstr(status_row, self.startcol, "等待扫码...", curses.color_pair(2))
         self.screen.refresh()
         return status_row
 
     def update_login_qr_status(self, row, text):
-        self.screen.move(row, 1)
-        self.screen.clrtoeol()
+        max_rows, _ = self.screen.getmaxyx()
+        row = min(max(row, 0), max_rows - 1)
+        with contextlib.suppress(curses.error):
+            self.screen.move(row, 1)
+            self.screen.clrtoeol()
         self.addstr(row, self.startcol, text, curses.color_pair(2))
         self.screen.refresh()
 
     def build_login_error(self):
-        curses.curs_set(0)
+        _safe_curs_set(0)
         self.screen.move(4, 1)
         self.screen.timeout(-1)  # disable the screen timeout
         self.screen.clrtobot()
@@ -775,7 +816,7 @@ class Ui:
         return x
 
     def build_search_error(self):
-        curses.curs_set(0)
+        _safe_curs_set(0)
         self.screen.move(4, 1)
         self.screen.timeout(-1)
         self.screen.clrtobot()
@@ -808,7 +849,7 @@ class Ui:
             raw = self.screen.getstr(y, x, max_len)
             return decode_terminal_input(raw)
 
-        curses.curs_set(1)
+        _safe_curs_set(1)
         chars = []
         self.screen.move(y, x)
         self.screen.keypad(True)
@@ -841,7 +882,7 @@ class Ui:
         return "".join(chars)
 
     def build_timing(self):
-        curses.curs_set(0)
+        _safe_curs_set(0)
         self.screen.move(6, 1)
         self.screen.clrtobot()
         self.screen.timeout(-1)
@@ -868,10 +909,10 @@ class Ui:
         try:
             return self._read_line_input(10, self.startcol, 60).strip()
         finally:
-            curses.curs_set(0)
+            _safe_curs_set(0)
 
     def update_size(self):
-        curses.curs_set(0)
+        _safe_curs_set(0)
         # get terminal size
         size = get_terminal_size()
         x = size[0]
