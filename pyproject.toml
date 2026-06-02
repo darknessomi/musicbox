@@ -37,9 +37,9 @@ urllib3 = "^2.0"
 qrcode = "^8.2"
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.0"
 pytest = "^8.0"
 ruff = "^0.9"
+pre-commit = "^4.6.0"
 
 [tool.poetry.scripts]
 musicbox = "NEMbox.__main__:start"
