@@ -1,27 +1,24 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 """
 网易云音乐 Api
 """
+
 import json
 import platform
 import time
 from collections import OrderedDict
-from http.cookiejar import Cookie
-from http.cookiejar import MozillaCookieJar
+from http.cookiejar import Cookie, MozillaCookieJar
 
 import requests
-import requests_cache
+from requests_cache import CachedSession
 
 from .config import Config
 from .const import Constant
 from .encrypt import encrypted_request
 from .logger import getLogger
 from .storage import Storage
-
-requests_cache.install_cache(Constant.cache_path, expire_after=3600)
 
 log = getLogger(__name__)
 
@@ -88,7 +85,20 @@ PLAYLIST_CLASSES = OrderedDict(
         ),
         (
             "场景",
-            ["清晨", "夜晚", "学习", "工作", "午休", "下午茶", "地铁", "驾车", "运动", "旅行", "散步", "酒吧"],
+            [
+                "清晨",
+                "夜晚",
+                "学习",
+                "工作",
+                "午休",
+                "下午茶",
+                "地铁",
+                "驾车",
+                "运动",
+                "旅行",
+                "散步",
+                "酒吧",
+            ],
         ),
         (
             "情感",
@@ -138,11 +148,11 @@ DEFAULT_TIMEOUT = 10
 BASE_URL = "http://music.163.com"
 
 
-class Parse(object):
+class Parse:
     @classmethod
     def _song_url_by_id(cls, sid):
         # 128k
-        url = "http://music.163.com/song/media/outer/url?id={}.mp3".format(sid)
+        url = f"http://music.163.com/song/media/outer/url?id={sid}.mp3"
         quality = "LD 128k"
         return url, quality
 
@@ -160,7 +170,7 @@ class Parse(object):
                 quality = "MD"
             else:
                 quality = "LD"
-            return url, "{} {}k".format(quality, br // 1000)
+            return url, f"{quality} {br // 1000}k"
         else:
             # songs_detail resp
             return Parse._song_url_by_id(song["id"])
@@ -268,7 +278,7 @@ class Parse(object):
         ]
 
 
-class NetEase(object):
+class NetEase:
     def __init__(self):
         self.header = {
             "Accept": "*/*",
@@ -284,7 +294,10 @@ class NetEase(object):
         self.storage = Storage()
         cookie_jar = MozillaCookieJar(self.storage.cookie_path)
         cookie_jar.load()
-        self.session = requests.Session()
+        self.session = CachedSession(
+            cache_name=Constant.cache_path,
+            expire_after=3600,
+        )
         self.session.cookies = cookie_jar
         for cookie in cookie_jar:
             if cookie.is_expired():
@@ -346,8 +359,14 @@ class NetEase(object):
             rest={},
         )
 
-    def request(self, method, path, params={}, default={"code": -1}, custom_cookies={}):
-        endpoint = "{}{}".format(BASE_URL, path)
+    def request(self, method, path, params=None, default=None, custom_cookies=None):
+        if custom_cookies is None:
+            custom_cookies = {}
+        if default is None:
+            default = {"code": -1}
+        if params is None:
+            params = {}
+        endpoint = f"{BASE_URL}{path}"
         csrf_token = ""
         for cookie in self.session.cookies:
             if cookie.name == "__csrf":
@@ -368,27 +387,26 @@ class NetEase(object):
         except requests.exceptions.RequestException as e:
             log.error(e)
         except ValueError:
-            log.error("Path: {}, response: {}".format(path, resp.text[:200]))
-        finally:
-            return data
+            log.error(f"Path: {path}, response: {resp.text[:200]}")
+        return data
 
     def login(self, username, password):
         self.session.cookies.load()
         if username.isdigit():
             path = "/weapi/login/cellphone"
-            params = dict(
-                phone=username,
-                password=password,
-                countrycode="86",
-                rememberLogin="true",
-            )
+            params = {
+                "phone": username,
+                "password": password,
+                "countrycode": "86",
+                "rememberLogin": "true",
+            }
         else:
             path = "/weapi/login"
-            params = dict(
-                username=username,
-                password=password,
-                rememberLogin="true",
-            )
+            params = {
+                "username": username,
+                "password": password,
+                "rememberLogin": "true",
+            }
         data = self.request("POST", path, params, custom_cookies={"os": "pc"})
         self.session.cookies.save()
         return data
@@ -396,13 +414,13 @@ class NetEase(object):
     # 每日签到
     def daily_task(self, is_mobile=True):
         path = "/weapi/point/dailyTask"
-        params = dict(type=0 if is_mobile else 1)
+        params = {"type": 0 if is_mobile else 1}
         return self.request("POST", path, params)
 
     # 用户歌单
     def user_playlist(self, uid, offset=0, limit=50):
         path = "/weapi/user/playlist"
-        params = dict(uid=uid, offset=offset, limit=limit)
+        params = {"uid": uid, "offset": offset, "limit": limit}
         return self.request("POST", path, params).get("playlist", [])
 
     # 每日推荐歌单
@@ -413,7 +431,7 @@ class NetEase(object):
     # 每日推荐歌曲
     def recommend_playlist(self, total=True, offset=0, limit=20):
         path = "/weapi/v1/discovery/recommend/songs"
-        params = dict(total=total, offset=offset, limit=limit)
+        params = {"total": total, "offset": offset, "limit": limit}
         return self.request("POST", path, params).get("recommend", [])
 
     # 私人FM
@@ -424,35 +442,48 @@ class NetEase(object):
     # like
     def fm_like(self, songid, like=True, time=25, alg="itembased"):
         path = "/weapi/radio/like"
-        params = dict(
-            alg=alg, trackId=songid, like="true" if like else "false", time=time
-        )
+        params = {
+            "alg": alg,
+            "trackId": songid,
+            "like": "true" if like else "false",
+            "time": time,
+        }
         return self.request("POST", path, params)["code"] == 200
 
     # FM trash
     def fm_trash(self, songid, time=25, alg="RT"):
         path = "/weapi/radio/trash/add"
-        params = dict(songId=songid, alg=alg, time=time)
+        params = {"songId": songid, "alg": alg, "time": time}
         return self.request("POST", path, params)["code"] == 200
 
     # 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002) *(type)*
     def search(self, keywords, stype=1, offset=0, total="true", limit=50):
         path = "/weapi/search/get"
-        params = dict(s=keywords, type=stype, offset=offset, total=total, limit=limit)
+        params = {
+            "s": keywords,
+            "type": stype,
+            "offset": offset,
+            "total": total,
+            "limit": limit,
+        }
         return self.request("POST", path, params).get("result", {})
 
     # 新碟上架
     def new_albums(self, offset=0, limit=50):
         path = "/weapi/album/new"
-        params = dict(area="ALL", offset=offset, total=True, limit=limit)
+        params = {"area": "ALL", "offset": offset, "total": True, "limit": limit}
         return self.request("POST", path, params).get("albums", [])
 
     # 歌单（网友精选碟） hot||new http://music.163.com/#/discover/playlist/
     def top_playlists(self, category="全部", order="hot", offset=0, limit=50):
         path = "/weapi/playlist/list"
-        params = dict(
-            cat=category, order=order, offset=offset, total="true", limit=limit
-        )
+        params = {
+            "cat": category,
+            "order": order,
+            "offset": offset,
+            "total": "true",
+            "limit": limit,
+        }
         return self.request("POST", path, params).get("playlists", [])
 
     def playlist_catelogs(self):
@@ -462,9 +493,15 @@ class NetEase(object):
     # 歌单详情
     def playlist_songlist(self, playlist_id):
         path = "/weapi/v3/playlist/detail"
-        params = dict(id=playlist_id, total="true", limit=1000, n=1000, offest=0)
+        params = {
+            "id": playlist_id,
+            "total": "true",
+            "limit": 1000,
+            "n": 1000,
+            "offest": 0,
+        }
         # cookie添加os字段
-        custom_cookies = dict(os=platform.system())
+        custom_cookies = {"os": platform.system()}
         return (
             self.request("POST", path, params, {"code": -1}, custom_cookies)
             .get("playlist", {})
@@ -474,7 +511,7 @@ class NetEase(object):
     # 热门歌手 http://music.163.com/#/discover/artist/
     def top_artists(self, offset=0, limit=100):
         path = "/weapi/artist/top"
-        params = dict(offset=offset, total=True, limit=limit)
+        params = {"offset": offset, "total": True, "limit": limit}
         return self.request("POST", path, params).get("artists", [])
 
     # 热门单曲 http://music.163.com/discover/toplist?id=
@@ -484,28 +521,28 @@ class NetEase(object):
 
     # 歌手单曲
     def artists(self, artist_id):
-        path = "/weapi/v1/artist/{}".format(artist_id)
+        path = f"/weapi/v1/artist/{artist_id}"
         return self.request("POST", path).get("hotSongs", [])
 
     def get_artist_album(self, artist_id, offset=0, limit=50):
-        path = "/weapi/artist/albums/{}".format(artist_id)
-        params = dict(offset=offset, total=True, limit=limit)
+        path = f"/weapi/artist/albums/{artist_id}"
+        params = {"offset": offset, "total": True, "limit": limit}
         return self.request("POST", path, params).get("hotAlbums", [])
 
     # album id --> song id set
     def album(self, album_id):
-        path = "/weapi/v1/album/{}".format(album_id)
+        path = f"/weapi/v1/album/{album_id}"
         return self.request("POST", path).get("songs", [])
 
     def song_comments(self, music_id, offset=0, total="false", limit=100):
-        path = "/weapi/v1/resource/comments/R_SO_4_{}/".format(music_id)
-        params = dict(rid=music_id, offset=offset, total=total, limit=limit)
+        path = f"/weapi/v1/resource/comments/R_SO_4_{music_id}/"
+        params = {"rid": music_id, "offset": offset, "total": total, "limit": limit}
         return self.request("POST", path, params)
 
     # song ids --> song urls ( details )
     def songs_detail(self, ids):
         path = "/weapi/v3/song/detail"
-        params = dict(c=json.dumps([{"id": _id} for _id in ids]), ids=json.dumps(ids))
+        params = {"c": json.dumps([{"id": _id} for _id in ids]), "ids": json.dumps(ids)}
         return self.request("POST", path, params).get("songs", [])
 
     def songs_url(self, ids):
@@ -513,13 +550,13 @@ class NetEase(object):
         rate_map = {0: 320000, 1: 192000, 2: 128000}
 
         path = "/weapi/song/enhance/player/url"
-        params = dict(ids=ids, br=rate_map[quality])
+        params = {"ids": ids, "br": rate_map[quality]}
         return self.request("POST", path, params).get("data", [])
 
     # lyric http://music.163.com/api/song/lyric?os=osx&id= &lv=-1&kv=-1&tv=-1
     def song_lyric(self, music_id):
         path = "/weapi/song/lyric"
-        params = dict(os="osx", id=music_id, lv=-1, kv=-1, tv=-1)
+        params = {"os": "osx", "id": music_id, "lv": -1, "kv": -1, "tv": -1}
         lyric = self.request("POST", path, params).get("lrc", {}).get("lyric", [])
         if not lyric:
             return []
@@ -528,7 +565,7 @@ class NetEase(object):
 
     def song_tlyric(self, music_id):
         path = "/weapi/song/lyric"
-        params = dict(os="osx", id=music_id, lv=-1, kv=-1, tv=-1)
+        params = {"os": "osx", "id": music_id, "lv": -1, "kv": -1, "tv": -1}
         lyric = self.request("POST", path, params).get("tlyric", {}).get("lyric", [])
         if not lyric:
             return []
@@ -538,12 +575,12 @@ class NetEase(object):
     # 今日最热（0）, 本周最热（10），历史最热（20），最新节目（30）
     def djRadios(self, offset=0, limit=50):
         path = "/weapi/djradio/hot/v1"
-        params = dict(limit=limit, offset=offset)
+        params = {"limit": limit, "offset": offset}
         return self.request("POST", path, params).get("djRadios", [])
 
     def djprograms(self, radio_id, asc=False, offset=0, limit=50):
         path = "/weapi/dj/program/byradio"
-        params = dict(asc=asc, radioId=radio_id, offset=offset, limit=limit)
+        params = {"asc": asc, "radioId": radio_id, "offset": offset, "limit": limit}
         programs = self.request("POST", path, params).get("programs", [])
         return [p["mainSong"] for p in programs]
 

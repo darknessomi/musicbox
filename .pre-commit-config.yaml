@@ -1,25 +1,13 @@
 repos:
-  - repo: https://github.com/ambv/black
-    rev: 20.8b1
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.10
     hooks:
-      - id: black
-        exclude: venv
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: check-yaml
-
-  - repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.3.6
-    hooks:
-      - id: reorder-python-imports
-        args: ["--py3-plus"]
-
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.4
-    hooks:
-      - id: flake8
-        # allow "imported but unused" for pre-commit, forbid it elsewhere e.g. in vscode
-        args: ["--config=setup.cfg", "--ignore=E402,F401"]

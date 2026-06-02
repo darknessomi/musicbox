@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import _curses
 import argparse
+import contextlib
 import curses
 import sys
 import traceback
@@ -21,10 +21,8 @@ def start():
 
     if args.version:
         latest = Menu().check_version()
-        try:
+        with contextlib.suppress(_curses.error):
             curses.endwin()
-        except _curses.error:
-            pass
         print("NetEase-MusicBox installed version:" + version)
         if latest != version:
             print("NetEase-MusicBox latest version:" + str(latest))

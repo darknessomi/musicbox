@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 # @Author: Catofes
 # @Date:   2015-08-15
 """
 Class to cache songs into local storage.
 """
+
 import os
 import signal
 import subprocess
@@ -75,7 +75,7 @@ class Cache(Singleton):
 
             new_url = NetEase().songs_url([song_id])[0]["url"]
             if new_url:
-                log.info("Old:{}. New:{}".format(url, new_url))
+                log.info(f"Old:{url}. New:{new_url}")
                 try:
                     para = [
                         "aria2c",
@@ -97,9 +97,7 @@ class Cache(Singleton):
                     )
                     self.aria2c.wait()
                 except OSError as e:
-                    log.warning(
-                        "{}.\tAria2c is unavailable, fall back to wget".format(e)
-                    )
+                    log.warning(f"{e}.\tAria2c is unavailable, fall back to wget")
 
                     para = ["wget", "-O", full_path, new_url]
                     self.wget = subprocess.Popen(

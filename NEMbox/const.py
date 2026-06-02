@@ -3,7 +3,7 @@
 import os
 
 
-class Constant(object):
+class Constant:
     if "XDG_CONFIG_HOME" in os.environ:
         conf_dir = os.path.join(os.environ["XDG_CONFIG_HOME"], "netease-musicbox")
     else:

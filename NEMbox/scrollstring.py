@@ -1,9 +1,8 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 from time import time
 
 
-class scrollstring(object):
+class scrollstring:
     def __init__(self, content, START):
         self.content = content  # the true content of the string
         self.display = content  # the displayed string
@@ -51,10 +50,8 @@ def truelen(string):
 
 def truelen_cut(string, length):
     current_length = 0
-    current_pos = 0
-    for c in string:
+    for current_pos, c in enumerate(string):
         current_length += 2 if c > chr(127) else 1
         if current_length > length:
             return string[:current_pos]
-        current_pos += 1
     return string

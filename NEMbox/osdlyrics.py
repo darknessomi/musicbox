@@ -1,10 +1,8 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # osdlyrics.py --- desktop lyrics for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
 import sys
-from multiprocessing import Process
-from multiprocessing import set_start_method
+from multiprocessing import Process, set_start_method
 
 from . import logger
 from .config import Config
@@ -14,10 +12,10 @@ log = logger.getLogger(__name__)
 config = Config()
 
 try:
-    from qtpy import QtGui, QtCore, QtWidgets
     import dbus
-    import dbus.service
     import dbus.mainloop.glib
+    import dbus.service
+    from qtpy import QtCore, QtGui, QtWidgets
 
     pyqt_activity = True
 except ImportError:
@@ -31,7 +29,7 @@ if pyqt_activity:
 
     class Lyrics(QWidget):
         def __init__(self):
-            super(Lyrics, self).__init__()
+            super().__init__()
             self.text = ""
             self.initUI()
 
@@ -121,8 +119,8 @@ if pyqt_activity:
         app = QApplication(sys.argv)
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         session_bus = dbus.SessionBus()
-        name = dbus.service.BusName("org.musicbox.Bus", session_bus)
-        lyrics = LyricsAdapter(session_bus, "/")
+        dbus.service.BusName("org.musicbox.Bus", session_bus)
+        LyricsAdapter(session_bus, "/")
         app.exec_()
 
 

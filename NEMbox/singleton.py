@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
-
-class Singleton(object):
+class Singleton:
     """Singleton Class
     This is a class to make some class being a Singleton class.
     Such as database class or config class.

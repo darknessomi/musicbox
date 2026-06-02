@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # KenHuang:
@@ -8,6 +7,8 @@
 """
 网易云音乐 Ui
 """
+
+import contextlib
 import curses
 import datetime
 import os
@@ -16,9 +17,7 @@ from shutil import get_terminal_size
 
 from . import logger
 from .config import Config
-from .scrollstring import scrollstring
-from .scrollstring import truelen
-from .scrollstring import truelen_cut
+from .scrollstring import scrollstring, truelen, truelen_cut
 from .storage import Storage
 from .utils import md5
 
@@ -50,10 +49,8 @@ def break_substr(s, start, max_len=80):
             end_pos += 1
         else:
             end_pos += 1
-    try:
+    with contextlib.suppress(Exception):
         res.append(s[start_pos:end_pos])
-    except Exception:
-        pass
     return "\n{}".format(" " * start).join(res)
 
 
@@ -64,7 +61,7 @@ def break_str(s, start, max_len=80):
     return "\n{}".format(" " * start).join(res)
 
 
-class Ui(object):
+class Ui:
     def __init__(self):
         self.screen = curses.initscr()
         curses.start_color()
@@ -159,12 +156,7 @@ class Ui(object):
             )
 
         if artist or album_name:
-            song_info = "{}{}{}  < {} >".format(
-                song_name,
-                self.space,
-                artist,
-                album_name,
-            )
+            song_info = f"{song_name}{self.space}{artist}  < {album_name} >"
         else:
             song_info = song_name
 
@@ -187,7 +179,6 @@ class Ui(object):
         self.screen.refresh()
 
     def update_lyrics(self, now_playing, lyrics, tlyrics):
-
         timestap_regex = r"[0-5][0-9]:[0-5][0-9]\.[0-9]*"
 
         def get_timestap(lyric_line):
@@ -264,7 +255,6 @@ class Ui(object):
     def build_process_bar(
         self, song, now_playing, total_length, playing_flag, playing_mode
     ):
-
         if not song or not playing_flag:
             return
         name, artist = song["song_name"], song["artist"]
@@ -293,11 +283,11 @@ class Ui(object):
         process = "["
         process_bar_width = self.content_width - 24
         for i in range(0, process_bar_width):
-            if i < now_playing / total_length * process_bar_width:
-                if (i + 1) > now_playing / total_length * process_bar_width:
-                    if playing_flag:
-                        process += ">"
-                        continue
+            progress = i < now_playing / total_length * process_bar_width
+            at_head = (i + 1) > now_playing / total_length * process_bar_width
+            if progress and at_head and playing_flag:
+                process += ">"
+            elif progress:
                 process += "="
             else:
                 process += " "
@@ -305,7 +295,7 @@ class Ui(object):
 
         now = str(datetime.timedelta(seconds=int(now_playing))).lstrip("0").lstrip(":")
         total = str(datetime.timedelta(seconds=total_length)).lstrip("0").lstrip(":")
-        process += "({}/{})".format(now, total)
+        process += f"({now}/{total})"
 
         if playing_mode == 0:
             process = "顺序播放 " + process
@@ -324,7 +314,7 @@ class Ui(object):
             self.now_lyric = "暂无歌词 ~>_<~ \n"
             self.post_lyric = ""
             if dbus_activity and self.config.get("osdlyrics"):
-                self.now_playing = "{} - {}\n".format(name, artist)
+                self.now_playing = f"{name} - {artist}\n"
         else:
             self.update_lyrics(now_playing, lyrics, tlyrics)
 
@@ -363,7 +353,9 @@ class Ui(object):
 
     def build_loading(self):
         curses.curs_set(0)
-        self.addstr(7, self.startcol, "享受高品质音乐，loading...", curses.color_pair(1))
+        self.addstr(
+            7, self.startcol, "享受高品质音乐，loading...", curses.color_pair(1)
+        )
         self.screen.refresh()
 
     def build_submenu(self, data):
@@ -691,9 +683,15 @@ class Ui(object):
                     )
 
             self.addstr(
-                20, self.startcol, "NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存"
+                20,
+                self.startcol,
+                "NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存",
             )
-            self.addstr(21, self.startcol, "按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~")
+            self.addstr(
+                21,
+                self.startcol,
+                "按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~",
+            )
             self.addstr(22, self.startcol, "Build with love to music by omi")
 
         self.screen.refresh()
@@ -710,7 +708,9 @@ class Ui(object):
         curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
-        self.addstr(5, self.startcol, "请输入登录信息(支持手机登录)", curses.color_pair(1))
+        self.addstr(
+            5, self.startcol, "请输入登录信息(支持手机登录)", curses.color_pair(1)
+        )
         self.addstr(8, self.startcol, "账号:", curses.color_pair(1))
         self.addstr(9, self.startcol, "密码:", curses.color_pair(1))
         self.screen.move(8, 24)
@@ -721,7 +721,9 @@ class Ui(object):
         self.screen.move(4, 1)
         self.screen.timeout(-1)  # disable the screen timeout
         self.screen.clrtobot()
-        self.addstr(8, self.startcol, "艾玛，登录信息好像不对呢 (O_O)#", curses.color_pair(1))
+        self.addstr(
+            8, self.startcol, "艾玛，登录信息好像不对呢 (O_O)#", curses.color_pair(1)
+        )
         self.addstr(10, self.startcol, "[1] 再试一次")
         self.addstr(11, self.startcol, "[2] 稍后再试")
         self.addstr(14, self.startcol, "请键入对应数字:", curses.color_pair(2))
@@ -736,7 +738,12 @@ class Ui(object):
         self.screen.timeout(-1)
         self.screen.clrtobot()
         self.addstr(8, self.startcol, "是不支持的搜索类型呢...", curses.color_pair(3))
-        self.addstr(9, self.startcol, "（在做了，在做了，按任意键关掉这个提示）", curses.color_pair(3))
+        self.addstr(
+            9,
+            self.startcol,
+            "（在做了，在做了，按任意键关掉这个提示）",
+            curses.color_pair(3),
+        )
         self.screen.refresh()
         x = self.screen.getch()
         self.screen.timeout(100)
@@ -748,7 +755,12 @@ class Ui(object):
         self.screen.clrtobot()
         self.screen.timeout(-1)
         self.addstr(8, self.startcol, "输入定时时间(min):", curses.color_pair(1))
-        self.addstr(11, self.startcol, "ps:定时时间为整数，输入0代表取消定时退出", curses.color_pair(1))
+        self.addstr(
+            11,
+            self.startcol,
+            "ps:定时时间为整数，输入0代表取消定时退出",
+            curses.color_pair(1),
+        )
         self.screen.timeout(-1)  # disable the screen timeout
         curses.echo()
         timing_time = self.screen.getstr(8, self.startcol + 19, 60)

@@ -81,10 +81,25 @@
 
 ## 安装
 
+**推荐从源码编译安装**，可获取最新代码与修复，避免 PyPI 版本滞后。
+
+### 源码编译（推荐，\*nix 系统）
+
+先安装 [Poetry](https://python-poetry.org/docs/#installation)，然后：
+
+```bash
+git clone https://github.com/darknessomi/musicbox.git && cd musicbox
+poetry build && poetry install
+```
+
+安装完成后，在 Poetry 虚拟环境中运行 `musicbox`，或使用 `poetry run musicbox`。
+
+**要求 Python 3.10 及以上版本。**
+
 ### 必选依赖
 
 1. `mpg123` 用于播放歌曲，安装方法参见下面的说明
-2. `python-fuzzywuzzy` 用于模糊搜索
+2. `rapidfuzz` 用于模糊搜索（源码编译时由 Poetry 自动安装）
 
 ### 可选依赖
 
@@ -92,56 +107,49 @@
 2. `libnotify-bin` 用于支持消息提示（Linux 平台）
 3. `qtpy python-dbus dbus qt` 用于支持桌面歌词
    (根据系统 qt 的版本还需要安装 pyqt4 pyqt4 pyside pyside2 中的任意一个)
-4. `python-levenshtein` 用于模糊搜索
 
-### PyPi 安装（\*nix 系统）
-
-```bash
-    pip3 install NetEase-MusicBox
-```
-
-### Git clone 安装 master 分支（\*nix 系统）
+### macOS
 
 ```bash
-    git clone https://github.com/darknessomi/musicbox.git && cd musicbox
-    poetry build && poetry install
-```
-
-### macOS 安装
-
-```bash
-    pip3 install NetEase-MusicBox
-    brew install mpg123
+brew install mpg123 poetry
+git clone https://github.com/darknessomi/musicbox.git && cd musicbox
+poetry build && poetry install
 ```
 
 ### Linux 安装
 
-**注意：通过以下方法安装可能仍然需要`pip3 install -U NetEase-MusicBox`更新到最新版**。
-
-#### Fedora
-
-首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`。
-
 #### Ubuntu/Debian
 
 ```bash
-    pip3 install NetEase-MusicBox
-    sudo apt-get install mpg123
-```
-
-#### Arch Linux
-
-```bash
-    pacaur -S netease-musicbox-git # or $ yaourt musicbox
+sudo apt-get install mpg123
+# 安装 Poetry 后执行源码编译（见上文）
 ```
 
 #### Centos/Red Hat
 
 ```bash
-    sudo yum install -y python3-devel
-    pip3 install NetEase-MusicBox
-    wget http://mirror.centos.org/centos/7/os/x86_64/Packages/mpg123-1.25.6-1.el7.x86_64.rpm
-    sudo yum install -y mpg123-1.25.6-1.el7.x86_64.rpm
+sudo yum install -y python3-devel mpg123
+# 安装 Poetry 后执行源码编译（见上文）
+```
+
+### 其他安装方式
+
+以下方式可能不是最新版本，仅作备选。
+
+#### PyPI
+
+```bash
+pip3 install NetEase-MusicBox
+```
+
+#### Fedora
+
+首先添加[FZUG](https://github.com/FZUG/repo/wiki)源，然后`sudo dnf install musicbox`。
+
+#### Arch Linux
+
+```bash
+pacaur -S netease-musicbox-git # or $ yaourt musicbox
 ```
 
 ## 配置和错误处理

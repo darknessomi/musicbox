@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
 # KenHuang:
@@ -9,6 +8,7 @@
 """
 网易云音乐 Menu
 """
+
 import curses as C
 import locale
 import os
@@ -21,23 +21,18 @@ from collections import namedtuple
 from copy import deepcopy
 from threading import Timer
 
-from fuzzywuzzy import process
+from rapidfuzz import process
 
 from . import logger
 from .api import NetEase
 from .cache import Cache
-from .cmd_parser import cmd_parser
-from .cmd_parser import erase_coroutine
-from .cmd_parser import parse_keylist
+from .cmd_parser import cmd_parser, erase_coroutine, parse_keylist
 from .config import Config
-from .osdlyrics import pyqt_activity
-from .osdlyrics import show_lyrics_new_process
-from .osdlyrics import stop_lyrics_process
+from .osdlyrics import pyqt_activity, show_lyrics_new_process, stop_lyrics_process
 from .player import Player
 from .storage import Storage
 from .ui import Ui
 from .utils import notify
-
 
 locale.setlocale(locale.LC_ALL, "")
 
@@ -108,7 +103,7 @@ shortcut = [
 ]
 
 
-class Menu(object):
+class Menu:
     def __init__(self):
         self.quit = False
         self.config = Config()
@@ -206,18 +201,19 @@ class Menu(object):
             return [], ""
         if self.datalist == []:
             return [], keyword
-        origin_index = 0
-        for item in self.datalist:
+        for origin_index, item in enumerate(self.datalist):
             item["origin_index"] = origin_index
-            origin_index += 1
         try:
             search_result = process.extract(
-                keyword, self.datalist, limit=max(10, 2 * self.step)
+                keyword,
+                self.datalist,
+                processor=lambda item: item.get("item", ""),
+                limit=max(10, 2 * self.step),
             )
             if not search_result:
                 return search_result, keyword
             search_result.sort(key=lambda ele: ele[1], reverse=True)
-            return (list(map(lambda ele: ele[0], search_result)), keyword)
+            return ([ele[0] for ele in search_result], keyword)
         except Exception as e:
             log.warn(e)
 
@@ -399,7 +395,7 @@ class Menu(object):
         return_data = self.request_api(self.api.fm_like, self.player.playing_id)
         if return_data:
             song_name = self.player.playing_name
-            notify("%s added successfully!" % song_name, 0)
+            notify(f"{song_name} added successfully!", 0)
         else:
             notify("Adding song failed!", 0)
 
@@ -456,7 +452,7 @@ class Menu(object):
             songs = self.api.album(album_id)
             self.datatype = "songs"
             self.datalist = self.api.dig_info(songs, "songs")
-            self.title = "网易云音乐 > 专辑 > %s" % album_name
+            self.title = f"网易云音乐 > 专辑 > {album_name}"
             for i in range(len(self.datalist)):
                 if self.datalist[i]["song_id"] == song_id:
                     self.offset = i - i % step
@@ -504,7 +500,7 @@ class Menu(object):
 
         countdown = int(countdown)
         if countdown > 0:
-            notify("The musicbox will exit in {} minutes".format(countdown))
+            notify(f"The musicbox will exit in {countdown} minutes")
             self.countdown = countdown * 60
             self.is_in_countdown = True
             self.timer = Timer(self.countdown, self.stop, ())
@@ -609,13 +605,10 @@ class Menu(object):
                 and key != ord(KEY_MAP["nextSong"])
                 and key != ord(KEY_MAP["prevSong"])
             ):
-                if not (
-                    (
-                        set(self.pre_keylist)
-                        | {ord(KEY_MAP["prevSong"]), ord(KEY_MAP["nextSong"])}
-                    )
-                    == {ord(KEY_MAP["prevSong"]), ord(KEY_MAP["nextSong"])}
-                ):
+                if set(self.pre_keylist) | {
+                    ord(KEY_MAP["prevSong"]),
+                    ord(KEY_MAP["nextSong"]),
+                } != {ord(KEY_MAP["prevSong"]), ord(KEY_MAP["nextSong"])}:
                     self.pre_keylist.append(key)
                 self.key_list = deepcopy(self.pre_keylist)
                 self.pre_keylist.clear()
@@ -657,11 +650,10 @@ class Menu(object):
                 continue
 
             # 如果是 数字+ [ ] j k
-            if len(keylist) > 1:
-                if parse_keylist(keylist):
-                    self.num_jump_key_event()
-                    self.key_list.clear()
-                    continue
+            if len(keylist) > 1 and parse_keylist(keylist):
+                self.num_jump_key_event()
+                self.key_list.clear()
+                continue
             # if self.is_in_countdown:
             #     if time.time() - self.countdown_start > self.countdown:
             #         break
@@ -682,19 +674,21 @@ class Menu(object):
                 break
 
             # 上移
-            elif C.keyname(key).decode("utf-8") == KEY_MAP[
-                "up"
-            ] and pre_key not in range(ord("0"), ord("9")):
-                self.up_key_event()
-            elif self.config.get("mouse_movement") and key == KEY_MAP["mouseUp"]:
+            elif (
+                C.keyname(key).decode("utf-8") == KEY_MAP["up"]
+                and pre_key not in range(ord("0"), ord("9"))
+                or self.config.get("mouse_movement")
+                and key == KEY_MAP["mouseUp"]
+            ):
                 self.up_key_event()
 
             # 下移
-            elif C.keyname(key).decode("utf-8") == KEY_MAP[
-                "down"
-            ] and pre_key not in range(ord("0"), ord("9")):
-                self.down_key_event()
-            elif self.config.get("mouse_movement") and key == KEY_MAP["mouseDown"]:
+            elif (
+                C.keyname(key).decode("utf-8") == KEY_MAP["down"]
+                and pre_key not in range(ord("0"), ord("9"))
+                or self.config.get("mouse_movement")
+                and key == KEY_MAP["mouseDown"]
+            ):
                 self.down_key_event()
 
             # 向上翻页
@@ -757,7 +751,7 @@ class Menu(object):
                 return_data = self.request_api(self.api.fm_like, self.player.playing_id)
                 if return_data:
                     song_name = self.player.playing_name
-                    notify("%s added successfully!" % song_name, 0)
+                    notify(f"{song_name} added successfully!", 0)
                 else:
                     notify("Adding song failed!", 0)
 
@@ -821,7 +815,7 @@ class Menu(object):
                     songs = self.api.album(album_id)
                     self.datatype = "songs"
                     self.datalist = self.api.dig_info(songs, "songs")
-                    self.title = "网易云音乐 > 专辑 > %s" % album_name
+                    self.title = f"网易云音乐 > 专辑 > {album_name}"
                     for i in range(len(self.datalist)):
                         if self.datalist[i]["song_id"] == song_id:
                             self.offset = i - i % step
@@ -955,11 +949,13 @@ class Menu(object):
                 )
                 cache_thread.start()
             # 在网页打开 ord(i)
-            elif C.keyname(key).decode("utf-8") == KEY_MAP["musicInfo"]:
-                if self.player.playing_id != -1:
-                    webbrowser.open_new_tab(
-                        "http://music.163.com/song?id={}".format(self.player.playing_id)
-                    )
+            elif (
+                C.keyname(key).decode("utf-8") == KEY_MAP["musicInfo"]
+                and self.player.playing_id != -1
+            ):
+                webbrowser.open_new_tab(
+                    f"http://music.163.com/song?id={self.player.playing_id}"
+                )
             # term resize
             # 刷新屏幕  按下某个键或者默认5秒刷新空白区
             #            erase_coro.send(key)
@@ -1001,8 +997,8 @@ class Menu(object):
             self.datatype = "artist_info"
             self.title += " > " + artist_name
             self.datalist = [
-                {"item": "{}的热门歌曲".format(artist_name), "id": artist_id},
-                {"item": "{}的所有专辑".format(artist_name), "id": artist_id},
+                {"item": f"{artist_name}的热门歌曲", "id": artist_id},
+                {"item": f"{artist_name}的所有专辑", "id": artist_id},
             ]
 
         elif datatype == "artist_info":
@@ -1077,8 +1073,7 @@ class Menu(object):
             for one_comment in hotcomments:
                 self.datalist.append(
                     {
-                        "comment_content": "(热评 %s❤️ ️) %s: %s"
-                        % (
+                        "comment_content": "(热评 {}❤️ ️) {}: {}".format(
                             one_comment["likedCount"],
                             one_comment["user"]["nickname"],
                             one_comment["content"],
@@ -1089,8 +1084,7 @@ class Menu(object):
                 # self.datalist.append(one_comment["content"])
                 self.datalist.append(
                     {
-                        "comment_content": "(%s❤️ ️) %s: %s"
-                        % (
+                        "comment_content": "({}❤️ ️) {}: {}".format(
                             one_comment["likedCount"],
                             one_comment["user"]["nickname"],
                             one_comment["content"],
@@ -1098,7 +1092,7 @@ class Menu(object):
                     }
                 )
             self.datatype = "comments"
-            self.title = "网易云音乐 > 评论: %s" % datalist[idx]["song_name"]
+            self.title = "网易云音乐 > 评论: {}".format(datalist[idx]["song_name"])
             self.offset = 0
             self.index = 0
 

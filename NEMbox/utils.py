@@ -1,17 +1,15 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # utils.py --- utils for musicbox
 # Copyright (c) 2015-2016 omi & Contributors
 """
 定义几个函数 写文件 通知 返回键 创建目录 创建文件
 """
+
+import hashlib
 import os
 import platform
 import subprocess
-import hashlib
-
 from collections import OrderedDict
-
 
 __all__ = [
     "utf8_data_to_file",
