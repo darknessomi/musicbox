@@ -1,0 +1,18 @@
+---
+description: 提交前本地跑与 CI 相同的检查，不等 CI 报错
+alwaysApply: true
+---
+
+# 提交前本地验证
+
+每次 `git commit` 前，必须先在本机跑完与 `.github/workflows/ci.yml` 等价的检查；任一失败则先修复再提交。
+
+```bash
+poetry run ruff check
+poetry run ruff format --check   # 失败则先 poetry run ruff format 再重跑
+poetry run pytest -s
+```
+
+格式问题优先用 `poetry run ruff format` 自动修复，不要只改代码却跳过 format。
+
+若已安装 pre-commit hook（`pre-commit install`），`git commit` 会自动跑 ruff；仍应在提交前手动跑完整 pytest。
