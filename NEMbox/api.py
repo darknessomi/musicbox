@@ -6,7 +6,9 @@
 """
 
 import json
+import os
 import platform
+import random
 import time
 from collections import OrderedDict
 from http.cookiejar import Cookie, MozillaCookieJar
@@ -16,7 +18,12 @@ from requests_cache import CachedSession
 
 from .config import Config
 from .const import Constant
-from .encrypt import encrypted_request
+from .encrypt import (
+    anonymous_username,
+    eapi_encrypt,
+    eapi_response_decrypt,
+    encrypted_request,
+)
 from .logger import getLogger
 from .storage import Storage
 
@@ -145,7 +152,18 @@ PLAYLIST_CLASSES = OrderedDict(
 
 DEFAULT_TIMEOUT = 10
 
-BASE_URL = "http://music.163.com"
+BASE_URL = "https://music.163.com"
+EAPI_BASE_URL = "https://interface.music.163.com"
+
+# music_quality -> song/url/v1 level (mp3 only, mpg123)
+QUALITY_LEVEL_MAP = {0: "exhigh", 1: "higher", 2: "standard"}
+
+EAPI_OS = {
+    "os": "iphone",
+    "appver": "9.0.90",
+    "osver": "16.2",
+    "channel": "distribution",
+}
 
 
 class Parse:
@@ -287,9 +305,13 @@ class NetEase:
             "Connection": "keep-alive",
             "Content-Type": "application/x-www-form-urlencoded",
             "Host": "music.163.com",
-            "Referer": "http://music.163.com",
+            "Referer": "https://music.163.com",
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.87 Safari/537.36",
         }
+        # 注入随机中国 IP 规避网易风控（8821 行为验证码）
+        cn_ip = self._gen_cn_ip()
+        self.header["X-Real-IP"] = cn_ip
+        self.header["X-Forwarded-For"] = cn_ip
 
         self.storage = Storage()
         cookie_jar = MozillaCookieJar(self.storage.cookie_path)
@@ -310,6 +332,26 @@ class NetEase:
                 }
                 self.storage.save()
                 break
+        self._device_id = self._get_cookie_value("deviceId") or self._gen_device_id()
+
+    @staticmethod
+    def _gen_device_id():
+        # 52 位大写 hex，对照 api-enhanced util/index.js generateDeviceId
+        return "".join(random.choice("0123456789ABCDEF") for _ in range(52))
+
+    @staticmethod
+    def _gen_cn_ip():
+        # 随机中国 IP，用于 X-Real-IP 规避风控，对照 generateRandomChineseIP 兜底逻辑
+        return f"116.{random.randint(25, 94)}.{random.randint(1, 255)}.{random.randint(1, 255)}"
+
+    def _get_cookie_value(self, name):
+        for cookie in self.session.cookies:
+            if cookie.name == name:
+                return cookie.value
+        return ""
+
+    def _set_cookie(self, name, value):
+        self.session.cookies.set_cookie(self.make_cookie(name, value))
 
     @property
     def toplists(self):
@@ -390,26 +432,135 @@ class NetEase:
             log.error(f"Path: {path}, response: {resp.text[:200]}")
         return data
 
-    def login(self, username, password):
-        self.session.cookies.load()
-        if username.isdigit():
-            path = "/weapi/login/cellphone"
-            params = {
-                "phone": username,
-                "password": password,
-                "countrycode": "86",
-                "rememberLogin": "true",
-            }
-        else:
-            path = "/weapi/login"
-            params = {
-                "username": username,
-                "password": password,
-                "rememberLogin": "true",
-            }
-        data = self.request("POST", path, params, custom_cookies={"os": "pc"})
+    def _eapi_header_cookie(self):
+        csrf_token = self._get_cookie_value("__csrf")
+        header = {
+            "osver": EAPI_OS["osver"],
+            "deviceId": self._device_id,
+            "os": EAPI_OS["os"],
+            "appver": EAPI_OS["appver"],
+            "versioncode": "140",
+            "mobilename": "",
+            "buildver": str(int(time.time()))[:10],
+            "resolution": "1920x1080",
+            "__csrf": csrf_token,
+            "channel": EAPI_OS["channel"],
+            "requestId": f"{int(time.time() * 1000)}_{random.randint(0, 9999):04d}",
+        }
+        music_u = self._get_cookie_value("MUSIC_U")
+        if music_u:
+            header["MUSIC_U"] = music_u
+        return header
+
+    def eapi_request(self, path, params=None, default=None):
+        """POST eapi 接口（interface.music.163.com）。"""
+        if default is None:
+            default = {"code": -1}
+        if params is None:
+            params = {}
+        api_path = path if path.startswith("/api/") else f"/api{path}"
+        endpoint = f"{EAPI_BASE_URL}/eapi/{api_path[5:]}"
+
+        header = self._eapi_header_cookie()
+        payload = {**params, "e_r": True, "header": header}
+        body = eapi_encrypt(api_path, payload)
+
+        eapi_headers = {
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip,deflate",
+            "Accept-Language": "zh-CN,zh;q=0.8",
+            "Connection": "keep-alive",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Host": "interface.music.163.com",
+            "User-Agent": "NeteaseMusic 9.0.90/5038 (iPhone; iOS 16.2; zh_CN)",
+            "Cookie": "; ".join(
+                f"{k}={v}" for k, v in header.items() if v is not None
+            ),
+            "X-Real-IP": self.header.get("X-Real-IP", ""),
+            "X-Forwarded-For": self.header.get("X-Forwarded-For", ""),
+        }
+
+        data = default
+        resp = None
+        try:
+            resp = self.session.post(
+                endpoint, data=body, headers=eapi_headers, timeout=DEFAULT_TIMEOUT
+            )
+            raw = resp.content
+            if not raw:
+                return data
+            try:
+                data = resp.json()
+            except ValueError:
+                # eapi 加密响应为二进制，需转 hex 再解密（同 api-enhanced request.js）
+                data = eapi_response_decrypt(raw.hex().upper())
+        except requests.exceptions.RequestException as e:
+            log.error(e)
+        except (ValueError, KeyError) as e:
+            preview = resp.text[:200] if resp is not None else ""
+            log.error("eapi path %s failed: %s, response: %s", api_path, e, preview)
+        return data
+
+    def _ensure_anon_cookies(self):
+        """登录前注入匿名设备上下文，对照 api-enhanced processCookieObject。"""
+        nuid = self._get_cookie_value("_ntes_nuid") or os.urandom(32).hex()
+        rand6 = "".join(random.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(6))
+        wnmcid = self._get_cookie_value("WNMCID") or (
+            f"{rand6}.{int(time.time() * 1000)}.01.0"
+        )
+        defaults = {
+            "deviceId": self._device_id,
+            "os": "pc",
+            "appver": "3.1.17.204416",
+            "osver": "Microsoft-Windows-10-Professional-build-19045-64bit",
+            "channel": "netease",
+            "__remember_me": "true",
+            "_ntes_nuid": nuid,
+            "_ntes_nnid": f"{nuid},{int(time.time() * 1000)}",
+            "WNMCID": wnmcid,
+            "WEVNSM": "1.0.0",
+        }
+        for name, value in defaults.items():
+            if not self._get_cookie_value(name):
+                self._set_cookie(name, value)
+
+    def register_anonimous(self):
+        """注册匿名设备以获取 MUSIC_A，对照 api-enhanced register/anonimous。"""
+        self._ensure_anon_cookies()
+        username = anonymous_username(self._device_id)
+        path = "/weapi/register/anonimous"
+        data = self.request("POST", path, {"username": username})
         self.session.cookies.save()
         return data
+
+    def login_qr_key(self):
+        """获取二维码 unikey。返回 unikey 字符串或 None。"""
+        self.session.cookies.load()
+        self._ensure_anon_cookies()
+        path = "/weapi/login/qrcode/unikey"
+        data = self.request("POST", path, {"type": 1})
+        if data.get("code") == 200:
+            return data.get("unikey")
+        log.error("login_qr_key failed: %s", data)
+        return None
+
+    @staticmethod
+    def login_qr_url(unikey):
+        """由 unikey 生成二维码内容 URL。"""
+        return f"https://music.163.com/login?codekey={unikey}"
+
+    def login_qr_check(self, unikey):
+        """轮询扫码状态。code: 800 过期 / 801 待扫码 / 802 待确认 / 803 成功。"""
+        path = "/weapi/login/qrcode/client/login"
+        data = self.request("POST", path, {"type": 1, "key": unikey})
+        if data.get("code") == 803:
+            self.session.cookies.save()
+        return data
+
+    def get_account_info(self):
+        """获取当前登录账号信息（含 account.id 与 profile.nickname）。"""
+        path = "/weapi/w/nuser/account/get"
+        return self.request("POST", path)
 
     # 每日签到
     def daily_task(self, is_mobile=True):
@@ -547,11 +698,24 @@ class NetEase:
 
     def songs_url(self, ids):
         quality = Config().get("music_quality")
+        level = QUALITY_LEVEL_MAP.get(quality, "exhigh")
+        if not isinstance(ids, list):
+            ids = list(ids)
+        params = {
+            "ids": json.dumps(ids, separators=(",", ":")),
+            "level": level,
+            "encodeType": "mp3",
+        }
+        result = self.eapi_request(
+            "/api/song/enhance/player/url/v1", params
+        ).get("data", [])
+        if result:
+            return result
+        # 降级：旧 weapi 按码率取链
         rate_map = {0: 320000, 1: 192000, 2: 128000}
-
         path = "/weapi/song/enhance/player/url"
-        params = {"ids": ids, "br": rate_map[quality]}
-        return self.request("POST", path, params).get("data", [])
+        fallback_params = {"ids": ids, "br": rate_map.get(quality, 320000)}
+        return self.request("POST", path, fallback_params).get("data", [])
 
     # lyric http://music.163.com/api/song/lyric?os=osx&id= &lv=-1&kv=-1&tv=-1
     def song_lyric(self, music_id):

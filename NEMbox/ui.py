@@ -19,7 +19,6 @@ from . import logger
 from .config import Config
 from .scrollstring import scrollstring, truelen, truelen_cut
 from .storage import Storage
-from .utils import md5
 
 log = logger.getLogger(__name__)
 
@@ -696,24 +695,43 @@ class Ui:
 
         self.screen.refresh()
 
-    def build_login(self):
-        curses.curs_set(0)
-        self.build_login_bar()
-        account = self.get_account()
-        password = md5(self.get_password())
-        return account, password
+    def build_login_qr(self, url):
+        """渲染扫码登录二维码，返回状态提示所在行号。"""
+        import io
 
-    def build_login_bar(self):
+        import qrcode
+
+        qr = qrcode.QRCode(border=1)
+        qr.add_data(url)
+        qr.make(fit=True)
+        buf = io.StringIO()
+        qr.print_ascii(out=buf, invert=True)
+        lines = buf.getvalue().splitlines()
+
         curses.curs_set(0)
         curses.noecho()
         self.screen.move(4, 1)
         self.screen.clrtobot()
         self.addstr(
-            5, self.startcol, "请输入登录信息(支持手机登录)", curses.color_pair(1)
+            4,
+            self.startcol,
+            "请使用网易云音乐 App 扫描二维码登录（按 [Q] 取消）",
+            curses.color_pair(1),
         )
-        self.addstr(8, self.startcol, "账号:", curses.color_pair(1))
-        self.addstr(9, self.startcol, "密码:", curses.color_pair(1))
-        self.screen.move(8, 24)
+        row = 6
+        for line in lines:
+            self.addstr(row, self.startcol, line)
+            row += 1
+        self.addstr(row + 1, self.startcol, "链接: " + url, curses.A_DIM)
+        status_row = row + 3
+        self.addstr(status_row, self.startcol, "等待扫码...", curses.color_pair(2))
+        self.screen.refresh()
+        return status_row
+
+    def update_login_qr_status(self, row, text):
+        self.screen.move(row, 1)
+        self.screen.clrtoeol()
+        self.addstr(row, self.startcol, text, curses.color_pair(2))
         self.screen.refresh()
 
     def build_login_error(self):
@@ -766,20 +784,6 @@ class Ui:
         timing_time = self.screen.getstr(8, self.startcol + 19, 60)
         self.screen.timeout(100)  # restore the screen timeout
         return timing_time
-
-    def get_account(self):
-        self.screen.timeout(-1)  # disable the screen timeout
-        curses.echo()
-        account = self.screen.getstr(8, self.startcol + 6, 60)
-        self.screen.timeout(100)  # restore the screen timeout
-        return account.decode("utf-8")
-
-    def get_password(self):
-        self.screen.timeout(-1)  # disable the screen timeout
-        curses.noecho()
-        password = self.screen.getstr(9, self.startcol + 6, 60)
-        self.screen.timeout(100)  # restore the screen timeout
-        return password.decode("utf-8")
 
     def get_param(self, prompt_string):
         # keep playing info in line 1

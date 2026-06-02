@@ -175,23 +175,63 @@ class Menu:
         return self.user["nickname"]
 
     def login(self):
-        if self.account and self.md5pass:
-            account, md5pass = self.account, self.md5pass
-        else:
-            account, md5pass = self.ui.build_login()
+        # 扫码登录，不再支持账号密码
+        unikey = self.api.login_qr_key()
+        if not unikey:
+            return self._login_retry()
 
-        resp = self.api.login(account, md5pass)
-        if resp["code"] == 200:
-            userid = resp["account"]["id"]
-            nickname = resp["profile"]["nickname"]
-            self.storage.login(account, md5pass, userid, nickname)
-            return True
-        else:
-            self.storage.logout()
-            x = self.ui.build_login_error()
-            if x >= 0 and C.keyname(x).decode("utf-8") != KEY_MAP["forward"]:
-                return False
-            return self.login()
+        url = self.api.login_qr_url(unikey)
+        status_row = self.ui.build_login_qr(url)
+        status_map = {
+            801: "等待扫码...",
+            802: "已扫码，请在手机上点击确认",
+            800: "二维码已过期",
+        }
+
+        deadline = time.time() + 300
+        last_code = None
+        self.ui.screen.nodelay(True)
+        try:
+            while time.time() < deadline:
+                resp = self.api.login_qr_check(unikey)
+                code = resp.get("code")
+                if code == 803:
+                    return self._on_qr_login_success()
+                if code == 800:
+                    break
+                if code != last_code:
+                    self.ui.update_login_qr_status(
+                        status_row, status_map.get(code, str(code))
+                    )
+                    last_code = code
+                # 等待约 2 秒，期间允许用户按 Q/ESC 取消
+                wait_until = time.time() + 2
+                while time.time() < wait_until:
+                    ch = self.ui.screen.getch()
+                    if ch in (ord("q"), ord("Q"), 27):
+                        return False
+                    time.sleep(0.05)
+        finally:
+            self.ui.screen.nodelay(False)
+            self.ui.screen.timeout(100)
+
+        return self._login_retry()
+
+    def _on_qr_login_success(self):
+        info = self.api.get_account_info()
+        account = info.get("account") or {}
+        profile = info.get("profile") or {}
+        userid = account.get("id")
+        nickname = profile.get("nickname") or ""
+        self.storage.login(nickname, "", userid, nickname)
+        return True
+
+    def _login_retry(self):
+        self.storage.logout()
+        x = self.ui.build_login_error()
+        if x >= 0 and C.keyname(x).decode("utf-8") != KEY_MAP["forward"]:
+            return False
+        return self.login()
 
     def in_place_search(self):
         self.ui.screen.timeout(-1)

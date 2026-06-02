@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 import base64
 import binascii
+import gzip
 import hashlib
 import json
 import os
 
 from Cryptodome.Cipher import AES
 
-__all__ = ["encrypted_id", "encrypted_request"]
+__all__ = [
+    "encrypted_id",
+    "encrypted_request",
+    "eapi_encrypt",
+    "eapi_response_decrypt",
+    "anonymous_username",
+]
 
 MODULUS = (
     "00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7"
@@ -59,3 +66,64 @@ def rsa(text, pubkey, modulus):
 
 def create_key(size):
     return binascii.hexlify(os.urandom(size))[:16]
+
+
+# 匿名设备注册用户名编码, 对照 api-enhanced module/register_anonimous.js
+ANON_ID_XOR_KEY = b"3go8&$8*3*3h0k(2)2"
+
+
+def _cloudmusic_dll_encode_id(some_id: str) -> str:
+    raw = some_id.encode("utf-8")
+    xored = bytes(
+        b ^ ANON_ID_XOR_KEY[i % len(ANON_ID_XOR_KEY)] for i, b in enumerate(raw)
+    )
+    digest = hashlib.md5(xored).digest()
+    return base64.b64encode(digest).decode("utf-8")
+
+
+def anonymous_username(device_id: str) -> str:
+    combined = f"{device_id} {_cloudmusic_dll_encode_id(device_id)}"
+    return base64.b64encode(combined.encode("utf-8")).decode("utf-8")
+
+
+EAPI_KEY = b"e82ckenh8dichen8"
+
+
+def _pkcs7_pad(data: bytes) -> bytes:
+    pad = 16 - len(data) % 16
+    return data + bytes([pad] * pad)
+
+
+def _pkcs7_unpad(data: bytes) -> bytes:
+    pad = data[-1]
+    if pad < 1 or pad > 16:
+        raise ValueError("invalid PKCS7 padding")
+    return data[:-pad]
+
+
+def eapi_encrypt(uri: str, payload: dict) -> dict:
+    """eapi 请求体加密，对照 api-enhanced util/crypto.js eapi()."""
+    text = json.dumps(payload, separators=(",", ":"))
+    message = f"nobody{uri}use{text}md5forencrypt"
+    digest = hashlib.md5(message.encode("utf-8")).hexdigest()
+    plain = f"{uri}-36cd479b6b5-{text}-36cd479b6b5-{digest}"
+    cipher = AES.new(EAPI_KEY, AES.MODE_ECB)
+    encrypted = cipher.encrypt(_pkcs7_pad(plain.encode("utf-8")))
+    return {"params": encrypted.hex().upper()}
+
+
+def eapi_response_decrypt(content) -> dict:
+    """eapi 响应解密，对照 api-enhanced util/crypto.js eapiResDecrypt()."""
+    if isinstance(content, str):
+        raw = content.strip()
+        if not raw:
+            raise ValueError("empty eapi response")
+        ciphertext = bytes.fromhex(raw)
+    else:
+        ciphertext = content
+
+    cipher = AES.new(EAPI_KEY, AES.MODE_ECB)
+    decrypted = _pkcs7_unpad(cipher.decrypt(ciphertext))
+    if len(decrypted) >= 2 and decrypted[0] == 0x1F and decrypted[1] == 0x8B:
+        decrypted = gzip.decompress(decrypted)
+    return json.loads(decrypted.decode("utf-8"))
