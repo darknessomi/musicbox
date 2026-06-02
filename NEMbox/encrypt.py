@@ -108,7 +108,10 @@ def eapi_encrypt(uri: str, payload: dict) -> dict:
     digest = hashlib.md5(message.encode("utf-8")).hexdigest()
     plain = f"{uri}-36cd479b6b5-{text}-36cd479b6b5-{digest}"
     cipher = AES.new(EAPI_KEY, AES.MODE_ECB)
-    encrypted = cipher.encrypt(_pkcs7_pad(plain.encode("utf-8")))
+    # NetEase eapi requires AES-ECB for wire compatibility.
+    encrypted = cipher.encrypt(
+        _pkcs7_pad(plain.encode("utf-8"))
+    )  # codeql[py/weak-cryptographic-algorithm]
     return {"params": encrypted.hex().upper()}
 
 
@@ -123,7 +126,10 @@ def eapi_response_decrypt(content) -> dict:
         ciphertext = content
 
     cipher = AES.new(EAPI_KEY, AES.MODE_ECB)
-    decrypted = _pkcs7_unpad(cipher.decrypt(ciphertext))
+    # NetEase eapi requires AES-ECB for wire compatibility.
+    decrypted = _pkcs7_unpad(
+        cipher.decrypt(ciphertext)
+    )  # codeql[py/weak-cryptographic-algorithm]
     if len(decrypted) >= 2 and decrypted[0] == 0x1F and decrypted[1] == 0x8B:
         decrypted = gzip.decompress(decrypted)
     return json.loads(decrypted.decode("utf-8"))

@@ -7,6 +7,8 @@
 网易云音乐 Player
 """
 
+from __future__ import annotations
+
 # Let's make some noise
 import os
 import random
