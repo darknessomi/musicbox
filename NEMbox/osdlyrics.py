@@ -135,15 +135,31 @@ if pyqt_activity:
         app.exec_()
 
 
+_lyrics_process: Process | None = None
+
+
 def stop_lyrics_process():
+    global _lyrics_process
+    if not pyqt_activity or not config.get("osdlyrics"):
+        return
+
     if dbus is not None:
-        bus = dbus.SessionBus().get_object("org.musicbox.Bus", "/")
-        bus.exit(dbus_interface="local.musicbox.Lyrics")
+        try:
+            bus = dbus.SessionBus().get_object("org.musicbox.Bus", "/")
+            bus.exit(dbus_interface="local.musicbox.Lyrics")
+        except Exception as e:
+            log.warn("Failed to stop osdlyrics via dbus: %s", e)
+
+    if _lyrics_process is not None and _lyrics_process.is_alive():
+        _lyrics_process.terminate()
+        _lyrics_process.join(timeout=1)
+    _lyrics_process = None
 
 
 def show_lyrics_new_process():
+    global _lyrics_process
     if pyqt_activity and config.get("osdlyrics"):
         set_start_method("spawn")
-        p = Process(target=show_lyrics)
-        p.daemon = True
-        p.start()
+        _lyrics_process = Process(target=show_lyrics)
+        _lyrics_process.daemon = True
+        _lyrics_process.start()

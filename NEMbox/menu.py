@@ -29,7 +29,7 @@ from .api import NetEase
 from .cache import Cache
 from .cmd_parser import cmd_parser, erase_coroutine, parse_keylist
 from .config import Config
-from .osdlyrics import pyqt_activity, show_lyrics_new_process, stop_lyrics_process
+from .osdlyrics import show_lyrics_new_process, stop_lyrics_process
 from .player import Player
 from .storage import Storage
 from .ui import Ui
@@ -318,8 +318,7 @@ class Menu:
         self.ui.screen.refresh()
 
     def send_kill(self, signum, fram):
-        if pyqt_activity:
-            stop_lyrics_process()
+        stop_lyrics_process()
         self.player.stop()
         self.cache.quit()
         self.storage.save()
@@ -660,8 +659,7 @@ class Menu:
         self.stack.append(
             [self.datatype, self.title, self.datalist, self.offset, self.index]
         )
-        if pyqt_activity:
-            show_lyrics_new_process()
+        show_lyrics_new_process()
         pre_key = -1
         keylist = self.key_list
         self.parser = cmd_parser(keylist)
@@ -741,14 +739,12 @@ class Menu:
 
             # 退出
             elif C.keyname(key).decode("utf-8") == KEY_MAP["quit"]:
-                if pyqt_activity:
-                    stop_lyrics_process()
+                stop_lyrics_process()
                 break
 
             # 退出并清除用户信息
             elif C.keyname(key).decode("utf-8") == KEY_MAP["quitClear"]:
-                if pyqt_activity:
-                    stop_lyrics_process()
+                stop_lyrics_process()
                 self.api.logout()
                 break
 
