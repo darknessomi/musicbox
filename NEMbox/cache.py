@@ -152,7 +152,9 @@ class Cache(Singleton):
 
     def add(self, song_id, song_name, artist, url, onExit, song_type="", level=""):
         self.check_lock.acquire()
-        self.downloading.append([song_id, song_name, artist, url, onExit, song_type, level])
+        self.downloading.append(
+            [song_id, song_name, artist, url, onExit, song_type, level]
+        )
         self.check_lock.release()
 
     def quit(self):

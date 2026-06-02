@@ -426,13 +426,17 @@ class Player:
         self._cleanup_mpv_ipc()
         ipc_path = self._new_mpv_ipc_path()
         self.mpv_ipc_path = ipc_path
-        para = [
-            "mpv",
-            "--no-video",
-            "--really-quiet",
-            f"--input-ipc-server={ipc_path}",
-            f"--volume={self.info['playing_volume']}",
-        ] + self.config_mpv + [url]
+        para = (
+            [
+                "mpv",
+                "--no-video",
+                "--really-quiet",
+                f"--input-ipc-server={ipc_path}",
+                f"--volume={self.info['playing_volume']}",
+            ]
+            + self.config_mpv
+            + [url]
+        )
         try:
             process = subprocess.Popen(
                 para,
@@ -472,11 +476,7 @@ class Player:
         if process.returncode == 0:
             self.next()
             return
-        if (
-            expires >= 0
-            and get_time >= 0
-            and time.time() - expires - get_time >= 0
-        ):
+        if expires >= 0 and get_time >= 0 and time.time() - expires - get_time >= 0:
             self.refresh_urls()
             if self.refresh_url_flag:
                 self.stop()
@@ -640,7 +640,11 @@ class Player:
         that would give to subprocess.Popen.
         """
         # print(args.get('cache'))
-        url = args["cache"] if "cache" in args and os.path.isfile(args["cache"]) else args["mp3_url"]
+        url = (
+            args["cache"]
+            if "cache" in args and os.path.isfile(args["cache"])
+            else args["mp3_url"]
+        )
         backend = self._play_backend(args, url)
         runner = self.run_mpv if backend == "mpv" else self.run_mpg123
         self.playback_token += 1
@@ -649,7 +653,14 @@ class Player:
             if backend == "mpv":
                 thread = threading.Thread(
                     target=runner,
-                    args=(on_exit, args["cache"], -1, -1, args.get("duration", 0), token),
+                    args=(
+                        on_exit,
+                        args["cache"],
+                        -1,
+                        -1,
+                        args.get("duration", 0),
+                        token,
+                    ),
                 )
             else:
                 thread = threading.Thread(target=runner, args=(on_exit, args["cache"]))

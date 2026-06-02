@@ -172,9 +172,7 @@ class Ui:
         self.screen.move(2, 1)
         self.screen.clrtoeol()
         prefix = "_ _ z Z Z " if pause else "♫  ♪ ♫  ♪ "
-        self.addstr(
-            1, self.indented_startcol, prefix + quality, curses.color_pair(3)
-        )
+        self.addstr(1, self.indented_startcol, prefix + quality, curses.color_pair(3))
 
         if artist or album_name:
             song_info = f"{song_name}{self.space}{artist}  < {album_name} >"

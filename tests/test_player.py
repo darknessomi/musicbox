@@ -4,7 +4,9 @@ from NEMbox.player import Player
 
 
 def test_playing_id_is_none_without_current_song():
-    with patch.object(Player, "current_song", new_callable=PropertyMock, return_value={}):
+    with patch.object(
+        Player, "current_song", new_callable=PropertyMock, return_value={}
+    ):
         player = Player.__new__(Player)
         assert player.playing_id is None
 
@@ -69,7 +71,9 @@ def test_refresh_mpv_audio_info_stores_audio_quality_separately():
         "format": "s16",
     }
 
-    with patch.object(Player, "current_song", new_callable=PropertyMock) as current_song:
+    with patch.object(
+        Player, "current_song", new_callable=PropertyMock
+    ) as current_song:
         current_song.return_value = song
         assert player._refresh_mpv_audio_info("sock", 1, process)
         assert player._refresh_mpv_audio_info("sock", 1, process)
@@ -96,7 +100,9 @@ def test_build_playinfo_rotates_quality_label(monkeypatch):
         {"build_playinfo": lambda self, *args, **kwargs: calls.append((args, kwargs))},
     )()
 
-    with patch.object(Player, "current_song", new_callable=PropertyMock) as current_song:
+    with patch.object(
+        Player, "current_song", new_callable=PropertyMock
+    ) as current_song:
         current_song.return_value = song
         monkeypatch.setattr("NEMbox.player.time.time", lambda: 101)
         player.build_playinfo()

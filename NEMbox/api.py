@@ -191,6 +191,7 @@ def music_quality_to_level(quality):
 def level_to_encode_type(level):
     return "flac" if level in LOSSLESS_LEVELS else "mp3"
 
+
 EAPI_OS = {
     "os": "iphone",
     "appver": "9.0.90",
