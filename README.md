@@ -4,6 +4,8 @@
 
 高品质网易云音乐命令行版本，简洁优雅，丝般顺滑，基于 Python 编写。
 
+感谢 [NeteaseCloudMusicApiEnhanced/api-enhanced](https://github.com/neteasecloudmusicapienhanced/api-enhanced) 项目提供的网易云音乐 API 能力支持。
+
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
 [![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
@@ -186,13 +188,6 @@ curl -L ip.cn
 ```
 
 显示 IP 属于中国大陆地区即可。
-
-### 已测试的系统兼容列表
-
-| OS    | Version |
-| ----- | ------- |
-| Arch  | Rolling |
-| macOS | 10.15.7 |
 
 ### 错误处理
 
