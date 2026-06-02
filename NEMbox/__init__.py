@@ -47,7 +47,7 @@ def _parse_version(version: str) -> tuple[int, ...]:
 
 
 _versions = [_parse_version(d.version) for d in distributions(name="NetEase-MusicBox")]
-__version__ = ".".join(map(str, max(_versions))) if _versions else "0.5.0"
+__version__ = ".".join(map(str, max(_versions))) if _versions else "0.5.1"
 
 
 def create_config():

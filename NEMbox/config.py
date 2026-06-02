@@ -15,7 +15,7 @@ class Config(Singleton):
 
         self.path = Constant.config_path
         self.default_config = {
-            "version": 8,
+            "version": 9,
             "page_length": {
                 "value": 10,
                 "default": 10,
@@ -34,6 +34,19 @@ class Config(Singleton):
                 "default": [],
                 "describe": "The additional parameters when mpg123 start.",
             },
+            "player_backend": {
+                "value": "mpg123",
+                "default": "mpg123",
+                "describe": (
+                    "Select player backend. "
+                    "mpg123 keeps legacy MP3 playback; mpv supports MP3/FLAC."
+                ),
+            },
+            "mpv_parameters": {
+                "value": [],
+                "default": [],
+                "describe": "The additional parameters when mpv start.",
+            },
             "aria2c_parameters": {
                 "value": [],
                 "default": [],
@@ -47,7 +60,8 @@ class Config(Singleton):
                 "describe": (
                     "Select the quality of the music. "
                     "May be useful when network is terrible. "
-                    "0 for high quality, 1 for medium and 2 for low."
+                    "0/exhigh for high, 1/higher for medium, 2/standard for low, "
+                    "3/lossless for FLAC lossless and 4/hires for hi-res."
                 ),
             },
             "global_play_pause": {

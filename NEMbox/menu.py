@@ -148,6 +148,7 @@ class Menu:
             {"entry_name": "新碟上架"},
             {"entry_name": "精选歌单"},
             {"entry_name": "我的歌单"},
+            {"entry_name": "我的云盘"},
             {"entry_name": "主播电台"},
             {"entry_name": "每日推荐歌曲"},
             {"entry_name": "每日推荐歌单"},
@@ -339,16 +340,8 @@ class Menu:
             )
 
     def check_version(self):
-        # 检查更新 && 签到
+        # 检查更新
         try:
-            mobile = self.api.daily_task(is_mobile=True)
-            pc = self.api.daily_task(is_mobile=False)
-
-            if mobile["code"] == 200:
-                notify("移动端签到成功", 1)
-            if pc["code"] == 200:
-                notify("PC端签到成功", 1)
-
             data = self.api.get_version()
             return data["info"]["version"]
         except KeyError:
@@ -1026,7 +1019,14 @@ class Menu:
                     continue
                 cache_thread = threading.Thread(
                     target=self.player.cache_song,
-                    args=(s["song_id"], s["song_name"], s["artist"], s["mp3_url"]),
+                    args=(
+                        s["song_id"],
+                        s["song_name"],
+                        s["artist"],
+                        s["mp3_url"],
+                        s.get("type", ""),
+                        s.get("level", ""),
+                    ),
                 )
                 cache_thread.start()
             # 在网页打开 ord(i)
@@ -1303,36 +1303,41 @@ class Menu:
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
             self.title += " > " + self.username + " 的歌单"
         elif idx == 5:
+            if not self.account and not self.login():
+                return
+            cloud_songs = self.request_api(self.api.user_cloud)
+            self.datatype = "songs"
+            self.title += " > " + self.username + " 的云盘"
+            self.datalist = self.api.dig_info(cloud_songs, "cloud_songs")
+        elif idx == 6:
             self.datatype = "djRadios"
             self.title += " > 主播电台"
             self.datalist = self.api.djRadios()
-        elif idx == 6:
-            if not self.account:
-                if not self.login():
-                    return
+        elif idx == 7:
+            if not self.account and not self.login():
+                return
             self.datatype = "songs"
             self.title += " > 每日推荐歌曲"
             myplaylist = self.request_api(self.api.recommend_playlist)
             if myplaylist is False:
                 return
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
-        elif idx == 7:
-            if not self.account:
-                if not self.login():
-                    return
+        elif idx == 8:
+            if not self.account and not self.login():
+                return
             myplaylist = self.request_api(self.api.recommend_resource)
             self.datatype = "top_playlists"
             self.title += " > 每日推荐歌单"
             self.datalist = self.api.dig_info(myplaylist, self.datatype)
-        elif idx == 8:
+        elif idx == 9:
             self.datatype = "fmsongs"
             self.title += " > 私人FM"
             self.datalist = self.get_new_fm()
-        elif idx == 9:
+        elif idx == 10:
             self.datatype = "search"
             self.title += " > 搜索"
             self.datalist = ["歌曲", "艺术家", "专辑", "主播电台", "网易精选集"]
-        elif idx == 10:
+        elif idx == 11:
             self.datatype = "help"
             self.title += " > 帮助"
             self.datalist = shortcut

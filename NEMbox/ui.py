@@ -45,6 +45,11 @@ def _is_escape_key(ch) -> bool:
         return ch == "\x1b"
     return ch == 27
 
+
+def playinfo_song_start(indented_startcol, prefix, quality):
+    return indented_startcol + truelen(prefix + quality) + 2
+
+
 try:
     dbus: Any | None = importlib.import_module("dbus")
 except ImportError:
@@ -166,24 +171,22 @@ class Ui:
         self.screen.clrtoeol()
         self.screen.move(2, 1)
         self.screen.clrtoeol()
-        if pause:
-            self.addstr(
-                1, self.indented_startcol, "_ _ z Z Z " + quality, curses.color_pair(3)
-            )
-        else:
-            self.addstr(
-                1, self.indented_startcol, "♫  ♪ ♫  ♪ " + quality, curses.color_pair(3)
-            )
+        prefix = "_ _ z Z Z " if pause else "♫  ♪ ♫  ♪ "
+        self.addstr(1, self.indented_startcol, prefix + quality, curses.color_pair(3))
 
         if artist or album_name:
             song_info = f"{song_name}{self.space}{artist}  < {album_name} >"
         else:
             song_info = song_name
 
-        if truelen(song_info) <= self.endcol - self.indented_startcol - 19:
+        song_start = min(
+            playinfo_song_start(self.indented_startcol, prefix, quality),
+            self.indented_endcol - 1,
+        )
+        if truelen(song_info) <= self.endcol - song_start:
             self.addstr(
                 1,
-                min(self.indented_startcol + 18, self.indented_endcol - 1),
+                song_start,
                 song_info,
                 curses.color_pair(4),
             )
@@ -191,8 +194,8 @@ class Ui:
             song_info = scrollstring(song_info + " ", start)
             self.addstr(
                 1,
-                min(self.indented_startcol + 18, self.indented_endcol - 1),
-                truelen_cut(str(song_info), self.endcol - self.indented_startcol - 19),
+                song_start,
+                truelen_cut(str(song_info), self.endcol - song_start),
                 curses.color_pair(4),
             )
 
