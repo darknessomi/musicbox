@@ -739,11 +739,7 @@ class NetEase:
     def playlist_songlist(self, playlist_id):
         path = "/api/v6/playlist/detail"
         params = {"id": playlist_id, "n": 100000, "s": 8}
-        return (
-            self.eapi_request(path, params)
-            .get("playlist", {})
-            .get("trackIds", [])
-        )
+        return self.eapi_request(path, params).get("playlist", {}).get("trackIds", [])
 
     # 热门歌手 http://music.163.com/#/discover/artist/
     def top_artists(self, offset=0, limit=100):

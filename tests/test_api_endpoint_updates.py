@@ -115,9 +115,7 @@ def test_recommend_playlist_reads_v3_daily_songs(monkeypatch):
     monkeypatch.setattr(api, "request", fake_request)
 
     assert api.recommend_playlist(offset=1, limit=1) == [{"id": 2}]
-    assert calls == [
-        ("POST", "/weapi/v3/discovery/recommend/songs", {"afresh": False})
-    ]
+    assert calls == [("POST", "/weapi/v3/discovery/recommend/songs", {"afresh": False})]
 
 
 def test_playlist_songlist_uses_v6_detail_eapi(monkeypatch):
