@@ -8,14 +8,36 @@ import os
 import signal
 import subprocess
 import threading
+from urllib.parse import urlparse
 
 from . import logger
-from .api import NetEase
+from .api import LOSSLESS_LEVELS, NetEase, music_quality_to_level
 from .config import Config
 from .const import Constant
 from .singleton import Singleton
 
 log = logger.getLogger(__name__)
+
+
+def infer_cache_extension(url="", song_type="", level="", configured_quality=None):
+    if str(song_type or "").lower() == "flac":
+        return ".flac"
+
+    parsed_path = urlparse(url or "").path.lower()
+    for ext in (".flac", ".mp3"):
+        if parsed_path.endswith(ext):
+            return ext
+
+    normalized_level = str(level or "").lower()
+    if normalized_level in LOSSLESS_LEVELS:
+        return ".flac"
+
+    if configured_quality is not None:
+        configured_level = music_quality_to_level(configured_quality)
+        if configured_level in LOSSLESS_LEVELS:
+            return ".flac"
+
+    return ".mp3"
 
 
 class Cache(Singleton):
@@ -69,11 +91,26 @@ class Cache(Singleton):
             artist = data[2]
             url = data[3]
             onExit = data[4]
+            song_type = data[5] if len(data) > 5 else ""
+            level = data[6] if len(data) > 6 else ""
             output_path = Constant.download_dir
-            output_file = str(artist) + " - " + str(song_name) + ".mp3"
+            ext = infer_cache_extension(
+                url, song_type, level, self.config.get("music_quality")
+            )
+            output_file = str(artist) + " - " + str(song_name) + ext
             full_path = os.path.join(output_path, output_file)
 
-            new_url = NetEase().songs_url([song_id])[0]["url"]
+            url_info = NetEase().songs_url([song_id])[0]
+            new_url = url_info["url"]
+            if not song_type:
+                song_type = url_info.get("type", "")
+            if not level:
+                level = url_info.get("level", "")
+            ext = infer_cache_extension(
+                new_url, song_type, level, self.config.get("music_quality")
+            )
+            output_file = str(artist) + " - " + str(song_name) + ext
+            full_path = os.path.join(output_path, output_file)
             if new_url:
                 log.info(f"Old:{url}. New:{new_url}")
                 try:
@@ -113,9 +150,9 @@ class Cache(Singleton):
                     onExit(song_id, full_path)
         self.download_lock.release()
 
-    def add(self, song_id, song_name, artist, url, onExit):
+    def add(self, song_id, song_name, artist, url, onExit, song_type="", level=""):
         self.check_lock.acquire()
-        self.downloading.append([song_id, song_name, artist, url, onExit])
+        self.downloading.append([song_id, song_name, artist, url, onExit, song_type, level])
         self.check_lock.release()
 
     def quit(self):

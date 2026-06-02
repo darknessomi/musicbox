@@ -156,8 +156,40 @@ DEFAULT_TIMEOUT = 10
 BASE_URL = "https://music.163.com"
 EAPI_BASE_URL = "https://interface.music.163.com"
 
-# music_quality -> song/url/v1 level (mp3 only, mpg123)
-QUALITY_LEVEL_MAP = {0: "exhigh", 1: "higher", 2: "standard"}
+# music_quality -> song/url/v1 level
+QUALITY_LEVEL_MAP = {
+    0: "exhigh",
+    1: "higher",
+    2: "standard",
+    3: "lossless",
+    4: "hires",
+}
+QUALITY_LEVELS = {
+    "standard",
+    "higher",
+    "exhigh",
+    "lossless",
+    "hires",
+    "jyeffect",
+    "sky",
+    "jymaster",
+}
+LOSSLESS_LEVELS = {"lossless", "hires", "jymaster"}
+
+
+def music_quality_to_level(quality):
+    if isinstance(quality, str):
+        normalized = quality.strip().lower()
+        if normalized.isdigit():
+            return QUALITY_LEVEL_MAP.get(int(normalized), "exhigh")
+        if normalized in QUALITY_LEVELS:
+            return normalized
+        return "exhigh"
+    return QUALITY_LEVEL_MAP.get(quality, "exhigh")
+
+
+def level_to_encode_type(level):
+    return "flac" if level in LOSSLESS_LEVELS else "mp3"
 
 EAPI_OS = {
     "os": "iphone",
@@ -182,7 +214,17 @@ class Parse:
             url = song["url"]
             if url is None:
                 return Parse._song_url_by_id(song["id"])
-            br = song["br"]
+            level = str(song.get("level") or "").upper()
+            song_type = str(song.get("type") or "").upper()
+            if level in {"LOSSLESS", "HIRES", "JYMASTER"} and song_type:
+                return url, f"{level} {song_type}"
+            if song_type == "FLAC" and level:
+                return url, f"{level} FLAC"
+            if song_type == "FLAC":
+                return url, "LOSSLESS FLAC"
+            br = song.get("br", 0) or 0
+            if br >= 999000:
+                return url, "LOSSLESS"
             if br >= 320000:
                 quality = "HD"
             elif br >= 192000:
@@ -256,12 +298,31 @@ class Parse:
                 "album_name": album_name,
                 "album_id": album_id,
                 "mp3_url": url,
+                "type": song.get("type", ""),
+                "level": song.get("level", ""),
+                "duration": int((song.get("dt") or song.get("duration") or 0) / 1000),
                 "quality": quality,
                 "expires": song["expires"],
                 "get_time": song["get_time"],
             }
             song_info_list.append(song_info)
         return song_info_list
+
+    @classmethod
+    def cloud_songs(cls, data):
+        songs = []
+        for item in data:
+            if not isinstance(item, dict):
+                continue
+            song = (
+                item.get("simpleSong")
+                or item.get("song")
+                or item.get("simple_song")
+                or item
+            )
+            if isinstance(song, dict) and song.get("id"):
+                songs.append(song)
+        return songs
 
     @classmethod
     def artists(cls, artists):
@@ -576,17 +637,17 @@ class NetEase:
         path = "/weapi/w/nuser/account/get"
         return self.request("POST", path)
 
-    # 每日签到
-    def daily_task(self, is_mobile=True):
-        path = "/weapi/point/dailyTask"
-        params = {"type": 0 if is_mobile else 1}
-        return self.request("POST", path, params)
-
     # 用户歌单
     def user_playlist(self, uid, offset=0, limit=50):
         path = "/weapi/user/playlist"
         params = {"uid": uid, "offset": offset, "limit": limit}
         return self.request("POST", path, params).get("playlist", [])
+
+    # 我的云盘
+    def user_cloud(self, offset=0, limit=100):
+        path = "/weapi/v1/cloud/get"
+        params = {"offset": offset, "limit": limit}
+        return self.request("POST", path, params).get("data", [])
 
     # 每日推荐歌单
     def recommend_resource(self):
@@ -712,13 +773,13 @@ class NetEase:
 
     def songs_url(self, ids):
         quality = Config().get("music_quality")
-        level = QUALITY_LEVEL_MAP.get(quality, "exhigh")
+        level = music_quality_to_level(quality)
         if not isinstance(ids, list):
             ids = list(ids)
         params = {
             "ids": json.dumps(ids, separators=(",", ":")),
             "level": level,
-            "encodeType": "mp3",
+            "encodeType": level_to_encode_type(level),
         }
         result = self.eapi_request("/api/song/enhance/player/url/v1", params).get(
             "data", []
@@ -726,9 +787,16 @@ class NetEase:
         if result:
             return result
         # 降级：旧 weapi 按码率取链
-        rate_map = {0: 320000, 1: 192000, 2: 128000}
+        rate_map = {
+            "exhigh": 320000,
+            "higher": 192000,
+            "standard": 128000,
+            "lossless": 999000,
+            "hires": 999000,
+            "jymaster": 999000,
+        }
         path = "/weapi/song/enhance/player/url"
-        fallback_params = {"ids": ids, "br": rate_map.get(quality, 320000)}
+        fallback_params = {"ids": ids, "br": rate_map.get(level, 320000)}
         return self.request("POST", path, fallback_params).get("data", [])
 
     # lyric http://music.163.com/api/song/lyric?os=osx&id= &lv=-1&kv=-1&tv=-1
@@ -783,6 +851,9 @@ class NetEase:
     def dig_info(self, data, dig_type):
         if not data:
             return []
+        if dig_type == "cloud_songs":
+            return self.dig_info(Parse.cloud_songs(data), "songs")
+
         if dig_type == "songs" or dig_type == "fmsongs" or dig_type == "djprograms":
             sids = [x["id"] for x in data]
             # 可能因网络波动，返回空值，在Parse.songs中引发KeyError
@@ -798,6 +869,14 @@ class NetEase:
             else:
                 for i in range(0, len(sids), 500):
                     sds.extend(self.songs_detail(sids[i : i + 500]))
+                detail_ids = {s.get("id") for s in sds}
+                for song in data:
+                    if (
+                        isinstance(song, dict)
+                        and song.get("id") not in detail_ids
+                        and song.get("name")
+                    ):
+                        sds.append(song)
             # api 返回的 urls 的 id 顺序和 data 的 id 顺序不一致
             # 为了获取到对应 id 的 url，对返回的 urls 做一个 id2index 的缓存
             # 同时保证 data 的 id 顺序不变
@@ -812,8 +891,10 @@ class NetEase:
                     log.error("can't get song url, id: %s", s["id"])
                     return []
                 s["url"] = urls[url_index]["url"]
-                s["br"] = urls[url_index]["br"]
-                s["expires"] = urls[url_index]["expi"]
+                s["br"] = urls[url_index].get("br", 0)
+                s["type"] = urls[url_index].get("type", "")
+                s["level"] = urls[url_index].get("level", "")
+                s["expires"] = urls[url_index].get("expi", -1)
                 s["get_time"] = timestamp
             return Parse.songs(sds)
 
@@ -828,7 +909,9 @@ class NetEase:
                 song = {}
                 song["song_id"] = url_info["id"]
                 song["mp3_url"] = url_info["url"]
-                song["expires"] = url_info["expi"]
+                song["type"] = url_info.get("type", "")
+                song["level"] = url_info.get("level", "")
+                song["expires"] = url_info.get("expi", -1)
                 song["get_time"] = timestamp
                 songs.append(song)
             return songs

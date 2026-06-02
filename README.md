@@ -1,8 +1,9 @@
 # NetEase-MusicBox
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
-[![versions](https://img.shields.io/pypi/v/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/NetEase-MusicBox.svg)](https://pypi.org/project/NetEase-MusicBox/)
+![PyPI - Version](https://img.shields.io/pypi/v/NetEase-MusicBox)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/NetEase-MusicBox)
+
 
 高品质网易云音乐命令行客户端，基于 Python 编写。
 
@@ -16,7 +17,7 @@
 
 ## 功能特性
 
-- 支持 320kbps 高品质音乐播放
+- 支持 320kbps 高品质音乐播放，安装 `mpv` 后支持 FLAC 无损播放
 - 支持歌曲、艺术家、专辑、本地列表模糊搜索
 - 支持排行榜、新碟推荐、精选歌单、主播电台、私人歌单和每日推荐
 - 支持本地收藏、歌曲评论、专辑跳转、随心打碟和定时退出
@@ -30,7 +31,8 @@
 ### 环境要求
 
 - Python 3.10 及以上
-- `mpg123`，用于播放歌曲
+- `mpg123`，用于默认 MP3 播放
+- `mpv`，可选，用于 FLAC 无损/Hi-Res 播放
 
 `rapidfuzz` 和 `qrcode` 会随 MusicBox 自动安装，分别用于模糊搜索和扫码登录二维码生成。
 
@@ -39,19 +41,19 @@
 macOS:
 
 ```bash
-brew install mpg123 uv
+brew install mpg123 mpv uv
 ```
 
 Ubuntu/Debian:
 
 ```bash
-sudo apt-get install mpg123
+sudo apt-get install mpg123 mpv
 ```
 
 CentOS/Red Hat:
 
 ```bash
-sudo yum install -y python3-devel mpg123
+sudo yum install -y python3-devel mpg123 mpv
 ```
 
 ### 安装 MusicBox
@@ -65,6 +67,8 @@ uv tool install .
 ```
 
 也可以使用 `pipx install .`。如果希望源码改动实时生效，使用 `uv tool install -e .`。
+
+> `uv tool install .` / `pipx install .` 安装的是源码的一份快照副本，之后修改源码不会自动生效，需重新执行安装命令。如需源码改动实时生效，用 `uv tool install -e .`。
 
 从 PyPI 安装：
 
@@ -156,7 +160,13 @@ musicbox
 
 ## 配置
 
-配置文件位于 `~/.config/netease-musicbox/config.json`，可配置缓存、快捷键、消息提示和桌面歌词。
+配置文件位于 `~/.netease-musicbox/config.json`，可配置缓存、快捷键、消息提示和桌面歌词。
+
+无损播放相关配置：
+
+- `music_quality`: `0/exhigh`、`1/higher`、`2/standard`、`3/lossless`、`4/hires`，也可直接填写 `lossless`、`hires`、`jymaster`。
+- `player_backend`: 默认 `mpg123`。设置为 `mpv` 后所有歌曲都用 `mpv` 播放；保持默认时，FLAC 链接会自动切到 `mpv`。
+- `mpv_parameters`: 传给 `mpv` 的额外参数列表。
 
 由于歌曲 API 只接受中国大陆地区访问，非中国大陆地区用户需要自行设置代理。可用 polipo 将 socks5 代理转换成 http 代理：
 
