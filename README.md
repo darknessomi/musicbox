@@ -86,6 +86,27 @@ uv run musicbox
 - `libnotify-bin`：Linux 消息提示
 - `qtpy python-dbus dbus qt`：桌面歌词。根据系统 Qt 版本，可能还需要安装 `pyqt4`、`pyside` 或 `pyside2`
 
+### 树莓派 / 老旧设备
+
+Ubuntu 22.04 / 64 位树莓派系统自带 Python 3.10，可用 `pipx` 直接安装。低性能设备建议先只装 MP3 播放必需依赖，避免一次性拉取 `mpv` 的大量图形/视频依赖：
+
+```bash
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends pipx mpg123
+pipx ensurepath
+pipx install NetEase-MusicBox
+musicbox
+```
+
+> 注意：项目要求 Python 3.10 及以上；旧版 Raspberry Pi OS / Debian 如果仍是 Python 3.9，不能直接安装当前版本。
+>
+
+### 已验证系统
+
+- Ubuntu 24.04 LTS x64
+- macOS 26.5
+- Raspberry Pi 4 / Ubuntu 22.04 arm64（Docker 镜像：`balenalib/raspberrypi4-64-ubuntu:jammy`）
+
 ## 使用
 
 启动 MusicBox：

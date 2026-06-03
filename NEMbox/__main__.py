@@ -7,7 +7,15 @@ import sys
 import traceback
 
 from . import __version__
+from .api import NetEase
 from .menu import Menu
+
+
+def _check_latest_version():
+    try:
+        return NetEase().get_version()["info"]["version"]
+    except (KeyError, TypeError):
+        return 0
 
 
 def start():
@@ -20,11 +28,11 @@ def start():
     args = parser.parse_args()
 
     if args.version:
-        latest = Menu().check_version()
+        latest = _check_latest_version()
         with contextlib.suppress(_curses.error):
             curses.endwin()
         print("NetEase-MusicBox installed version:" + version)
-        if latest != version:
+        if latest and latest != version:
             print("NetEase-MusicBox latest version:" + str(latest))
         sys.exit()
 
