@@ -3,7 +3,7 @@ name = "NetEase-MusicBox"
 version = "0.5.1"
 description = "A sexy command line interface musicbox"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
   { name = "omi", email = "4399.omi@gmail.com" },
   { name = "Weiliang Li", email = "to.be.impressive@gmail.com" },
@@ -16,29 +16,36 @@ keywords = ["music", "netease", "cli", "player"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
   "Natural Language :: Chinese (Simplified)",
   "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: Implementation :: CPython",
   "Topic :: Multimedia :: Sound/Audio",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 dependencies = [
-  "pycryptodomex>=3.20",
-  "rapidfuzz>=3.0",
+  "pycryptodomex>=3.21",
+  "rapidfuzz>=3.9",
   "requests>=2.32",
-  "requests-cache>=1.2",
-  "urllib3>=2.0",
-  "qrcode>=8.2",
+  "requests-cache>=1.3",
+  "urllib3>=2.2",
+  "qrcode>=8.0",
 ]
 
 [project.urls]
+Homepage = "https://github.com/darknessomi/musicbox"
 Repository = "https://github.com/darknessomi/musicbox"
+Issues = "https://github.com/darknessomi/musicbox/issues"
 
 [project.scripts]
 musicbox = "NEMbox.__main__:start"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.24,<2"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
@@ -49,10 +56,17 @@ exclude = [".poetry-cache", ".venv", ".git"]
 
 [dependency-groups]
 dev = [
-  "pytest>=8.0",
-  "ruff>=0.9",
-  "ty",
+  "pytest>=8.3",
+  "ruff>=0.15",
+  "ty>=0.0.40",
   "pre-commit>=4.6",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --tb=short"
+filterwarnings = [
+  "ignore:The 'warn' method is deprecated:DeprecationWarning:NEMbox.osdlyrics",
 ]
 
 [tool.ruff]
