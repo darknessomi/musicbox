@@ -120,7 +120,27 @@ musicbox
 1. 用网易云音乐手机 App 扫描二维码，并在手机上确认。
 2. 登录成功后 Cookie 写入 `~/.local/share/netease-musicbox/cookie.txt`（未设置 `XDG_DATA_HOME` 时为 `~/.netease-musicbox/cookie.txt`）。
 
-终端以字符块渲染二维码，窗口建议 ≥25 行、等宽字体。无法扫描时，可复制提示中的 `https://music.163.com/login?codekey=...` 链接另行生成二维码。
+终端以字符块渲染二维码，窗口建议 ≥25 行、等宽字体。必须使用网易云音乐 App 扫描二维码并在手机上确认，不支持打开 URL 完成登录。
+
+## CLI 与 AI Agent
+
+MusicBox 支持命令行和 AI Agent 调用：搜索歌曲、获取播放链接、播放控制、查询状态和登录都可以通过 `musicbox` 命令完成。
+
+```bash
+musicbox search 周杰伦 --type song --json
+musicbox song url 33894312 --quality lossless --quiet
+musicbox play --id 33894312 --json
+musicbox pause --json
+musicbox status --json
+musicbox queue list --json
+musicbox auth login --no-wait --json
+```
+
+安装 Agent Skill 后，可直接让 Codex、Claude Code、Cursor 等 Agent 操作 MusicBox：
+
+```bash
+npx skills add darknessomi/musicbox -y
+```
 
 ## 快捷键
 

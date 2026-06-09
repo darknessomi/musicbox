@@ -58,7 +58,10 @@ def test_login_qr_key_uses_type_3_and_reads_nested_unikey(monkeypatch):
     calls = []
 
     monkeypatch.setattr(
-        api, "cookie_jar", type("Jar", (), {"load": lambda self: None})(), raising=False
+        api,
+        "cookie_jar",
+        type("Jar", (), {"load": lambda self: None, "save": lambda self: None})(),
+        raising=False,
     )
     monkeypatch.setattr(api, "_ensure_anon_cookies", lambda: None)
 
@@ -77,13 +80,22 @@ def test_login_qr_check_uses_type_3_and_applies_cookie(monkeypatch):
     calls = []
     applied = []
     saved = []
+    ensured = []
 
     monkeypatch.setattr(
         api,
         "cookie_jar",
-        type("Jar", (), {"save": lambda self: saved.append(True)})(),
+        type(
+            "Jar",
+            (),
+            {
+                "load": lambda self: None,
+                "save": lambda self: saved.append(True),
+            },
+        )(),
         raising=False,
     )
+    monkeypatch.setattr(api, "_ensure_anon_cookies", lambda: ensured.append(True))
     monkeypatch.setattr(api, "_apply_cookie_string", applied.append)
 
     def fake_request(method, path, params=None):
@@ -100,7 +112,8 @@ def test_login_qr_check_uses_type_3_and_applies_cookie(monkeypatch):
         ("POST", "/weapi/login/qrcode/client/login", {"type": 3, "key": "abc"})
     ]
     assert applied == ["MUSIC_U=token; __csrf=csrf"]
-    assert saved == [True]
+    assert ensured == [True]
+    assert saved == [True, True]
 
 
 def test_recommend_playlist_reads_v3_daily_songs(monkeypatch):
