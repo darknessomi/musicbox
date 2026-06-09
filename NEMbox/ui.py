@@ -736,7 +736,6 @@ class Ui:
         qr = None
         lines = []
         status_row = qr_start_row
-        show_link = False
         for border in (4, 2, 1, 0):
             candidate = qrcode.QRCode(border=border)
             candidate.add_data(url)
@@ -745,18 +744,11 @@ class Ui:
             candidate.print_ascii(out=buf, invert=True)
             candidate_lines = buf.getvalue().splitlines()
             qr_height = len(candidate_lines)
-            link_row = qr_start_row + qr_height + 1
-            candidate_status_row = link_row + 2
+            candidate_status_row = qr_start_row + qr_height + 1
             if candidate_status_row < max_rows:
                 qr = candidate
                 lines = candidate_lines
                 status_row = candidate_status_row
-                show_link = True
-                break
-            if link_row < max_rows:
-                qr = candidate
-                lines = candidate_lines
-                status_row = link_row
                 break
         if qr is None:
             qr = qrcode.QRCode(border=0)
@@ -783,8 +775,6 @@ class Ui:
                 break
             self.addstr(row, self.startcol, line)
             row += 1
-        if show_link and row + 1 < max_rows:
-            self.addstr(row + 1, self.startcol, "链接: " + url, curses.A_DIM)
         status_row = min(status_row, max_rows - 1)
         self.addstr(status_row, self.startcol, "等待扫码...", curses.color_pair(2))
         self.screen.refresh()

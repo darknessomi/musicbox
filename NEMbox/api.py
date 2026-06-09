@@ -342,11 +342,6 @@ class NetEase:
             "Referer": "https://music.163.com",
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.87 Safari/537.36",
         }
-        # 注入随机中国 IP 规避网易风控（8821 行为验证码）
-        cn_ip = self._gen_cn_ip()
-        self.header["X-Real-IP"] = cn_ip
-        self.header["X-Forwarded-For"] = cn_ip
-
         self.storage = Storage()
         self.cookie_jar = MozillaCookieJar(self.storage.cookie_path)
         self.cookie_jar.load()
@@ -367,6 +362,11 @@ class NetEase:
                 self.storage.save()
                 break
         self._device_id = self._get_cookie_value("deviceId") or self._gen_device_id()
+        # Keep the QR login split-flow consistent across CLI processes.
+        # The TUI uses one NetEase instance; CLI no-wait/check do not.
+        cn_ip = self._cn_ip_for_device(self._device_id)
+        self.header["X-Real-IP"] = cn_ip
+        self.header["X-Forwarded-For"] = cn_ip
         self._toplists_cache = None
 
     @staticmethod
@@ -375,9 +375,10 @@ class NetEase:
         return "".join(random.choice("0123456789ABCDEF") for _ in range(52))
 
     @staticmethod
-    def _gen_cn_ip():
-        # 随机中国 IP，用于 X-Real-IP 规避风控，对照 generateRandomChineseIP 兜底逻辑
-        return f"116.{random.randint(25, 94)}.{random.randint(1, 255)}.{random.randint(1, 255)}"
+    def _cn_ip_for_device(device_id):
+        # 稳定中国 IP，用于 X-Real-IP；同一 deviceId 在 CLI split-flow 两轮保持一致。
+        seed = int(str(device_id or "0")[:8], 16)
+        return f"116.{25 + seed % 70}.{1 + (seed // 70) % 255}.{1 + (seed // (70 * 255)) % 255}"
 
     def _get_cookie_value(self, name):
         for cookie in self.session.cookies:
@@ -627,6 +628,7 @@ class NetEase:
         """获取二维码 unikey。返回 unikey 字符串或 None。"""
         self.cookie_jar.load()
         self._ensure_anon_cookies()
+        self.cookie_jar.save()
         path = "/weapi/login/qrcode/unikey"
         data = self.request("POST", path, {"type": 3}) or {}
         nested = data.get("data")
@@ -645,6 +647,9 @@ class NetEase:
 
     def login_qr_check(self, unikey):
         """轮询扫码状态。code: 800 过期 / 801 待扫码 / 802 待确认 / 803 成功。"""
+        self.cookie_jar.load()
+        self._ensure_anon_cookies()
+        self.cookie_jar.save()
         path = "/weapi/login/qrcode/client/login"
         data = self.request("POST", path, {"type": 3, "key": unikey})
         if data.get("code") == 803:

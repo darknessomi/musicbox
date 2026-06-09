@@ -37,6 +37,20 @@ from .utils import notify
 log = logger.getLogger(__name__)
 
 
+class NullUi:
+    """Headless UI stub for the daemon: every render call is a no-op.
+
+    The real ``Ui`` grabs the terminal via ``curses.initscr()`` on construction,
+    which must never happen inside ``musicboxd``.
+    """
+
+    def build_playinfo(self, *args, **kwargs):
+        return None
+
+    def update_size(self, *args, **kwargs):
+        return None
+
+
 class Player:
     MODE_ORDERED = 0
     MODE_ORDERED_LOOP = 1
@@ -46,9 +60,9 @@ class Player:
     SUBPROCESS_LIST = []
     MUSIC_THREADS = []
 
-    def __init__(self):
+    def __init__(self, ui=None):
         self.config = Config()
-        self.ui = Ui()
+        self.ui = ui if ui is not None else Ui()
         self.popen_handler: Any = None
         self.current_backend = ""
         self.mpv_ipc_path = ""
@@ -247,26 +261,38 @@ class Player:
                         pass
 
     def tune_volume(self, up=0):
+        new_volume = self.info["playing_volume"] + up
+        if new_volume < 0:
+            new_volume = 0
+        self.info["playing_volume"] = new_volume
+        if not self.popen_handler:
+            return
         try:
             if self.popen_handler.poll() is not None:
                 return
         except Exception as e:
             log.warn("Unable to tune volume: " + str(e))
             return
-
-        new_volume = self.info["playing_volume"] + up
-        # if new_volume > 100:
-        #   new_volume = 100
-        if new_volume < 0:
-            new_volume = 0
-
-        self.info["playing_volume"] = new_volume
         if self.current_backend == "mpv":
+            self._send_mpv_command(["set_property", "volume", new_volume])
             return
         try:
-            self.popen_handler.stdin.write(
-                "V {}\n".format(self.info["playing_volume"]).encode()
-            )
+            self.popen_handler.stdin.write(f"V {new_volume}\n".encode())
+            self.popen_handler.stdin.flush()
+        except Exception as e:
+            log.warn(e)
+
+    def set_volume(self, volume):
+        """Set absolute volume (0-100+). Persists to storage even when stopped."""
+        volume = max(0, int(volume))
+        self.info["playing_volume"] = volume
+        if not self.popen_handler or self.popen_handler.poll() is not None:
+            return
+        if self.current_backend == "mpv":
+            self._send_mpv_command(["set_property", "volume", volume])
+            return
+        try:
+            self.popen_handler.stdin.write(f"V {volume}\n".encode())
             self.popen_handler.stdin.flush()
         except Exception as e:
             log.warn(e)
@@ -853,6 +879,28 @@ class Player:
         self.shuffle_order()
         self.info["idx"] = self.info["playing_order"][self.info["random_index"]]
         self.replay()
+
+    def seek(self, position, relative=False):
+        """Seek the current track. Returns True on success.
+
+        Only mpv (which exposes an IPC ``seek`` command) is supported;
+        mpg123 streaming has no reliable second->frame mapping, so the daemon
+        surfaces a structured ``not_supported`` for it.
+        """
+        if not self.popen_handler or self.popen_handler.poll() is not None:
+            return False
+        if self.current_backend != "mpv":
+            return False
+        mode = "relative" if relative else "absolute"
+        if not self._send_mpv_command(["seek", position, mode]):
+            return False
+        if relative:
+            self.process_location = max(
+                0, min(self.process_location + position, self.process_length)
+            )
+        else:
+            self.process_location = max(0, min(position, self.process_length))
+        return True
 
     def volume_up(self):
         self.tune_volume(5)
