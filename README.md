@@ -127,9 +127,9 @@ musicbox
 MusicBox 支持命令行和 AI Agent 调用：搜索歌曲、获取播放链接、播放控制、查询状态和登录都可以通过 `musicbox` 命令完成。
 
 ```bash
-musicbox search 周杰伦 --type song --json
-musicbox song url 33894312 --quality lossless --quiet
-musicbox play --id 33894312 --json
+musicbox search 邓丽君 --type song --json
+musicbox song url 1847408145 --quality lossless --quiet
+musicbox play --id 1847408145 --json
 musicbox pause --json
 musicbox status --json
 musicbox queue list --json

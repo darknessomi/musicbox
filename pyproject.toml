@@ -1,6 +1,6 @@
 [project]
 name = "NetEase-MusicBox"
-version = "0.5.1"
+version = "0.5.2"
 description = "A sexy command line interface musicbox"
 readme = "README.md"
 license = "MIT"
