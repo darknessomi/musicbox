@@ -12,6 +12,7 @@ description: Use when the user wants to play/pause/skip music, control volume, s
 
 - 通过 `musicbox <cmd> --json` 操作，**绝不**向 curses TUI 模拟按键。
 - 重要动作后调 `musicbox status --json` **读回真实状态**再回复用户，不要"发完命令就假设成功"。
+- `play` / `next` / `prev` 的即时返回值常滞后（先 `stopped` 或旧进度）；**sleep 1–2 秒后再 `status`** 再下结论。
 - 数据类命令（search/playlist/toplist/...）无状态，直接调，**不需要** daemon。
 
 ## 命令速查
@@ -30,6 +31,48 @@ description: Use when the user wants to play/pause/skip music, control volume, s
 | 评论/喜爱 | `comments <id>` / `like <id>`（需登录） |
 | 认证/配置 | `auth status\|login\|logout` / `config get <key>` / `config list` |
 
+## 任务配方
+
+### 搜歌并播放
+
+```bash
+musicbox search <关键词> --type song --json   # 取 data[0].song_id
+musicbox play --id <song_id> --json
+# sleep 1–2s
+musicbox status --json
+```
+
+### 暂停 / 继续
+
+| 当前 `state` | 命令 |
+| --- | --- |
+| `paused` | `musicbox resume --json` → `status` |
+| `stopped` | **不要** `resume`；用 `play --id <id>`、`play --index <n>`，或队列非空时 `play` |
+| 换歌/换歌手 | 用 `play --id`，不要假设 `resume` 能接上之前的暂停 |
+
+### 今日推荐（需登录）
+
+```bash
+musicbox auth status --json                  # exit 3 则走 login split-flow
+musicbox recommend songs --limit 20 --json   # 收集 data[].song_id → ids[]
+musicbox play --id <ids[0]> --json
+musicbox queue add <ids[1]> <ids[2]> ... --json   # 每个 ID 独立 argv
+musicbox mode ordered --json
+musicbox status --json
+```
+
+`queue add` 在 shell 里勿把多个 ID 拼成一个字符串；可用 `queue add $(printf '%s\n' "${ids[@]:1}")` 或从 JSON 解析后逐个传参。
+
+### 歌单播放
+
+```bash
+musicbox play --playlist <playlist_id> --json
+musicbox mode ordered --json    # 列表类意图默认顺序播放
+musicbox status --json
+```
+
+切歌后用 `queue_index` / `queue_size` 确认当前第几首。
+
 ## 输出约定
 
 - Agent 调用时**始终加 `--json`**，解析 stdout 的 `{ok, data}` 信封。
@@ -43,6 +86,7 @@ description: Use when the user wants to play/pause/skip music, control volume, s
 - 控制类命令默认**自动拉起 daemon**；若遇 `exit 4`（daemon 未运行），先 `musicbox daemon start` 再重试。
 - `--no-daemon-autostart` 可禁用自动拉起（不在跑则直接 `exit 4`）。
 - daemon 与 curses TUI **互斥**：TUI 在跑时 daemon 无法启动，反之亦然。
+- 本地改过播放/daemon 代码后，先 `musicbox daemon restart`，否则仍是旧进程逻辑。
 
 ## status 是你的眼睛
 
@@ -82,3 +126,5 @@ description: Use when the user wants to play/pause/skip music, control volume, s
 
 - `seek` 仅在 mpv 后端可用；mpg123 后端会返回 `not_supported`（`exit 5`），可提示用户播放无损或将 `player_backend` 设为 `mpv`。
 - `queue clear`、`auth logout` 是高风险写操作，遇 `exit 10` 先向用户确认。
+- **版权失败**：`state` 为 `stopped` 且日志/通知含 copyright；单曲或无可切下一首时会停止，**不要**对同一首反复 `play`/`next` 重试，直接告知用户换歌。
+- 播列表、今日推荐、歌单时，未指定模式则设 `mode ordered`，避免残留 `random-loop` 打乱顺序。

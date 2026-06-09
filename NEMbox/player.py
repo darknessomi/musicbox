@@ -210,18 +210,38 @@ class Player:
 
     def refresh_urls(self):
         songs = cast(list[dict[str, Any]], self.api.dig_info(self.list, "refresh_urls"))
-        if songs:
-            for song in songs:
-                song_id = str(song["song_id"])
-                if song_id in self.songs:
-                    self.songs[song_id]["mp3_url"] = song["mp3_url"]
-                    self.songs[song_id]["type"] = song.get("type", "")
-                    self.songs[song_id]["level"] = song.get("level", "")
-                    self.songs[song_id]["expires"] = song["expires"]
-                    self.songs[song_id]["get_time"] = song["get_time"]
-                else:
-                    self.songs[song_id] = song
+        if not songs:
+            return
+        for song in songs:
+            song_id = str(song["song_id"])
+            if song_id in self.songs:
+                self.songs[song_id]["mp3_url"] = song["mp3_url"]
+                self.songs[song_id]["type"] = song.get("type", "")
+                self.songs[song_id]["level"] = song.get("level", "")
+                self.songs[song_id]["expires"] = song["expires"]
+                self.songs[song_id]["get_time"] = song["get_time"]
+            else:
+                self.songs[song_id] = song
+        if not self.is_index_valid:
+            return
+        current = self.songs.get(str(self.list[self.index]), {})
+        if current.get("mp3_url"):
             self.refresh_url_flag = True
+
+    def _advance_on_playback_failure(self):
+        """Skip after playback failure; stop when no other track would be tried."""
+        if len(self.list) <= 1:
+            self.playing_flag = False
+            self.stop()
+            return
+        current_id = self.playing_id
+        self.stop()
+        self.next_idx()
+        if not self.is_index_valid or self.playing_id == current_id:
+            self.playing_flag = False
+            self.stop()
+            return
+        self.replay()
 
     def stop(self):
         if (
@@ -447,10 +467,7 @@ class Player:
         self.current_backend = "mpv"
         if not url:
             self.notify_copyright_issue()
-            if not self.is_single_loop_mode:
-                self.next()
-            else:
-                self.stop()
+            self._advance_on_playback_failure()
             return
 
         self._cleanup_mpv_ipc()
@@ -513,12 +530,12 @@ class Player:
                 self.playing_flag = True
                 self.start_playing(lambda: 0, self.current_song)
                 self.refresh_url_flag = False
+            else:
+                self.notify_copyright_issue()
+                self._advance_on_playback_failure()
             return
         self.notify_copyright_issue()
-        if self.is_single_loop_mode:
-            self.stop()
-        else:
-            self.next()
+        self._advance_on_playback_failure()
 
     def run_mpg123(self, on_exit, url, expires=-1, get_time=-1):
         self.current_backend = "mpg123"
@@ -529,10 +546,7 @@ class Player:
 
         if not url:
             self.notify_copyright_issue()
-            if not self.is_single_loop_mode:
-                self.next()
-            else:
-                self.stop()
+            self._advance_on_playback_failure()
             return
 
         self.tune_volume()
@@ -629,13 +643,10 @@ class Player:
             self.start_playing(lambda: 0, self.current_song)
             self.refresh_url_flag = False
         else:
-            # When no replay are needed
-            if (
-                not self.playing_flag
-                or copyright_issue_flag
-                and self.is_single_loop_mode
-            ):
+            if not self.playing_flag:
                 self.stop()
+            elif copyright_issue_flag:
+                self._advance_on_playback_failure()
             else:
                 self.next()
 
