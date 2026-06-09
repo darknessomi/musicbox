@@ -696,7 +696,23 @@ class NetEase:
         path = "/weapi/v1/radio/get"
         return self.request("POST", path).get("data", [])
 
-    # like
+    # 红心 / 取消红心（我喜欢）
+    def song_like(self, songid, like=True):
+        raw_user = self.storage.database.get("user", {})
+        user = raw_user if isinstance(raw_user, dict) else {}
+        user_id = user.get("user_id")
+        if not user_id:
+            user_id = (self.get_account_info().get("account") or {}).get("id")
+        if not user_id:
+            return False
+        params = {
+            "trackId": songid,
+            "userid": user_id,
+            "like": like,
+        }
+        return self.eapi_request("/api/song/like", params)["code"] == 200
+
+    # 私人 FM 推荐反馈
     def fm_like(self, songid, like=True, time=25, alg="itembased"):
         path = "/weapi/radio/like"
         params = {

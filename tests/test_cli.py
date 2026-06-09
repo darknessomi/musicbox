@@ -69,6 +69,9 @@ class FakeNetEase:
             "total": 1,
         }
 
+    def song_like(self, songid, like=True):
+        return True
+
     def fm_like(self, songid, like=True, time=25, alg="itembased"):
         return True
 

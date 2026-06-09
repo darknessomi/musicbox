@@ -408,10 +408,10 @@ def cmd_comments(api: NetEase, ctx: CliContext, args: argparse.Namespace) -> int
 def cmd_like(api: NetEase, ctx: CliContext, args: argparse.Namespace) -> int:
     if not _require_logged_in(api, ctx):
         return EXIT_NOT_LOGGED_IN
-    ok = api.fm_like(args.id)
+    ok = api.song_like(args.id)
     if not ok:
-        return ctx.emit_err("api_error", f"喜爱歌曲 {args.id} 失败")
-    return ctx.emit_ok({"song_id": args.id, "liked": True}, f"已喜爱 {args.id}")
+        return ctx.emit_err("api_error", f"红心歌曲 {args.id} 失败")
+    return ctx.emit_ok({"song_id": args.id, "liked": True}, f"已红心 {args.id}")
 
 
 def cmd_auth_status(api: NetEase, ctx: CliContext, args: argparse.Namespace) -> int:
@@ -946,7 +946,7 @@ def _build_parser() -> MusicboxArgumentParser:
     # like
     p_like = sub.add_parser(
         "like",
-        help="喜爱歌曲（需登录，FM like API）",
+        help="红心歌曲（需登录，加入「我喜欢」）",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="Examples:\n  musicbox like 33894312 --json",
     )

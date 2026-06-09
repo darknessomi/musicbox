@@ -459,7 +459,7 @@ class Menu:
         self.build_menu_processbar()
 
     def like_event(self):
-        return_data = self.request_api(self.api.fm_like, self.player.playing_id)
+        return_data = self.request_api(self.api.song_like, self.player.playing_id)
         if return_data:
             song_name = self.player.playing_name
             notify(f"{song_name} added successfully!", 0)
@@ -818,7 +818,9 @@ class Menu:
 
             # 喜爱
             elif C.keyname(key).decode("utf-8") == KEY_MAP["like"]:
-                return_data = self.request_api(self.api.fm_like, self.player.playing_id)
+                return_data = self.request_api(
+                    self.api.song_like, self.player.playing_id
+                )
                 if return_data:
                     song_name = self.player.playing_name
                     notify(f"{song_name} added successfully!", 0)
