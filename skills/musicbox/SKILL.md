@@ -13,13 +13,13 @@ description: Use when the user wants to play/pause/skip music, control volume, s
 - 通过 `musicbox <cmd> --json` 操作，**绝不**向 curses TUI 模拟按键。
 - 重要动作后调 `musicbox status --json` **读回真实状态**再回复用户，不要"发完命令就假设成功"。
 - `play` / `next` / `prev` 的即时返回值常滞后（先 `stopped` 或旧进度）；**sleep 1–2 秒后再 `status`** 再下结论。
-- 数据类命令（search/playlist/toplist/...）无状态，直接调，**不需要** daemon。
+- 数据类命令（search/artist/album/playlist/toplist/...）无状态，直接调，**不需要** daemon。
 
 ## 命令速查
 
 | 类别 | 命令 |
 | --- | --- |
-| 播放控制 | `play [--id <id>\|--playlist <id>\|--index <n>]` / `pause` / `resume` / `toggle` / `stop` |
+| 播放控制 | `play [--id <id>\|--playlist <id>\|--index <n>\|--artist <id>\|--album <id>\|--songs <ids...>]` / `pause` / `resume` / `toggle` / `stop` |
 | 切歌/进度 | `next [n]` / `prev [n]` / `seek <秒\|+n\|-n>` |
 | 音量/模式 | `volume <0-100\|+n\|-n>` / `mode <ordered\|ordered-loop\|single-loop\|random\|random-loop>` |
 | 状态/歌词 | `status` / `lyrics --current` |
@@ -29,6 +29,8 @@ description: Use when the user wants to play/pause/skip music, control volume, s
 | 歌曲/歌单 | `song info <id>` / `song url <id> [--quality lossless]` / `playlist show <id>` |
 | 榜单/推荐 | `toplist [--index n]` / `recommend songs\|playlists`（需登录） / `fm`（需登录） |
 | 评论/喜爱 | `comments <id>` / `like <id>`（需登录） |
+| 查询歌手/专辑 | `artist <id>` / `album <id>` |
+| 下载 | `download --artist/--album/--songs/--playlist` |
 | 认证/配置 | `auth status\|login\|logout` / `config get <key>` / `config list` |
 
 ## 任务配方
@@ -73,6 +75,43 @@ musicbox status --json
 
 切歌后用 `queue_index` / `queue_size` 确认当前第几首。
 
+
+### 搜歌手并播放热门歌曲
+
+```bash
+musicbox search <关键词> --type artist --json   # 取 data[0].id
+musicbox artist <artist_id> --json            # 查看热门歌曲
+musicbox play --artist <artist_id> --limit 20 --json   # 播放前 20 首
+musicbox status --json
+```
+
+### 搜专辑并播放
+
+```bash
+musicbox search <关键词> --type album --json    # 取 data[0].id
+musicbox album <album_id> --json              # 查看专辑歌曲列表
+musicbox play --album <album_id> --json       # 播放整张专辑
+musicbox status --json
+```
+
+### 播放多首指定歌曲
+
+```bash
+musicbox play --songs <id1> <id2> <id3> --json   # 清队列 + 添加歌曲 + 播放第一首
+musicbox queue list --json                    # 确认队列内容
+musicbox status --json
+```
+
+### 下载歌曲
+
+```bash
+musicbox download --playlist <playlist_id> --path ./music --json
+musicbox download --artist <artist_id> --limit 20 --path ./music --json
+musicbox download --album <album_id> --path ./music --json
+musicbox download --songs <id1> <id2> --path ./music --json
+```
+
+每首歌曲下载为 `<artist> - <song>.mp3`，结果输出 JSON 数组，每项包含 `ok`/错误信息。
 ## 输出约定
 
 - Agent 调用时**始终加 `--json`**，解析 stdout 的 `{ok, data}` 信封。
