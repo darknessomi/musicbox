@@ -48,7 +48,7 @@ body:
     attributes:
       label: MusicBox 版本
       description: 运行 `musicbox --version` 的输出
-      placeholder: "0.5.2"
+      placeholder: "0.5.3"
     validations:
       required: true
 

@@ -223,6 +223,64 @@ def test_song_url_quiet(monkeypatch, capsys):
     assert capsys.readouterr().out.strip() == "http://example.com/song.mp3"
 
 
+@pytest.mark.parametrize("quality", ["", "vivid", "unknown-quality"])
+def test_song_url_rejects_unsupported_quality_before_side_effects(
+    monkeypatch, capsys, quality
+):
+    calls = []
+
+    class FailOnSongUrlNetEase(FakeNetEase):
+        def songs_url(self, ids):
+            calls.append(ids)
+            raise AssertionError("unsupported quality must not call the API")
+
+    class FailConfig:
+        def __init__(self):
+            raise AssertionError("unsupported quality must not touch config")
+
+    monkeypatch.setattr(cli, "Config", FailConfig)
+
+    code = _run(
+        monkeypatch,
+        ["song", "url", "33894312", "--quality", quality, "--json"],
+        FailOnSongUrlNetEase,
+    )
+
+    assert code == 2
+    error = json.loads(capsys.readouterr().err)["error"]
+    assert error["type"] == "invalid_args"
+    assert quality in error["message"]
+    assert calls == []
+
+
+def test_song_url_temporarily_applies_supported_quality(monkeypatch, capsys):
+    seen_quality = []
+
+    class FakeConfig:
+        config = {"music_quality": {"value": "exhigh"}}
+
+        def get(self, key):
+            return self.config[key]["value"]
+
+    class QualityNetEase(FakeNetEase):
+        def songs_url(self, ids):
+            seen_quality.append(FakeConfig().get("music_quality"))
+            return super().songs_url(ids)
+
+    monkeypatch.setattr(cli, "Config", FakeConfig)
+
+    code = _run(
+        monkeypatch,
+        ["song", "url", "33894312", "--quality", "lossless", "--quiet"],
+        QualityNetEase,
+    )
+
+    assert code == 0
+    assert capsys.readouterr().out.strip() == "http://example.com/song.mp3"
+    assert seen_quality == ["lossless"]
+    assert FakeConfig().get("music_quality") == "exhigh"
+
+
 def test_recommend_not_logged_in(monkeypatch, capsys):
     code = _run(monkeypatch, ["recommend", "songs", "--json"])
     assert code == 3

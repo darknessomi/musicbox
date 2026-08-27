@@ -131,6 +131,7 @@ QUALITY_LEVELS = {
     "jymaster",
 }
 LOSSLESS_LEVELS = {"lossless", "hires", "jymaster"}
+QUALITY_INPUTS = {str(quality) for quality in QUALITY_LEVEL_MAP} | QUALITY_LEVELS
 
 
 def music_quality_to_level(quality):
@@ -142,6 +143,16 @@ def music_quality_to_level(quality):
             return normalized
         return "exhigh"
     return QUALITY_LEVEL_MAP.get(quality, "exhigh")
+
+
+def is_supported_music_quality(quality):
+    if isinstance(quality, str):
+        return quality.strip().lower() in QUALITY_INPUTS
+    return (
+        isinstance(quality, int)
+        and not isinstance(quality, bool)
+        and quality in QUALITY_LEVEL_MAP
+    )
 
 
 def level_to_encode_type(level):
@@ -353,6 +364,7 @@ class NetEase:
         self.header["X-Real-IP"] = cn_ip
         self.header["X-Forwarded-For"] = cn_ip
         self._toplists_cache = None
+        self._playlist_classes_cache = None
 
     @staticmethod
     def _gen_device_id():
@@ -523,7 +535,22 @@ class NetEase:
         music_u = self._get_cookie_value("MUSIC_U")
         if music_u:
             header["MUSIC_U"] = music_u
+        else:
+            music_a = self._get_cookie_value("MUSIC_A")
+            if music_a:
+                header["MUSIC_A"] = music_a
+        nmtid = self._get_cookie_value("NMTID")
+        if nmtid:
+            header["NMTID"] = nmtid
         return header
+
+    def _persist_new_nmtid(self, had_nmtid):
+        if had_nmtid or not self._get_cookie_value("NMTID"):
+            return
+        try:
+            self.cookie_jar.save()
+        except Exception as e:
+            log.warning("failed to persist EAPI NMTID (%s)", type(e).__name__)
 
     def eapi_request(
         self,
@@ -539,6 +566,7 @@ class NetEase:
         api_path = path if path.startswith("/api/") else f"/api{path}"
         endpoint = f"{EAPI_BASE_URL}/eapi/{api_path[5:]}"
 
+        had_nmtid = bool(self._get_cookie_value("NMTID"))
         header = self._eapi_header_cookie()
         payload = {**params, "e_r": True, "header": header}
         body = eapi_encrypt(api_path, payload)
@@ -562,6 +590,7 @@ class NetEase:
             resp = self.session.post(
                 endpoint, data=body, headers=eapi_headers, timeout=DEFAULT_TIMEOUT
             )
+            self._persist_new_nmtid(had_nmtid)
             raw = resp.content
             if not raw:
                 return data
@@ -748,6 +777,66 @@ class NetEase:
         path = "/weapi/playlist/catalogue"
         return self.request("POST", path)
 
+    @staticmethod
+    def _parse_playlist_classes(data):
+        if not isinstance(data, dict) or data.get("code") != 200:
+            return {}
+        categories = data.get("categories")
+        subcategories = data.get("sub")
+        if not isinstance(categories, dict) or not isinstance(subcategories, list):
+            return {}
+
+        def category_order(item):
+            try:
+                return (0, int(item[0]))
+            except (TypeError, ValueError):
+                return (1, str(item[0]))
+
+        category_names = {}
+        playlist_classes = {}
+        seen = {}
+        for category_id, category_name in sorted(
+            categories.items(), key=category_order
+        ):
+            if not isinstance(category_name, str) or not category_name:
+                continue
+            category_names[str(category_id)] = category_name
+            playlist_classes[category_name] = []
+            seen[category_name] = set()
+
+        for item in subcategories:
+            if not isinstance(item, dict):
+                continue
+            category_name = category_names.get(str(item.get("category")))
+            name = item.get("name")
+            if (
+                not category_name
+                or not isinstance(name, str)
+                or not name
+                or name in seen[category_name]
+            ):
+                continue
+            playlist_classes[category_name].append(name)
+            seen[category_name].add(name)
+
+        if not any(playlist_classes.values()):
+            return {}
+        return playlist_classes
+
+    def _get_playlist_classes(self):
+        cached = getattr(self, "_playlist_classes_cache", None)
+        if cached is not None:
+            return cached
+        try:
+            parsed = self._parse_playlist_classes(self.playlist_catelogs())
+        except Exception as e:
+            log.warning("failed to fetch playlist categories: %s", e)
+            parsed = {}
+        self._playlist_classes_cache = parsed or {
+            category: list(items) for category, items in PLAYLIST_CLASSES.items()
+        }
+        return self._playlist_classes_cache
+
     # 歌单详情
     def playlist_songlist(self, playlist_id):
         path = "/api/v6/playlist/detail"
@@ -890,6 +979,10 @@ class NetEase:
             return {}
 
     def dig_info(self, data, dig_type):
+        if dig_type == "playlist_classes":
+            return list(self._get_playlist_classes())
+        if dig_type == "playlist_class_detail":
+            return list(self._get_playlist_classes().get(data, []))
         if not data:
             return []
         if dig_type == "cloud_songs":
@@ -965,12 +1058,6 @@ class NetEase:
 
         elif dig_type == "playlists" or dig_type == "top_playlists":
             return Parse.playlists(data)
-
-        elif dig_type == "playlist_classes":
-            return list(PLAYLIST_CLASSES.keys())
-
-        elif dig_type == "playlist_class_detail":
-            return PLAYLIST_CLASSES[data]
 
         elif dig_type == "djRadios":
             return data

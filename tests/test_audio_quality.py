@@ -1,4 +1,6 @@
-from NEMbox.api import Parse
+import pytest
+
+from NEMbox.api import Parse, is_supported_music_quality
 
 
 def test_parse_song_url_hides_lossless_bitrate():
@@ -16,6 +18,19 @@ def test_parse_song_url_hides_lossless_bitrate():
 
 def test_parse_song_url_keeps_mp3_bitrate():
     assert Parse.song_url({"id": 1, "url": "u", "br": 320000}) == ("u", "HD 320k")
+
+
+@pytest.mark.parametrize(
+    "quality",
+    [0, 1, 2, 3, 4, "0", "4", "standard", "exhigh", "lossless", "sky"],
+)
+def test_supported_music_quality_values(quality):
+    assert is_supported_music_quality(quality) is True
+
+
+@pytest.mark.parametrize("quality", ["", "vivid", "unknown", "5", -1, True, None])
+def test_unsupported_music_quality_values(quality):
+    assert is_supported_music_quality(quality) is False
 
 
 def test_parse_songs_keeps_duration_for_mpv_progress():

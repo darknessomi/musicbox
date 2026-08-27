@@ -12,7 +12,7 @@ from typing import Any
 import requests
 
 from . import __version__
-from .api import NetEase
+from .api import QUALITY_INPUTS, NetEase, is_supported_music_quality
 from .config import Config
 from .daemon import (
     is_daemon_running,
@@ -312,6 +312,19 @@ def cmd_song_info(api: NetEase, ctx: CliContext, args: argparse.Namespace) -> in
 
 
 def cmd_song_url(api: NetEase, ctx: CliContext, args: argparse.Namespace) -> int:
+    if args.quality is not None and not is_supported_music_quality(args.quality):
+        quality = args.quality.strip().lower()
+        message = (
+            "音质 vivid 需要 XEAPI，当前版本暂不支持"
+            if quality == "vivid"
+            else f"不支持的音质: {args.quality}"
+        )
+        return ctx.emit_err(
+            "invalid_args",
+            message,
+            "可用音质: " + "|".join(sorted(QUALITY_INPUTS)),
+            exit_code=EXIT_INVALID_ARGS,
+        )
     config = Config()
     old_quality = config.get("music_quality")
     if args.quality:
@@ -1073,7 +1086,7 @@ def _build_parser() -> MusicboxArgumentParser:
     p_song_url.add_argument("id", type=int, help="歌曲 ID")
     p_song_url.add_argument(
         "--quality",
-        default="",
+        default=None,
         help="音质: standard|higher|exhigh|lossless|hires 等",
     )
     p_song_url.set_defaults(handler="song_url")
