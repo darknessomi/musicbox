@@ -55,6 +55,26 @@ def playinfo_song_start(indented_startcol, prefix, quality):
     return indented_startcol + truelen(prefix + quality) + 2
 
 
+HELP_ITEM_FIRST_ROW = 9
+HELP_FOOTER_LINES = (
+    "NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存",
+    "按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~",
+    "Build with love to music by omi",
+)
+
+
+def help_footer_row(screen_rows: int) -> int:
+    """帮助页脚起始行。贴在终端底部，避免写死在第 20 行盖住列表。"""
+    footer_h = len(HELP_FOOTER_LINES)
+    if screen_rows <= footer_h:
+        return 0
+    return screen_rows - footer_h
+
+
+def help_item_row(index: int, offset: int) -> int:
+    return index - offset + HELP_ITEM_FIRST_ROW
+
+
 try:
     dbus: Any | None = importlib.import_module("dbus")
 except ImportError:
@@ -685,42 +705,33 @@ class Ui:
             self.screen.timeout(100)
 
         elif datatype == "help":
+            footer_row = help_footer_row(self.y)
+            footer_end = footer_row + len(HELP_FOOTER_LINES)
             for i in range(offset, min(len(datalist), offset + step)):
+                row = help_item_row(i, offset)
+                # page_length=0 时一页能放下很多行；页脚若仍写在 20–22 行会盖住中间条目。
+                if row >= self.y or footer_row <= row < footer_end:
+                    continue
+                entry = "{}. '{}{}   {}".format(
+                    i,
+                    (datalist[i][0] + "'").ljust(11),
+                    datalist[i][1].ljust(16),
+                    datalist[i][2],
+                )
                 if i == index:
                     self.addstr(
-                        i - offset + 9,
+                        row,
                         self.indented_startcol,
-                        "-> {}. '{}{}   {}".format(
-                            i,
-                            (datalist[i][0] + "'").ljust(11),
-                            datalist[i][1].ljust(16),
-                            datalist[i][2],
-                        ),
+                        "-> " + entry,
                         curses.color_pair(2),
                     )
                 else:
-                    self.addstr(
-                        i - offset + 9,
-                        self.startcol,
-                        "{}. '{}{}   {}".format(
-                            i,
-                            (datalist[i][0] + "'").ljust(11),
-                            datalist[i][1].ljust(16),
-                            datalist[i][2],
-                        ),
-                    )
+                    self.addstr(row, self.startcol, entry)
 
-            self.addstr(
-                20,
-                self.startcol,
-                "NetEase-MusicBox 基于Python，所有版权音乐来源于网易，本地不做任何保存",
-            )
-            self.addstr(
-                21,
-                self.startcol,
-                "按 [G] 到 Github 了解更多信息，帮助改进，或者Star表示支持~~",
-            )
-            self.addstr(22, self.startcol, "Build with love to music by omi")
+            for n, line in enumerate(HELP_FOOTER_LINES):
+                row = footer_row + n
+                if 0 <= row < self.y:
+                    self.addstr(row, self.startcol, line)
 
         self.screen.refresh()
 
