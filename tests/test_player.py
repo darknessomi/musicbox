@@ -1,6 +1,6 @@
 from unittest.mock import PropertyMock, patch
 
-from NEMbox.player import Player
+from NEMbox.player import Player, playback_reached_song_end
 
 
 def test_playing_id_is_none_without_current_song():
@@ -159,6 +159,111 @@ def test_advance_on_playback_failure_replays_when_next_song_differs():
     player._advance_on_playback_failure()
 
     assert replayed == [33894312]
+
+
+def test_playback_reached_song_end_rejects_trial_and_truncated_streams():
+    assert playback_reached_song_end(45, 240, True) is False
+    assert playback_reached_song_end(40, 200, False) is False
+    assert playback_reached_song_end(30, 0, True) is False
+
+
+def test_playback_reached_song_end_accepts_a_finished_track():
+    assert playback_reached_song_end(198, 200, False) is True
+    assert playback_reached_song_end(240, 240, True) is True
+    assert playback_reached_song_end(30, 0, False) is True
+
+
+def test_trial_eof_does_not_skip(monkeypatch):
+    player = _player_with_queue([1, 2], mode=Player.MODE_ORDERED_LOOP, idx=0)
+    player.songs["1"].update(
+        {
+            "duration": 240,
+            "free_trial": True,
+            "media_duration": 45,
+            "song_name": "trial",
+        }
+    )
+    player._incomplete_replay_id = None
+    advanced = []
+    player.next = lambda: advanced.append("next")
+    player.stop = lambda: None
+    monkeypatch.setattr("NEMbox.player.notify", lambda *_args, **_kwargs: None)
+
+    player._on_playback_eof(45)
+
+    assert advanced == []
+    assert player.playing_flag is False
+
+
+def test_full_eof_advances_queue():
+    player = _player_with_queue([1], mode=Player.MODE_ORDERED, idx=0)
+    player.songs["1"].update(
+        {"duration": 200, "free_trial": False, "song_name": "full"}
+    )
+    player._incomplete_replay_id = None
+    advanced = []
+    player.next = lambda: advanced.append("next")
+
+    player._on_playback_eof(198)
+
+    assert advanced == ["next"]
+
+
+def test_truncated_stream_replays_when_refresh_covers_the_song(monkeypatch):
+    player = _player_with_queue([1], idx=0)
+    song = player.songs["1"]
+    song.update(
+        {
+            "duration": 200,
+            "free_trial": False,
+            "media_duration": 40,
+            "song_name": "cut",
+        }
+    )
+    player._incomplete_replay_id = None
+    player.refresh_url_flag = False
+    started = []
+
+    def refresh():
+        song["free_trial"] = False
+        song["media_duration"] = 200
+        player.refresh_url_flag = True
+
+    player.refresh_urls = refresh
+    player.stop = lambda: None
+    player.start_playing = lambda _on_exit, args: started.append(args["media_duration"])
+    player.next = lambda: (_ for _ in ()).throw(AssertionError("next"))
+    monkeypatch.setattr("NEMbox.player.notify", lambda *_args, **_kwargs: None)
+
+    player._on_playback_eof(40)
+
+    assert started == [200]
+    assert player.playing_flag is True
+
+
+def test_truncated_stream_stops_when_refresh_is_still_a_trial(monkeypatch):
+    player = _player_with_queue([1, 2], idx=0)
+    song = player.songs["1"]
+    song.update({"duration": 200, "free_trial": False, "song_name": "cut"})
+    player._incomplete_replay_id = None
+    player.refresh_url_flag = False
+    started = []
+
+    def refresh():
+        song["free_trial"] = True
+        song["media_duration"] = 45
+        player.refresh_url_flag = True
+
+    player.refresh_urls = refresh
+    player.stop = lambda: None
+    player.start_playing = lambda *_args, **_kwargs: started.append("play")
+    player.next = lambda: started.append("next")
+    monkeypatch.setattr("NEMbox.player.notify", lambda *_args, **_kwargs: None)
+
+    player._on_playback_eof(40)
+
+    assert started == []
+    assert player.playing_flag is False
 
 
 def test_build_playinfo_rotates_quality_label(monkeypatch):

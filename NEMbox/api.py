@@ -134,6 +134,14 @@ LOSSLESS_LEVELS = {"lossless", "hires", "jymaster"}
 QUALITY_INPUTS = {str(quality) for quality in QUALITY_LEVEL_MAP} | QUALITY_LEVELS
 
 
+def _media_duration_seconds(url_info: dict[str, Any]) -> int:
+    """播放链接返回的 ``time`` 是媒体文件时长（毫秒），试听片段会远短于曲目。"""
+    try:
+        return max(int(url_info.get("time") or 0), 0) // 1000
+    except (TypeError, ValueError):
+        return 0
+
+
 def music_quality_to_level(quality):
     if isinstance(quality, str):
         normalized = quality.strip().lower()
@@ -272,6 +280,8 @@ class Parse:
                 "quality": quality,
                 "expires": song["expires"],
                 "get_time": song["get_time"],
+                "free_trial": bool(song.get("free_trial")),
+                "media_duration": int(song.get("media_duration") or 0),
             }
             song_info_list.append(song_info)
         return song_info_list
@@ -1030,6 +1040,8 @@ class NetEase:
                 s["level"] = urls[url_index].get("level", "")
                 s["expires"] = urls[url_index].get("expi", -1)
                 s["get_time"] = timestamp
+                s["free_trial"] = bool(urls[url_index].get("freeTrialInfo"))
+                s["media_duration"] = _media_duration_seconds(urls[url_index])
             return Parse.songs(sds)
 
         elif dig_type == "refresh_urls":
@@ -1047,6 +1059,8 @@ class NetEase:
                 song["level"] = url_info.get("level", "")
                 song["expires"] = url_info.get("expi", -1)
                 song["get_time"] = timestamp
+                song["free_trial"] = bool(url_info.get("freeTrialInfo"))
+                song["media_duration"] = _media_duration_seconds(url_info)
                 songs.append(song)
             return songs
 

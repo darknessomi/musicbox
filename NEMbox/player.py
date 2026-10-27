@@ -36,6 +36,27 @@ from .utils import notify
 
 log = logger.getLogger(__name__)
 
+# 曲目时长和实际播完位置允许的误差。网易试听片段通常只有 30–60 秒，
+# 远小于曲库里的完整时长；正常编码误差不会到这一档。
+_EARLY_END_SLACK_SECONDS = 15
+
+
+def playback_reached_song_end(
+    played_seconds: float, catalog_duration: int, free_trial: bool
+) -> bool:
+    """播放器报 EOF 时，判断这是完整曲目结束，还是试听/截断。"""
+    try:
+        played = float(played_seconds)
+    except (TypeError, ValueError):
+        played = 0.0
+    try:
+        catalog = int(catalog_duration or 0)
+    except (TypeError, ValueError):
+        catalog = 0
+    if free_trial and (catalog <= 0 or played + 3 < catalog):
+        return False
+    return catalog <= 0 or played + _EARLY_END_SLACK_SECONDS >= catalog
+
 
 class NullUi:
     """Headless UI stub for the daemon: every render call is a no-op.
@@ -78,6 +99,7 @@ class Player:
         self.playing_song_changed_callback: Callable[[], None] | None = None
         self.api = NetEase()
         self.playinfo_starts = time.time()
+        self._incomplete_replay_id = None
 
     @property
     def info(self) -> dict[str, Any]:
@@ -220,6 +242,10 @@ class Player:
                 self.songs[song_id]["level"] = song.get("level", "")
                 self.songs[song_id]["expires"] = song["expires"]
                 self.songs[song_id]["get_time"] = song["get_time"]
+                self.songs[song_id]["free_trial"] = bool(song.get("free_trial"))
+                self.songs[song_id]["media_duration"] = int(
+                    song.get("media_duration") or 0
+                )
             else:
                 self.songs[song_id] = song
         if not self.is_index_valid:
@@ -521,7 +547,7 @@ class Player:
         if not self.playing_flag or not self._is_current_playback(token, process):
             return
         if process.returncode == 0:
-            self.next()
+            self._on_playback_eof(self.process_location)
             return
         if expires >= 0 and get_time >= 0 and time.time() - expires - get_time >= 0:
             self.refresh_urls()
@@ -651,7 +677,65 @@ class Player:
                 self.stop()
                 self.playing_flag = False
             else:
-                self.next()
+                self._on_playback_eof(self.process_location)
+
+    def _on_playback_eof(self, played_seconds: float) -> None:
+        """区分正常结束和试听/断流。
+
+        试听 URL 本身只有几十秒，mpg123/mpv 会以正常 EOF（``@P 0`` / 退出码 0）
+        结束。旧逻辑一律 ``next()``，听起来就是歌曲没放完就切歌。
+        非试听但远早于曲目时长结束时，先刷新一次 URL；新链接能覆盖整曲才重播。
+        """
+        song = self.current_song or {}
+        catalog = int(song.get("duration") or 0)
+        free_trial = bool(song.get("free_trial"))
+        if playback_reached_song_end(played_seconds, catalog, free_trial):
+            self.next()
+            return
+
+        try:
+            played = float(played_seconds or 0)
+        except (TypeError, ValueError):
+            played = 0.0
+        if not free_trial and getattr(self, "_incomplete_replay_id", None) != (
+            self.playing_id
+        ):
+            self._incomplete_replay_id = self.playing_id
+            self.refresh_urls()
+            refreshed = self.current_song or {}
+            media = int(refreshed.get("media_duration") or 0)
+            if (
+                self.refresh_url_flag
+                and not refreshed.get("free_trial")
+                and media >= played + _EARLY_END_SLACK_SECONDS
+                and playback_reached_song_end(
+                    media, int(refreshed.get("duration") or 0), False
+                )
+            ):
+                self.stop()
+                self.playing_flag = True
+                self.refresh_url_flag = False
+                self.start_playing(lambda: 0, refreshed)
+                return
+            self.refresh_url_flag = False
+
+        self._stop_incomplete_track(played)
+
+    def _stop_incomplete_track(self, played_seconds: float) -> None:
+        song = self.current_song or {}
+        name = song.get("song_name") or "当前歌曲"
+        log.warning(
+            "track ended early id=%s name=%s played=%.1fs catalog=%s media=%s free_trial=%s",
+            self.playing_id,
+            name,
+            float(played_seconds or 0),
+            song.get("duration"),
+            song.get("media_duration"),
+            song.get("free_trial"),
+        )
+        notify(f"《{name}》在结束前停止（试听或链接中断），已取消自动切歌")
+        self.playing_flag = False
+        self.stop()
 
     def download_lyric(self, is_transalted=False):
         key = "lyric" if not is_transalted else "tlyric"
