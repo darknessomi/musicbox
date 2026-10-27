@@ -177,7 +177,11 @@ class Menu:
         self.djstack: list[Any] = []
         self.at_playing_list = False
         self.enter_flag = True
+        # SIGWINCH/SIGCONT 里不能碰 curses。只记标志，回到按键循环再恢复终端。
+        self._winch_pending = False
         signal.signal(signal.SIGWINCH, self.change_term)
+        if hasattr(signal, "SIGCONT"):
+            signal.signal(signal.SIGCONT, self.change_term)
         signal.signal(signal.SIGINT, self.send_kill)
         signal.signal(signal.SIGTERM, self.send_kill)
         self.menu_starts = time.time()
@@ -317,8 +321,21 @@ class Menu:
         return self.api.dig_info(datalist, category)
 
     def change_term(self, signum, frame):
-        self.ui.screen.clear()
-        self.ui.screen.refresh()
+        # 休眠恢复或终端尺寸变化时，终端模拟器常会发 SIGWINCH，从作业控制恢复会发 SIGCONT。
+        # 在信号处理函数里调用 curses 会和主循环的 getch 抢同一把锁，界面卡死而 mpg123 继续响。
+        self._winch_pending = True
+
+    def _restore_terminal_after_signal(self):
+        if not self._winch_pending:
+            return
+        self._winch_pending = False
+        try:
+            C.endwin()
+            self.screen.keypad(True)
+            self.screen.refresh()
+            self.ui.update_size()
+        except C.error:
+            log.warning("failed to restore terminal after signal")
 
     def send_kill(self, signum, fram):
         stop_lyrics_process()
@@ -663,6 +680,7 @@ class Menu:
         next(self.parser)  # start generator
         next(erase_coro)
         while not self.quit:
+            self._restore_terminal_after_signal()
             datatype = self.datatype
             title = self.title
             datalist = self.datalist

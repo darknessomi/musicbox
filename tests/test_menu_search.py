@@ -1,4 +1,6 @@
-from NEMbox.menu import _item_search_text, _prepare_search_items
+import signal
+
+from NEMbox.menu import Menu, _item_search_text, _prepare_search_items
 
 
 def test_prepare_search_items_handles_string_entries():
@@ -30,3 +32,54 @@ def test_item_search_text_includes_song_fields():
 
 def test_item_search_text_falls_back_to_string():
     assert _item_search_text("华语榜") == "华语榜"
+
+
+def test_resize_signal_only_sets_a_flag():
+    menu = Menu.__new__(Menu)
+    menu._winch_pending = False
+    touched: list[str] = []
+
+    class Screen:
+        def clear(self):
+            touched.append("clear")
+
+        def refresh(self):
+            touched.append("refresh")
+
+    class Ui:
+        def __init__(self):
+            self.screen = Screen()
+
+    menu.ui = Ui()
+
+    menu.change_term(signal.SIGWINCH, None)
+
+    assert menu._winch_pending is True
+    assert touched == []
+
+
+def test_restore_terminal_runs_on_the_main_loop(monkeypatch):
+    menu = Menu.__new__(Menu)
+    menu._winch_pending = True
+    calls: list[object] = []
+
+    class Screen:
+        def keypad(self, enabled):
+            calls.append(("keypad", enabled))
+
+        def refresh(self):
+            calls.append("refresh")
+
+    class Ui:
+        def update_size(self):
+            calls.append("update_size")
+
+    menu.screen = Screen()
+    menu.ui = Ui()
+    monkeypatch.setattr("NEMbox.menu.C.endwin", lambda: calls.append("endwin"))
+
+    menu._restore_terminal_after_signal()
+    menu._restore_terminal_after_signal()
+
+    assert calls == ["endwin", ("keypad", True), "refresh", "update_size"]
+    assert menu._winch_pending is False
