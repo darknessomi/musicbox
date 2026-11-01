@@ -922,7 +922,7 @@ class Ui:
             return
         self.x, self.y = x, y
 
-        # update intendations
+        # update indentations
         curses.resizeterm(self.y, self.x)
         self.update_margin()
         self.update_space()
