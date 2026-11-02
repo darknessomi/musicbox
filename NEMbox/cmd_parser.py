@@ -74,7 +74,7 @@ def erase_coroutine(erase_cmd_list):
 def parse_keylist(keylist):
     """
     '2' '3' '4' 'j'  ----> 234 j
-    supoort keys  [  ]   j  k  <KEY_UP> <KEY_DOWN>
+    support keys  [  ]   j  k  <KEY_UP> <KEY_DOWN>
     """
     keylist = deepcopy(keylist)
     if keylist == []:

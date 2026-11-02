@@ -33,7 +33,7 @@ class scrollstring:
 def truelen(string):
     """
     It appears one Asian character takes two spots, but __len__
-    counts it as three, so this function counts the dispalyed
+    counts it as three, so this function counts the displayed
     length of the string.
 
     >>> truelen('abc')
